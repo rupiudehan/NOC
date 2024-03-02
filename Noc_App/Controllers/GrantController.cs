@@ -61,7 +61,8 @@ namespace Noc_App.Controllers
                 OwnerType = new SelectList(ownerType, "Id", "Name"),
                 Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
-                SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name")
+                SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
+                Owners = new List<OwnerViewModelCreate> { new OwnerViewModelCreate { Name = "", Address = "",MobileNo="",Email="" } }
             };
 
             return View(viewModel);

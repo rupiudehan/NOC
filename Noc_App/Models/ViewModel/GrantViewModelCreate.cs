@@ -72,7 +72,7 @@ namespace Noc_App.Models.ViewModel
         [Required]
         [Display(Name = "Authorization Letter")]
         public IFormFile AuthorizationLetterPhoto { get; set; }
-        public List<OwnerDetails> Owners { get; set; }
+        public List<OwnerViewModelCreate> Owners { get; set; }
         [Required]
         [Display(Name = "NOC Permission Type")]
         public int SelectedNocPermissionTypeID { get; set; }
@@ -84,7 +84,7 @@ namespace Noc_App.Models.ViewModel
         public bool IsExtension { get; set; }
         [Display(Name = "NOC Number")]
         public string NocNumber { get; set; }
-        [Display(Name = "Previous Date")]
+        [Display(Name = "Date")]
         public DateTime PreviousDate { get; set; }
         public bool IsConfirmed { get; set; }
         public string ApplicationID { get; set; }
