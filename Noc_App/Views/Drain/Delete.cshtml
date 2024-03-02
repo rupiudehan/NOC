@@ -1,0 +1,73 @@
+﻿
+@model DrainDetails
+@{
+    ViewBag.Title = "Delete Drain Detail";
+}
+<h1 class="h3 mb-4 text-gray-800">Delete Drain Detail</h1>
+
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Delete</h6>
+            </div>
+            <div class="card-body">
+                <h4>Are you sure you want to delete this drain detail?</h4>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+                    <!-- Include other properties as needed -->
+                </dl>
+
+                <form asp-action="Delete" asp-controller="Drain" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <button type="submit" class="btn btn-danger btn-user btn-block">Delete</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <a class="btn btn-secondary btn-user btn-block" asp-controller="Drain" asp-action="Index">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<h2>Delete Drain</h2>
+
+<p>Are you sure you want to delete this drain?</p>
+
+<h3>Name: @Model.Name</h3>
+
+<h3>Coordinates</h3>
+<div>
+    @foreach (var coordinate in Model.DrainCoordinates)
+    {
+        <div>Latitude: @coordinate.Latitude, Longitude: @coordinate.Longitude</div>
+    }
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</form>

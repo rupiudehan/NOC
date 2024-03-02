@@ -1,0 +1,161 @@
+﻿@model RegisterEmployeeViewModelEdit
+@{
+    ViewBag.Title = "Edit User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<h1 class="h3 mb-4 text-gray-800">Edit User</h1>
+
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Edit</h6>
+                <input hidden asp-for="Id" />
+            </div>
+            <div class="card-body">
+                <form class="user" asp-action="Edit" asp-controller="Account" method="post">
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control form-control-user" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SelectedRole" class="control-label">Role</label>
+                        <select asp-for="SelectedRole" asp-items="@Model.Roles" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="SelectedRole" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SelectedDivisionId" class="control-label">Division</label>
+                        <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
+                        <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivision" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        @* <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span> *@
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
+                        <select asp-for="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        @* <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span> *@
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SelectedVillageId" class="control-label">Village</label>
+                        <select asp-for="SelectedVillageId" asp-items="@Model.Village" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        @* <span asp-validation-for="SelectedVillageId" class="text-danger"></span> *@
+                    </div>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <button type="submit" class="btn btn-primary btn-user btn-block">Update</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <a class="btn btn-secondary btn-user btn-block" asp-controller="Account" asp-action="List">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+
+
+</div>
+@section Scripts {
+    <script>
+        function populateDropdown(data, dropdownId) {
+            var dropdown = $("#Selected" + dropdownId);
+            dropdown.html('<option value="">Select</option>');
+            $.each(data, function (key, value) {
+                dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
+            });
+        }
+        $(document).ready(function () {
+            $("#SelectedDivisionId").change(function () {
+                var divisionId = $(this).val();
+                $.ajax({
+                    url: "/Account/GetSubDivisions",
+                    type: "POST",
+                    data: { divisionId: divisionId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "SubDivisionId");
+                        var dropdownlistTehsil = $("#SelectedTehsilBlockId");
+                        dropdownlistTehsil.empty();
+                        var dropdownlistVillage = $("#SelectedVillageId");
+                        dropdownlistVillage.empty();
+                        dropdownlistTehsil.html('<option value="">Select</option>');
+                        dropdownlistVillage.html('<option value="">Select</option>');
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+
+            $("#SelectedSubDivisionId").change(function () {
+                var subDivisionId = $(this).val();
+                $.ajax({
+                    url: "/Account/GetTehsilBlocks",
+                    type: "POST",
+                    data: { subDivisionId: subDivisionId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "TehsilBlockId");
+                        var dropdownlistVillage = $("#SelectedVillageId");
+                        dropdownlistVillage.empty();
+                        dropdownlistVillage.html('<option value="">Select</option>');
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+
+
+            $("#SelectedTehsilBlockId").change(function () {
+                var tehsilBlockId = $(this).val();
+                $.ajax({
+                    url: "/Account/GetVillagess",
+                    type: "POST",
+                    data: { tehsilBlockId: tehsilBlockId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "VillageId");
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+        });
+    </script>
+}
+

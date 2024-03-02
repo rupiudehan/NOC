@@ -1,0 +1,40 @@
+﻿@model RoleViewModelCreate;
+@{
+    ViewBag.Title = "Create Roles";
+}
+
+<h1 class="h3 mb-4 text-gray-800">Create Role</h1>
+
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Create</h6>
+            </div>
+            <div class="card-body">
+                <form class="user" asp-controller="Administration" asp-action="CreateRole" method="post">
+                    <div class="form-group">
+                        <input asp-for="RoleName" class="form-control form-control-user" placeholder="Role Name">
+                        <span asp-validation-for="RoleName" class="text-danger"></span>
+                    </div>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <button type="submit" class="btn btn-primary btn-user btn-block">Create</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <a class="btn btn-secondary btn-user btn-block" asp-controller="Administration" asp-action="List">Back to List</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    
+
+</div>

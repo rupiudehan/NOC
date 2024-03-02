@@ -1,0 +1,90 @@
+﻿@model TehsilBlockViewModelEdit
+@{
+    ViewBag.Title = "Edit Tehsil/Block";
+}
+
+
+<h1 class="h3 mb-4 text-gray-800">Edit Tehsil/Block</h1>
+
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Edit</h6>
+            </div>
+            <div class="card-body">
+                <form class="user" asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-group">
+                        <label asp-for="SelectedDivisionId" class="control-label">Division</label>
+                        <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
+                        <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivisions" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control form-control-user" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <button type="submit" class="btn btn-primary btn-user btn-block">Update</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <a class="btn btn-secondary btn-user btn-block" asp-controller="TehsilBlock" asp-action="List">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+
+</div>
+
+@section  Scripts {
+    <script>
+        function populateDropdown(data, dropdownId) {
+            var dropdown = $("#Selected" + dropdownId);
+            dropdown.html('<option value="">Select</option>');
+            $.each(data, function (key, value) {
+                console.log(value);
+                dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
+            });
+        }
+        $(document).ready(function () {
+            $("#SelectedDivisionId").change(function () {
+                var divisionId = $(this).val();
+                $.ajax({
+                    url: "/TehsilBlock/GetSubDivisions",
+                    type: "POST",
+                    data: { divisionId: divisionId },
+                    success: function (data) {
+                        populateDropdown(data, "SubDivisionId");
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,426 @@
+﻿@model GrantViewModelCreate
+@{
+    ViewBag.Title = "Apply For Grant of NOC";
+}
+<h1 class="h3 mb-4 text-gray-800">Apply</h1>
+<div class="row">
+
+    <div class="col-lg-12">
+
+        <!-- Circle Buttons -->
+        <form class="user" asp-action="Create" asp-controller="Grant" method="post">
+            <div class="card shadow mb-4">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Project Details</h6>
+                        </div>
+                        <div class="card-body">
+                            @* <div class="row"> *@
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label"></label>
+                                <input asp-for="Name" class="form-control form-control-user" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SiteAreaOrSizeInFeet" class="control-label"></label>
+                                <input asp-for="SiteAreaOrSizeInFeet" class="form-control form-control-user" />
+                                <span asp-validation-for="SiteAreaOrSizeInFeet" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SiteAreaOrSizeInInches" class="control-label"></label>
+                                <input asp-for="SiteAreaOrSizeInInches" class="form-control form-control-user" />
+                                <span asp-validation-for="SiteAreaOrSizeInInches" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SelectedProjectTypeId" class="control-label">Project Type</label>
+                                <select asp-for="SelectedProjectTypeId" asp-items="@Model.ProjectType" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SelectedProjectTypeId" class="text-danger"></span>
+                            </div>
+                            @* </div> *@
+                        </div>
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">GPS Coordinates Of Site</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="Latitude" class="control-label"></label>
+                                <input asp-for="Latitude" class="form-control form-control-user" />
+                                <span asp-validation-for="Latitude" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Longitute" class="control-label"></label>
+                                <input asp-for="Longitute" class="form-control form-control-user" />
+                                <span asp-validation-for="Latitude" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Address Details of Site</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="Khasra" class="control-label"></label>
+                                <input asp-for="Khasra" class="form-control form-control-user" />
+                                <span asp-validation-for="Khasra" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Hadbast" class="control-label"></label>
+                                <input asp-for="Hadbast" class="form-control form-control-user" />
+                                <span asp-validation-for="Hadbast" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="PlotNo" class="control-label"></label>
+                                <input asp-for="PlotNo" class="form-control form-control-user" />
+                                <span asp-validation-for="PlotNo" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SelectedDivisionId" class="control-label">Division</label>
+                                <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
+                                <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivision" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
+                                <select asp-for="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="SelectedVillageID" class="control-label">Village</label>
+                                <select asp-for="SelectedVillageID" asp-items="@Model.Village" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SelectedVillageID" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Pin Code</label>
+                                <label asp-for="Pincode" class="form-control form-control-user">@Model.Pincode</label>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="AddressProofPhoto" class="control-label"></label>
+                                <div class="custom-file1">
+                                    <input asp-for="AddressProofPhoto" class="form-control custom-file-input1" />
+                                    @* <label class="custom-file-label1">Choose File...</label> *@
+                                    <span asp-validation-for="AddressProofPhoto" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="ApplicantName" class="control-label"></label>
+                                <input asp-for="ApplicantName" class="form-control form-control-user" />
+                                <span asp-validation-for="ApplicantName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ApplicantEmailID" class="control-label"></label>
+                                <input asp-for="ApplicantEmailID" class="form-control form-control-user" />
+                                <span asp-validation-for="ApplicantEmailID" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="IDProofPhoto" class="control-label"></label>
+                                <div class="custom-file3">
+                                    <input asp-for="IDProofPhoto" class="form-control custom-file-input3" />
+                                    @* <label class="custom-file-label">Choose File...</label> *@
+                                    <span asp-validation-for="IDProofPhoto" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="AuthorizationLetterPhoto" class="control-label">
+                                    Authorization Letter (Attach in case
+                                    application is to be filled
+                                    by person other than
+                                    owner)
+                                </label>
+                                <div class="custom-file2">
+                                    <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" />
+                                    @* <label class="custom-file-label2">Choose File...</label> *@
+                                    <span asp-validation-for="AuthorizationLetterPhoto" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Types of Permissions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label asp-for="SelectedNocPermissionTypeID" class="control-label">NOC Permission Type</label>
+                                <select asp-for="SelectedNocPermissionTypeID" asp-items="@Model.NocPermissionType" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SelectedNocPermissionTypeID" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input hidden asp-for="IsExtension" />
+                                <label asp-for="SelectedNocTypeId" class="control-label">NOC Type</label>
+                                <select asp-for="SelectedNocTypeId" asp-items="@Model.NocType" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SelectedNocTypeId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="NocNumber" class="control-label"></label>
+                                <input asp-for="NocNumber" class="form-control form-control-user" />
+                                <span asp-validation-for="NocNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="PreviousDate" class="control-label">Date</label>
+                                <input asp-for="PreviousDate" class="form-control form-control-user" />
+                                <span asp-validation-for="PreviousDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Details of Owners/Partners/Chief Executive/Full Time Directors</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <table id="ownerTable" class="table">
+                            <thead>
+                                <tr>
+                                    @* <th>#</th> *@
+                                    <th>OwnerType</th>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Mobile Number</th>
+                                    <th>Email</th>
+                                    <!-- Add more columns as needed -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="owner-entry">
+                                    @* <td>1</td> *@
+                                    <td>
+                                        <select asp-for="SelectedOwnerTypeID" asp-items="@Model.OwnerType" class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                        <span asp-validation-for="SelectedOwnerTypeID" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input type="text" asp-for=Owners[0].Name class="form-control" placeholder="Owner Name" />
+                                        <span asp-validation-for="Owners[0].Name" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input type="text" asp-for=Owners[0].Address class="form-control" placeholder="Address" />
+                                        <span asp-validation-for="Owners[0].Address" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input type="text" asp-for=Owners[0].MobileNo class="form-control" placeholder="Mobile No." />
+                                        <span asp-validation-for="Owners[0].MobileNo" class="text-danger"></span>
+                                    </td>
+                                    <td>
+                                        <input type="text" asp-for=Owners[0].Email class="form-control" placeholder="Email" />
+                                        <span asp-validation-for="Owners[0].Email" class="text-danger"></span>
+                                    </td>
+
+                                    <!-- Render more columns as needed -->
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                    <div class="row col-sm-2 offset-sm-10">
+                        <button type="button" class="btn btn-success" id="addMoreBtn">Add More</button>
+                    </div>
+                    <div class="row">
+                        <input type="checkbox" asp-for="IsConfirmed"  />
+                        <label asp-for="IsConfirmed">
+                            I / We confirm that the information furnished
+                            herewith is correct to the best of my/our
+                            knowledge and nothing has been concealed
+                            therein. The Government would be at liberty
+                            to take suitable action against the
+                            unit/project and the person(s) responsible
+                            who failed to comply with the provisions of
+                            the Law. Rules, Regulations & Directions in
+                            case the information /Documents are found
+                            to be incorrect /false/misleading the
+                            government may withdraw the NOC issued
+                            for the project
+                        </label>
+                    </div>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-lg-4 offset-lg-4">
+                            <button type="submit" class="btn btn-primary btn-user btn-block">Submit</button>
+                        </div>
+                        @* <div class="col-lg-6">
+                            <a class="btn btn-secondary btn-user btn-block" asp-controller="Grant" asp-action="List">Back to List</a> 
+                        </div> *@
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+
+</div>
+
+
+
+
+@* <div id="partialContainer"></div> *@
+@section Scripts {
+    <script>
+        document.getElementById("SelectedNocTypeId").addEventListener("change", function () {
+            var selectedText = this.options[this.selectedIndex].text;
+            console.log("Selected Item's Text: " + selectedText);
+        });
+        $(function () {
+            $('.custom-file-input3').on('change', function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label3').html(fileName);
+            });
+            $('.custom-file-input1').on('change', function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label1').html(fileName);
+            });
+            $('.custom-file-input2').on('change', function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label2').html(fileName);
+            });
+        });
+    </script>
+    <script>
+        var ownerIndex = 1;
+
+        $("#addMoreBtn").on("click", function () {
+            var newEntry = $(".owner-entry:first").clone();
+            newEntry.find("input").each(function () {
+                var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
+                $(this).attr("name", name);
+                $(this).val("");
+            });
+            ownerIndex++;
+            $("#ownerTable tbody").append(newEntry);
+        });
+
+        function deleteRow(button) {
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+    </script>
+    <script>
+        <script>
+            function populateDropdown(data, dropdownId) {
+                var dropdown = $("#Selected" + dropdownId);
+                dropdown.html('<option value="">Select</option>');
+                $.each(data, function (key, value) {
+                    dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
+                });
+            }
+        $(document).ready(function () {
+            $("#SelectedVillageID").change(function () {
+                var villageId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetVillageDetail",
+                    type: "POST",
+                    data: { villageId: villageId },
+                    async: false,
+                    success: function (data) {
+                        console.log(data);
+                        $.each(data, function (key, value) {
+                            // dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
+                        });
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+            $("#SelectedDivisionId").change(function () {
+                var divisionId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetSubDivisions",
+                    type: "POST",
+                    data: { divisionId: divisionId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "SubDivisionId");
+                        var dropdownlistTehsil = $("#SelectedTehsilBlockId");
+                        dropdownlistTehsil.empty();
+                        var dropdownlistVillage = $("#SelectedVillageId");
+                        dropdownlistVillage.empty();
+                        dropdownlistTehsil.html('<option value="">Select</option>');
+                        dropdownlistVillage.html('<option value="">Select</option>');
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+
+            $("#SelectedSubDivisionId").change(function () {
+                var subDivisionId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetTehsilBlocks",
+                    type: "POST",
+                    data: { subDivisionId: subDivisionId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "TehsilBlockId");
+                        var dropdownlistVillage = $("#SelectedVillageId");
+                        dropdownlistVillage.empty();
+                        dropdownlistVillage.html('<option value="">Select</option>');
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+
+
+            $("#SelectedTehsilBlockId").change(function () {
+                var tehsilBlockId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetVillagess",
+                    type: "POST",
+                    data: { tehsilBlockId: tehsilBlockId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "VillageID");
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+        });
+    </script>
+}

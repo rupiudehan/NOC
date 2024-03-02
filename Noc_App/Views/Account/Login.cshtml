@@ -1,0 +1,34 @@
+﻿@model LoginViewModel;
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Account/_AccountLayout.cshtml";
+}
+
+<div class="col-lg-12">
+    <div class="p-5">
+        <div class="text-center">
+            <h1 class="h4 text-gray-900 mb-4">Login</h1>
+        </div>
+        <form class="user" asp-controller="Account" asp-action="Login" method="post">
+            <div class="form-group">
+                <input asp-for="Email" class="form-control form-control-user" placeholder="Enter Email Address...">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group ">
+                <input asp-for="Password" class="form-control form-control-user" placeholder="Password">
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="col-lg-4  offset-lg-4">
+                <button type="submit" class="btn btn-primary btn-user btn-block">Login</button>
+            </div>
+        </form>
+        <hr>
+        @* <div class="text-center">
+            <a class="small" href="forgot-password.html">Forgot Password?</a>
+        </div> *@
+        @* <div class="text-center">
+            <a class="small" asp-action="Register" asp-controller="Account">Create an Account!</a>
+        </div> *@
+    </div>
+</div>
+

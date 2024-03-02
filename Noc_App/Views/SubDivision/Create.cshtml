@@ -1,0 +1,52 @@
+﻿@model SubDivisionViewModelCreate
+@{
+    ViewBag.Title = "Create Sub-Division";
+}
+
+
+
+<h1 class="h3 mb-4 text-gray-800">Create Sub-Division</h1>
+
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Create</h6>
+            </div>
+            <div class="card-body">
+                <form class="user" asp-action="Create" method="post">
+                    <div class="form-group">
+                        <label asp-for="SelectedDivisionId" class="control-label">Division</label>
+                        <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control form-control-user" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <button type="submit" class="btn btn-primary btn-user btn-block">Create</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <a class="btn btn-secondary btn-user btn-block" asp-controller="SubDivision" asp-action="List">Back to List</a>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+
+
+</div>
+

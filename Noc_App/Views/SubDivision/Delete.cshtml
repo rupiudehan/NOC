@@ -1,0 +1,58 @@
+﻿@model SubDivisionDetails
+@{
+    ViewBag.Title = "Delete Sub-Division";
+}
+<h1 class="h3 mb-4 text-gray-800">Delete Sub-Division</h1>
+
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Delete</h6>
+            </div>
+            <div class="card-body">
+                <h4>Are you sure you want to delete this sub-division?</h4>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        Division
+                        @* @Html.DisplayNameFor(model => model.Division.Name) *@
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Division.Name)
+                    </dd>
+                    <!-- Include other properties as needed -->
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+                    <!-- Include other properties as needed -->
+                </dl>
+
+                <form asp-action="Delete" asp-controller="SubDivision" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <button type="submit" class="btn btn-danger btn-user btn-block">Delete</button>
+                        </div>
+                        <div class="col-lg-6">
+                            <a class="btn btn-secondary btn-user btn-block" asp-controller="SubDivision" asp-action="List">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
