@@ -7,9 +7,14 @@ namespace Noc_App.Models.ViewModel
     {
         public int OwnerTypeId { get; set; }
         public IEnumerable<SelectListItem> OwnerType { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
+        [MaxLength(250, ErrorMessage = "Address cannot exceed 250 characters")]
         public string Address { get; set; }
+        [Required]
         public string MobileNo { get; set; }
+        [Required]
         [RegularExpression(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", ErrorMessage = "Invalid Email Format")]
         public string Email { get; set; }
     }

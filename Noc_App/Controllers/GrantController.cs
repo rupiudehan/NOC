@@ -7,6 +7,7 @@ using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto;
 
 namespace Noc_App.Controllers
 {
@@ -62,7 +63,10 @@ namespace Noc_App.Controllers
                 Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
                 SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
-                Owners = new List<OwnerViewModelCreate> { new OwnerViewModelCreate { Name = "", Address = "",MobileNo="",Email="" } }
+                Owners = new List<OwnerViewModelCreate> { new OwnerViewModelCreate { Name = "", Address = "",MobileNo="",Email="" } },
+                IsOtherTypeSelected=false,
+                IsConfirmed=false,
+                IsExtension=false
             };
 
             return View(viewModel);
@@ -72,54 +76,129 @@ namespace Noc_App.Controllers
         [Obsolete]
         public async Task<IActionResult> Create(GrantViewModelCreate model)
         {
-            if (ModelState.IsValid)
-            {
-                string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto,"IDProof");
-                string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
-                string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
-                GrantDetails obj = new GrantDetails
-                {
-                    Name = model.Name,
-                    SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
-                    SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
-                    IDProofPhotoPath = uniqueIDProofFileName,
-                    AddressProofPhotoPath = uniqueAddressProofFileName,
-                    AuthorizationLetterPhotoPath = uniqueAuthLetterFileName,
-                    VillageID = model.SelectedVillageID,
-                    ProjectTypeId = model.SelectedProjectTypeId,
-                    Khasra = model.Khasra,
-                    Hadbast = model.Hadbast,
-                    PlotNo = model.PlotNo,
-                    Latitude = model.Latitude,
-                    Longitute = model.Longitute,
-                    ApplicantName = model.ApplicantName,
-                    ApplicantEmailID=model.ApplicantEmailID,
-                    NocPermissionTypeID=model.SelectedNocPermissionTypeID,
-                    NocTypeId=model.SelectedNocTypeId,
-                    IsExtension = model.IsExtension,
-                    NocNumber=model.NocNumber,
-                    PreviousDate = model.PreviousDate,
-                    IsConfirmed = model.IsConfirmed,
-                    ApplicationID = model.ApplicationID,
-                    CreatedOn=DateTime.Now
-                };
-                await _repo.CreateAsync(obj);
-                return RedirectToAction("Index", "Home");
-            }
+            bool isValid = true;
+            var divisions = _divisionRepo.GetAll();
+            var projectType = _projectTypeRepo.GetAll();
+            var nocPermission = _nocPermissionTypeRepo.GetAll();
+            var nocType = _nocTypeRepo.GetAll();
+            var ownerType = _ownerTypeRepo.GetAll();
+            var subDivision = _subDivisionRepo.GetAll();
+            var filteredSubdivisions = subDivision.Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
+            
+            
             var viewModel = new GrantViewModelCreate
             {
                 Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
-                SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
-                Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name"),
-                ProjectType = new SelectList(_projectTypeRepo.GetAll(), "Id", "Name"),
-                NocPermissionType = new SelectList(_divisionRepo.GetAll(), "Id", "Name"),
-                NocType = new SelectList(_divisionRepo.GetAll(), "Id", "Name"),
-                OwnerType = new SelectList(_ownerTypeRepo.GetAll(), "Id", "Name")
+                SubDivision = new SelectList(filteredSubdivisions, "Id", "Name"),// new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
+                Divisions = new SelectList(divisions, "Id", "Name"),
+                ProjectType = new SelectList(projectType, "Id", "Name"),
+                NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
+                NocType = new SelectList(nocType, "Id", "Name"),
+                OwnerType = new SelectList(ownerType, "Id", "Name"),
+                Owners = model.Owners
             };
+            string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto, "IDProof");
+            string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
+            string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
+            if (model.SiteAreaOrSizeInInches <= 0 && model.SiteAreaOrSizeInFeet<=0 && model.IDProofPhoto!=null && model.AddressProofPhoto!=null && model.AuthorizationLetterPhoto!=null
+                && model.SelectedVillageID<=0 && model.SelectedProjectTypeId <= 0 && model.SelectedNocPermissionTypeID <= 0 && model.Latitude <= 0 && model.Longitute <= 0 && model.ApplicantName!=null
+                && model.ApplicantEmailID!=null && model.SelectedNocTypeId<=0 && model.IsConfirmed
+                )
+            {
+                if(model.IsExtension)
+                {
+                    if (model.NocNumber == null) isValid = false;
+                    if (model.PreviousDate.ToString()== "1/1/0001 12:00:00 AM") { isValid = false; }
+                    if (!isValid)
+                    {
+                        ModelState.AddModelError("", $"NOC Number and Date are required to fill");
 
+                        return View(viewModel);
+                    }
+                }
+                if (model.Khasra == null && model.Hadbast==null && model.PlotNo==null)
+                {
+                    isValid = false;
 
-            return View(viewModel);
+                    ModelState.AddModelError("", $"Atleast one field is required to fill out of Khasra/Hadbast/Plot No.");
+
+                    return View(viewModel);
+                }
+                if (model.IsOtherTypeSelected)
+                {
+                    if (model.OtherProjectTypeDetail == null)
+                    {
+                        isValid = false;
+                        ModelState.AddModelError("", $"Other Detail is required to fill");
+
+                        return View(viewModel);
+                    }
+                }
+                if (isValid)
+                {
+
+                    string inputString = string.Empty;
+                    var grant = _repo.GetAll();
+                    if (grant != null && grant.Count() > 0)
+                    {
+                        int grantId = Convert.ToInt32((from g in grant
+                                                       select new { id = g.Id }
+                                    ).Max());
+                        var specificGrant = await _repo.GetByIdAsync(grantId);
+                        int extractedNumber = Convert.ToInt32(ExtractNumber(specificGrant.ApplicationID)) + 1;
+                        inputString = "GNT" + extractedNumber.ToString();
+                    }
+                    else inputString = "GNT1";
+
+                    model.ApplicationID = inputString;
+
+                    GrantDetails obj = new GrantDetails
+                    {
+                        Name = model.Name,
+                        SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
+                        SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
+                        IDProofPhotoPath = uniqueIDProofFileName,
+                        AddressProofPhotoPath = uniqueAddressProofFileName,
+                        AuthorizationLetterPhotoPath = uniqueAuthLetterFileName,
+                        VillageID = model.SelectedVillageID,
+                        ProjectTypeId = model.SelectedProjectTypeId,
+                        Khasra = model.Khasra,
+                        Hadbast = model.Hadbast,
+                        PlotNo = model.PlotNo,
+                        Latitude = model.Latitude,
+                        Longitute = model.Longitute,
+                        ApplicantName = model.ApplicantName,
+                        ApplicantEmailID = model.ApplicantEmailID,
+                        NocPermissionTypeID = model.SelectedNocPermissionTypeID,
+                        NocTypeId = model.SelectedNocTypeId,
+                        IsExtension = model.IsExtension,
+                        NocNumber = model.NocNumber,
+                        PreviousDate = model.PreviousDate,
+                        IsConfirmed = model.IsConfirmed,
+                        ApplicationID = model.ApplicationID,
+                        CreatedOn = DateTime.Now
+                    };
+                    await _repo.CreateAsync(obj);
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+
+                    ModelState.AddModelError("", $"All fields are required");
+
+                    return View(viewModel);
+                }
+            }
+            else
+            {               
+
+                ModelState.AddModelError("", $"All fields are required");
+
+                return View(viewModel);
+            }
+            
+
         }
         
 
@@ -148,7 +227,7 @@ namespace Noc_App.Controllers
         {
             var user = await _repo.GetAll().AnyAsync(x=>x.ApplicantEmailID == applicantEmailID);
 
-            if (user)
+            if (!user)
             {
                 return Json(true);
             }
@@ -158,21 +237,13 @@ namespace Noc_App.Controllers
             }
         }
 
-        //[AcceptVerbs("Get", "Post")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> IsEmailUnique(string email, string id)
-        //{
-        //    var user =null ;// await userManager.FindByEmailAsync(email);
+        private string ExtractNumber(string inputString)
+        {
+            // Use LINQ to filter out non-numeric characters and create a new string.
+            string numericPart = new string(inputString.Where(c => Char.IsDigit(c)).ToArray());
 
-        //    if (user != null && user.Id != id)
-        //    {
-        //        return Json($"Email {email} is already in use");
-        //    }
-        //    else
-        //    {
-        //        return Json(true);
-        //    }
-        //}
+            return numericPart;
+        }
 
         [HttpPost]
         public IActionResult GetSubDivisions(int divisionId)
@@ -193,7 +264,7 @@ namespace Noc_App.Controllers
         public IActionResult GetVillagess(int tehsilBlockId)
         {
             var village = _villageRpo.GetAll().Where(c => c.TehsilBlockId == tehsilBlockId).ToList();
-            return Json(new SelectList(village, "Id", "VillageName"));
+            return Json(new SelectList(village, "Id", "Name"));
         }
 
 

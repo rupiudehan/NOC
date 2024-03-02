@@ -89,6 +89,9 @@ namespace Noc_App.Controllers
                         DrainCoordinatesDetails location = new DrainCoordinatesDetails();
                         location.Latitude = d.Latitude;
                         location.Longitude = d.Longitude;
+                        location.CreatedBy = userid;
+                        location.CreatedOn=DateTime.Now;
+                        location.IsActive = true;
                         locationList.Add(location);
                     }
                     //if (obj.DrainCoordinates != null && obj.DrainCoordinates.Any())
@@ -140,7 +143,8 @@ namespace Noc_App.Controllers
                         Name = model.Name,
                         DrainCoordinates = locationList,
                         CreatedOn = DateTime.Now,
-                        CreatedBy = userid
+                        CreatedBy = userid,
+                        
                     };
                     await _repo.CreateAsync(obj);
 
@@ -211,9 +215,15 @@ namespace Noc_App.Controllers
                             return View(model);
                         }
                         string userid = await LoggedInUserID();
+                        var coordinates = _repoLocation.GetAll();
                         List<DrainCoordinatesDetails> locationList = new List<DrainCoordinatesDetails>();
                         foreach (var d in model.DrainCoordinates)
                         {
+                            if (coordinates.Any(d => EF.Property<double>(d, "Latitude") == d.Latitude && EF.Property<double>(d, "Longitude") == d.Longitude) && EF.Property<int>(d, "Id") != d.Id)
+                            {
+                                ModelState.AddModelError("", $"{d.Latitude} and {d.Longitude} is already in use");
+                                return View(model);
+                            }
                             DrainCoordinatesDetails objLocation = await _repoLocation.GetByIdAsync(d.Id);
                             //DrainCoordinatesDetails location = new DrainCoordinatesDetails();
                             objLocation.Id = d.Id;

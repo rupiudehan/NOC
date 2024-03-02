@@ -15,13 +15,9 @@ namespace Noc_App.Models
         public int ProjectTypeId { get; set; }
         public ProjectTypeDetails ProjectType { get; set; }
         public string OtherProjectTypeDetail { get; set; }
-        [Required]
         public string Khasra { get; set; }
-        [Required]
         public string Hadbast { get; set; }
-        [Required]
         public string PlotNo { get; set; }
-        [Required]
         public int VillageID { get; set; }
         public VillageDetails Village { get; set; }
         [Required]
@@ -49,9 +45,7 @@ namespace Noc_App.Models
         public int NocTypeId { get; set; }
         public NocTypeDetails NocType { get; set; }
         public bool IsExtension { get; set; }
-        [Required]
         public string NocNumber { get; set; }
-        [Required]
         public DateTime PreviousDate { get; set; }
         public bool IsConfirmed { get; set; }
         public string ApplicationID { get; set; }

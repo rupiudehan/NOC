@@ -33,27 +33,53 @@
                                 <span asp-validation-for="SiteAreaOrSizeInInches" class="text-danger"></span>
                             </div>
                             <div class="form-group">
+                                <input hidden asp-for="IsOtherTypeSelected" value="false" id="IsOtherType" />
                                 <label asp-for="SelectedProjectTypeId" class="control-label">Project Type</label>
                                 <select asp-for="SelectedProjectTypeId" asp-items="@Model.ProjectType" class="form-control">
                                     <option value="">Select</option>
                                 </select>
                                 <span asp-validation-for="SelectedProjectTypeId" class="text-danger"></span>
                             </div>
+                            <div class="form-group other" style="display:none">
+                                <label asp-for="OtherProjectTypeDetail" class="control-label"></label>
+                                <input asp-for="OtherProjectTypeDetail" class="form-control form-control-user" />
+                            </div>
                             @* </div> *@
                         </div>
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">GPS Coordinates Of Site</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6>
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label asp-for="Latitude" class="control-label"></label>
-                                <input asp-for="Latitude" class="form-control form-control-user" />
-                                <span asp-validation-for="Latitude" class="text-danger"></span>
+                                <label asp-for="ApplicantName" class="control-label"></label>
+                                <input asp-for="ApplicantName" class="form-control form-control-user" />
+                                <span asp-validation-for="ApplicantName" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="Longitute" class="control-label"></label>
-                                <input asp-for="Longitute" class="form-control form-control-user" />
-                                <span asp-validation-for="Latitude" class="text-danger"></span>
+                                <label asp-for="ApplicantEmailID" class="control-label"></label>
+                                <input asp-for="ApplicantEmailID" class="form-control form-control-user" />
+                                <span asp-validation-for="ApplicantEmailID" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="IDProofPhoto" class="control-label"></label>
+                                <div class="custom-file3">
+                                    <input asp-for="IDProofPhoto" class="form-control custom-file-input3" />
+                                    @* <label class="custom-file-label">Choose File...</label> *@
+                                    <span asp-validation-for="IDProofPhoto" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="AuthorizationLetterPhoto" class="control-label">
+                                    Authorization Letter (Attach in case
+                                    application is to be filled
+                                    by person other than
+                                    owner)
+                                </label>
+                                <div class="custom-file2">
+                                    <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" />
+                                    @* <label class="custom-file-label2">Choose File...</label> *@
+                                    <span asp-validation-for="AuthorizationLetterPhoto" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -107,7 +133,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="control-label">Pin Code</label>
-                                <label asp-for="Pincode" class="form-control form-control-user">@Model.Pincode</label>
+                                <label asp-for="Pincode" id="Pincode" class="form-control form-control-user">@Model.Pincode</label>
                             </div>
                             <div class="form-group">
                                 <label asp-for="AddressProofPhoto" class="control-label"></label>
@@ -123,39 +149,18 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">GPS Coordinates Of Site</h6>
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label asp-for="ApplicantName" class="control-label"></label>
-                                <input asp-for="ApplicantName" class="form-control form-control-user" />
-                                <span asp-validation-for="ApplicantName" class="text-danger"></span>
+                                <label asp-for="Latitude" class="control-label"></label>
+                                <input asp-for="Latitude" class="form-control form-control-user" />
+                                <span asp-validation-for="Latitude" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="ApplicantEmailID" class="control-label"></label>
-                                <input asp-for="ApplicantEmailID" class="form-control form-control-user" />
-                                <span asp-validation-for="ApplicantEmailID" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="IDProofPhoto" class="control-label"></label>
-                                <div class="custom-file3">
-                                    <input asp-for="IDProofPhoto" class="form-control custom-file-input3" />
-                                    @* <label class="custom-file-label">Choose File...</label> *@
-                                    <span asp-validation-for="IDProofPhoto" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="AuthorizationLetterPhoto" class="control-label">
-                                    Authorization Letter (Attach in case
-                                    application is to be filled
-                                    by person other than
-                                    owner)
-                                </label>
-                                <div class="custom-file2">
-                                    <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" />
-                                    @* <label class="custom-file-label2">Choose File...</label> *@
-                                    <span asp-validation-for="AuthorizationLetterPhoto" class="text-danger"></span>
-                                </div>
+                                <label asp-for="Longitute" class="control-label"></label>
+                                <input asp-for="Longitute" class="form-control form-control-user" />
+                                <span asp-validation-for="Latitude" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -172,19 +177,19 @@
                                 <span asp-validation-for="SelectedNocPermissionTypeID" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <input hidden asp-for="IsExtension" />
+                                <input hidden asp-for="IsExtension" value="false" id="IsExtension" />
                                 <label asp-for="SelectedNocTypeId" class="control-label">NOC Type</label>
                                 <select asp-for="SelectedNocTypeId" asp-items="@Model.NocType" class="form-control">
                                     <option value="">Select</option>
                                 </select>
                                 <span asp-validation-for="SelectedNocTypeId" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group existing" style="display:none;">
                                 <label asp-for="NocNumber" class="control-label"></label>
                                 <input asp-for="NocNumber" class="form-control form-control-user" />
                                 <span asp-validation-for="NocNumber" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group existing" style="display:none;">
                                 <label asp-for="PreviousDate" class="control-label">Date</label>
                                 <input asp-for="PreviousDate" class="form-control form-control-user" />
                                 <span asp-validation-for="PreviousDate" class="text-danger"></span>
@@ -286,9 +291,27 @@
 @* <div id="partialContainer"></div> *@
 @section Scripts {
     <script>
+        document.getElementById("SelectedProjectTypeId").addEventListener("change", function () {
+            var selectedText = this.options[this.selectedIndex].text;
+            if (selectedText != 'Any Other') {
+                $('.other').css('display', 'none');
+                $('#IsOtherType').val(1);
+            } else {
+                $('.other').css('display', '');
+                $('#IsOtherType').val(0);
+            }
+
+        });
         document.getElementById("SelectedNocTypeId").addEventListener("change", function () {
             var selectedText = this.options[this.selectedIndex].text;
-            console.log("Selected Item's Text: " + selectedText);
+            if (selectedText == 'Extension of Existing Project') {
+                $('#IsExtension').val(1);
+                $('.existing').css('display', '');
+            } else {
+                $('.existing').css('display', 'none');
+                $('#IsExtension').val(0);
+            }
+            
         });
         $(function () {
             $('.custom-file-input3').on('change', function () {
@@ -325,7 +348,6 @@
         }
     </script>
     <script>
-        <script>
             function populateDropdown(data, dropdownId) {
                 var dropdown = $("#Selected" + dropdownId);
                 dropdown.html('<option value="">Select</option>');
@@ -334,6 +356,16 @@
                 });
             }
         $(document).ready(function () {
+            if ($('#IsOtherType').val() == "false") {
+                $('.other').css('display', 'none');
+            } else { 
+                $('.other').css('display', '');
+            }
+            if ($('#IsExtension').val() == "false") {
+                $('.existing').css('display', 'none');
+            } else {
+                $('.existing').css('display', '');
+            }
             $("#SelectedVillageID").change(function () {
                 var villageId = $(this).val();
                 $.ajax({
@@ -342,9 +374,10 @@
                     data: { villageId: villageId },
                     async: false,
                     success: function (data) {
-                        console.log(data);
                         $.each(data, function (key, value) {
-                            // dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
+                            if (key == 'pinCode') {
+                                $('#Pincode').text(value);
+                            }
                         });
                     },
                     failure: function (f) {

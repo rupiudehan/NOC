@@ -19,13 +19,13 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Project Type")]
         public int SelectedProjectTypeId { get; set; }
         public IEnumerable<SelectListItem> ProjectType { get; set; }
-        [Required]
+        [Display(Name ="Specify Other Detail")]
+        public string OtherProjectTypeDetail { get; set; }
+        public bool IsOtherTypeSelected { get; set; }
         [MaxLength(50, ErrorMessage = "Khasra cannot exceed 50 characters")]
         public string Khasra { get; set; }
-        [Required]
         [MaxLength(50, ErrorMessage = "Hadbast cannot exceed 50 characters")]
         public string Hadbast { get; set; }
-        [Required]
         [MaxLength(50, ErrorMessage = "Plot No. cannot exceed 50 characters")]
         [Display(Name ="Plot No.")]
         public string PlotNo { get; set; }
