@@ -47,7 +47,7 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="PinCode" class="control-label"></label>
-                        <input asp-for="PinCode" class="form-control form-control-user" />
+                        <input asp-for="PinCode" id="PinCode" maxlength="6" class="form-control form-control-user" />
                         <span asp-validation-for="PinCode" class="text-danger"></span>
                     </div>
                     <div asp-validation-summary="All" class="text-danger"></div>
@@ -78,6 +78,21 @@
             });
         }
         $(document).ready(function () {
+            $("#PinCode").on("blur", function () {
+                validatePinCode($(this).val());
+            });
+
+            function validatePinCode(pinCode) {
+                var pinCodeRegex = /^\d{6}$/;
+                var PinCode = $('#PinCode');
+                if (!pinCodeRegex.test(pinCode)) {
+                    // PinCode.addClass("is-invalid");
+                    PinCode.next(".text-danger").text("Please enter a valid 6-digit PIN code.");
+                } else {
+                    // PinCode.removeClass("is-invalid");
+                    PinCode.next(".text-danger").text("");
+                }
+            }
             $("#SelectedDivisionId").change(function () {
                 var divisionId = $(this).val();
                 $.ajax({

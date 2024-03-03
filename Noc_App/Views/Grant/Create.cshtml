@@ -23,17 +23,17 @@
                                 <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="SiteAreaOrSizeInFeet" class="control-label"></label>
+                                <label asp-for="SiteAreaOrSizeInFeet" class="control-label numericField"></label>
                                 <input asp-for="SiteAreaOrSizeInFeet" class="form-control form-control-user" />
                                 <span asp-validation-for="SiteAreaOrSizeInFeet" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="SiteAreaOrSizeInInches" class="control-label"></label>
+                                <label asp-for="SiteAreaOrSizeInInches" class="control-label numericField"></label>
                                 <input asp-for="SiteAreaOrSizeInInches" class="form-control form-control-user" />
                                 <span asp-validation-for="SiteAreaOrSizeInInches" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <input hidden asp-for="IsOtherTypeSelected" value="false" id="IsOtherType" />
+                                <input hidden asp-for="IsOtherTypeSelected" value="0" id="IsOtherType" />
                                 <label asp-for="SelectedProjectTypeId" class="control-label">Project Type</label>
                                 <select asp-for="SelectedProjectTypeId" asp-items="@Model.ProjectType" class="form-control">
                                     <option value="">Select</option>
@@ -155,12 +155,12 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label asp-for="Latitude" class="control-label"></label>
-                                <input asp-for="Latitude" class="form-control form-control-user" />
+                                <input asp-for="Latitude" class="form-control form-control-user numericField" />
                                 <span asp-validation-for="Latitude" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="Longitute" class="control-label"></label>
-                                <input asp-for="Longitute" class="form-control form-control-user" />
+                                <input asp-for="Longitute" class="form-control form-control-user numericField" />
                                 <span asp-validation-for="Latitude" class="text-danger"></span>
                             </div>
                         </div>
@@ -178,7 +178,7 @@
                                 <span asp-validation-for="SelectedNocPermissionTypeID" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <input hidden asp-for="IsExtension" value="false" id="IsExtension" />
+                                <input hidden asp-for="IsExtension" value="0" id="IsExtension" />
                                 <label asp-for="SelectedNocTypeId" class="control-label">NOC Type</label>
                                 <select asp-for="SelectedNocTypeId" asp-items="@Model.NocType" class="form-control">
                                     <option value="">Select</option>
@@ -233,7 +233,7 @@
                                         <span asp-validation-for="Owners[0].Address" class="text-danger"></span>
                                     </td>
                                     <td>
-                                        <input type="text" asp-for=Owners[0].MobileNo class="form-control" placeholder="Mobile No." />
+                                        <input type="text" asp-for=Owners[0].MobileNo class="form-control mobno" maxlength="10" placeholder="Mobile No." />
                                         <span asp-validation-for="Owners[0].MobileNo" class="text-danger"></span>
                                     </td>
                                     <td>
@@ -316,6 +316,34 @@
             
         });
         $(function () {
+            $(".mobno").on("input", function () {
+                // Remove non-numeric characters using a regular expression
+                $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+
+            });
+            $(".mobno").on("blur", function () {
+                validatePinCode($(this).val(), $(this));
+            });
+            function validatePinCode(mobno,field) {
+                var fieldRegex = /^\d{10}$/;
+                
+                if (!fieldRegex.test(mobno)) {
+                    // PinCode.addClass("is-invalid");
+                    field.next(".text-danger").text("Please enter a valid mobile number.");
+                } else {
+                    // PinCode.removeClass("is-invalid");
+                    field.next(".text-danger").text("");
+                }
+            }
+            $(".numericField").on("input", function () {
+                // Remove non-numeric characters using a regular expression
+                $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+
+                // Remove multiple dots, leaving only one
+                if ($(this).val().split('.').length > 2) {
+                    $(this).val($(this).val().replace(/\.+$/, ''));
+                }
+            });
             $('.custom-file-input3').on('change', function () {
                 var fileName = $(this).val().split("\\").pop();
                 $(this).next('.custom-file-label3').html(fileName);

@@ -38,12 +38,15 @@
                             <tbody>
                                 @for (int i = 0; i < Model.DrainCoordinates.Count; i++)
                                 {
-                                    <tr class="coordinate-entry">
+                                        string Latitude = @"Latitude" + i;
+                                        string Longitude = @"Longitude" + i;
+                                        <tr class="coordinate-entry">
                                         @* <td>1</td> *@
                                             <td>
-                                                <input type="hidden" asp-for="DrainCoordinates[i].Id" /><input type="text" asp-for=DrainCoordinates[i].Latitude class="form-control" placeholder="Latitude" />
+                                                <input type="hidden" asp-for="DrainCoordinates[i].Id" />
+                                                <input type="text" asp-for=DrainCoordinates[i].Latitude id="@Latitude" class="form-control numericField" placeholder="Latitude" />
                                             </td>
-                                        <td><input type="text" asp-for=DrainCoordinates[i].Longitude class="form-control" placeholder="Longitude" /></td>
+                                            <td><input type="text" asp-for=DrainCoordinates[i].Longitude id="@Longitude" class="form-control numericField" placeholder="Longitude" /></td>
 
                                         <!-- Render more columns as needed -->
                                     </tr>
@@ -80,14 +83,32 @@
 @* <div id="partialContainer"></div> *@
 @section Scripts {
     <script>
-                        ar coordinateIndex = @Model.DrainCoordinates.Count;
+        // Allow only numbers in the input field
+        $(document).ready(function () {
+            // Allow only numbers in the input field
+            $("body").on("input", ".numericField", function () {
+                // Remove non-numeric characters using a regular expression
+                $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+
+                // Remove multiple dots, leaving only one
+                if ($(this).val().split('.').length > 2) {
+                    $(this).val($(this).val().replace(/\.+$/, ''));
+                }
+            });
+        });
+    </script>
+    <script>
+                        var coordinateIndex = @Model.DrainCoordinates.Count;
 
         $("#addMoreBtn").on("click", function () {
             var newEntry = $(".coordinate-entry:first").clone();
             newEntry.find("input").each(function () {
                 var name = $(this).attr("name").replace("[" + (coordinateIndex - 1) + "]", "[" + coordinateIndex + "]");
+                var id = $(this).attr("id").replace("0", coordinateIndex);
                 $(this).attr("name", name);
+                $(this).attr("id", id);
                 $(this).val("");
+                
             });
             coordinateIndex++;
             $("#locationTable tbody").append(newEntry);

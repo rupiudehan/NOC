@@ -9,6 +9,7 @@ namespace Noc_App.Models.ViewModel
         [Required]
         public string Id { get; set; }
         [Required]
+        [MaxLength(150, ErrorMessage = "Email cannot exceed 150 characters")]
         [EmailAddress]
         //[Remote(action: "IsEmailUnique", controller: "Account", AdditionalFields = "Id")]
         public string Email { get; set; }

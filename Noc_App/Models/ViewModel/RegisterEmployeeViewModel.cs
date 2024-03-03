@@ -8,6 +8,7 @@ namespace Noc_App.Models.ViewModel
     {
         [Required]
         [EmailAddress]
+        [MaxLength(150, ErrorMessage = "Email cannot exceed 150 characters")]
         [Remote(action: "IsEmailExists", controller: "Account")]
         public string Email { get; set; }
         //[Required]

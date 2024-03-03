@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Noc_App.Helpers;
 using System.ComponentModel.DataAnnotations;
 
 namespace Noc_App.Models.ViewModel
@@ -11,9 +12,11 @@ namespace Noc_App.Models.ViewModel
         public string Name { get; set; }
         [Required]
         [Display(Name ="Site Size in Feet")]
+        [NumericValidation(typeof(double))]
         public double SiteAreaOrSizeInFeet { get; set; }
         [Required]
         [Display(Name = "Site Size in Inches")]
+        [NumericValidation(typeof(double))]
         public double SiteAreaOrSizeInInches { get; set; }
         [Required]
         [Display(Name = "Project Type")]
@@ -55,8 +58,10 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Address Proof")]
         public IFormFile AddressProofPhoto { get; set; }
         [Required]
+        [NumericValidation(typeof(double))]
         public double Latitude { get; set; }
         [Required]
+        [NumericValidation(typeof(double))]
         public double Longitute { get; set; }
         [Required]
         [Display(Name = "Applicant Name")]
