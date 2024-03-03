@@ -26,13 +26,13 @@ namespace Noc_App.Models.ViewModel
         public int SelectedDivisionId { get; set; }
         public IEnumerable<SelectListItem> Divisions { get; set; }
         [Display(Name = "Sub-Division")]
-        public int SelectedSubDivisionId { get; set; }
+        public int? SelectedSubDivisionId { get; set; }
         public IEnumerable<SelectListItem> SubDivision { get; set; }
         [Display(Name = "Tehsil/Block")]
-        public int SelectedTehsilBlockId { get; set; }
+        public int? SelectedTehsilBlockId { get; set; }
         public IEnumerable<SelectListItem> TehsilBlock { get; set; }
         [Display(Name = "Village")]
-        public int SelectedVillageId { get; set; }
+        public int? SelectedVillageId { get; set; }
         public IEnumerable<SelectListItem> Village { get; set; }
     }
 }

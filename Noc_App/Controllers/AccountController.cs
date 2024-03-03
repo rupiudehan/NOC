@@ -46,11 +46,16 @@ namespace Noc_App.Controllers
         {
             if(ModelState.IsValid)
             {
+                if (!await _roleManager.RoleExistsAsync("Administrator"))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("Administrator"));
+                }
                 var user = new ApplicationUser { UserName=registerViewModel.Email,Email=registerViewModel.Email };
                 user.EmailConfirmed = true;
                 var result = await userManager.CreateAsync(user,registerViewModel.Password);
                 if(result.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(user, "Administrator");
                     //userManager.AddToRoleAsync(user, "User").Wait();
                     await signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("index","home");
@@ -123,7 +128,26 @@ namespace Noc_App.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterEmployee(RegisterEmployeeViewModel registerViewModel)
         {
-            if (ModelState.IsValid)
+            var divisions = _divisionRepository.GetAll();
+            var filteredSubdivisions = _subDivisionRepository.GetAll().Where(c => c.DivisionId == registerViewModel.SelectedDivisionId).ToList();
+            var filteredtehsilBlock = _tehsilBlockRepository.GetAll().Where(c => c.SubDivisionId == registerViewModel.SelectedSubDivisionId).ToList();
+            var fileteedvillage = _villageRepository.GetAll().Where(c => c.TehsilBlockId == registerViewModel.SelectedTehsilBlockId).ToList();
+            var role = (from r in _roleManager.Roles.AsEnumerable()
+                        where r.Name != "Administrator"
+                        select new
+                        {
+                            Name = r.Name
+                        }).ToList();
+            var viewModel = new RegisterEmployeeViewModel
+            {
+                Village = new SelectList(fileteedvillage, "Id", "Name"),
+                TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name"),
+                SubDivision = new SelectList(filteredSubdivisions, "Id", "Name"),
+                Divisions = new SelectList(divisions, "Id", "Name"),
+                Roles = new SelectList(role, "Name", "Name"),
+            };
+
+            if ((registerViewModel.SelectedVillageId > 0 || registerViewModel.SelectedTehsilBlockId>0 || registerViewModel.SelectedSubDivisionId>0 || registerViewModel.SelectedDivisionId>0) && registerViewModel.Email!=null && registerViewModel.SelectedRole!=null)
             {
                 var user = new ApplicationUser { 
                     UserName = registerViewModel.Email, 
@@ -137,9 +161,9 @@ namespace Noc_App.Controllers
                 string password = "Abc@123";
                 var result = await userManager.CreateAsync(user, password);
                 // Retrieve associated regions from the repository
-                var village = await _villageRepository.GetByIdAsync(registerViewModel.SelectedVillageId);
-                var tehsilBlock = await _tehsilBlockRepository.GetByIdAsync(registerViewModel.SelectedTehsilBlockId);
-                var subDivision = await _subDivisionRepository.GetByIdAsync(registerViewModel.SelectedSubDivisionId);
+                var village = await _villageRepository.GetByIdAsync(registerViewModel.SelectedVillageId??0);
+                var tehsilBlock = await _tehsilBlockRepository.GetByIdAsync(registerViewModel.SelectedTehsilBlockId?? 0);
+                var subDivision = await _subDivisionRepository.GetByIdAsync(registerViewModel.SelectedSubDivisionId??0);
                 var division = await _divisionRepository.GetByIdAsync(registerViewModel.SelectedDivisionId);
 
                 
@@ -168,8 +192,13 @@ namespace Noc_App.Controllers
                 {
                     ModelState.AddModelError("", error.Description);
                 }
+                return View(viewModel);
             }
-            return View(registerViewModel);
+            else
+            {
+                ModelState.AddModelError("", $"EmailID and atleast on field is required out of division/subdivision/tehsil/block/village");
+            }
+            return View(viewModel);
         }
 
         [AcceptVerbs("Get", "Post")]
@@ -237,15 +266,20 @@ namespace Noc_App.Controllers
                 {
 
                     var roles = userManager.GetRolesAsync(user).Result;
-                    user.Village = await _villageRepository.GetByIdAsync(user.VillageId ?? 0);
-                    if(user.Village!=null)
-                        user.TehsilBlock = await _tehsilBlockRepository.GetByIdAsync(user.Village.TehsilBlockId!=null? user.Village.TehsilBlockId : 0);
-                    if (user.TehsilBlock != null)
+                    user.Division = await _divisionRepository.GetByIdAsync(user.DivisionId ?? 0);
+                    if (user.Division != null)
                     {
-                        user.SubDivision = await _subDivisionRepository.GetByIdAsync(user.TehsilBlock.SubDivisionId != null ? user.TehsilBlock.SubDivisionId : 0);
-                        if (user.TehsilBlock.SubDivision != null)
-                            user.Division = await _divisionRepository.GetByIdAsync(user.TehsilBlock.SubDivision.DivisionId != null ? user.TehsilBlock.SubDivision.DivisionId : 0);
+                        user.SubDivision = await _subDivisionRepository.GetByIdAsync(user.SubDivisionId?? 0);
+                        if(user.SubDivision!= null)
+                        {
+                            user.TehsilBlock = await _tehsilBlockRepository.GetByIdAsync(user.TehsilBlockId?? 0);
+                            if (user.TehsilBlock != null)
+                            {
+                                user.Village = await _villageRepository.GetByIdAsync(user.VillageId ?? 0);
+                            }
+                        }
                     }
+                    
                     var userWithRoles = new UserWithRolesViewModel
                     {
                         User = user,
@@ -272,11 +306,25 @@ namespace Noc_App.Controllers
             {
                 var user = this.userManager.Users.FirstOrDefault(x => x.Id == Id);
                 var roles = userManager.GetRolesAsync(user).Result;
-                
-                user.Village = await _villageRepository.GetByIdAsync(user.VillageId??0);
-                user.TehsilBlock = await _tehsilBlockRepository.GetByIdAsync(user.Village.TehsilBlockId);
-                user.TehsilBlock.SubDivision = await _subDivisionRepository.GetByIdAsync(user.TehsilBlock.SubDivisionId);
-                user.TehsilBlock.SubDivision.Division = await _divisionRepository.GetByIdAsync(user.TehsilBlock.SubDivision.DivisionId);
+
+                user.Division = await _divisionRepository.GetByIdAsync(user.DivisionId ?? 0);
+                if (user.Division != null)
+                {
+                    user.SubDivision = await _subDivisionRepository.GetByIdAsync(user.SubDivisionId ?? 0);
+                    if (user.SubDivision != null)
+                    {
+                        user.TehsilBlock = await _tehsilBlockRepository.GetByIdAsync(user.TehsilBlockId ?? 0);
+                        if (user.TehsilBlock != null)
+                        {
+                            user.Village = await _villageRepository.GetByIdAsync(user.VillageId ?? 0);
+                        }
+                    }
+                }
+
+                user.Village = user.Village;
+                user.TehsilBlock = user.TehsilBlock;
+                user.TehsilBlock.SubDivision = user.SubDivision;
+                user.TehsilBlock.SubDivision.Division = user.Division;
                 var userRoles = await userManager.GetRolesAsync(user);
 
                 var availableRoles = _roleManager.Roles.Where(x=>x.Name!= "Administrator").Select(r => new SelectListItem
@@ -285,9 +333,9 @@ namespace Noc_App.Controllers
                     Value = r.Name,
                     Selected = userRoles.Contains(r.Name)
                 });
-                var village = _villageRepository.GetAll().Where(x => x.TehsilBlockId == user.Village.TehsilBlockId);
-                var tehsilBlock = _tehsilBlockRepository.GetAll().Where(x => x.SubDivisionId == user.TehsilBlock.SubDivisionId);
-                var subDivision = _subDivisionRepository.GetAll().Where(x => x.DivisionId == user.TehsilBlock.SubDivision.DivisionId);
+                var village = _villageRepository.GetAll().Where(x => x.TehsilBlockId == user.TehsilBlockId);
+                var tehsilBlock = _tehsilBlockRepository.GetAll().Where(x => x.SubDivisionId == user.SubDivisionId);
+                var subDivision = _subDivisionRepository.GetAll().Where(x => x.DivisionId == user.DivisionId);
                 var division = _divisionRepository.GetAll();
 
                 RegisterEmployeeViewModelEdit model = new RegisterEmployeeViewModelEdit
@@ -297,14 +345,14 @@ namespace Noc_App.Controllers
                     UserName = user.UserName,
                     SelectedRole=roles.FirstOrDefault(),
                     Roles = availableRoles,
-                    SelectedVillageId = user.Village.Id,
-                    Village = new SelectList(village, "Id", "VillageName", user.VillageId),
-                    SelectedTehsilBlockId = user.TehsilBlock.Id,
-                    TehsilBlock = new SelectList(tehsilBlock, "Id", "Name", user.TehsilBlockId),
-                    SelectedSubDivisionId = user.TehsilBlock.SubDivisionId,
-                    SubDivision = new SelectList(subDivision, "Id", "Name", user.TehsilBlock.SubDivisionId),
-                    SelectedDivisionId = user.TehsilBlock.SubDivision.DivisionId,
-                    Divisions = new SelectList(division, "Id", "Name", user.TehsilBlock.SubDivision.DivisionId)
+                    SelectedVillageId = user.VillageId ??0,
+                    Village = village==null? new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name") : new SelectList(village, "Id", "Name", user.VillageId),
+                    SelectedTehsilBlockId = user.TehsilBlockId??0,
+                    TehsilBlock = tehsilBlock==null? new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name") :new SelectList(tehsilBlock, "Id", "Name", user.TehsilBlockId),
+                    SelectedSubDivisionId = user.SubDivisionId??0,
+                    SubDivision = subDivision==null? new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name") : new SelectList(subDivision, "Id", "Name", user.SubDivisionId),
+                    SelectedDivisionId = user.Division==null?0:user.Division.Id,
+                    Divisions = new SelectList(division, "Id", "Name", user.DivisionId)
                 };
 
                 return View(model);
@@ -370,9 +418,9 @@ namespace Noc_App.Controllers
 
                 var result = await userManager.UpdateAsync(user);
                 // Retrieve associated regions from the repository
-                var village = await _villageRepository.GetByIdAsync(model.SelectedVillageId);
-                var tehsilBlock = await _tehsilBlockRepository.GetByIdAsync(model.SelectedTehsilBlockId);
-                var subDivision = await _subDivisionRepository.GetByIdAsync(model.SelectedSubDivisionId);
+                var village = model.SelectedVillageId==null?null:await _villageRepository.GetByIdAsync(model.SelectedVillageId??0);
+                var tehsilBlock = model.SelectedTehsilBlockId==null?null:await _tehsilBlockRepository.GetByIdAsync(model.SelectedTehsilBlockId ?? 0);
+                var subDivision = model.SelectedSubDivisionId==null?null:await _subDivisionRepository.GetByIdAsync(model.SelectedSubDivisionId ?? 0);
                 var division = await _divisionRepository.GetByIdAsync(model.SelectedDivisionId);
 
 

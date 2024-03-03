@@ -8,7 +8,7 @@
     <div class="col-lg-12">
 
         <!-- Circle Buttons -->
-        <form class="user" asp-action="Create" asp-controller="Grant" method="post">
+        <form enctype="multipart/form-data" class="user" asp-action="Create" asp-controller="Grant" method="post">
             <div class="card shadow mb-4">
                 <div class="row">
                     <div class="col-lg-6">
@@ -43,6 +43,7 @@
                             <div class="form-group other" style="display:none">
                                 <label asp-for="OtherProjectTypeDetail" class="control-label"></label>
                                 <input asp-for="OtherProjectTypeDetail" class="form-control form-control-user" />
+                                <span asp-validation-for="OtherProjectTypeDetail" class="text-danger"></span>
                             </div>
                             @* </div> *@
                         </div>
@@ -63,7 +64,7 @@
                             <div class="form-group">
                                 <label asp-for="IDProofPhoto" class="control-label"></label>
                                 <div class="custom-file3">
-                                    <input asp-for="IDProofPhoto" class="form-control custom-file-input3" />
+                                    <input asp-for="IDProofPhoto" class="form-control custom-file-input3" accept=".jpg, .jpeg, .png, .pdf" />
                                     @* <label class="custom-file-label">Choose File...</label> *@
                                     <span asp-validation-for="IDProofPhoto" class="text-danger"></span>
                                 </div>
@@ -76,7 +77,7 @@
                                     owner)
                                 </label>
                                 <div class="custom-file2">
-                                    <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" />
+                                    <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" accept=".jpg, .jpeg, .png, .pdf" />
                                     @* <label class="custom-file-label2">Choose File...</label> *@
                                     <span asp-validation-for="AuthorizationLetterPhoto" class="text-danger"></span>
                                 </div>
@@ -138,7 +139,7 @@
                             <div class="form-group">
                                 <label asp-for="AddressProofPhoto" class="control-label"></label>
                                 <div class="custom-file1">
-                                    <input asp-for="AddressProofPhoto" class="form-control custom-file-input1" />
+                                    <input asp-for="AddressProofPhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
                                     @* <label class="custom-file-label1">Choose File...</label> *@
                                     <span asp-validation-for="AddressProofPhoto" class="text-danger"></span>
                                 </div>
@@ -250,7 +251,8 @@
                         <button type="button" class="btn btn-success" id="addMoreBtn">Add More</button>
                     </div>
                     <div class="row">
-                        <input type="checkbox" asp-for="IsConfirmed"  />
+                        <input type="checkbox" asp-for="IsConfirmed" />
+                        <span asp-validation-for="IsConfirmed" class="text-danger"></span>
                         <label asp-for="IsConfirmed">
                             I / We confirm that the information furnished
                             herewith is correct to the best of my/our
@@ -295,10 +297,10 @@
             var selectedText = this.options[this.selectedIndex].text;
             if (selectedText != 'Any Other') {
                 $('.other').css('display', 'none');
-                $('#IsOtherType').val(1);
+                $('#IsOtherType').val(0);
             } else {
                 $('.other').css('display', '');
-                $('#IsOtherType').val(0);
+                $('#IsOtherType').val(1);
             }
 
         });
@@ -356,16 +358,32 @@
                 });
             }
         $(document).ready(function () {
-            if ($('#IsOtherType').val() == "false") {
+            var selectedText = document.getElementById("SelectedProjectTypeId").options[document.getElementById("SelectedProjectTypeId").selectedIndex].text;
+            if (selectedText != 'Any Other') {
                 $('.other').css('display', 'none');
-            } else { 
-                $('.other').css('display', '');
-            }
-            if ($('#IsExtension').val() == "false") {
-                $('.existing').css('display', 'none');
+                $('#IsOtherType').val(0);
             } else {
-                $('.existing').css('display', '');
+                $('.other').css('display', '');
+                $('#IsOtherType').val(1);
             }
+            var selectedText = document.getElementById("SelectedNocTypeId").options[document.getElementById("SelectedNocTypeId").selectedIndex].text;
+            if (selectedText == 'Extension of Existing Project') {
+                $('#IsExtension').val(1);
+                $('.existing').css('display', '');
+            } else {
+                $('.existing').css('display', 'none');
+                $('#IsExtension').val(0);
+            }
+            // if ($('#IsOtherType').val() == "false") {
+            //     $('.other').css('display', 'none');
+            // } else { 
+            //     $('.other').css('display', '');
+            // }
+            // if ($('#IsExtension').val() == "false") {
+            //     $('.existing').css('display', 'none');
+            // } else {
+            //     $('.existing').css('display', '');
+            // }
             $("#SelectedVillageID").change(function () {
                 var villageId = $(this).val();
                 $.ajax({

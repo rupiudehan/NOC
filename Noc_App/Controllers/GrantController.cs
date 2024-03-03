@@ -64,9 +64,9 @@ namespace Noc_App.Controllers
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
                 SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
                 Owners = new List<OwnerViewModelCreate> { new OwnerViewModelCreate { Name = "", Address = "",MobileNo="",Email="" } },
-                IsOtherTypeSelected=false,
+                IsOtherTypeSelected=0,
                 IsConfirmed=false,
-                IsExtension=false
+                IsExtension=0
             };
 
             return View(viewModel);
@@ -82,31 +82,97 @@ namespace Noc_App.Controllers
             var nocPermission = _nocPermissionTypeRepo.GetAll();
             var nocType = _nocTypeRepo.GetAll();
             var ownerType = _ownerTypeRepo.GetAll();
-            var subDivision = _subDivisionRepo.GetAll();
-            var filteredSubdivisions = subDivision.Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
-            
-            
+            var filteredSubdivisions = _subDivisionRepo.GetAll().Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
+            var filteredtehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == model.SelectedSubDivisionId).ToList();
+            var fileteedvillage = _villageRpo.GetAll().Where(c => c.TehsilBlockId == model.SelectedTehsilBlockId).ToList();
+            var selectedvillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID);
+            string ErrorMessage = string.Empty;
+
             var viewModel = new GrantViewModelCreate
             {
-                Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
-                TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
+                Village = new SelectList(fileteedvillage, "Id", "Name"),
+                TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name"),
                 SubDivision = new SelectList(filteredSubdivisions, "Id", "Name"),// new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
                 Divisions = new SelectList(divisions, "Id", "Name"),
                 ProjectType = new SelectList(projectType, "Id", "Name"),
                 NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
                 NocType = new SelectList(nocType, "Id", "Name"),
                 OwnerType = new SelectList(ownerType, "Id", "Name"),
-                Owners = model.Owners
+                Owners = model.Owners,
+                Pincode=selectedvillage.PinCode.ToString()
             };
-            string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto, "IDProof");
-            string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
-            string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
-            if (model.SiteAreaOrSizeInInches <= 0 && model.SiteAreaOrSizeInFeet<=0 && model.IDProofPhoto!=null && model.AddressProofPhoto!=null && model.AuthorizationLetterPhoto!=null
-                && model.SelectedVillageID<=0 && model.SelectedProjectTypeId <= 0 && model.SelectedNocPermissionTypeID <= 0 && model.Latitude <= 0 && model.Longitute <= 0 && model.ApplicantName!=null
-                && model.ApplicantEmailID!=null && model.SelectedNocTypeId<=0 && model.IsConfirmed
+            if (model.SiteAreaOrSizeInInches >0 && model.SiteAreaOrSizeInFeet>0 && model.IDProofPhoto!=null && model.AddressProofPhoto!=null && model.AuthorizationLetterPhoto!=null
+                && model.SelectedVillageID>0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.Latitude > 0 && model.Longitute >0 && model.ApplicantName!=null
+                && model.ApplicantEmailID!=null && model.SelectedNocTypeId>0 && model.IsConfirmed
                 )
             {
-                if(model.IsExtension)
+                int IdPrrofValidation = AllowedCheckExtensions(model.IDProofPhoto);
+                int AddressPrrofValidation = AllowedCheckExtensions(model.AddressProofPhoto);
+                int AuthorizationValidation = AllowedCheckExtensions(model.AuthorizationLetterPhoto);
+                if (IdPrrofValidation == 0)
+                {
+                    ErrorMessage = $"Invalid ID proof file type. Please upload a JPG, PNG, or PDF file";
+                    ModelState.AddModelError("", ErrorMessage);
+
+                    return View(viewModel);
+
+                }
+                else if (IdPrrofValidation == 2)
+                {
+                    ErrorMessage = "ID proof field is required";
+                    ModelState.AddModelError("", ErrorMessage);
+                    return View(viewModel);
+                }
+                if (AddressPrrofValidation == 0)
+                {
+                    ErrorMessage = $"Invalid address proof file type. Please upload a JPG, PNG, or PDF file";
+                    ModelState.AddModelError("", ErrorMessage);
+                    return View(viewModel);
+
+                }
+                else if (AddressPrrofValidation == 2)
+                {
+                    ErrorMessage = "Address proof field is required";
+                    ModelState.AddModelError("", ErrorMessage);
+                    return View(viewModel);
+                }
+                if (AuthorizationValidation == 0)
+                {
+                    ErrorMessage = $"Invalid authorization letter file type. Please upload a JPG, PNG, or PDF file";
+                    ModelState.AddModelError("", ErrorMessage);
+                    return View(viewModel);
+
+                }
+                else if (AuthorizationValidation == 2)
+                {
+                    ErrorMessage = "Authorization letter field is required";
+                    ModelState.AddModelError("", ErrorMessage);
+                    return View(viewModel);
+                }
+
+                if (!AllowedFileSize(model.IDProofPhoto))
+                {
+                    ErrorMessage = "ID proof file size exceeds the allowed limit of 4MB";
+                    ModelState.AddModelError("", ErrorMessage);
+                    return View(viewModel);
+                }
+                if (!AllowedFileSize(model.AddressProofPhoto))
+                {
+                    ErrorMessage = "Address proof file size exceeds the allowed limit of 4MB";
+                    ModelState.AddModelError("", ErrorMessage);
+                    return View(viewModel);
+                }
+                if (!AllowedFileSize(model.AuthorizationLetterPhoto))
+                {
+                    ErrorMessage = "Authorization letter file size exceeds the allowed limit of 4MB";
+                    ModelState.AddModelError("", ErrorMessage);
+                    return View(viewModel);
+                }
+
+                    string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto, "IDProof");
+                string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
+                string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
+                if (model.IsExtension==1)
                 {
                     if (model.NocNumber == null) isValid = false;
                     if (model.PreviousDate.ToString()== "1/1/0001 12:00:00 AM") { isValid = false; }
@@ -125,7 +191,7 @@ namespace Noc_App.Controllers
 
                     return View(viewModel);
                 }
-                if (model.IsOtherTypeSelected)
+                if (model.IsOtherTypeSelected == 1)
                 {
                     if (model.OtherProjectTypeDetail == null)
                     {
@@ -172,7 +238,7 @@ namespace Noc_App.Controllers
                         ApplicantEmailID = model.ApplicantEmailID,
                         NocPermissionTypeID = model.SelectedNocPermissionTypeID,
                         NocTypeId = model.SelectedNocTypeId,
-                        IsExtension = model.IsExtension,
+                        IsExtension = Convert.ToBoolean(model.IsExtension),
                         NocNumber = model.NocNumber,
                         PreviousDate = model.PreviousDate,
                         IsConfirmed = model.IsConfirmed,
@@ -186,29 +252,49 @@ namespace Noc_App.Controllers
                 {
 
                     ModelState.AddModelError("", $"All fields are required");
-
-                    return View(viewModel);
                 }
             }
             else
-            {               
-
+            {
                 ModelState.AddModelError("", $"All fields are required");
-
-                return View(viewModel);
             }
-            
+
+
+            return View(viewModel);
 
         }
         
+        private bool AllowedFileSize(IFormFile file)
+        {
+            var maxSize = 4 * 1024 * 1024;
+            if (file.Length > maxSize) // 4MB limit
+            {
+                return false;                
+            }
+            return true;
+        }
+        private int AllowedCheckExtensions(IFormFile file)
+        {
+            if (file != null && file.Length > 0)
+            {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
+                var fileExtension = Path.GetExtension(file.FileName);
 
-
+                if (!allowedExtensions.Contains(fileExtension.ToLower()))
+                {
+                    return 0;
+                }
+                return 1;
+            }
+            else return 2;
+        }
         [Obsolete]
         private string ProcessUploadedFile(IFormFile file,string prefixName)
         {
             string uniqueFileName = null;
-            if (file != null)
+            if (file != null && file.Length>0)
             {
+
                 string uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, "Documents");
                 uniqueFileName = prefixName+"_"+Guid.NewGuid().ToString() + "_" + file.FileName;
                 string filePath = Path.Combine(uploadFolder, uniqueFileName);

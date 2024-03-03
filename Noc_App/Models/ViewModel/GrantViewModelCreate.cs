@@ -20,15 +20,15 @@ namespace Noc_App.Models.ViewModel
         public int SelectedProjectTypeId { get; set; }
         public IEnumerable<SelectListItem> ProjectType { get; set; }
         [Display(Name ="Specify Other Detail")]
-        public string OtherProjectTypeDetail { get; set; }
-        public bool IsOtherTypeSelected { get; set; }
+        public string? OtherProjectTypeDetail { get; set; }
+        public int IsOtherTypeSelected { get; set; }
         [MaxLength(50, ErrorMessage = "Khasra cannot exceed 50 characters")]
-        public string Khasra { get; set; }
+        public string? Khasra { get; set; }
         [MaxLength(50, ErrorMessage = "Hadbast cannot exceed 50 characters")]
-        public string Hadbast { get; set; }
+        public string? Hadbast { get; set; }
         [MaxLength(50, ErrorMessage = "Plot No. cannot exceed 50 characters")]
         [Display(Name ="Plot No.")]
-        public string PlotNo { get; set; }
+        public string? PlotNo { get; set; }
         [Required]
         [Display(Name = "Owner Type")]
         public int SelectedOwnerTypeID { get; set; }
@@ -81,11 +81,13 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "NOC Type")]
         public int SelectedNocTypeId { get; set; }
         public IEnumerable<SelectListItem> NocType { get; set; }
-        public bool IsExtension { get; set; }
+        public int IsExtension { get; set; }
         [Display(Name = "NOC Number")]
-        public string NocNumber { get; set; }
+        public string? NocNumber { get; set; }
         [Display(Name = "Date")]
-        public DateTime PreviousDate { get; set; }
+        public DateTime? PreviousDate { get; set; }
+        [Required]
+        [Display(Name ="Confirm")]
         public bool IsConfirmed { get; set; }
         public string ApplicationID { get; set; }
         public DateTime CreatedOn { get; set; }
