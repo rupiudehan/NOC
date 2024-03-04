@@ -315,6 +315,8 @@
             }
             
         });
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('PreviousDate').setAttribute('max', today);
         $(function () {
             $(".mobno").on("input", function () {
                 // Remove non-numeric characters using a regular expression

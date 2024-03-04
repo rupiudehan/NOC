@@ -90,6 +90,8 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "NOC Number")]
         public string? NocNumber { get; set; }
         [Display(Name = "Date")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? PreviousDate { get; set; }
         [Required]
         [Display(Name ="Confirm")]

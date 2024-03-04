@@ -33,8 +33,11 @@
                                     <tr>
                                         <td>@role</td>
                                         <td>
-                                            <a asp-action="EditRole" asp-controller="Administration" asp-route-id="@role.Id" class="btn btn-warning">Edit</a>
-                                            <a asp-action="DeleteRole" asp-controller="Administration" asp-route-id="@role.Id" class="btn btn-danger">Delete</a>
+                                            @if (role.Name.ToUpper() != "ADMINISTRATOR")
+                                            {
+                                                <a asp-action="EditRole" asp-controller="Administration" asp-route-id="@role.Id" class="btn btn-warning">Edit</a>
+                                                <a asp-action="DeleteRole" asp-controller="Administration" asp-route-id="@role.Id" class="btn btn-danger">Delete</a>
+                                            }
                                         </td>
                                     </tr>
                                 }

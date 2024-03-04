@@ -175,10 +175,10 @@ namespace Noc_App.Controllers
                 if (model.IsExtension==1)
                 {
                     if (model.NocNumber == null) isValid = false;
-                    if (model.PreviousDate.ToString()== "1/1/0001 12:00:00 AM") { isValid = false; }
+                    if (model.PreviousDate == null) { isValid = false; }
                     if (!isValid)
                     {
-                        ModelState.AddModelError("", $"NOC Number and Date are required to fill");
+                        ModelState.AddModelError("", $"NOC Number and Date both are required to fill");
 
                         return View(viewModel);
                     }
