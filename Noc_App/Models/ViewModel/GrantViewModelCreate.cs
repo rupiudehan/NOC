@@ -20,7 +20,7 @@ namespace Noc_App.Models.ViewModel
         public double SiteAreaOrSizeInInches { get; set; }
         [Required]
         [Display(Name = "Project Type")]
-        public int SelectedProjectTypeId { get; set; }
+        public int? SelectedProjectTypeId { get; set; }
         public IEnumerable<SelectListItem> ProjectType { get; set; }
         [Display(Name ="Specify Other Detail")]
         public string? OtherProjectTypeDetail { get; set; }
@@ -34,25 +34,25 @@ namespace Noc_App.Models.ViewModel
         public string? PlotNo { get; set; }
         [Required]
         [Display(Name = "Owner Type")]
-        public int SelectedOwnerTypeID { get; set; }
+        public int? SelectedOwnerTypeID { get; set; }
         public IEnumerable<SelectListItem> OwnerType { get; set; }
         [Display(Name="Pin Code")]
         public string Pincode { get; set; }
         [Required]
         [Display(Name = "Village/Town/City")]
-        public int SelectedVillageID { get; set; }
+        public int? SelectedVillageID { get; set; }
         public IEnumerable<SelectListItem> Village { get; set; }
         [Required]
         [Display(Name = "Division")]
-        public int SelectedDivisionId { get; set; }
+        public int? SelectedDivisionId { get; set; }
         public IEnumerable<SelectListItem> Divisions { get; set; }
         [Required]
         [Display(Name = "Sub-Division")]
-        public int SelectedSubDivisionId { get; set; }
+        public int? SelectedSubDivisionId { get; set; }
         public IEnumerable<SelectListItem> SubDivision { get; set; }
         [Required]
         [Display(Name = "Tehsil/Block")]
-        public int SelectedTehsilBlockId { get; set; }
+        public int? SelectedTehsilBlockId { get; set; }
         public IEnumerable<SelectListItem> TehsilBlock { get; set; }
         [Required]
         [Display(Name = "Address Proof")]
@@ -80,11 +80,11 @@ namespace Noc_App.Models.ViewModel
         public List<OwnerViewModelCreate> Owners { get; set; }
         [Required]
         [Display(Name = "NOC Permission Type")]
-        public int SelectedNocPermissionTypeID { get; set; }
+        public int? SelectedNocPermissionTypeID { get; set; }
         public IEnumerable<SelectListItem> NocPermissionType { get; set; }
         [Required]
         [Display(Name = "NOC Type")]
-        public int SelectedNocTypeId { get; set; }
+        public int? SelectedNocTypeId { get; set; }
         public IEnumerable<SelectListItem> NocType { get; set; }
         public int IsExtension { get; set; }
         [Display(Name = "NOC Number")]

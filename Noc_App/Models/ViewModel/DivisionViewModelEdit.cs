@@ -9,7 +9,7 @@ namespace Noc_App.Models.ViewModel
         [Required]
         [Display(Name = "Name")]
         [MaxLength(150, ErrorMessage = "Division Name cannot exceed 150 characters")]
-        public string DivisionName { get; set; }
+        public string Name { get; set; }
         public ApplicationUser UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
     }

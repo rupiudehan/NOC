@@ -33,10 +33,17 @@ namespace Noc_App.Controllers
                 if (ModelState.IsValid)
                 {
                     string userid = await LoggedInUserID();
-                    
+
+                    bool IsDuplicate = _repo.IsDuplicateName(model.Name);
+                    if (IsDuplicate)
+                    {
+                        ModelState.AddModelError("", $"Name {model.Name} is already in use");
+                        return View(model);
+                    }
+
                     DivisionDetails divisionDetails = new DivisionDetails
                     {
-                        Name = model.DivisionName,
+                        Name = model.Name,
                         CreatedOn = DateTime.Now,
                         CreatedBy = userid,
                         IsActive=true
@@ -105,7 +112,7 @@ namespace Noc_App.Controllers
                 DivisionViewModelEdit model = new DivisionViewModelEdit
                 {
                     Id = obj.Id,
-                    DivisionName = obj.Name
+                    Name = obj.Name
                 };
                 return View(model);
             }
@@ -129,15 +136,15 @@ namespace Noc_App.Controllers
                 }
                 else
                 {
-                    bool IsDuplicate = _repo.IsUniqueName(model.DivisionName,model.Id);
+                    bool IsDuplicate = _repo.IsUniqueName(model.Name,model.Id);
                     if (IsDuplicate)
                     {
                         // Duplicate name found
-                        ModelState.AddModelError("e",$"Name {model.DivisionName} is already in use");
+                        ModelState.AddModelError("e",$"Name {model.Name} is already in use");
                         return View(model);
                     }
                     string userid = await LoggedInUserID();
-                    obj.Name = model.DivisionName;
+                    obj.Name = model.Name;
                     obj.UpdatedOn = DateTime.Now;
                     obj.UpdatedBy = userid;
                     await _repo.UpdateAsync(obj);

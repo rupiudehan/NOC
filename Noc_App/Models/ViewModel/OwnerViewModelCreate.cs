@@ -13,6 +13,7 @@ namespace Noc_App.Models.ViewModel
         [MaxLength(250, ErrorMessage = "Address cannot exceed 250 characters")]
         public string Address { get; set; }
         [Required]
+        [DataType(DataType.PhoneNumber)]
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Please enter a valid 10-digit mobile number.")]
         public string MobileNo { get; set; }
         [Required]

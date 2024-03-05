@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Crypto;
+using Noc_App.Helpers;
+using Noc_App.UtilityService;
 
 namespace Noc_App.Controllers
 {
@@ -22,12 +24,13 @@ namespace Noc_App.Controllers
         private readonly IRepository<NocPermissionTypeDetails> _nocPermissionTypeRepo;
         private readonly IRepository<NocTypeDetails> _nocTypeRepo;
         private readonly IRepository<OwnerTypeDetails> _ownerTypeRepo;
+        private readonly IEmailService _emailService;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
         public GrantController(IRepository<GrantDetails> repo,IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo, 
             IRepository<DivisionDetails> divisionRepo, IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo, 
-            IRepository<NocTypeDetails> nocTypeRepo,IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment)
+            IRepository<NocTypeDetails> nocTypeRepo,IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment, IEmailService emailService)
         {
             _villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
@@ -40,12 +43,27 @@ namespace Noc_App.Controllers
             _hostingEnvironment = hostingEnvironment;
             _repo = repo;
         }
-        public IActionResult Index()
+        public async Task<ViewResult> Index(int Id)
         {
-            return View();
+            try
+            {
+                GrantDetails obj = await _repo.GetByIdAsync(Id);
+                GrantViewModel model = new GrantViewModel
+                {
+                    Id = obj.Id,
+                    ApplicationID = obj.ApplicationID
+                };
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return View();
+            }
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Create()
         {
             var divisions = _divisionRepo.GetAll();
@@ -74,6 +92,7 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [Obsolete]
+        [AllowAnonymous]
         public async Task<IActionResult> Create(GrantViewModelCreate model)
         {
             bool isValid = true;
@@ -85,174 +104,184 @@ namespace Noc_App.Controllers
             var filteredSubdivisions = _subDivisionRepo.GetAll().Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
             var filteredtehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == model.SelectedSubDivisionId).ToList();
             var fileteedvillage = _villageRpo.GetAll().Where(c => c.TehsilBlockId == model.SelectedTehsilBlockId).ToList();
-            var selectedvillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID);
+            var selectedvillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID ?? 0);
             string ErrorMessage = string.Empty;
-
-            var viewModel = new GrantViewModelCreate
+            if (filteredSubdivisions.Count > 0 && filteredtehsilBlock.Count > 0 && fileteedvillage.Count > 0 && selectedvillage != null)
             {
-                Village = new SelectList(fileteedvillage, "Id", "Name"),
-                TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name"),
-                SubDivision = new SelectList(filteredSubdivisions, "Id", "Name"),// new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
-                Divisions = new SelectList(divisions, "Id", "Name"),
-                ProjectType = new SelectList(projectType, "Id", "Name"),
-                NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
-                NocType = new SelectList(nocType, "Id", "Name"),
-                OwnerType = new SelectList(ownerType, "Id", "Name"),
-                Owners = model.Owners,
-                Pincode=selectedvillage.PinCode.ToString()
-            };
-            if (model.SiteAreaOrSizeInInches >0 && model.SiteAreaOrSizeInFeet>0 && model.IDProofPhoto!=null && model.AddressProofPhoto!=null && model.AuthorizationLetterPhoto!=null
-                && model.SelectedVillageID>0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.Latitude > 0 && model.Longitute >0 && model.ApplicantName!=null
-                && model.ApplicantEmailID!=null && model.SelectedNocTypeId>0 && model.IsConfirmed
-                )
-            {
-                int IdPrrofValidation = AllowedCheckExtensions(model.IDProofPhoto);
-                int AddressPrrofValidation = AllowedCheckExtensions(model.AddressProofPhoto);
-                int AuthorizationValidation = AllowedCheckExtensions(model.AuthorizationLetterPhoto);
-                if (IdPrrofValidation == 0)
+                var viewModel = new GrantViewModelCreate
                 {
-                    ErrorMessage = $"Invalid ID proof file type. Please upload a JPG, PNG, or PDF file";
-                    ModelState.AddModelError("", ErrorMessage);
+                    Village = new SelectList(fileteedvillage, "Id", "Name"),
+                    TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name"),
+                    SubDivision = new SelectList(filteredSubdivisions, "Id", "Name"),// new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
+                    Divisions = new SelectList(divisions, "Id", "Name"),
+                    ProjectType = new SelectList(projectType, "Id", "Name"),
+                    NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
+                    NocType = new SelectList(nocType, "Id", "Name"),
+                    OwnerType = new SelectList(ownerType, "Id", "Name"),
+                    Owners = model.Owners,
+                    Pincode = selectedvillage.PinCode.ToString()
+                };
+                if (model.SiteAreaOrSizeInInches > 0 && model.SiteAreaOrSizeInFeet > 0 && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
+                    && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.Latitude > 0 && model.Longitute > 0 && model.ApplicantName != null
+                    && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.IsConfirmed
+                    )
+                {
+                    int IdPrrofValidation = AllowedCheckExtensions(model.IDProofPhoto);
+                    int AddressPrrofValidation = AllowedCheckExtensions(model.AddressProofPhoto);
+                    int AuthorizationValidation = AllowedCheckExtensions(model.AuthorizationLetterPhoto);
+                    if (IdPrrofValidation == 0)
+                    {
+                        ErrorMessage = $"Invalid ID proof file type. Please upload a JPG, PNG, or PDF file";
+                        ModelState.AddModelError("", ErrorMessage);
 
-                    return View(viewModel);
+                        return View(viewModel);
 
-                }
-                else if (IdPrrofValidation == 2)
-                {
-                    ErrorMessage = "ID proof field is required";
-                    ModelState.AddModelError("", ErrorMessage);
-                    return View(viewModel);
-                }
-                if (AddressPrrofValidation == 0)
-                {
-                    ErrorMessage = $"Invalid address proof file type. Please upload a JPG, PNG, or PDF file";
-                    ModelState.AddModelError("", ErrorMessage);
-                    return View(viewModel);
+                    }
+                    else if (IdPrrofValidation == 2)
+                    {
+                        ErrorMessage = "ID proof field is required";
+                        ModelState.AddModelError("", ErrorMessage);
+                        return View(viewModel);
+                    }
+                    if (AddressPrrofValidation == 0)
+                    {
+                        ErrorMessage = $"Invalid address proof file type. Please upload a JPG, PNG, or PDF file";
+                        ModelState.AddModelError("", ErrorMessage);
+                        return View(viewModel);
 
-                }
-                else if (AddressPrrofValidation == 2)
-                {
-                    ErrorMessage = "Address proof field is required";
-                    ModelState.AddModelError("", ErrorMessage);
-                    return View(viewModel);
-                }
-                if (AuthorizationValidation == 0)
-                {
-                    ErrorMessage = $"Invalid authorization letter file type. Please upload a JPG, PNG, or PDF file";
-                    ModelState.AddModelError("", ErrorMessage);
-                    return View(viewModel);
+                    }
+                    else if (AddressPrrofValidation == 2)
+                    {
+                        ErrorMessage = "Address proof field is required";
+                        ModelState.AddModelError("", ErrorMessage);
+                        return View(viewModel);
+                    }
+                    if (AuthorizationValidation == 0)
+                    {
+                        ErrorMessage = $"Invalid authorization letter file type. Please upload a JPG, PNG, or PDF file";
+                        ModelState.AddModelError("", ErrorMessage);
+                        return View(viewModel);
 
-                }
-                else if (AuthorizationValidation == 2)
-                {
-                    ErrorMessage = "Authorization letter field is required";
-                    ModelState.AddModelError("", ErrorMessage);
-                    return View(viewModel);
-                }
+                    }
+                    else if (AuthorizationValidation == 2)
+                    {
+                        ErrorMessage = "Authorization letter field is required";
+                        ModelState.AddModelError("", ErrorMessage);
+                        return View(viewModel);
+                    }
 
-                if (!AllowedFileSize(model.IDProofPhoto))
-                {
-                    ErrorMessage = "ID proof file size exceeds the allowed limit of 4MB";
-                    ModelState.AddModelError("", ErrorMessage);
-                    return View(viewModel);
-                }
-                if (!AllowedFileSize(model.AddressProofPhoto))
-                {
-                    ErrorMessage = "Address proof file size exceeds the allowed limit of 4MB";
-                    ModelState.AddModelError("", ErrorMessage);
-                    return View(viewModel);
-                }
-                if (!AllowedFileSize(model.AuthorizationLetterPhoto))
-                {
-                    ErrorMessage = "Authorization letter file size exceeds the allowed limit of 4MB";
-                    ModelState.AddModelError("", ErrorMessage);
-                    return View(viewModel);
-                }
+                    if (!AllowedFileSize(model.IDProofPhoto))
+                    {
+                        ErrorMessage = "ID proof file size exceeds the allowed limit of 4MB";
+                        ModelState.AddModelError("", ErrorMessage);
+                        return View(viewModel);
+                    }
+                    if (!AllowedFileSize(model.AddressProofPhoto))
+                    {
+                        ErrorMessage = "Address proof file size exceeds the allowed limit of 4MB";
+                        ModelState.AddModelError("", ErrorMessage);
+                        return View(viewModel);
+                    }
+                    if (!AllowedFileSize(model.AuthorizationLetterPhoto))
+                    {
+                        ErrorMessage = "Authorization letter file size exceeds the allowed limit of 4MB";
+                        ModelState.AddModelError("", ErrorMessage);
+                        return View(viewModel);
+                    }
 
                     string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto, "IDProof");
-                string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
-                string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
-                if (model.IsExtension==1)
-                {
-                    if (model.NocNumber == null) isValid = false;
-                    if (model.PreviousDate == null) { isValid = false; }
-                    if (!isValid)
+                    string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
+                    string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
+                    if (model.IsExtension == 1)
                     {
-                        ModelState.AddModelError("", $"NOC Number and Date both are required to fill");
+                        if (model.NocNumber == null) isValid = false;
+                        if (model.PreviousDate == null) { isValid = false; }
+                        if (!isValid)
+                        {
+                            ModelState.AddModelError("", $"NOC Number and Date both are required to fill");
 
-                        return View(viewModel);
+                            return View(viewModel);
+                        }
                     }
-                }
-                if (model.Khasra == null && model.Hadbast==null && model.PlotNo==null)
-                {
-                    isValid = false;
-
-                    ModelState.AddModelError("", $"Atleast one field is required to fill out of Khasra/Hadbast/Plot No.");
-
-                    return View(viewModel);
-                }
-                if (model.IsOtherTypeSelected == 1)
-                {
-                    if (model.OtherProjectTypeDetail == null)
+                    if (model.Khasra == null && model.Hadbast == null && model.PlotNo == null)
                     {
                         isValid = false;
-                        ModelState.AddModelError("", $"Other Detail is required to fill");
+
+                        ModelState.AddModelError("", $"Atleast one field is required to fill out of Khasra/Hadbast/Plot No.");
 
                         return View(viewModel);
                     }
-                }
-                if (isValid)
-                {
-
-                    string inputString = string.Empty;
-                    var grant = _repo.GetAll();
-                    if (grant != null && grant.Count() > 0)
+                    if (model.IsOtherTypeSelected == 1)
                     {
-                        int grantId = Convert.ToInt32((from g in grant
-                                                       select new { id = g.Id }
-                                    ).Max());
-                        var specificGrant = await _repo.GetByIdAsync(grantId);
-                        int extractedNumber = Convert.ToInt32(ExtractNumber(specificGrant.ApplicationID)) + 1;
-                        inputString = "GNT" + extractedNumber.ToString();
+                        if (model.OtherProjectTypeDetail == null)
+                        {
+                            isValid = false;
+                            ModelState.AddModelError("", $"Other Detail is required to fill");
+
+                            return View(viewModel);
+                        }
                     }
-                    else inputString = "GNT1";
-
-                    model.ApplicationID = inputString;
-
-                    GrantDetails obj = new GrantDetails
+                    if (isValid)
                     {
-                        Name = model.Name,
-                        SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
-                        SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
-                        IDProofPhotoPath = uniqueIDProofFileName,
-                        AddressProofPhotoPath = uniqueAddressProofFileName,
-                        AuthorizationLetterPhotoPath = uniqueAuthLetterFileName,
-                        VillageID = model.SelectedVillageID,
-                        ProjectTypeId = model.SelectedProjectTypeId,
-                        Khasra = model.Khasra,
-                        Hadbast = model.Hadbast,
-                        PlotNo = model.PlotNo,
-                        Latitude = model.Latitude,
-                        Longitute = model.Longitute,
-                        ApplicantName = model.ApplicantName,
-                        ApplicantEmailID = model.ApplicantEmailID,
-                        NocPermissionTypeID = model.SelectedNocPermissionTypeID,
-                        NocTypeId = model.SelectedNocTypeId,
-                        IsExtension = Convert.ToBoolean(model.IsExtension),
-                        NocNumber = model.NocNumber,
-                        PreviousDate = model.PreviousDate,
-                        IsConfirmed = model.IsConfirmed,
-                        ApplicationID = model.ApplicationID,
-                        CreatedOn = DateTime.Now
-                    };
-                    await _repo.CreateAsync(obj);
-                    return RedirectToAction("Index", "Home");
+
+                        string inputString = string.Empty;
+                        var grant = _repo.GetAll();
+                        if (grant != null && grant.Count() > 0)
+                        {
+                            int grantId = Convert.ToInt32((from g in grant
+                                                           select new { id = g.Id }
+                                        ).AsEnumerable().Max(x => x.id));
+                            var specificGrant = await _repo.GetByIdAsync(grantId);
+                            int extractedNumber = Convert.ToInt32(ExtractNumber(specificGrant.ApplicationID)) + 1;
+                            inputString = "GNT" + extractedNumber.ToString();
+                        }
+                        else inputString = "GNT1";
+
+                        model.ApplicationID = inputString;
+
+                        GrantDetails obj = new GrantDetails
+                        {
+                            Name = model.Name,
+                            SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
+                            SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
+                            IDProofPhotoPath = uniqueIDProofFileName,
+                            AddressProofPhotoPath = uniqueAddressProofFileName,
+                            AuthorizationLetterPhotoPath = uniqueAuthLetterFileName,
+                            VillageID = model.SelectedVillageID ?? 0,
+                            ProjectTypeId = model.SelectedProjectTypeId??0,
+                            Khasra = model.Khasra,
+                            Hadbast = model.Hadbast,
+                            PlotNo = model.PlotNo,
+                            Latitude = model.Latitude,
+                            Longitute = model.Longitute,
+                            ApplicantName = model.ApplicantName,
+                            ApplicantEmailID = model.ApplicantEmailID,
+                            NocPermissionTypeID = model.SelectedNocPermissionTypeID??0,
+                            NocTypeId = model.SelectedNocTypeId ?? 0,
+                            IsExtension = Convert.ToBoolean(model.IsExtension),
+                            NocNumber = model.NocNumber,
+                            PreviousDate = model.PreviousDate,
+                            IsConfirmed = model.IsConfirmed,
+                            ApplicationID = model.ApplicationID,
+                            CreatedOn = DateTime.Now
+                        };
+                        await _repo.CreateAsync(obj);
+                        var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantEmailID, model.ApplicationID));
+                        _emailService.SendEmail(emailModel);
+                        return RedirectToAction("Index", "Grant", new { Id = obj.Id });
+                    }
+                    else
+                    {
+
+                        ModelState.AddModelError("", $"All fields are required");
+                    }
                 }
                 else
                 {
-
                     ModelState.AddModelError("", $"All fields are required");
                 }
+
+                return View(viewModel);
             }
             else
             {
@@ -260,8 +289,7 @@ namespace Noc_App.Controllers
             }
 
 
-            return View(viewModel);
-
+            return View(model);
         }
         
         private bool AllowedFileSize(IFormFile file)
@@ -332,6 +360,7 @@ namespace Noc_App.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult GetSubDivisions(int divisionId)
         {
             var subDivision = _subDivisionRepo.GetAll();
@@ -340,6 +369,7 @@ namespace Noc_App.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult GetTehsilBlocks(int subDivisionId)
         {
             var tehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == subDivisionId).ToList();
@@ -347,6 +377,7 @@ namespace Noc_App.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult GetVillagess(int tehsilBlockId)
         {
             var village = _villageRpo.GetAll().Where(c => c.TehsilBlockId == tehsilBlockId).ToList();
@@ -355,6 +386,7 @@ namespace Noc_App.Controllers
 
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> GetVillageDetail(int villageId)
         {
             var village = await _villageRpo.GetByIdAsync(villageId);

@@ -99,13 +99,13 @@ namespace Noc_App.Models.Repository
         }
         public bool IsDuplicateName(string name)
         {
-            var result = _dbSet.Any(e => e.GetType().GetProperty("Name").GetValue(e).ToString() == name);
+            var result = _dbSet.AsEnumerable().Any(e => e.GetType().GetProperty("Name").GetValue(e).ToString() == name);
             return result;
         }
 
         public bool IsUniqueName(string name, int id)
         {
-            return _dbSet.Any(e => e.GetType().GetProperty("Name").GetValue(e).ToString() == name && e.GetType().GetProperty("Id").GetValue(e).ToString()!=id.ToString());
+            return _dbSet.AsEnumerable().Any(e => e.GetType().GetProperty("Name").GetValue(e).ToString() == name && e.GetType().GetProperty("Id").GetValue(e).ToString()!=id.ToString());
         }
     }
 }

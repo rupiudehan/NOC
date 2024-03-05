@@ -11,6 +11,7 @@ using System.Data;
 
 namespace Noc_App.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -87,18 +88,25 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
-
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
-                    else return RedirectToAction("index", "home");
+                    var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+
+                    if (result.Succeeded)
+                    {
+                        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
+                        else return RedirectToAction("index", "home");
+                    }
+
+
+                    ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+
                 }
-
-
-                ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+            }
+            catch (Exception ex)
+            {
 
             }
             return View(model);

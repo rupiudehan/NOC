@@ -38,9 +38,16 @@ namespace Noc_App.Controllers
         {
             try
             {
+                model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name");
                 if (ModelState.IsValid)
                 {
                     string userid = await LoggedInUserID();
+                    bool IsDuplicate = _repo.IsDuplicateName(model.Name);
+                    if (IsDuplicate)
+                    {
+                        ModelState.AddModelError("", $"Name {model.Name} is already in use");
+                        return View(model);
+                    }
                     SubDivisionDetails SubDivisionDetails = new SubDivisionDetails
                     {
                         Name = model.Name,
@@ -52,7 +59,6 @@ namespace Noc_App.Controllers
                     await _repo.CreateAsync(SubDivisionDetails);
                     return RedirectToAction("List", "SubDivision");
                 }
-                model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name");
 
             }
             catch (Exception ex)
@@ -135,6 +141,8 @@ namespace Noc_App.Controllers
                 }
                 else
                 {
+                    model.SelectedDivisionId = obj.DivisionId;
+                    model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name", obj.DivisionId);
                     bool IsDuplicate = _repo.IsUniqueName(model.Name, model.Id);
                     if (IsDuplicate)
                     {

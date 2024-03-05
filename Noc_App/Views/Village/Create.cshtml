@@ -78,17 +78,31 @@
             });
         }
         $(document).ready(function () {
+            $("#PinCode").on("keypress", function (event) {
+                // Allow only numeric characters (0-9) in the input field
+                var charCode = event.which;
+                if (charCode < 48 || charCode > 57) {
+                    event.preventDefault();
+                }
+            });
             $("#PinCode").on("blur", function () {
-                validatePinCode($(this).val());
+                validatePinCode($(this).val(), $(this));
             });
 
-            function validatePinCode(pinCode) {
+            function validatePinCode(pinCode,field) {
                 var pinCodeRegex = /^\d{6}$/;
                 var PinCode = $('#PinCode');
-                if (!pinCodeRegex.test(pinCode)) {
+                if (parseInt(pinCode) < 0) {
+
+                    field.val('');
+                    PinCode.next(".text-danger").text("Please enter a valid 6-digit PIN code.");
+                }
+                else if(!pinCodeRegex.test(pinCode)) {
                     // PinCode.addClass("is-invalid");
                     PinCode.next(".text-danger").text("Please enter a valid 6-digit PIN code.");
-                } else {
+                }
+                 
+                else {
                     // PinCode.removeClass("is-invalid");
                     PinCode.next(".text-danger").text("");
                 }

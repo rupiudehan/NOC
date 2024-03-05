@@ -45,5 +45,26 @@
             </body>
             </html>";
         }
+
+        public static string EmailStringBodyForGrantMessage(string email,string applicationID)
+        {
+            return $@"<htm>
+            <head></head>
+            <body style=""margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;"">
+            <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
+                <div>
+                    <div>
+                        <h1>Grant Application Status</h1>
+                        <hr>
+                        <p>You getting this email because you applied for NOC Grant.</p>
+                        <p>Application for Grant with Application ID <b>{applicationID}</b> has been applied successfully!</p><br>
+                        <p>Kind Regards,<br><br>
+                        Official</p>
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>";
+        }
     }
 }

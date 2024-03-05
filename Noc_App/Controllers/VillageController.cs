@@ -44,6 +44,19 @@ namespace Noc_App.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name");
+                    var filteredSubdivisions = _subDivisionRepo.GetAll().Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
+                    model.SubDivision = new SelectList(filteredSubdivisions, "Id", "Name");
+                    var filteredtehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == model.SelectedSubDivisionId).ToList();
+                    model.TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name");
+
+                    bool IsDuplicate = _repo.IsDuplicateName(model.Name);
+                    if (IsDuplicate)
+                    {
+                        // Duplicate name found
+                        ModelState.AddModelError("e", $"Name {model.Name} is already in use");
+                        return View(model);
+                    }
                     string userid = await LoggedInUserID();
                     VillageDetails SaveModel = new VillageDetails
                     {
@@ -57,10 +70,6 @@ namespace Noc_App.Controllers
                     await _repo.CreateAsync(SaveModel);
                     return RedirectToAction("List", "Village");
                 }
-                model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name");
-                model.SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name");
-                model.TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name");
-
             }
             catch (Exception ex)
             {
@@ -156,6 +165,12 @@ namespace Noc_App.Controllers
                 }
                 else
                 {
+                    model.TehsilBlock = new SelectList(_tehsilBlockRepo.GetAll().Where(x => x.SubDivisionId == model.SelectedSubDivisionId), "Id", "Name", model.SelectedTehsilBlockId);
+                    
+                    model.SubDivisions = new SelectList(_subDivisionRepo.GetAll().Where(x => x.DivisionId == model.SelectedDivisionId), "Id", "Name", model.SelectedSubDivisionId);
+                    model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name", model.SelectedDivisionId);
+                    
+
                     bool IsDuplicate = _repo.IsUniqueName(model.Name, model.Id);
                     if (IsDuplicate)
                     {
