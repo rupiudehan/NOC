@@ -93,7 +93,6 @@
                 var pinCodeRegex = /^\d{6}$/;
                 var PinCode = $('#PinCode');
                 if (parseInt(pinCode) < 0) {
-
                     field.val('');
                     PinCode.next(".text-danger").text("Please enter a valid 6-digit PIN code.");
                 }

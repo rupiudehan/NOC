@@ -352,7 +352,11 @@
             function validateMob(mobno, field) {
                 var fieldRegex = /^\d{10}$/;
 
-                if (!fieldRegex.test(mobno)) {
+                if (parseInt(pinCode) < 0) {
+                    field.val('');
+                    field.next(".text-danger").text("Please enter a valid mobile number.");
+                }
+                else if (!fieldRegex.test(mobno)) {
                     // PinCode.addClass("is-invalid");
                     field.next(".text-danger").text("Please enter a valid mobile number.");
                 } else {
