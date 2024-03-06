@@ -15,14 +15,16 @@ namespace Noc_App.Controllers
         private readonly IRepository<TehsilBlockDetails> _repo;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
+        private readonly IRepository<VillageDetails> _villageRepo;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public TehsilBlockController(IRepository<TehsilBlockDetails> repo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo, UserManager<ApplicationUser> userManager)
+        public TehsilBlockController(IRepository<TehsilBlockDetails> repo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo, IRepository<VillageDetails> villageRepo, UserManager<ApplicationUser> userManager)
         {
             _repo = repo;
             _subDivisionRepo = subDivisionRepo;
             _divisionRepo = divisionRepo;
             _userManager = userManager;
+            _villageRepo = villageRepo;
         }
         [HttpGet]
         public IActionResult Create()
@@ -220,6 +222,13 @@ namespace Noc_App.Controllers
                 return View("NotFound");
             }
 
+            var users = await _userManager.Users.AnyAsync(x => x.SubDivisionId == id);
+            var village = await _villageRepo.FindAsync(x => x.TehsilBlockId == id);
+            if (users || village.Count() > 0)
+            {
+                ModelState.AddModelError("e", $"Tehsil {obj.Name} is already in use");
+                return View(obj);
+            }
             await _repo.DeleteAsync(id);
 
             return RedirectToAction("List", "TehsilBlock");

@@ -315,7 +315,7 @@ namespace Noc_App.Controllers
 
             if (drain.DrainCoordinates != null)
             {
-                ViewBag.ErrorMessage = $"Drain with Id = {drain.Id} cannot be deleted due already in use";
+                ViewBag.ErrorMessage = $"Drain {drain.Name} is already in use";
                 return View(drain);
             }
 

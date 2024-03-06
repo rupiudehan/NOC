@@ -15,15 +15,17 @@ namespace Noc_App.Controllers
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
+        private readonly IRepository<GrantDetails> _grantRepo;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public VillageController(IRepository<VillageDetails> repo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo, UserManager<ApplicationUser> userManager)
+        public VillageController(IRepository<VillageDetails> repo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<GrantDetails> grantRepo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo, UserManager<ApplicationUser> userManager)
         {
             _repo = repo;
             _tehsilBlockRepo = tehsilBlockRepo;
             _subDivisionRepo = subDivisionRepo;
             _divisionRepo = divisionRepo;
             _userManager = userManager;
+            _grantRepo = grantRepo;
         }
         [HttpGet]
         public IActionResult Create()
@@ -237,6 +239,13 @@ namespace Noc_App.Controllers
                 return View("NotFound");
             }
 
+            var users = await _userManager.Users.AnyAsync(x => x.SubDivisionId == id);
+            var grant = await _grantRepo.FindAsync(x => x.VillageID == id);
+            if (users || grant.Count() > 0)
+            {
+                ModelState.AddModelError("e", $"Village {obj.Name} is already in use");
+                return View(obj);
+            }
             await _repo.DeleteAsync(id);
 
             return RedirectToAction("List", "Village");

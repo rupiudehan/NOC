@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Noc_App.Helpers;
 using Noc_App.Models;
 using Noc_App.Models.interfaces;
@@ -22,8 +23,9 @@ namespace Noc_App.Controllers
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepository;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepository;
         private readonly IRepository<DivisionDetails> _divisionRepository;
+        private readonly IRepository<DrainDetails> _drainRepo;
 
-        public AccountController(UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, IRepository<DivisionDetails> divisionRepository, IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, IRepository<VillageDetails> villageRepository, IEmailService emailService)
+        public AccountController(UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager, IRepository<DivisionDetails> divisionRepository, IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, IRepository<VillageDetails> villageRepository, IEmailService emailService, IRepository<DrainDetails> drainRepo)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -33,6 +35,8 @@ namespace Noc_App.Controllers
             _villageRepository = villageRepository;
             _emailService = emailService;
             _roleManager = roleManager;
+            _drainRepo = drainRepo;
+            //_grantRepo = grantRepo;
         }
         [HttpGet]
         [AllowAnonymous]
@@ -468,6 +472,18 @@ namespace Noc_App.Controllers
             if (user == null)
             {
                 return NotFound();
+            }
+
+
+            var village = await _villageRepository.FindAsync(x => x.CreatedBy == user.Id || x.UpdatedBy == user.Id);
+            var tehsil = await _tehsilBlockRepository.FindAsync(x => x.CreatedBy == user.Id || x.UpdatedBy == user.Id);
+            var subdivision = await _subDivisionRepository.FindAsync(x => x.CreatedBy == user.Id || x.UpdatedBy == user.Id);
+            var division = await _divisionRepository.FindAsync(x => x.CreatedBy == user.Id || x.UpdatedBy == user.Id);
+            var drain = await _drainRepo.FindAsync(x => x.CreatedBy == user.Id || x.UpdatedBy == user.Id);
+            if (village.Count()<=0 || tehsil.Count() <= 0 || subdivision.Count() <= 0 || division.Count() <= 0 ||drain.Count()<=0)
+            {
+                ModelState.AddModelError("e", $"User {user.UserName} is already in use");
+                return View(user);
             }
 
             // Delete associated user roles
