@@ -32,24 +32,24 @@
         <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon rotate-n-15">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-action="Index" asp-controller="Home">
+               @*  <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
-                </div>
-                <div class="sidebar-brand-text mx-3">NOC </div>
+                </div> *@
+                <div class="sidebar-brand-text mx-3">NOC, WRD, Punjab </div>
             </a>
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active">
+            @* <li class="nav-item active">
                 <a class="nav-link" asp-action="Index" asp-controller="Home">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-            </li>
-            <li class="nav-item">
+            </li> *@
+            <li class="nav-item active">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
                    aria-expanded="true" aria-controls="masters">
                     <i class="fas fa-fw fa-cog"></i>
@@ -58,7 +58,7 @@
                 <div id="masters" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         @* <h6 class="collapse-header">Custom Components:</h6> *@
-                        <a class="collapse-item" asp-action="ListRoles" asp-controller="Administration">Roles</a>
+                       @*  <a class="collapse-item" asp-action="ListRoles" asp-controller="Administration">Roles</a> *@
                         <a class="collapse-item" asp-action="List" asp-controller="Division">Division</a>
                         <a class="collapse-item" asp-action="List" asp-controller="SubDivision">SubDivision</a>
                         <a class="collapse-item" asp-action="List" asp-controller="TehsilBlock">Tehsil/Block</a>

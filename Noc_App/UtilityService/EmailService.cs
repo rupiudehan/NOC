@@ -37,11 +37,11 @@ namespace Noc_App.UtilityService
         {
             _config = config;
         }
-        public void SendEmail(EmailModel emailModel)
+        public void SendEmail(EmailModel emailModel,string subject= "Reset Password")
         {
             var emailMessage = new MimeMessage();
             var from = _config["EmailSettings:From"];
-            emailMessage.From.Add(new MailboxAddress("Reset Password", from));
+            emailMessage.From.Add(new MailboxAddress( System.Text.Encoding.UTF8, subject, from));
             emailMessage.To.Add(new MailboxAddress(emailModel.To, emailModel.To));
             emailMessage.Subject = emailModel.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html)

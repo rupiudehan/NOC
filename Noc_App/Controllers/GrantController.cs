@@ -42,7 +42,9 @@ namespace Noc_App.Controllers
             _ownerTypeRepo= ownerTypeRepo;
             _hostingEnvironment = hostingEnvironment;
             _repo = repo;
+            _emailService = emailService;
         }
+        [AllowAnonymous]
         public async Task<ViewResult> Index(int Id)
         {
             try
@@ -267,7 +269,7 @@ namespace Noc_App.Controllers
                         };
                         await _repo.CreateAsync(obj);
                         var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantEmailID, model.ApplicationID));
-                        _emailService.SendEmail(emailModel);
+                        _emailService.SendEmail(emailModel, "NOC Application Submitted Successfully");
                         return RedirectToAction("Index", "Grant", new { Id = obj.Id });
                     }
                     else

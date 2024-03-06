@@ -16,8 +16,8 @@
                         <p>Please tap the button below to choose a new password.</p>
                         <a href=""http://localhost:4200/reset?email={email}&code={emailToken}"" target=""_blank"" style=""background:#0d6efd;padding:10px;border:none;
                         color:white;border-radius:4px;display:block;margin:0 auto; width:50%;text-align:center;text-decoration:none;"">Reset Password</a><br>
-                        <p>Kind Regards,<br><br>
-                        Official</p>
+                        <p>Best Regards,<br><br>
+                        Punjab Irrigation Department</p>
                     </div>
                 </div>
             </div>
@@ -37,8 +37,8 @@
                         <p>Username: {email}</p>
                         <p>Password: {password}</p>
                         <br>
-                        <p>Kind Regards,<br><br>
-                        Official</p>
+                        <p>Best Regards,<br><br>
+                        Punjab Irrigation Department</p>
                     </div>
                 </div>
             </div>
@@ -54,12 +54,12 @@
             <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
                 <div>
                     <div>
-                        <h1>Grant Application Status</h1>
-                        <hr>
-                        <p>You getting this email because you applied for NOC Grant.</p>
-                        <p>Application for Grant with Application ID <b>{applicationID}</b> has been applied successfully!</p><br>
-                        <p>Kind Regards,<br><br>
-                        Official</p>
+                        <p>Dear {email},</p>
+                        
+                        <p>Congratulations! Your application ID <b>{applicationID}</b>for NOC Certificate has been successfully submitted. 
+                        You can track the status of your application on the portal using this Application ID</p><br>
+                        <p>Best Regards,<br><br>
+                        Punjab Irrigation Department</p>
                     </div>
                 </div>
             </div>

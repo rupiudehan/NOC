@@ -8,6 +8,7 @@ using Noc_App.Models.ViewModel;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Xml.Linq;
 using System.Linq;
+using System.Drawing;
 
 namespace Noc_App.Controllers
 {
@@ -80,23 +81,30 @@ namespace Noc_App.Controllers
                     }
                     List<DrainCoordinatesDetails> locationList = new List<DrainCoordinatesDetails>();
                     var coordinates = _repoLocation.GetAll();
-                    foreach (var d in model.DrainCoordinates)
+                    string latlang = "";
+                    foreach (var coor in model.DrainCoordinates)
                     {
-                        if (coordinates.Any(d => EF.Property<double>(d, "Latitude") == d.Latitude && EF.Property<double>(d, "Longitude") == d.Longitude)){
-                            ModelState.AddModelError("", $"{d.Latitude} and {d.Longitude} is already in use");
-                            return View(model);
+                        if (coordinates.Any(d => coor.Latitude == d.Latitude && coor.Longitude == d.Longitude)){
+                            latlang += $"{coor.Latitude} - {coor.Longitude}, ";
                         }
                         DrainCoordinatesDetails location = new DrainCoordinatesDetails();
-                        location.Latitude = d.Latitude;
-                        location.Longitude = d.Longitude;
+                        location.Latitude = coor.Latitude;
+                        location.Longitude = coor.Longitude;
                         location.CreatedBy = userid;
                         location.CreatedOn=DateTime.Now;
                         location.IsActive = true;
                         locationList.Add(location);
                     }
+                    if (latlang != "")
+                    {
+                        latlang=latlang.Remove(latlang.LastIndexOf(','), 1);
+                        ModelState.AddModelError("", $"{latlang} are already in use");
+                        return View(model);
+
+                    }
                     //if (obj.DrainCoordinates != null && obj.DrainCoordinates.Any())
                     //{
-                        var duplicateCoordinates = model.DrainCoordinates
+                    var duplicateCoordinates = model.DrainCoordinates
                         .GroupBy(c => new { c.Latitude, c.Longitude })
                         .Where(g => g.Count() > 1)
                         .Select(g => g.Key)
@@ -209,7 +217,8 @@ namespace Noc_App.Controllers
                         var drainDetailsList = _repo.GetAll();
 
                         // Perform dynamic property access client-side
-                        if (drainDetailsList.Any(d => EF.Property<string>(d, "Name") == model.Name && EF.Property<int>(d, "Id") != model.Id))
+                       
+                        if (drainDetailsList.AsEnumerable().Any(d => d.Name == model.Name && d.Id != model.Id))
                         {
                             ModelState.AddModelError("", $"Name {model.Name} is already in use");
                             return View(model);
@@ -217,22 +226,29 @@ namespace Noc_App.Controllers
                         string userid = await LoggedInUserID();
                         var coordinates = _repoLocation.GetAll();
                         List<DrainCoordinatesDetails> locationList = new List<DrainCoordinatesDetails>();
-                        foreach (var d in model.DrainCoordinates)
+                        string latlang = "";
+                        foreach (var coor in model.DrainCoordinates)
                         {
-                            if (coordinates.Any(d => EF.Property<double>(d, "Latitude") == d.Latitude && EF.Property<double>(d, "Longitude") == d.Longitude) && EF.Property<int>(d, "Id") != d.Id)
+                            if (coordinates.Any(d => coor.Latitude == d.Latitude && coor.Longitude == d.Longitude) && coor.Id != coor.Id)
                             {
-                                ModelState.AddModelError("", $"{d.Latitude} and {d.Longitude} is already in use");
-                                return View(model);
+                                latlang += $"{coor.Latitude} - {coor.Longitude}, ";
                             }
-                            DrainCoordinatesDetails objLocation = await _repoLocation.GetByIdAsync(d.Id);
+                            DrainCoordinatesDetails objLocation = await _repoLocation.GetByIdAsync(coor.Id);
                             //DrainCoordinatesDetails location = new DrainCoordinatesDetails();
-                            objLocation.Id = d.Id;
-                            objLocation.Latitude = d.Latitude;
-                            objLocation.Longitude = d.Longitude;
+                            objLocation.Id = coor.Id;
+                            objLocation.Latitude = coor.Latitude;
+                            objLocation.Longitude = coor.Longitude;
                             objLocation.UpdatedBy = userid;
                             objLocation.UpdatedOn= DateTime.Now;
                             ///await _repoLocation.UpdateAsync(location);
                             locationList.Add(objLocation);
+                        }
+                        if (latlang != "")
+                        {
+                            latlang = latlang.Remove(latlang.LastIndexOf(','), 1);
+                            ModelState.AddModelError("", $"{latlang} are already in use");
+                            return View(model);
+
                         }
                         obj.Name = model.Name;
                         obj.DrainCoordinates = locationList;
@@ -337,7 +353,7 @@ namespace Noc_App.Controllers
         public IActionResult IsNameDuplicate(string name)
         {
             var drainDetailsList = _repo.GetAll();
-            if (drainDetailsList.Any(d => EF.Property<string>(d, "Name") == name))
+            if (drainDetailsList.AsEnumerable().Any(d => EF.Property<string>(d, "Name") == name))
             {
                 return Json($"Name {name} is already in use");
             }

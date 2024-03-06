@@ -189,7 +189,7 @@ namespace Noc_App.Controllers
                     await this.userManager.UpdateAsync(user);
 
                     var emailModel = new EmailModel(user.Email, "Login Credentials", EmailBody.EmailStringBodyForInformation(user.Email, password));
-                    _emailService.SendEmail(emailModel);
+                    _emailService.SendEmail(emailModel,"Login Credentials");
 
                     //userManager.AddToRoleAsync(user, "User").Wait();
                     //await signInManager.SignInAsync(user, isPersistent: false);

@@ -35,14 +35,33 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="coordinate-entry">
-                                    @* <td>1</td> *@
-                                        <td><input type="text" pattern="^[0-9]*$" id="Latitude0" asp-for=DrainCoordinates[0].Latitude class="form-control numericField" placeholder="Latitude" /></td>
-                                        <td><input type="text" pattern="^[0-9]*$" id="Longitude0" asp-for=DrainCoordinates[0].Longitude class="form-control numericField" placeholder="Longitude" /></td>
+                                    @if (Model.DrainCoordinates.Count > 0)
+                                    {
+                                        @for (int i = 0; i < Model.DrainCoordinates.Count; i++)
+                                        {
+                                            string Latitude = @"Latitude" + i;
+                                            string Longitude = @"Longitude" + i;
+                                            <tr class="coordinate-entry">
+                                                <td>
+                                                    <input type="text" asp-for=DrainCoordinates[i].Latitude id="@Latitude" class="form-control numericField" placeholder="Latitude" />
+                                                </td>
+                                                <td><input type="text" asp-for=DrainCoordinates[i].Longitude id="@Longitude" class="form-control numericField" placeholder="Longitude" /></td>
 
-                                    <!-- Render more columns as needed -->
-                                </tr>
-                            </tbody>
+                                                <!-- Render more columns as needed -->
+                                            </tr>
+                                        }
+
+                                    }else
+                                    {
+                                        <tr class="coordinate-entry">
+                                            @* <td>1</td> *@
+                                            <td><input type="text" pattern="^[0-9]*$" id="Latitude0" asp-for=DrainCoordinates[0].Latitude class="form-control numericField" placeholder="Latitude" /></td>
+                                            <td><input type="text" pattern="^[0-9]*$" id="Longitude0" asp-for=DrainCoordinates[0].Longitude class="form-control numericField" placeholder="Longitude" /></td>
+
+                                            <!-- Render more columns as needed -->
+                                        </tr>
+                                    }
+                                </tbody>
                         </table>
                         
                     </div>
@@ -77,7 +96,9 @@
     <script>
         // Allow only numbers in the input field
         $(document).ready(function () {
-            $("body").on("input", ".numericField", function () {
+    // $('#Latitude0').val('');
+    // $('#Longitude0').val('');
+        $("body").on("input", ".numericField", function () {
                 // Remove non-numeric characters using a regular expression
                 $(this).val($(this).val().replace(/[^0-9.]/g, ''));
 

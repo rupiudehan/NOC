@@ -25,7 +25,20 @@
 
     <!-- Template Main CSS File -->
     <link href="~/landingpage/assets/css/style.css" rel="stylesheet">
-
+    <style>
+        footer {
+            position: fixed;
+            height: 88px;
+            bottom: 0;
+            width: 100%;
+        }
+        main, #hero {
+            min-height: 80vh;
+            height: auto !important;
+            height: 100%;
+            margin: 0 auto 60px;
+        }
+    </style>
     <!-- =======================================================
     * Template Name: Green
     * Updated: Jan 29 2024 with Bootstrap v5.3.2
@@ -57,7 +70,7 @@
     <header id="header" class="d-flex align-items-center">
         <div class="container d-flex align-items-center">
 
-            <h1 class="logo me-auto"><a asp-action="Index" asp-controller="HomeLanding">NOC</a></h1>
+            <h1 class="logo me-auto"><a asp-action="Index" asp-controller="HomeLanding">NOC, Department of Water Resources , Punjab</a></h1>
             <!-- Uncomment below if you prefer to use an image logo -->
             <!-- <a href="index.html" class="logo me-auto"><img src="~/landingpage/assets/img/logo.png" alt="" class="img-fluid"></a>-->
 
@@ -116,14 +129,7 @@
         <div class="container">
             @* <h3>Green</h3>
             <p>Et aut eum quis fuga eos sunt ipsa nihil. Labore corporis magni eligendi fuga maxime saepe commodi placeat.</p> *@
-            <div class="social-links">
-                
-                <a asp-action="Login" asp-controller="Account" class="twitter"><i class="bx bx-lock-open"></i></a>
-                <a asp-action="Create" asp-controller="Grant" class="facebook"><i class="bx bx-registered"></i></a>
-                @* <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-                <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
-                <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a> *@
-            </div>
+           
             <div class="copyright">
                 &copy; Copyright <strong><span>NOC</span></strong>. All Rights Reserved
             </div>
