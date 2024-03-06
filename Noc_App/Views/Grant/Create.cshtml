@@ -4,14 +4,18 @@
     Layout = "~/Views/HomeLanding/_HomeLayout.cshtml";
 }
 <main id="main">
-
-    <!-- ======= Featured Services Section ======= -->
-    <section id="featured-services" class="featured-services section-bg">
+    <section id="contact" class="contact">
         <div class="container">
-            <h1 class="h3 mb-4 text-gray-800">Application for Issue of NOC-Drainage</h1>
+
+            <div class="section-title">
+                <h2>Application for Issue of NOC-Drainage</h2>
+                @* <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p> *@
+            </div>
+
             <div class="row">
 
-                <div class="col-lg-12">
+                <div class="col-lg-12 mt-5 mt-lg-0 d-flex align-items-stretch">
+
 
                     <!-- Circle Buttons -->
                     <form enctype="multipart/form-data" class="user" asp-action="Create" asp-controller="Grant" method="post">
@@ -296,12 +300,10 @@
                     </form>
                 </div>
 
-
-
             </div>
 
         </div>
-    </section> <!-- End Featured Services Section -->
+    </section>
 
 </main>
 
@@ -339,7 +341,7 @@
             $('#Longitute').val('');
             $('#SiteAreaOrSizeInFeet').val('');
             $('#SiteAreaOrSizeInInches').val('');
-           
+
             $(".mobno").on("keypress", function (event) {
                 // Allow only numeric characters (0-9) in the input field
                 var charCode = event.which;
