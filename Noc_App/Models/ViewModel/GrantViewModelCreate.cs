@@ -61,6 +61,7 @@ namespace Noc_App.Models.ViewModel
         [NumericValidation(typeof(double))]
         public double Latitude { get; set; }
         [Required]
+        [Display(Name ="Longitude")]
         [NumericValidation(typeof(double))]
         public double Longitute { get; set; }
         [Required]

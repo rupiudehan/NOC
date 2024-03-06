@@ -8,7 +8,7 @@
         <div class="container">
 
             <div class="section-title">
-                <h2>Application for Issue of NOC-Drainage</h2>
+                <h2>Application for Issuance of NOC-Drainage</h2>
                 @* <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p> *@
             </div>
 
@@ -72,7 +72,7 @@
                                             <span asp-validation-for="ApplicantEmailID" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
-                                            <label asp-for="IDProofPhoto" class="control-label">ID Proof Document (Max File(jpg,png,pdf) Size 4MB)</label>
+                                            <label asp-for="IDProofPhoto" class="control-label">ID Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
                                             <div class="custom-file3">
                                                 <input asp-for="IDProofPhoto" class="form-control custom-file-input3" accept=".jpg, .jpeg, .png, .pdf" />
                                                 @* <label class="custom-file-label">Choose File...</label> *@
@@ -84,8 +84,8 @@
                                                 Authorization Letter (Attach in case
                                                 application is to be filled
                                                 by person other than
-                                                owner)-Max File(jpg,png,pdf) Size 4MB
-                                            </label>
+                                                owner)-
+                                            </label><span style="color:red">Max File (jpg,png,pdf) Size 4MB</span>
                                             <div class="custom-file2">
                                                 <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" accept=".jpg, .jpeg, .png, .pdf" />
                                                 @* <label class="custom-file-label2">Choose File...</label> *@
@@ -147,7 +147,7 @@
                                             <label asp-for="Pincode" id="Pincode" class="form-control form-control-user">@Model.Pincode</label>
                                         </div>
                                         <div class="form-group">
-                                            <label asp-for="AddressProofPhoto" class="control-label">Address Proof Document (Max File(jpg,png,pdf) Size 4MB)</label>
+                                            <label asp-for="AddressProofPhoto" class="control-label">Address Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
                                             <div class="custom-file1">
                                                 <input asp-for="AddressProofPhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
                                                 @* <label class="custom-file-label1">Choose File...</label> *@
@@ -337,10 +337,10 @@
         var today = new Date().toISOString().split('T')[0];
         document.getElementById('PreviousDate').setAttribute('max', today);
         $(function () {
-            $('#Latitude').val('');
-            $('#Longitute').val('');
-            $('#SiteAreaOrSizeInFeet').val('');
-            $('#SiteAreaOrSizeInInches').val('');
+            if ($('#Latitude').val() == '0') $('#Latitude').val('');
+            if ($('#Longitute').val() == '0') $('#Longitute').val('');
+            if($('#SiteAreaOrSizeInFeet').val()=='0') $('#SiteAreaOrSizeInFeet').val('');
+            if ($('#SiteAreaOrSizeInInches').val() == '0') $('#SiteAreaOrSizeInInches').val('');
 
             $(".mobno").on("keypress", function (event) {
                 // Allow only numeric characters (0-9) in the input field
