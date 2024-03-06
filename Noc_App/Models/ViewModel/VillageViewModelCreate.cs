@@ -9,7 +9,8 @@ namespace Noc_App.Models.ViewModel
         [MaxLength(150, ErrorMessage = "Name cannot exceed 150 characters")]
         public string Name { get; set; }
         [Required]
-        [MaxLength(6, ErrorMessage = "Please enter a valid 6-digit PIN code.")]
+        [DataType(DataType.PostalCode)]
+        //[MaxLength(6, ErrorMessage = "Please enter a valid 6-digit PIN code.")]
         [RegularExpression(@"^\d{6}$", ErrorMessage = "Please enter a valid 6-digit PIN code.")]
         public int PinCode { get; set; }
         [Required]

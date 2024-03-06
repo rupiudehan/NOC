@@ -46,7 +46,7 @@
             </html>";
         }
 
-        public static string EmailStringBodyForGrantMessage(string email,string applicationID)
+        public static string EmailStringBodyForGrantMessage(string applicantName,string applicationID)
         {
             return $@"<htm>
             <head></head>
@@ -54,10 +54,9 @@
             <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
                 <div>
                     <div>
-                        <p>Dear {email},</p>
+                        <p>Dear {applicantName},</p>
                         
-                        <p>Congratulations! Your application ID <b>{applicationID}</b>for NOC Certificate has been successfully submitted. 
-                        You can track the status of your application on the portal using this Application ID</p><br>
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been successfully submitted.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
                         <p>Best Regards,<br><br>
                         Punjab Irrigation Department</p>
                     </div>

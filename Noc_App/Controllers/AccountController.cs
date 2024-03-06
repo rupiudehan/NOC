@@ -322,6 +322,8 @@ namespace Noc_App.Controllers
                     if (user.SubDivision != null)
                     {
                         user.TehsilBlock = await _tehsilBlockRepository.GetByIdAsync(user.TehsilBlockId ?? 0);
+                        //user.TehsilBlock.SubDivision = user.SubDivision;
+                        //user.TehsilBlock.SubDivision.Division = user.Division;
                         if (user.TehsilBlock != null)
                         {
                             user.Village = await _villageRepository.GetByIdAsync(user.VillageId ?? 0);
@@ -329,10 +331,6 @@ namespace Noc_App.Controllers
                     }
                 }
 
-                user.Village = user.Village;
-                user.TehsilBlock = user.TehsilBlock;
-                user.TehsilBlock.SubDivision = user.SubDivision;
-                user.TehsilBlock.SubDivision.Division = user.Division;
                 var userRoles = await userManager.GetRolesAsync(user);
 
                 var availableRoles = _roleManager.Roles.Where(x=>x.Name!= "Administrator").Select(r => new SelectListItem

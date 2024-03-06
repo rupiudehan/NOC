@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Noc_App.Models;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.Repository;
@@ -13,11 +14,13 @@ namespace Noc_App.Controllers
     public class DivisionController : Controller
     {
         private readonly IRepository<DivisionDetails> _repo;
+        private readonly IRepository<SubDivisionDetails> _repoSubdivision;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public DivisionController(IRepository<DivisionDetails> repo, UserManager<ApplicationUser> userManager)
+        public DivisionController(IRepository<DivisionDetails> repo, IRepository<SubDivisionDetails> repoSubdivision, UserManager<ApplicationUser> userManager)
         {
             _repo = repo;
+            _repoSubdivision = repoSubdivision;
             _userManager = userManager;
         }
         [HttpGet]
@@ -179,6 +182,13 @@ namespace Noc_App.Controllers
                 return View("NotFound");
             }
 
+            var users = await _userManager.Users.AnyAsync(x => x.DivisionId == id);
+            var subdivision = await _repoSubdivision.FindAsync(x=>x.DivisionId==id);
+            if (users || subdivision.Count()>0)
+            {
+                ModelState.AddModelError("e", $"Division {obj.Name} is already in use");
+                return View(obj);
+            }
             await _repo.DeleteAsync(id);
 
             return RedirectToAction("List", "Division");

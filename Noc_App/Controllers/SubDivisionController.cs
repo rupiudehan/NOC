@@ -15,13 +15,15 @@ namespace Noc_App.Controllers
     {
         private readonly IRepository<SubDivisionDetails> _repo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
+        private readonly IRepository<TehsilBlockDetails> _tehsilRepo;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public SubDivisionController(IRepository<SubDivisionDetails> repo, IRepository<DivisionDetails> divisionRepo, UserManager<ApplicationUser> userManager)
+        public SubDivisionController(IRepository<SubDivisionDetails> repo, IRepository<DivisionDetails> divisionRepo, IRepository<TehsilBlockDetails> tehsilRepo, UserManager<ApplicationUser> userManager)
         {
             _repo = repo;
             _divisionRepo = divisionRepo;
             _userManager = userManager;
+            _tehsilRepo= tehsilRepo;
         }
         [HttpGet]
         public IActionResult Create()
@@ -205,7 +207,13 @@ namespace Noc_App.Controllers
                 ViewBag.ErrorMessage = $"Sub-Division with Id = {obj.Id} cannot be found";
                 return View("NotFound");
             }
-
+            var users = await _userManager.Users.AnyAsync(x => x.SubDivisionId == id);
+            var tehsil = await _tehsilRepo.FindAsync(x => x.SubDivisionId == id);
+            if (users || tehsil.Count() > 0)
+            {
+                ModelState.AddModelError("e", $"Sub-Division {obj.Name} is already in use");
+                return View(obj);
+            }
             await _repo.DeleteAsync(id);
 
             return RedirectToAction("List","SubDivision");

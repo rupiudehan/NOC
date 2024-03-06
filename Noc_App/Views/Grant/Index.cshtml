@@ -16,9 +16,13 @@
                     <input hidden asp-for="Id" />
                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                         <tbody>
-                        <tr><td>Your application has been applied successfully!</td></tr>
+                            <tr><td>Your application has been received.</td></tr>
                         <tr>
-                            <td>Application Number is <b style="color:green">@Model.ApplicationID</b> to track the status</td>
+                                <td>
+                                    Track its status with the following tracking number: <b style="color:green">
+                                        @Model.ApplicationID.
+                                    </b>
+                                </td>
                         </tr>
                     </tbody>
                     </table>

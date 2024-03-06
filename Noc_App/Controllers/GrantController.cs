@@ -268,7 +268,7 @@ namespace Noc_App.Controllers
                             CreatedOn = DateTime.Now
                         };
                         await _repo.CreateAsync(obj);
-                        var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantEmailID, model.ApplicationID));
+                        var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
                         _emailService.SendEmail(emailModel, "NOC Application Submitted Successfully");
                         return RedirectToAction("Index", "Grant", new { Id = obj.Id });
                     }
