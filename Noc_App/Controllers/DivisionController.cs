@@ -182,9 +182,9 @@ namespace Noc_App.Controllers
                 return View("NotFound");
             }
 
-            var users = await _userManager.Users.AnyAsync(x => x.DivisionId == id);
+            //var users = await _userManager.Users.AnyAsync(x => x.DivisionId == id);
             var subdivision = await _repoSubdivision.FindAsync(x=>x.DivisionId==id);
-            if (users || subdivision.Count()>0)
+            if (/*users ||*/ subdivision.Count()>0)
             {
                 ModelState.AddModelError("e", $"Division {obj.Name} is already in use");
                 return View(obj);

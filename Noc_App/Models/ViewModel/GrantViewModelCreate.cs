@@ -11,13 +11,20 @@ namespace Noc_App.Models.ViewModel
         [MaxLength(250, ErrorMessage = "Name cannot exceed 250 characters")]
         public string Name { get; set; }
         [Required]
-        [Display(Name ="Site Size in Feet")]
-        [NumericValidation(typeof(double))]
-        public double SiteAreaOrSizeInFeet { get; set; }
-        [Required]
-        [Display(Name = "Site Size in Inches")]
-        [NumericValidation(typeof(double))]
-        public double SiteAreaOrSizeInInches { get; set; }
+        [Display(Name = "Unit of Site Area")]
+        public int SelectedSiteAreaUnitId { get; set; }
+        public IEnumerable<SelectListItem> SiteAreaUnit { get; set; }
+        public List<GrantKhasraViewModelCreate> GrantKhasras { get; set; }
+        [Display(Name = "Total Area")]
+        public string TotalArea { get; set; }
+        //[Required]
+        //[Display(Name ="Site Size in Feet")]
+        //[NumericValidation(typeof(double))]
+        //public double SiteAreaOrSizeInFeet { get; set; }
+        //[Required]
+        //[Display(Name = "Site Size in Inches")]
+        //[NumericValidation(typeof(double))]
+        //public double SiteAreaOrSizeInInches { get; set; }
         [Required]
         [Display(Name = "Project Type")]
         public int? SelectedProjectTypeId { get; set; }
@@ -25,8 +32,6 @@ namespace Noc_App.Models.ViewModel
         [Display(Name ="Specify Other Detail")]
         public string? OtherProjectTypeDetail { get; set; }
         public int IsOtherTypeSelected { get; set; }
-        [MaxLength(50, ErrorMessage = "Khasra cannot exceed 50 characters")]
-        public string? Khasra { get; set; }
         [MaxLength(50, ErrorMessage = "Hadbast cannot exceed 50 characters")]
         public string? Hadbast { get; set; }
         [MaxLength(50, ErrorMessage = "Plot No. cannot exceed 50 characters")]
@@ -58,12 +63,9 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Address Proof")]
         public IFormFile AddressProofPhoto { get; set; }
         [Required]
-        [NumericValidation(typeof(double))]
-        public double Latitude { get; set; }
+        public IFormFile KMLFile { get; set; }
         [Required]
-        [Display(Name ="Longitude")]
-        [NumericValidation(typeof(double))]
-        public double Longitute { get; set; }
+        public string KMLLinkName { get; set; }
         [Required]
         [Display(Name = "Applicant Name")]
         public string ApplicantName { get; set; }
@@ -97,6 +99,7 @@ namespace Noc_App.Models.ViewModel
         [Required]
         [Display(Name ="Confirm")]
         public bool IsConfirmed { get; set; }
+        public bool IsPaymentDone { get; set; }
         public string ApplicationID { get; set; }
         public DateTime CreatedOn { get; set; }
     }

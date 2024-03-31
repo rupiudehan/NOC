@@ -17,47 +17,82 @@ namespace Noc_App.Context
         public DbSet<SubDivisionDetails> SubDivisionDetails { get; set; }
         public DbSet<TehsilBlockDetails> TehsilBlockDetails { get; set; }
         public DbSet<VillageDetails> VillageDetails { get; set; }
-        public DbSet<DrainCoordinatesDetails> DrainCoordinatesDetails { get; set; }
-        public DbSet<DrainDetails> DrainDetails { get; set; }
+        public DbSet<UserDivision> UserDivision { get; set; }
+        public DbSet<UserSubdivision> UserSubdivision { get; set; }
+        public DbSet<UserTehsil> UserTehsil { get; set; }
+        public DbSet<UserVillage> UserVillage { get; set; }
+        //public DbSet<DrainCoordinatesDetails> DrainCoordinatesDetails { get; set; }
+        //public DbSet<DrainDetails> DrainDetails { get; set; }
         public DbSet<OwnerTypeDetails> OwnerTypeDetails { get; set; }
         public DbSet<OwnerDetails> OwnerDetails { get; set; }
         public DbSet<NocPermissionTypeDetails> NocPermissionTypeDetails { get; set; }
         public DbSet<NocTypeDetails> NocTypeDetails { get; set; }
         public DbSet<ProjectTypeDetails> ProjectTypeDetails { get; set; }
+        public DbSet<SiteAreaUnitDetails> SiteAreaUnitDetails { get; set; }
+        public DbSet<GrantApprovalMaster> GrantApprovalMaster { get; set; }
         public DbSet<GrantDetails> GrantDetails { get; set; }
+        public DbSet<GrantKhasraDetails> GrantKhasraDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserDivision>()
+            .HasKey(ud => new { ud.UserId, ud.DivisionId });
 
-            modelBuilder.Entity<ApplicationUser>()
-                .HasOne(u => u.Village)
-                .WithMany(v => v.ApplicationUsers)
-                .HasForeignKey(u => u.VillageId)
-                .OnDelete(DeleteBehavior.Restrict); // Use appropriate delete behavior based on your requirements
+            modelBuilder.Entity<UserDivision>()
+                .HasOne(ud => ud.User)
+                .WithMany(u => u.UserDivisions)
+                .HasForeignKey(ud => ud.UserId);
 
-            modelBuilder.Entity<ApplicationUser>()
-                .HasOne(u => u.TehsilBlock)
-                .WithMany(c => c.ApplicationUsers)
-                .HasForeignKey(u => u.TehsilBlockId)
-                .OnDelete(DeleteBehavior.Restrict); // Use appropriate delete behavior based on your requirements
+            modelBuilder.Entity<UserDivision>()
+                .HasOne(ud => ud.Division)
+                .WithMany(d => d.UserDivisions)
+                .HasForeignKey(ud => ud.DivisionId);
 
-            modelBuilder.Entity<ApplicationUser>()
-                .HasOne(u => u.SubDivision)
-                .WithMany(c => c.ApplicationUsers)
-                .HasForeignKey(u => u.SubDivisionId)
-                .OnDelete(DeleteBehavior.Restrict); // Use appropriate delete behavior based on your requirements
+            modelBuilder.Entity<UserSubdivision>()
+            .HasKey(ud => new { ud.UserId, ud.SubdivisionId });
 
-            modelBuilder.Entity<ApplicationUser>()
-                .HasOne(u => u.Division)
-                .WithMany(c => c.ApplicationUsers)
-                .HasForeignKey(u => u.DivisionId)
-                .OnDelete(DeleteBehavior.Restrict); // Use appropriate delete behavior based on your requirements
+            modelBuilder.Entity<UserSubdivision>()
+                .HasOne(ud => ud.User)
+                .WithMany(u => u.UserSubdivisions)
+                .HasForeignKey(ud => ud.UserId);
+
+            modelBuilder.Entity<UserSubdivision>()
+                .HasOne(ud => ud.Subdivision)
+                .WithMany(d => d.UserSubdivisions)
+                .HasForeignKey(ud => ud.SubdivisionId);
+
+            modelBuilder.Entity<UserTehsil>()
+            .HasKey(ud => new { ud.UserId, ud.TehsilId });
+
+            modelBuilder.Entity<UserTehsil>()
+                .HasOne(ud => ud.User)
+                .WithMany(u => u.UserTehsils)
+                .HasForeignKey(ud => ud.UserId);
+
+            modelBuilder.Entity<UserTehsil>()
+                .HasOne(ud => ud.Tehsil)
+                .WithMany(d => d.UserTehsils)
+                .HasForeignKey(ud => ud.TehsilId);
+
+            modelBuilder.Entity<UserVillage>()
+            .HasKey(ud => new { ud.UserId, ud.VillageId });
+
+            modelBuilder.Entity<UserVillage>()
+                .HasOne(ud => ud.User)
+                .WithMany(u => u.UserVillages)
+                .HasForeignKey(ud => ud.UserId);
+
+            modelBuilder.Entity<UserVillage>()
+                .HasOne(ud => ud.Village)
+                .WithMany(d => d.UserVillages)
+                .HasForeignKey(ud => ud.VillageId);
 
             modelBuilder.Entity<VillageDetails>()
                 .HasOne(v => v.User)
                 .WithMany(u => u.Villages)
                 .HasForeignKey(v => v.CreatedBy);
             modelBuilder.Entity<VillageDetails>().Ignore(d => d.User2);
+
             modelBuilder.Entity<VillageDetails>()
                 .HasOne(v => v.User2)
                 .WithMany(u => u.Villages2)
@@ -96,29 +131,6 @@ namespace Noc_App.Context
                 .WithMany(u => u.Divisions2)
                 .HasForeignKey(s => s.UpdatedBy);
 
-            modelBuilder.Entity<DrainCoordinatesDetails>()
-                .HasOne(s => s.User)
-                .WithMany(u => u.DrainCoordinates)
-                .HasForeignKey(s => s.CreatedBy);
-
-            modelBuilder.Entity<DrainCoordinatesDetails>().Ignore(d => d.User2);
-
-            modelBuilder.Entity<DrainDetails>()
-            .HasMany(d => d.DrainCoordinates)
-            .WithOne(c => c.Drain)
-            .HasForeignKey(c => c.DrainId);
-
-            modelBuilder.Entity<DrainDetails>()
-                .HasOne(s => s.User)
-                .WithMany(u => u.Drains)
-                .HasForeignKey(s => s.CreatedBy);
-
-            modelBuilder.Entity<DrainDetails>().Ignore(d => d.User2);
-            modelBuilder.Entity<DrainDetails>()
-                .HasOne(s => s.User2)
-                .WithMany(u => u.Drains2)
-                .HasForeignKey(s => s.UpdatedBy);
-
             modelBuilder.Entity<GrantDetails>()
                 .HasMany(g => g.Owners)
                 .WithOne(o => o.Grant)
@@ -153,6 +165,32 @@ namespace Noc_App.Context
                 .HasOne(s => s.NocType)
                 .WithMany(u => u.Grants)
                 .HasForeignKey(s => s.NocTypeId);
+
+            modelBuilder.Entity<SiteAreaUnitDetails>().HasData(
+                new SiteAreaUnitDetails { Id = 1, Name ="Biswansi/Biswa/Bigha"},
+                new SiteAreaUnitDetails { Id = 2, Name = "Marla/Kanal/Sarsai" }
+                );
+            modelBuilder.Entity<ProjectTypeDetails>().HasData(
+                new ProjectTypeDetails { Id = 1,Name = "Residentials" },
+                new ProjectTypeDetails { Id = 2,Name = "Industrial" },
+                new ProjectTypeDetails { Id = 3,Name = "Commercial" },
+                new ProjectTypeDetails { Id = 4, Name = "Any Other" }
+                );
+            modelBuilder.Entity<OwnerTypeDetails>().HasData(
+                new OwnerTypeDetails { Id = 1,Name = "Owner" },
+                new OwnerTypeDetails { Id = 2,Name = "Partners" },
+                new OwnerTypeDetails { Id = 3,Name = "Chief Executive" },
+                new OwnerTypeDetails { Id = 4,Name = "Full Time Directors" }
+                );
+            modelBuilder.Entity<NocPermissionTypeDetails>().HasData(
+                new NocPermissionTypeDetails {Id = 1,Name = "Residential" },
+                new NocPermissionTypeDetails {Id = 2,Name = "Industrial" },
+                new NocPermissionTypeDetails { Id = 3, Name = "Commercial" }
+                );
+            modelBuilder.Entity<NocTypeDetails>().HasData(
+                new NocTypeDetails {Id = 1, Name = "New" },
+                new NocTypeDetails { Id = 2, Name = "Extension of Existing Project" }
+                );
 
             base.OnModelCreating(modelBuilder);
         }

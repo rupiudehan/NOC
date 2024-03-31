@@ -1,9 +1,28 @@
 ﻿@model GrantViewModel
 @{
-    ViewBag.Title = "Application of Grant for NOC Detail";
-    Layout = "~/Views/HomeLanding/_HomeLayout.cshtml";
+    // ViewBag.Title = "Application of Grant for NOC Detail";
+    // Layout = "~/Views/HomeLanding/_HomeLayout.cshtml";
+    ViewBag.Title = "Success";
+    Layout = "~/Views/Shared/_LayoutSuccess.cshtml";
 }
-<h1 style="text-align:center" class="h3 mb-4 text-gray-800">Application Detail</h1>
+<h1> Congratulations!</h1>
+@if (Model != null)
+{
+    <input hidden asp-for="Id" />
+    <p>
+        Your application has been received successfully.<br /> Track its status with the following tracking number:<br />
+        <b style="color:#76ac23">
+            @Model.ApplicationID.
+        </b>
+    </p><br />
+    <p>
+        <a class="btn btn-secondary btn-user btn-block" asp-controller="HomeLanding" asp-action="Index">Back To Home</a>
+    </p>
+}else
+{
+    <p>Invalid request!</p>
+}
+@* <h1 style="text-align:center" class="h3 mb-4 text-gray-800">Application Detail</h1>
 <div class="row">
 
     <div class="col-lg-12" style="text-align:center" >
@@ -40,4 +59,4 @@
             </div>
         </form>
     </div>
-</div>
+</div> *@

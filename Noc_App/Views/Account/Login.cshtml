@@ -1,4 +1,6 @@
 ﻿@model LoginViewModel;
+@using Microsoft.Extensions.Options;
+@inject IOptions<Noc_App.Helpers.GoogleCaptchaConfig> GoogleCaptchaConfig;
 @{
     ViewBag.Title = "Login";
     // Layout = "~/Views/Account/_AccountLayout.cshtml";
@@ -20,6 +22,7 @@
                         <div class="row">
                             <div class="form-group mt-3">
                                 <label asp-for="Email"></label>
+                                <input id="loginToken" type="hidden" asp-for="Token" />
                                 <input asp-for="Email" class="form-control form-control-user" placeholder="Enter Email Address...">
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
@@ -45,3 +48,14 @@
     </section>
 
 </main>
+@section Scripts {
+    <script src="https://www.google.com/recaptcha/api.js?render=@GoogleCaptchaConfig.Value.SiteKey"></script>
+    <script>
+        grecaptcha.ready(function () {
+            grecaptcha.execute('@GoogleCaptchaConfig.Value.SiteKey', { action: 'submit' }).then(function (token) {
+                // Add your logic to submit to your backend server here.
+                $('#loginToken').val(token);
+            });
+        });
+    </script>
+}

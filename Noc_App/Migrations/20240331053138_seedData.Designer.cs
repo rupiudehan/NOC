@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240301102338_AddedForeignKeyinGrantANdItsMasters")]
-    partial class AddedForeignKeyinGrantANdItsMasters
+    [Migration("20240331053138_seedData")]
+    partial class seedData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -169,9 +169,6 @@ namespace NocApp.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
-                    b.Property<int?>("DivisionId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -205,12 +202,6 @@ namespace NocApp.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
-                    b.Property<int?>("SubDivisionId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("TehsilBlockId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -218,12 +209,7 @@ namespace NocApp.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.Property<int?>("VillageId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("DivisionId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -231,12 +217,6 @@ namespace NocApp.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
-
-                    b.HasIndex("SubDivisionId");
-
-                    b.HasIndex("TehsilBlockId");
-
-                    b.HasIndex("VillageId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -278,7 +258,7 @@ namespace NocApp.Migrations
                     b.ToTable("DivisionDetails");
                 });
 
-            modelBuilder.Entity("Noc_App.Models.DrainCoordinatesDetails", b =>
+            modelBuilder.Entity("Noc_App.Models.GrantApprovalMaster", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -286,76 +266,15 @@ namespace NocApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
+                    b.Property<string>("Code")
                         .HasColumnType("text");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("DrainId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<double>("Latitude")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("Longitude")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DrainId");
-
-                    b.ToTable("DrainCoordinatesDetails");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.DrainDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
-
-                    b.Property<string>("UpdatedBy")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("UpdatedBy");
-
-                    b.ToTable("DrainDetails");
+                    b.ToTable("GrantApprovalMaster");
                 });
 
             modelBuilder.Entity("Noc_App.Models.GrantDetails", b =>
@@ -367,34 +286,37 @@ namespace NocApp.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddressProofPhotoPath")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ApplicantEmailID")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ApplicantName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ApplicationID")
                         .HasColumnType("text");
 
                     b.Property<string>("AuthorizationLetterPhotoPath")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("ForwardLevel")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Hadbast")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("IDProofPhotoPath")
-                        .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsCancelled")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("boolean");
@@ -402,22 +324,28 @@ namespace NocApp.Migrations
                     b.Property<bool>("IsExtension")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Khasra")
-                        .IsRequired()
+                    b.Property<bool>("IsForwarded")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPending")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRejected")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSentBack")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("KMLFilePath")
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("Longitute")
-                        .HasColumnType("numeric");
+                    b.Property<string>("KMLLinkName")
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("NocNumber")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("NocPermissionTypeID")
@@ -426,21 +354,23 @@ namespace NocApp.Migrations
                     b.Property<int>("NocTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("PlotNo")
-                        .IsRequired()
+                    b.Property<string>("OtherProjectTypeDetail")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("PreviousDate")
+                    b.Property<string>("PlotNo")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PreviousDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("ProjectTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("SiteAreaOrSizeInFeet")
-                        .HasColumnType("numeric");
+                    b.Property<int>("SentBackLevel")
+                        .HasColumnType("integer");
 
-                    b.Property<decimal>("SiteAreaOrSizeInInches")
-                        .HasColumnType("numeric");
+                    b.Property<int>("SiteAreaUnitId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("timestamp with time zone");
@@ -456,9 +386,46 @@ namespace NocApp.Migrations
 
                     b.HasIndex("ProjectTypeId");
 
+                    b.HasIndex("SiteAreaUnitId");
+
                     b.HasIndex("VillageID");
 
                     b.ToTable("GrantDetails");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantKhasraDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GrantID")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("KanalOrBiswa")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("KhasraNo")
+                        .HasColumnType("text");
+
+                    b.Property<double>("MarlaOrBiswansi")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("SarsaiOrBigha")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrantID");
+
+                    b.HasIndex("UnitId");
+
+                    b.ToTable("GrantKhasraDetails");
                 });
 
             modelBuilder.Entity("Noc_App.Models.NocPermissionTypeDetails", b =>
@@ -475,6 +442,23 @@ namespace NocApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("NocPermissionTypeDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Residential"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Industrial"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Commercial"
+                        });
                 });
 
             modelBuilder.Entity("Noc_App.Models.NocTypeDetails", b =>
@@ -491,6 +475,18 @@ namespace NocApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("NocTypeDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "New"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Extension of Existing Project"
+                        });
                 });
 
             modelBuilder.Entity("Noc_App.Models.OwnerDetails", b =>
@@ -542,6 +538,28 @@ namespace NocApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("OwnerTypeDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Owner"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Partners"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Chief Executive"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Full Time Directors"
+                        });
                 });
 
             modelBuilder.Entity("Noc_App.Models.ProjectTypeDetails", b =>
@@ -558,6 +576,56 @@ namespace NocApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProjectTypeDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Residentials"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Industrial"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Commercial"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Any Other"
+                        });
+                });
+
+            modelBuilder.Entity("Noc_App.Models.SiteAreaUnitDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SiteAreaUnitDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Biswansi/Biswa/Bigha"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Marla/Kanal/Sarsai"
+                        });
                 });
 
             modelBuilder.Entity("Noc_App.Models.SubDivisionDetails", b =>
@@ -642,6 +710,66 @@ namespace NocApp.Migrations
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("TehsilBlockDetails");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.UserDivision", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("DivisionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "DivisionId");
+
+                    b.HasIndex("DivisionId");
+
+                    b.ToTable("UserDivision");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.UserSubdivision", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("SubdivisionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "SubdivisionId");
+
+                    b.HasIndex("SubdivisionId");
+
+                    b.ToTable("UserSubdivision");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.UserTehsil", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("TehsilId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "TehsilId");
+
+                    b.HasIndex("TehsilId");
+
+                    b.ToTable("UserTehsil");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.UserVillage", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("VillageId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "VillageId");
+
+                    b.HasIndex("VillageId");
+
+                    b.ToTable("UserVillage");
                 });
 
             modelBuilder.Entity("Noc_App.Models.VillageDetails", b =>
@@ -740,37 +868,6 @@ namespace NocApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Noc_App.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("Noc_App.Models.DivisionDetails", "Division")
-                        .WithMany("ApplicationUsers")
-                        .HasForeignKey("DivisionId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Noc_App.Models.SubDivisionDetails", "SubDivision")
-                        .WithMany("ApplicationUsers")
-                        .HasForeignKey("SubDivisionId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Noc_App.Models.TehsilBlockDetails", "TehsilBlock")
-                        .WithMany("ApplicationUsers")
-                        .HasForeignKey("TehsilBlockId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Noc_App.Models.VillageDetails", "Village")
-                        .WithMany("ApplicationUsers")
-                        .HasForeignKey("VillageId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Division");
-
-                    b.Navigation("SubDivision");
-
-                    b.Navigation("TehsilBlock");
-
-                    b.Navigation("Village");
-                });
-
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>
                 {
                     b.HasOne("Noc_App.Models.ApplicationUser", "User")
@@ -779,42 +876,6 @@ namespace NocApp.Migrations
 
                     b.HasOne("Noc_App.Models.ApplicationUser", "User2")
                         .WithMany("Divisions2")
-                        .HasForeignKey("UpdatedBy");
-
-                    b.Navigation("User");
-
-                    b.Navigation("User2");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.DrainCoordinatesDetails", b =>
-                {
-                    b.HasOne("Noc_App.Models.ApplicationUser", null)
-                        .WithMany("DrainCoordinates2")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("DrainCoordinates")
-                        .HasForeignKey("CreatedBy");
-
-                    b.HasOne("Noc_App.Models.DrainDetails", "Drain")
-                        .WithMany("DrainCoordinates")
-                        .HasForeignKey("DrainId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Drain");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.DrainDetails", b =>
-                {
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("Drains")
-                        .HasForeignKey("CreatedBy");
-
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User2")
-                        .WithMany("Drains2")
                         .HasForeignKey("UpdatedBy");
 
                     b.Navigation("User");
@@ -842,6 +903,12 @@ namespace NocApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Noc_App.Models.SiteAreaUnitDetails", "SiteAreaUnits")
+                        .WithMany()
+                        .HasForeignKey("SiteAreaUnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Noc_App.Models.VillageDetails", "Village")
                         .WithMany("Grants")
                         .HasForeignKey("VillageID")
@@ -854,7 +921,28 @@ namespace NocApp.Migrations
 
                     b.Navigation("ProjectType");
 
+                    b.Navigation("SiteAreaUnits");
+
                     b.Navigation("Village");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantKhasraDetails", b =>
+                {
+                    b.HasOne("Noc_App.Models.GrantDetails", "Grant")
+                        .WithMany("Khasras")
+                        .HasForeignKey("GrantID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Noc_App.Models.SiteAreaUnitDetails", "Units")
+                        .WithMany()
+                        .HasForeignKey("UnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Grant");
+
+                    b.Navigation("Units");
                 });
 
             modelBuilder.Entity("Noc_App.Models.OwnerDetails", b =>
@@ -922,6 +1010,82 @@ namespace NocApp.Migrations
                     b.Navigation("User2");
                 });
 
+            modelBuilder.Entity("Noc_App.Models.UserDivision", b =>
+                {
+                    b.HasOne("Noc_App.Models.DivisionDetails", "Division")
+                        .WithMany("UserDivisions")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
+                        .WithMany("UserDivisions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Division");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.UserSubdivision", b =>
+                {
+                    b.HasOne("Noc_App.Models.SubDivisionDetails", "Subdivision")
+                        .WithMany("UserSubdivisions")
+                        .HasForeignKey("SubdivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
+                        .WithMany("UserSubdivisions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subdivision");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.UserTehsil", b =>
+                {
+                    b.HasOne("Noc_App.Models.TehsilBlockDetails", "Tehsil")
+                        .WithMany("UserTehsils")
+                        .HasForeignKey("TehsilId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
+                        .WithMany("UserTehsils")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tehsil");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.UserVillage", b =>
+                {
+                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
+                        .WithMany("UserVillages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Noc_App.Models.VillageDetails", "Village")
+                        .WithMany("UserVillages")
+                        .HasForeignKey("VillageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Village");
+                });
+
             modelBuilder.Entity("Noc_App.Models.VillageDetails", b =>
                 {
                     b.HasOne("Noc_App.Models.ApplicationUser", "User")
@@ -951,14 +1115,6 @@ namespace NocApp.Migrations
 
                     b.Navigation("Divisions2");
 
-                    b.Navigation("DrainCoordinates");
-
-                    b.Navigation("DrainCoordinates2");
-
-                    b.Navigation("Drains");
-
-                    b.Navigation("Drains2");
-
                     b.Navigation("SubDivisions");
 
                     b.Navigation("SubDivisions2");
@@ -967,6 +1123,14 @@ namespace NocApp.Migrations
 
                     b.Navigation("TehsilBlocks2");
 
+                    b.Navigation("UserDivisions");
+
+                    b.Navigation("UserSubdivisions");
+
+                    b.Navigation("UserTehsils");
+
+                    b.Navigation("UserVillages");
+
                     b.Navigation("Villages");
 
                     b.Navigation("Villages2");
@@ -974,18 +1138,15 @@ namespace NocApp.Migrations
 
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>
                 {
-                    b.Navigation("ApplicationUsers");
-
                     b.Navigation("SubDivision");
-                });
 
-            modelBuilder.Entity("Noc_App.Models.DrainDetails", b =>
-                {
-                    b.Navigation("DrainCoordinates");
+                    b.Navigation("UserDivisions");
                 });
 
             modelBuilder.Entity("Noc_App.Models.GrantDetails", b =>
                 {
+                    b.Navigation("Khasras");
+
                     b.Navigation("Owners");
                 });
 
@@ -1011,23 +1172,23 @@ namespace NocApp.Migrations
 
             modelBuilder.Entity("Noc_App.Models.SubDivisionDetails", b =>
                 {
-                    b.Navigation("ApplicationUsers");
-
                     b.Navigation("TehsilBlock");
+
+                    b.Navigation("UserSubdivisions");
                 });
 
             modelBuilder.Entity("Noc_App.Models.TehsilBlockDetails", b =>
                 {
-                    b.Navigation("ApplicationUsers");
+                    b.Navigation("UserTehsils");
 
                     b.Navigation("Village");
                 });
 
             modelBuilder.Entity("Noc_App.Models.VillageDetails", b =>
                 {
-                    b.Navigation("ApplicationUsers");
-
                     b.Navigation("Grants");
+
+                    b.Navigation("UserVillages");
                 });
 #pragma warning restore 612, 618
         }

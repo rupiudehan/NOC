@@ -22,6 +22,9 @@ namespace Noc_App.Models
         public ApplicationUser User2 { get; set; }
         //public ApplicationUser UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
-        public ICollection<ApplicationUser> ApplicationUsers { get; set; }
+        //public ICollection<ApplicationUser> ApplicationUsers { get; set; }
+
+        //public List<LocationUserMapping> LocatioinUserMapping { get; set; }
+        public ICollection<UserSubdivision> UserSubdivisions { get; set; }
     }
 }

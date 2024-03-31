@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Crypto;
 using Noc_App.Helpers;
 using Noc_App.UtilityService;
+using System.Linq;
 
 namespace Noc_App.Controllers
 {
@@ -24,13 +25,16 @@ namespace Noc_App.Controllers
         private readonly IRepository<NocPermissionTypeDetails> _nocPermissionTypeRepo;
         private readonly IRepository<NocTypeDetails> _nocTypeRepo;
         private readonly IRepository<OwnerTypeDetails> _ownerTypeRepo;
+        private readonly IRepository<GrantKhasraDetails> _khasraRepo;
+        private readonly IRepository<SiteAreaUnitDetails> _siteUnitsRepo;
         private readonly IEmailService _emailService;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
         public GrantController(IRepository<GrantDetails> repo,IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo, 
             IRepository<DivisionDetails> divisionRepo, IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo, 
-            IRepository<NocTypeDetails> nocTypeRepo,IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment, IEmailService emailService)
+            IRepository<NocTypeDetails> nocTypeRepo,IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment,
+            IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService)
         {
             _villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
@@ -43,6 +47,8 @@ namespace Noc_App.Controllers
             _hostingEnvironment = hostingEnvironment;
             _repo = repo;
             _emailService = emailService;
+            _khasraRepo = khasraRepo;
+            _siteUnitsRepo = siteUnitsRepo;
         }
         [AllowAnonymous]
         public async Task<ViewResult> Index(int Id)
@@ -73,6 +79,7 @@ namespace Noc_App.Controllers
             var nocPermission = _nocPermissionTypeRepo.GetAll();
             var nocType = _nocTypeRepo.GetAll();
             var ownerType = _ownerTypeRepo.GetAll();
+            var siteUnits = _siteUnitsRepo.GetAll();
             var viewModel = new GrantViewModelCreate
             {
                 Divisions = new SelectList(divisions, "Id", "Name"),
@@ -83,9 +90,12 @@ namespace Noc_App.Controllers
                 Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
                 SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
+                SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
+                GrantKhasras = new List<GrantKhasraViewModelCreate> { new GrantKhasraViewModelCreate { KanalOrBiswa = 0, KhasraNo = "", MarlaOrBiswansi = 0, SarsaiOrBigha = 0/*,SelectedUnitId= siteUnits.OrderBy(x=>x.Name).Select(x=>x.Id).FirstOrDefault()*/ } },
                 Owners = new List<OwnerViewModelCreate> { new OwnerViewModelCreate { Name = "", Address = "",MobileNo="",Email="" } },
                 IsOtherTypeSelected=0,
-                IsConfirmed=false,
+                IsPaymentDone = false,
+                IsConfirmed =false,
                 IsExtension=0
             };
 
@@ -105,6 +115,7 @@ namespace Noc_App.Controllers
                 var nocPermission = _nocPermissionTypeRepo.GetAll();
                 var nocType = _nocTypeRepo.GetAll();
                 var ownerType = _ownerTypeRepo.GetAll();
+                var siteUnits = _siteUnitsRepo.GetAll();
                 var filteredSubdivisions = _subDivisionRepo.GetAll().Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
                 var filteredtehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == model.SelectedSubDivisionId).ToList();
                 var fileteedvillage = _villageRpo.GetAll().Where(c => c.TehsilBlockId == model.SelectedTehsilBlockId).ToList();
@@ -122,22 +133,25 @@ namespace Noc_App.Controllers
                         NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
                         NocType = new SelectList(nocType, "Id", "Name"),
                         OwnerType = new SelectList(ownerType, "Id", "Name"),
+                        SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
+                        GrantKhasras=model.GrantKhasras,
                         Owners = model.Owners,
                         Pincode = selectedvillage.PinCode.ToString(),
-                        SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
-                        SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
-                        Latitude = model.Latitude,
-                        Longitute = model.Longitute
+                        //SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
+                        //SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
+                        //Latitude = model.Latitude,
+                        //Longitute = model.Longitute
                     };
-                    if (model.SiteAreaOrSizeInInches > 0 && model.SiteAreaOrSizeInFeet > 0 && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
-                        && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.Latitude > 0 && model.Longitute > 0 && model.ApplicantName != null
+                    if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.KMLLinkName != null && model.KMLLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
+                        && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 /*&& model.Latitude > 0 && model.Longitute > 0*/ && model.ApplicantName != null
                         && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.IsConfirmed
                         )
                     {
-                        int IdPrrofValidation = AllowedCheckExtensions(model.IDProofPhoto);
-                        int AddressPrrofValidation = AllowedCheckExtensions(model.AddressProofPhoto);
-                        int AuthorizationValidation = AllowedCheckExtensions(model.AuthorizationLetterPhoto);
-                        if (IdPrrofValidation == 0)
+                        int IdProofValidation = AllowedCheckExtensions(model.IDProofPhoto, "proof");
+                        int AddressProofValidation = AllowedCheckExtensions(model.AddressProofPhoto, "proof");
+                        int AuthorizationValidation = AllowedCheckExtensions(model.AuthorizationLetterPhoto, "proof");
+                        int kmlFileValidation = AllowedCheckExtensions(model.KMLFile, "kml");
+                        if (IdProofValidation == 0)
                         {
                             ErrorMessage = $"Invalid ID proof file type. Please upload a JPG, PNG, or PDF file";
                             ModelState.AddModelError("", ErrorMessage);
@@ -145,20 +159,20 @@ namespace Noc_App.Controllers
                             return View(viewModel);
 
                         }
-                        else if (IdPrrofValidation == 2)
+                        else if (IdProofValidation == 2)
                         {
                             ErrorMessage = "ID proof field is required";
                             ModelState.AddModelError("", ErrorMessage);
                             return View(viewModel);
                         }
-                        if (AddressPrrofValidation == 0)
+                        if (AddressProofValidation == 0)
                         {
                             ErrorMessage = $"Invalid address proof file type. Please upload a JPG, PNG, or PDF file";
                             ModelState.AddModelError("", ErrorMessage);
                             return View(viewModel);
 
                         }
-                        else if (AddressPrrofValidation == 2)
+                        else if (AddressProofValidation == 2)
                         {
                             ErrorMessage = "Address proof field is required";
                             ModelState.AddModelError("", ErrorMessage);
@@ -174,6 +188,21 @@ namespace Noc_App.Controllers
                         else if (AuthorizationValidation == 2)
                         {
                             ErrorMessage = "Authorization letter field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(viewModel);
+                        }
+
+                        if (kmlFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return View(viewModel);
+
+                        }
+                        else if (kmlFileValidation == 2)
+                        {
+                            ErrorMessage = "KML File field is required";
                             ModelState.AddModelError("", ErrorMessage);
                             return View(viewModel);
                         }
@@ -197,9 +226,17 @@ namespace Noc_App.Controllers
                             return View(viewModel);
                         }
 
+                        if (!AllowedFileSize(model.KMLFile))
+                        {
+                            ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(viewModel);
+                        }
+
                         string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto, "IDProof");
                         string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
                         string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
+                        string uniqueKmlFileName = ProcessUploadedFile(model.KMLFile, "kml");
                         if (model.IsExtension == 1)
                         {
                             if (model.NocNumber == null) isValid = false;
@@ -211,11 +248,11 @@ namespace Noc_App.Controllers
                                 return View(viewModel);
                             }
                         }
-                        if (model.Khasra == null && model.Hadbast == null && model.PlotNo == null)
+                        if (/*model.Khasra == null &&*/ model.Hadbast == null && model.PlotNo == null)
                         {
                             isValid = false;
 
-                            ModelState.AddModelError("", $"Atleast one field is required to fill out of Khasra/Hadbast/Plot No.");
+                            ModelState.AddModelError("", $"Atleast one field is required to fill out of Hadbast/Plot No.");
 
                             return View(viewModel);
                         }
@@ -241,27 +278,28 @@ namespace Noc_App.Controllers
                                             ).AsEnumerable().Max(x => x.id));
                                 var specificGrant = await _repo.GetByIdAsync(grantId);
                                 int extractedNumber = Convert.ToInt32(ExtractNumber(specificGrant.ApplicationID)) + 1;
-                                inputString = "GNT" + extractedNumber.ToString();
+                                inputString = "GNTNOC" + extractedNumber.ToString();
                             }
-                            else inputString = "GNT1";
+                            else inputString = "GNTNOC1";
 
                             model.ApplicationID = inputString;
 
                             GrantDetails obj = new GrantDetails
                             {
                                 Name = model.Name,
-                                SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
-                                SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
+                                SiteAreaUnitId = model.SelectedSiteAreaUnitId,
+                                //SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
+                                //SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
                                 IDProofPhotoPath = uniqueIDProofFileName,
                                 AddressProofPhotoPath = uniqueAddressProofFileName,
                                 AuthorizationLetterPhotoPath = uniqueAuthLetterFileName,
                                 VillageID = model.SelectedVillageID ?? 0,
                                 ProjectTypeId = model.SelectedProjectTypeId ?? 0,
-                                Khasra = model.Khasra,
+                                //Khasra = model.Khasra,
                                 Hadbast = model.Hadbast,
                                 PlotNo = model.PlotNo,
-                                Latitude = model.Latitude,
-                                Longitute = model.Longitute,
+                                //Latitude = model.Latitude,
+                                //Longitute = model.Longitute,
                                 ApplicantName = model.ApplicantName,
                                 ApplicantEmailID = model.ApplicantEmailID,
                                 NocPermissionTypeID = model.SelectedNocPermissionTypeID ?? 0,
@@ -306,31 +344,69 @@ namespace Noc_App.Controllers
                 return View(model);
             }
         }
-        
+
+        //private bool AllowedFileSize(IFormFile file)
+        //{
+        //    var maxSize = 4 * 1024 * 1024;
+        //    if (file.Length > maxSize) // 4MB limit
+        //    {
+        //        return false;                
+        //    }
+        //    return true;
+        //}
+        //private int AllowedCheckExtensions(IFormFile file)
+        //{
+        //    if (file != null && file.Length > 0)
+        //    {
+        //        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
+        //        var fileExtension = Path.GetExtension(file.FileName);
+
+        //        if (!allowedExtensions.Contains(fileExtension.ToLower()))
+        //        {
+        //            return 0;
+        //        }
+        //        return 1;
+        //    }
+        //    else return 2;
+        //}
         private bool AllowedFileSize(IFormFile file)
         {
             var maxSize = 4 * 1024 * 1024;
             if (file.Length > maxSize) // 4MB limit
             {
-                return false;                
+                return false;
             }
             return true;
         }
-        private int AllowedCheckExtensions(IFormFile file)
+        private int AllowedCheckExtensions(IFormFile file, string fileType)
         {
             if (file != null && file.Length > 0)
             {
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
-                var fileExtension = Path.GetExtension(file.FileName);
-
-                if (!allowedExtensions.Contains(fileExtension.ToLower()))
+                if (fileType == "kml")
                 {
-                    return 0;
+                    var allowedExtensions = new[] { ".pdf" };
+                    var fileExtension = Path.GetExtension(file.FileName);
+
+                    if (!allowedExtensions.Contains(fileExtension.ToLower()))
+                    {
+                        return 0;
+                    }
+                }
+                else
+                {
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
+                    var fileExtension = Path.GetExtension(file.FileName);
+
+                    if (!allowedExtensions.Contains(fileExtension.ToLower()))
+                    {
+                        return 0;
+                    }
                 }
                 return 1;
             }
             else return 2;
         }
+
         [Obsolete]
         private string ProcessUploadedFile(IFormFile file,string prefixName)
         {

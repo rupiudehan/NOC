@@ -33,15 +33,17 @@
                                             <span asp-validation-for="Name" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
-                                            <label asp-for="SiteAreaOrSizeInFeet" class="control-label "></label>
-                                            <input asp-for="SiteAreaOrSizeInFeet" class="form-control form-control-user numericField" />
-                                            <span asp-validation-for="SiteAreaOrSizeInFeet" class="text-danger"></span>
+                                            <label asp-for="SelectedSiteAreaUnitId" class="control-label ">Unit of Site Area</label>
+                                            <select asp-for="SelectedSiteAreaUnitId" asp-items="@Model.SiteAreaUnit" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <span asp-validation-for="SelectedSiteAreaUnitId" class="text-danger"></span>
                                         </div>
-                                        <div class="form-group">
-                                            <label asp-for="SiteAreaOrSizeInInches" class="control-label "></label>
-                                            <input asp-for="SiteAreaOrSizeInInches" class="form-control form-control-user numericField" />
-                                            <span asp-validation-for="SiteAreaOrSizeInInches" class="text-danger"></span>
-                                        </div>
+                                        @* <div class="form-group">
+                                        <label asp-for="SiteAreaOrSizeInInches" class="control-label "></label>
+                                        <input asp-for="SiteAreaOrSizeInInches" class="form-control form-control-user numericField" />
+                                        <span asp-validation-for="SiteAreaOrSizeInInches" class="text-danger"></span>
+                                        </div> *@
                                         <div class="form-group">
                                             <input hidden asp-for="IsOtherTypeSelected" value="0" id="IsOtherType" />
                                             <label asp-for="SelectedProjectTypeId" class="control-label">Project Type</label>
@@ -99,11 +101,11 @@
                                         <h6 class="m-0 font-weight-bold text-primary">Address Details of Site</h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="form-group">
-                                            <label asp-for="Khasra" class="control-label"></label>
-                                            <input asp-for="Khasra" class="form-control form-control-user" />
-                                            <span asp-validation-for="Khasra" class="text-danger"></span>
-                                        </div>
+                                        @* <div class="form-group">
+                                        <label asp-for="Khasra" class="control-label"></label>
+                                        <input asp-for="Khasra" class="form-control form-control-user" />
+                                        <span asp-validation-for="Khasra" class="text-danger"></span>
+                                        </div> *@
                                         <div class="form-group">
                                             <label asp-for="Hadbast" class="control-label"></label>
                                             <input asp-for="Hadbast" class="form-control form-control-user" />
@@ -158,21 +160,94 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Details of Khasra</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <table id="khasraTable" class="table">
+                                                <thead>
+                                                    <tr>
+                                                        @* <th>#</th> *@
+                                                        <th>Khasra No.</th>
+                                                        <th>Marla/Biswansi</th>
+                                                        <th>Kanal/Biswa</th>
+                                                        <th>Sarsai/Bigha</th>
+                                                        <!-- Add more columns as needed -->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="khasra-entry">
+                                                        @* <td>1</td> *@
+                                                        <td>
+                                                            <input type="text" asp-for=GrantKhasras[0].KhasraNo class="form-control" placeholder="Khasra No." />
+                                                            <span asp-validation-for="GrantKhasras[0].KhasraNo" class="text-danger"></span>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" asp-for=GrantKhasras[0].MarlaOrBiswansi class="form-control numericField M1" placeholder="Marla/Biswansi" />
+                                                            <span asp-validation-for="GrantKhasras[0].MarlaOrBiswansi" class="text-danger"></span>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" asp-for=GrantKhasras[0].KanalOrBiswa class="form-control numericField K2" placeholder="Kanal/Biswa" />
+                                                            <span asp-validation-for="GrantKhasras[0].KanalOrBiswa" class="text-danger"></span>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" asp-for=GrantKhasras[0].SarsaiOrBigha class="form-control numericField B3" placeholder="Sarsai/Bigha< No." />
+                                                            <span asp-validation-for="GrantKhasras[0].SarsaiOrBigha" class="text-danger"></span>
+                                                        </td>
+
+                                                        <!-- Render more columns as needed -->
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                @* <div class="col-sm-4">
+                                                <label class="control-label">Total Area</label>
+                                                </div> *@
+                                                @* <div class="col-sm-8"> *@
+                                                <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
+                                                @* </div> *@
+                                            </div>
+                                            <div class="col-sm-2 offset-sm-6">
+                                                <button type="button" class="btn btn-success" id="addMoreKhasraBtn">Add More</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-6">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary">GPS Coordinates Of Site</h6>
+                                        <h6 class="m-0 font-weight-bold text-primary">KML File Details</h6>
                                     </div>
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label asp-for="Latitude" class="control-label"></label>
-                                            <input asp-for="Latitude" class="form-control form-control-user numericField" />
-                                            <span asp-validation-for="Latitude" class="text-danger"></span>
+                                            <label asp-for="KMLFile" class="control-label">KML File</label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                            <div class="custom-file1">
+                                                <input asp-for="KMLFile" class="form-control custom-file-input1" accept=".pdf" />
+                                                @* <label class="custom-file-label1">Choose File...</label> *@
+                                                <span asp-validation-for="KMLFile" class="text-danger"></span>
+                                            </div>
                                         </div>
                                         <div class="form-group">
-                                            <label asp-for="Longitute" class="control-label"></label>
-                                            <input asp-for="Longitute" class="form-control form-control-user numericField" />
-                                            <span asp-validation-for="Latitude" class="text-danger"></span>
+                                            <label asp-for="KMLLinkName" class="control-label"></label>
+                                            <input asp-for="KMLLinkName" class="form-control form-control-user" />
+                                            <span asp-validation-for="KMLLinkName" class="text-danger"></span>
                                         </div>
+                                        @*   <div class="form-group">
+                                        <label asp-for="Latitude" class="control-label"></label>
+                                        <input asp-for="Latitude" class="form-control form-control-user numericField" />
+                                        <span asp-validation-for="Latitude" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                        <label asp-for="Longitute" class="control-label"></label>
+                                        <input asp-for="Longitute" class="form-control form-control-user numericField" />
+                                        <span asp-validation-for="Latitude" class="text-danger"></span>
+                                        </div> *@
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
@@ -207,6 +282,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
 
                             <div class="row">
@@ -337,10 +413,11 @@
         var today = new Date().toISOString().split('T')[0];
         document.getElementById('PreviousDate').setAttribute('max', today);
         $(function () {
-            if ($('#Latitude').val() == '0') $('#Latitude').val('');
-            if ($('#Longitute').val() == '0') $('#Longitute').val('');
-            if($('#SiteAreaOrSizeInFeet').val()=='0') $('#SiteAreaOrSizeInFeet').val('');
-            if ($('#SiteAreaOrSizeInInches').val() == '0') $('#SiteAreaOrSizeInInches').val('');
+            var total = 0.0;
+            // if ($('#Latitude').val() == '0') $('#Latitude').val('');
+            // if ($('#Longitute').val() == '0') $('#Longitute').val('');
+            // if($('#SiteAreaOrSizeInFeet').val()=='0') $('#SiteAreaOrSizeInFeet').val('');
+            // if ($('#SiteAreaOrSizeInInches').val() == '0') $('#SiteAreaOrSizeInInches').val('');
 
             $(".mobno").on("keypress", function (event) {
                 // Allow only numeric characters (0-9) in the input field
@@ -349,51 +426,128 @@
                     event.preventDefault();
                 }
             });
-            // $(".mobno").on("input", function () {
-            //     // Remove non-numeric characters using a regular expression
-            //     $(this).val($(this).val().replace(/[^0-9]/g, ''));
-            //     validateMob($(this).val(), $(this));
-            // });
-            $(".mobno").on("blur", function () {
-                validateMob($(this).val(), $(this));
+            $('body').on('change', '#SelectedSiteAreaUnitId', function () {
+                var list = ($(this).find("option:selected").text()).split('/');
+                var Biswansi = list[0];
+                var Biswa = list[1];
+                var Bigha = list[2];
+                $('#khasraTable .M1').each(function () {
+                    $(this).removeAttr('class');
+                    $(this).attr('class', 'form-control numericField M1 ' + Biswansi);
+                });
+                $('#khasraTable .K2').each(function () {
+                    $(this).removeAttr('class');
+                    $(this).attr('class', 'form-control numericField K2 ' + Biswa);
+                });
+                $('#khasraTable .B3').each(function () {
+                    $(this).removeAttr('class');
+                    $(this).attr('class', 'form-control numericField B3 ' + Bigha);
+                });
+                var khasraIndex = 0;
+                var newEntry = $(".khasra-entry:first").clone();
+                newEntry.find("input").each(function () {
+                    var name = $(this).attr("name").replace("[0]", "[" + khasraIndex + "]");
+                    var id = $(this).attr("id").replace("0", khasraIndex);
+                    $(this).attr("name", name);
+                    $(this).attr("id", id);
+                    $(this).val("");
+                });
+                khasraIndex++;
+                $("#khasraTable tbody").empty();
+                $("#khasraTable tbody").append(newEntry);
+                $('#TotalArea').text(0.0);
             });
-            function validateMob(mobno, field) {
-                var fieldRegex = /^\d{10}$/;
+            $('#khasraTable tbody').on('change', '.numericField', function () {
+                var grandTotal = 0.0;
+                var _this = $(this);
+                if ($('#SelectedSiteAreaUnitId').find("option:selected").text() != 'Select') {
 
-                if (parseInt(pinCode) < 0) {
-                    field.val('');
-                    field.next(".text-danger").text("Please enter a valid mobile number.");
-                }
-                else if (!fieldRegex.test(mobno)) {
-                    // PinCode.addClass("is-invalid");
-                    field.next(".text-danger").text("Please enter a valid mobile number.");
-                } else {
-                    // PinCode.removeClass("is-invalid");
-                    field.next(".text-danger").text("");
-                }
-            }
-            $("body").on("input", ".numericField", function () {
-                // Remove non-numeric characters using a regular expression
-                $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+                    $('#khasraTable tbody .khasra-entry').each(function () {
+                        var _thisInner = $(this);
+                        var Marla = 0;
+                        var Biswansi = 0;
+                        var Kanal = 0;
+                        var Biswa = 0;
+                        var Sarsai = 0;
+                        var Bigha = 0;
+                        if (_thisInner.find('.Marla').length > 0) {
+                            Marla = _thisInner.find('.Marla').val()!=''?parseFloat(_thisInner.find('.Marla').val()) / 160:0.0;
+                        }
+                        if (_thisInner.find('.Biswansi').length>0) {
 
-                // Remove multiple dots, leaving only one
-                if ($(this).val().split('.').length > 2) {
-                    $(this).val($(this).val().replace(/\.+$/, ''));
+                            Biswansi = _thisInner.find('.Biswansi').val()!=''?parseFloat(_thisInner.find('.Biswansi').val()) / 0.000625:0.0;
+                        }
+                        if (_thisInner.find('.Kanal').length > 0) {
+                            Kanal = _thisInner.find('.Kanal').val()!=''?parseFloat(_thisInner.find('.Kanal').val()) / 8:0.0;
+                        }
+
+                        if (_thisInner.find('.Biswa').length > 0) {
+                            Biswa = _thisInner.find('.Biswa').val()!=''?parseFloat(_thisInner.find('.Biswa').val()) / 0.0125:0.0;
+                        }
+
+                        if (_thisInner.find('.Sarsai').length > 0) {
+                            Sarsai = _thisInner.find('.Sarsai').val()!=''?parseFloat(_thisInner.find('.Sarsai').val()) / 1440:0.0;
+                        }
+                        if (_thisInner.find('.Bigha').length > 0) {
+                            Bigha = _thisInner.find('.Bigha').val()!=''?parseFloat(_thisInner.find('.Bigha').val()) / 0.25:0.0;
+                        }
+                        grandTotal = parseFloat(grandTotal) + Marla + Biswansi + Kanal + Biswa + Sarsai + Bigha;
+                        total = grandTotal;
+                        
+                    });
                 }
+                else{
+                    _this.val(0);
+                    alert('Please select Unit of Site Area!');
+                }
+                $('#TotalArea').text(total.toString());
             });
-            $('.custom-file-input3').on('change', function () {
-                var fileName = $(this).val().split("\\").pop();
-                $(this).next('.custom-file-label3').html(fileName);
-            });
-            $('.custom-file-input1').on('change', function () {
-                var fileName = $(this).val().split("\\").pop();
-                $(this).next('.custom-file-label1').html(fileName);
-            });
-            $('.custom-file-input2').on('change', function () {
-                var fileName = $(this).val().split("\\").pop();
-                $(this).next('.custom-file-label2').html(fileName);
-            });
+            $('#TotalArea').text(total.toString());
+        // $(".mobno").on("input", function () {
+        //     // Remove non-numeric characters using a regular expression
+        //     $(this).val($(this).val().replace(/[^0-9]/g, ''));
+        //     validateMob($(this).val(), $(this));
+        // });
+        $(".mobno").on("blur", function () {
+            validateMob($(this).val(), $(this));
         });
+        function validateMob(mobno, field) {
+            var fieldRegex = /^\d{10}$/;
+
+            if (parseInt(pinCode) < 0) {
+                field.val('');
+                field.next(".text-danger").text("Please enter a valid mobile number.");
+            }
+            else if (!fieldRegex.test(mobno)) {
+                // PinCode.addClass("is-invalid");
+                field.next(".text-danger").text("Please enter a valid mobile number.");
+            } else {
+                // PinCode.removeClass("is-invalid");
+                field.next(".text-danger").text("");
+            }
+        }
+        $("body").on("input", ".numericField", function () {
+            // Remove non-numeric characters using a regular expression
+            $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+
+            // Remove multiple dots, leaving only one
+            if ($(this).val().split('.').length > 2) {
+                $(this).val($(this).val().replace(/\.+$/, ''));
+            }
+        });
+        $('.custom-file-input3').on('change', function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label3').html(fileName);
+        });
+        $('.custom-file-input1').on('change', function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label1').html(fileName);
+        });
+        $('.custom-file-input2').on('change', function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label2').html(fileName);
+        });
+                });
     </script>
     <script>
         var ownerIndex = 1;
@@ -407,6 +561,21 @@
             });
             ownerIndex++;
             $("#ownerTable tbody").append(newEntry);
+        });
+
+        var khasraIndex = 1;
+
+        $("#addMoreKhasraBtn").on("click", function () {
+            var newEntry = $(".khasra-entry:first").clone();
+            newEntry.find("input").each(function () {
+                var name = $(this).attr("name").replace("[0]", "[" + khasraIndex + "]");
+                var id = $(this).attr("id").replace("0", khasraIndex);
+                $(this).attr("name", name);
+                $(this).attr("id", id);
+                $(this).val("");
+            });
+            khasraIndex++;
+            $("#khasraTable tbody").append(newEntry);
         });
 
         function deleteRow(button) {
@@ -439,16 +608,6 @@
                 $('.existing').css('display', 'none');
                 $('#IsExtension').val(0);
             }
-            // if ($('#IsOtherType').val() == "false") {
-            //     $('.other').css('display', 'none');
-            // } else {
-            //     $('.other').css('display', '');
-            // }
-            // if ($('#IsExtension').val() == "false") {
-            //     $('.existing').css('display', 'none');
-            // } else {
-            //     $('.existing').css('display', '');
-            // }
             $("#SelectedVillageID").change(function () {
                 var villageId = $(this).val();
                 $.ajax({

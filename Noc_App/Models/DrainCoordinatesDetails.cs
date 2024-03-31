@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Noc_App.Models
 {
-    public class DrainCoordinatesDetails
+    public class DrainCoordinatesDetails2
     {
         public int Id { get; set; }
         [Required]
@@ -12,7 +12,7 @@ namespace Noc_App.Models
         public double Longitude { get; set; }
         [Required]
         public int DrainId { get; set; }
-        public DrainDetails Drain { get; set; }
+        public DrainDetails1 Drain { get; set; }
         public bool IsActive { get; set; }
         public string CreatedBy { get; set; } // Assuming it's a user ID
         public ApplicationUser User { get; set; }

@@ -222,9 +222,9 @@ namespace Noc_App.Controllers
                 return View("NotFound");
             }
 
-            var users = await _userManager.Users.AnyAsync(x => x.SubDivisionId == id);
+            //var users = await _userManager.Users.AnyAsync(x => x.SubDivisionId == id);
             var village = await _villageRepo.FindAsync(x => x.TehsilBlockId == id);
-            if (users || village.Count() > 0)
+            if (/*users || */village.Count() > 0)
             {
                 ModelState.AddModelError("e", $"Tehsil {obj.Name} is already in use");
                 return View(obj);

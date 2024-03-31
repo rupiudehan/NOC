@@ -31,31 +31,40 @@
                         </select>
                         <span asp-validation-for="SelectedRole" class="text-danger"></span>
                     </div>
+                    @* <div class="form-group">
+                        @Html.LabelFor(model => model.SelectedDivisionId, new {@class="control-label"})
+                        @Html.ListBoxFor(model => model.SelectedDivisionId, new MultiSelectList(Model.Divisions1, "Value", "Text"), new { @class = "form-control" , multiple="multiple", id="drpDivision"})
+    })
+                    </div> *@
                     <div class="form-group">
-                        <label asp-for="SelectedDivisionId" class="control-label">Division</label>
-                        <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
-                            <option value="">Select</option>
+                        <label for="SelectedDivisionId" class="control-label">Division</label>
+                        <select id="SelectedDivisionId" asp-for="SelectedDivisionId" multiple class="form-control">
+                            @* <option value="">Select</option> *@
+                            @foreach (var division in Model.Divisions)
+                            {
+                                <option value="@division.Id">@division.Name</option>
+                            }
                         </select>
                         <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
-                        <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivision" class="form-control">
-                            <option value="">Select</option>
+                        <label for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
+                        <select id="SelectedSubDivisionId" asp-for=SelectedSubDivisionId class="form-control" multiple>
+                            @* <option value="">Select</option> *@
                         </select>
                         @* <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span> *@
                     </div>
                     <div class="form-group">
-                        <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
-                        <select asp-for="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
-                            <option value="">Select</option>
+                        <label for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
+                        <select id="SelectedTehsilBlockId" asp-for=SelectedTehsilBlockId class="form-control" multiple>
+                            @* <option value="">Select</option> *@
                         </select>
                         @* <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span> *@
                     </div>
                     <div class="form-group">
-                        <label asp-for="SelectedVillageId" class="control-label">Village</label>
-                        <select asp-for="SelectedVillageId" asp-items="@Model.Village" class="form-control">
-                            <option value="">Select</option>
+                        <label for="SelectedVillageId" class="control-label">Village</label>
+                        <select id="SelectedVillageId" asp-for=SelectedVillageId class="form-control" multiple>
+                            @* <option value="">Select</option> *@
                         </select>
                         @* <span asp-validation-for="SelectedVillageId" class="text-danger"></span> *@
                     </div>
@@ -82,18 +91,21 @@
     <script>
         function populateDropdown(data, dropdownId) {
             var dropdown = $("#Selected" + dropdownId);
-            dropdown.html('<option value="">Select</option>');
+            // dropdown.html('<option value="">Select</option>');
             $.each(data, function (key, value) {
                 dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
             });
         }
-        $(document).ready(function () {
+        $(function () {
+            $('#SelectedDivisionId, #SelectedSubDivisionId, #SelectedTehsilBlockId, #SelectedVillageId').select2();
             $("#SelectedDivisionId").change(function () {
-                var divisionId = $(this).val();
+                var divisionIds = $(this).val();
+                var dropdownlistSubdivision = $("#SelectedSubDivisionId");
+                dropdownlistSubdivision.empty();
                 $.ajax({
                     url: "/Account/GetSubDivisions",
                     type: "POST",
-                    data: { divisionId: divisionId },
+                    data: { divisionIds: divisionIds },
                     async: false,
                     success: function (data) {
                         populateDropdown(data, "SubDivisionId");
@@ -101,8 +113,8 @@
                         dropdownlistTehsil.empty();
                         var dropdownlistVillage = $("#SelectedVillageId");
                         dropdownlistVillage.empty();
-                        dropdownlistTehsil.html('<option value="">Select</option>');
-                        dropdownlistVillage.html('<option value="">Select</option>');
+                        // dropdownlistTehsil.html('<option value="">Select</option>');
+                        // dropdownlistVillage.html('<option value="">Select</option>');
                     },
                     failure: function (f) {
                         alert(f);
@@ -111,47 +123,50 @@
                         alert('Error ' + e);
                     }
                 });
-            });
-
-            $("#SelectedSubDivisionId").change(function () {
-                var subDivisionId = $(this).val();
-                $.ajax({
-                    url: "/Account/GetTehsilBlocks",
-                    type: "POST",
-                    data: { subDivisionId: subDivisionId },
-                    async: false,
-                    success: function (data) {
-                        populateDropdown(data, "TehsilBlockId"); 
-                        var dropdownlistVillage = $("#SelectedVillageId");
-                        dropdownlistVillage.empty();
-                        dropdownlistVillage.html('<option value="">Select</option>');
-                    },
-                    failure: function (f) {
-                        alert(f);
-                    },
-                    error: function (e) {
-                        alert('Error ' + e);
-                    }
+                $("#SelectedSubDivisionId").change(function () {
+                    var subdivisionIds = $(this).val();
+                    var dropdownlistTehsil = $("#SelectedTehsilBlockId");
+                    dropdownlistTehsil.empty();
+                    $.ajax({
+                        url: "/Account/GetTehsilBlocks",
+                        type: "POST",
+                        data: { subdivisionIds: subdivisionIds },
+                        async: false,
+                        success: function (data) {
+                            populateDropdown(data, "TehsilBlockId");
+                            var dropdownlistVillage = $("#SelectedVillageId");
+                            dropdownlistVillage.empty();
+                            // dropdownlistVillage.html('<option value="">Select</option>');
+                        },
+                        failure: function (f) {
+                            alert(f);
+                        },
+                        error: function (e) {
+                            alert('Error ' + e);
+                        }
+                    });
                 });
-            });
 
 
-            $("#SelectedTehsilBlockId").change(function () {
-                var tehsilBlockId = $(this).val();
-                $.ajax({
-                    url: "/Account/GetVillagess",
-                    type: "POST",
-                    data: { tehsilBlockId: tehsilBlockId },
-                    async:false,
-                    success: function (data) {
-                        populateDropdown(data, "VillageId");
-                    },
-                    failure: function (f) {
-                        alert(f);
-                    },
-                    error: function (e) {
-                        alert('Error ' + e);
-                    }
+                $("#SelectedTehsilBlockId").change(function () {
+                    var tehsilIds = $(this).val();
+                    var dropdownlistVillage = $("#SelectedVillageId");
+                    dropdownlistVillage.empty();
+                    $.ajax({
+                        url: "/Account/GetVillagess",
+                        type: "POST",
+                        data: { tehsilIds: tehsilIds },
+                        async: false,
+                        success: function (data) {
+                            populateDropdown(data, "VillageId");
+                        },
+                        failure: function (f) {
+                            alert(f);
+                        },
+                        error: function (e) {
+                            alert('Error ' + e);
+                        }
+                    });
                 });
             });
         });

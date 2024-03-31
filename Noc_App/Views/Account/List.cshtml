@@ -41,37 +41,83 @@
                                         <td>@data.User.UserName</td>
                                         <td>@data.User.Email</td>
                                         <td>@string.Join(", ", @data.Roles)</td>
-                                        @if (@data.User.Division == null)
+                                        @if (data.User.UserDivisions==null || @data.User.UserDivisions.Count <= 0)
                                         {
                                             <td></td>
                                         }
                                         else
                                         {
-                                            <td>@data.User.Division.Name</td>
+                                            <td>
+                                                @{
+                                                    string div = "";
+                                                    foreach (var item in @data.User.UserDivisions)
+                                                    {
+                                                        if (!div.Contains(item.Division.Name))
+                                                        {
+                                                            div = div != "" ? div + "," + item.Division.Name : item.Division.Name;
+                                                        }
+                                                    }
+                                                    @div
+                                                }
+                                                
+                                            </td>
                                         }
-                                        @if (@data.User.SubDivision == null)
+                                        @if (@data.User.UserSubdivisions==null || @data.User.UserSubdivisions.Count <= 0)
                                         {
                                             <td></td>
                                         }
                                         else
                                         {
-                                            <td>@data.User.SubDivision.Name</td>
+                                            <td>
+                                            @{
+                                                    string div = "";
+                                                    foreach (var item in @data.User.UserSubdivisions)
+                                                    {
+                                                        if (!div.Contains(item.Subdivision.Name))
+                                                        div = div != "" ? div + "," + item.Subdivision.Name : item.Subdivision.Name;
+                                                    }
+                                                    @div
+                                                }
+                                                
+                                            </td>
                                         }
-                                        @if (@data.User.TehsilBlock == null)
+                                        @if (@data.User.UserTehsils==null || @data.User.UserTehsils.Count <= 0)
                                         {
                                             <td></td>
                                         }
                                         else
                                         {
-                                            <td>@data.User.TehsilBlock.Name</td>
+                                            <td>
+                                                @{
+                                                    string div = "";
+                                                    foreach (var item in @data.User.UserTehsils)
+                                                    {
+                                                        if (!div.Contains(item.Tehsil.Name))
+                                                        div = div != "" ? div + "," + item.Tehsil.Name : item.Tehsil.Name;
+                                                    }
+                                                    @div
+                                                }
+
+                                            </td>
                                         }
-                                        @if (@data.User.Village == null)
+                                        @if (@data.User.UserVillages==null || @data.User.UserVillages.Count <= 0)
                                         {
                                             <td></td>
                                         }
                                         else
                                         {
-                                            <td>@data.User.Village.Name</td>
+                                            <td>
+                                                @{
+                                                    string div = "";
+                                                    foreach (var item in @data.User.UserVillages)
+                                                    {
+                                                        if (!div.Contains(item.Village.Name))
+                                                        div = div != "" ? div + "," + item.Village.Name : item.Village.Name;
+                                                    }
+                                                    @div
+                                                }
+
+                                            </td>
                                         }
                                         <td>
                                             @if (string.Join(", ", @data.Roles) != "Administrator")

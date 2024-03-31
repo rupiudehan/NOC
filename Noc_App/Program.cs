@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
+using Noc_App.Clients;
 using Noc_App.Context;
+using Noc_App.Helpers;
 using Noc_App.Models;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.Repository;
@@ -24,22 +26,55 @@ builder.Services.AddMvc(options => {
     var policy=new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     options.Filters.Add(new AuthorizeFilter(policy));
 });
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+builder.Services.Configure<GoogleCaptchaConfig>(builder.Configuration.GetSection("reCaptcha"));
 //builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 //builder.Services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
+builder.Services.AddTransient<GoogleCaptchaService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRepository<DivisionDetails>, Repository<DivisionDetails>>();
 builder.Services.AddScoped<IRepository<SubDivisionDetails>, Repository<SubDivisionDetails>>();
 builder.Services.AddScoped<IRepository<TehsilBlockDetails>, Repository<TehsilBlockDetails>>();
 builder.Services.AddScoped<IRepository<VillageDetails>, Repository<VillageDetails>>();
-builder.Services.AddScoped<IRepository<DrainCoordinatesDetails>, Repository<DrainCoordinatesDetails>>();
-builder.Services.AddScoped<IRepository<DrainDetails>, Repository<DrainDetails>>();
+//builder.Services.AddScoped<IRepository<DrainCoordinatesDetails>, Repository<DrainCoordinatesDetails>>();
+//builder.Services.AddScoped<IRepository<DrainDetails>, Repository<DrainDetails>>();
 builder.Services.AddScoped<IRepository<OwnerTypeDetails>, Repository<OwnerTypeDetails>>();
 builder.Services.AddScoped<IRepository<OwnerDetails>, Repository<OwnerDetails>>();
 builder.Services.AddScoped<IRepository<NocPermissionTypeDetails>, Repository<NocPermissionTypeDetails>>();
 builder.Services.AddScoped<IRepository<NocTypeDetails>, Repository<NocTypeDetails>>();
 builder.Services.AddScoped<IRepository<ProjectTypeDetails>, Repository<ProjectTypeDetails>>();
+builder.Services.AddScoped<IRepository<SiteAreaUnitDetails>, Repository<SiteAreaUnitDetails>>();
+builder.Services.AddScoped<IRepository<GrantKhasraDetails>, Repository<GrantKhasraDetails>>();
+builder.Services.AddScoped<IRepository<UserDivision>, Repository<UserDivision>>();
+builder.Services.AddScoped<IRepository<UserSubdivision>, Repository<UserSubdivision>>();
+builder.Services.AddScoped<IRepository<UserTehsil>, Repository<UserTehsil>>();
+builder.Services.AddScoped<IRepository<UserVillage>, Repository<UserVillage>>();
 builder.Services.AddScoped<IRepository<GrantDetails>, Repository<GrantDetails>>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddSingleton(x =>
+    new PaypalClient(
+        builder.Configuration["PayPalOptions:ClientId"],
+        builder.Configuration["PayPalOptions:ClientSecret"],
+        builder.Configuration["PayPalOptions:Mode"]
+    )
+);
+
 var app = builder.Build();
 
 
@@ -55,6 +90,7 @@ else
     app.UseStatusCodePagesWithRedirects("/Error/{0}");
 }
 
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

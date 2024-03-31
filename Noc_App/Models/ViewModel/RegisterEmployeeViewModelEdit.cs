@@ -24,16 +24,16 @@ namespace Noc_App.Models.ViewModel
         public IEnumerable<SelectListItem> Roles { get; set; }
         [Required]
         [Display(Name = "Division")]
-        public int SelectedDivisionId { get; set; }
-        public IEnumerable<SelectListItem> Divisions { get; set; }
+        public List<int> SelectedDivisionId { get; set; }
+        public IEnumerable<DivisionDetails> Divisions { get; set; }
         [Display(Name = "Sub-Division")]
-        public int? SelectedSubDivisionId { get; set; }
-        public IEnumerable<SelectListItem> SubDivision { get; set; }
+        public List<int> SelectedSubDivisionId { get; set; }
+        public IEnumerable<SubDivisionDetails> SubDivision { get; set; }
         [Display(Name = "Tehsil/Block")]
-        public int? SelectedTehsilBlockId { get; set; }
-        public IEnumerable<SelectListItem> TehsilBlock { get; set; }
+        public List<int> SelectedTehsilBlockId { get; set; }
+        public IEnumerable<TehsilBlockDetails> TehsilBlock { get; set; }
         [Display(Name = "Village")]
-        public int? SelectedVillageId { get; set; }
-        public IEnumerable<SelectListItem> Village { get; set; }
+        public List<int> SelectedVillageId { get; set; }
+        public IEnumerable<VillageDetails> Village { get; set; }
     }
 }

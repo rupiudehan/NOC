@@ -12,5 +12,7 @@ namespace Noc_App.Models.ViewModel
         public string Password { get; set; }
         [Display(Name = "Remember Me")]
         public bool RememberMe { get; set; }
+        [Required]
+        public string Token { get; set; }
     }
 }
