@@ -59,6 +59,7 @@ builder.Services.AddScoped<IRepository<UserSubdivision>, Repository<UserSubdivis
 builder.Services.AddScoped<IRepository<UserTehsil>, Repository<UserTehsil>>();
 builder.Services.AddScoped<IRepository<UserVillage>, Repository<UserVillage>>();
 builder.Services.AddScoped<IRepository<GrantDetails>, Repository<GrantDetails>>();
+builder.Services.AddScoped<IRepository<GrantPaymentDetails>, Repository<GrantPaymentDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

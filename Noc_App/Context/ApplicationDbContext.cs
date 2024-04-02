@@ -32,6 +32,7 @@ namespace Noc_App.Context
         public DbSet<GrantApprovalMaster> GrantApprovalMaster { get; set; }
         public DbSet<GrantDetails> GrantDetails { get; set; }
         public DbSet<GrantKhasraDetails> GrantKhasraDetails { get; set; }
+        public DbSet<GrantPaymentDetails> GrantPaymentDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

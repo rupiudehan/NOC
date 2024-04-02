@@ -193,7 +193,7 @@
                                                             <span asp-validation-for="GrantKhasras[0].KanalOrBiswa" class="text-danger"></span>
                                                         </td>
                                                         <td>
-                                                            <input type="text" asp-for=GrantKhasras[0].SarsaiOrBigha class="form-control numericField B3" placeholder="Sarsai/Bigha< No." />
+                                                            <input type="text" asp-for=GrantKhasras[0].SarsaiOrBigha class="form-control numericField B3" placeholder="Sarsai/Bigha" />
                                                             <span asp-validation-for="GrantKhasras[0].SarsaiOrBigha" class="text-danger"></span>
                                                         </td>
 
@@ -209,6 +209,7 @@
                                                 <label class="control-label">Total Area</label>
                                                 </div> *@
                                                 @* <div class="col-sm-8"> *@
+                                                <input hidden asp-for="TotalArea" value="0" id="TotalSiteArea" />
                                                 <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
                                                 @* </div> *@
                                             </div>
@@ -501,6 +502,7 @@
                     alert('Please select Unit of Site Area!');
                 }
                 $('#TotalArea').text(total.toString());
+                $('#TotalSiteArea').val(total.toString());
             });
             $('#TotalArea').text(total.toString());
         // $(".mobno").on("input", function () {

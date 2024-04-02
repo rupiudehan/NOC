@@ -1,21 +1,27 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Noc_App.Clients;
 using Noc_App.Helpers;
 using Noc_App.Models;
+using Noc_App.Models.interfaces;
+using System.Numerics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Noc_App.Controllers
 {
+    [AllowAnonymous]
     public class CheckoutController : Controller
     {
+        private readonly IRepository<GrantPaymentDetails> _repo;
         [TempData]
         public string TotalAmount { get; set; } = null;
 
         private readonly PaypalClient _paypalClient;
-        public CheckoutController(PaypalClient paypalClient)
+        public CheckoutController(PaypalClient paypalClient, IRepository<GrantPaymentDetails> repo)
         {
             this._paypalClient = paypalClient;
+            this._repo = repo;
         }
-
 
 
         public IActionResult Index()
@@ -26,11 +32,12 @@ namespace Noc_App.Controllers
 
             try
             {
-                var cart = SessionHelper.GetObjectFromJson<List<Item>>(HttpContext.Session, "cart");
-                ViewBag.cart = cart;
-                ViewBag.DollarAmount = cart.Sum(item => item.Grant.Khasras.Select(x => x.MarlaOrBiswansi).FirstOrDefault() * item.Quantity);
-                ViewBag.total = ViewBag.DollarAmount;
-                int total = ViewBag.total;
+                //var cart = SessionHelper.GetObjectFromJson<List<Item>>(HttpContext.Session, "cart");
+                //ViewBag.cart = cart;
+                //ViewBag.DollarAmount = cart.Sum(item => item.Grant.Khasras.Select(x => x.MarlaOrBiswansi).FirstOrDefault() * item.Quantity);
+                ViewBag.total = TempData["TotalAreaAmount"]!=null?(Convert.ToDecimal(TempData["TotalAreaAmount"])/60).ToString():"0";
+                ViewBag.Id = TempData["GrantID"];
+                double total = Convert.ToDouble(ViewBag.total);
                 TotalAmount = total.ToString();
                 TempData["TotalAmount"] = TotalAmount;
 
@@ -79,7 +86,7 @@ namespace Noc_App.Controllers
             try
             {
                 // set the transaction price and currency
-                var price = "10.00";
+                var price = TotalAmount;
                 var currency = "USD";
 
                 // "reference" is the transaction key
@@ -99,18 +106,40 @@ namespace Noc_App.Controllers
                 return BadRequest(error);
             }
         }
-        public async Task<IActionResult> Capture(string orderId, CancellationToken cancellationToken)
+        public async Task<IActionResult> Capture(string orderId,string payerID,int grantId, CancellationToken cancellationToken)
         {
             try
             {
                 var response = await _paypalClient.CaptureOrder(orderId);
+                if (response.purchase_units != null)
+                {
+                    var reference = response.purchase_units != null ? response.purchase_units[0].reference_id : "ff2323";
 
-                var reference = response.purchase_units[0].reference_id;
+                    // Put your logic to save the transaction here
+                    // You can use the "reference" variable as a transaction key
+                    if (string.IsNullOrEmpty(orderId)) await Task.FromResult(BadRequest("orderId"));
+                    if (string.IsNullOrEmpty(payerID)) await Task.FromResult(BadRequest("payerID"));
+                    var paymentDetails = new GrantPaymentDetails
+                    {
+                        CreatedOn = DateTime.Now,
+                        TotalAmount = 100,
+                        PaymentOrderId = orderId,
+                        paymentid = 1,
+                        Paymentstatus = "A",
+                        sessionid = payerID,
+                        referenceId = reference,
+                        GrantID = grantId
+                    };
 
-                // Put your logic to save the transaction here
-                // You can use the "reference" variable as a transaction key
+                    await _repo.CreateAsync(paymentDetails);
+                    //return result > 0 ? Ok() : BadRequest("Error while saving");
 
-                return Ok(response);
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest("Access Denied!");
+                }
             }
             catch (Exception e)
             {

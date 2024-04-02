@@ -11,6 +11,7 @@ using Org.BouncyCastle.Crypto;
 using Noc_App.Helpers;
 using Noc_App.UtilityService;
 using System.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Noc_App.Controllers
 {
@@ -68,6 +69,12 @@ namespace Noc_App.Controllers
                 ViewBag.ErrorMessage = ex.Message;
                 return View();
             }
+        }
+
+        [AllowAnonymous]
+        public ViewResult PayNow()
+        {
+            return View();
         }
 
         [HttpGet]
@@ -314,8 +321,43 @@ namespace Noc_App.Controllers
                             };
                             await _repo.CreateAsync(obj);
                             var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
-                            _emailService.SendEmail(emailModel, "NOC Application Submitted Successfully");
-                            return RedirectToAction("Index", "Grant", new { Id = obj.Id });
+                            _emailService.SendEmail(emailModel, "Punjab Irrigation Department");
+                            double TotalPayment = 0;
+                            if (Convert.ToDouble(model.TotalArea) <= 0.25)
+                            {
+                                TotalPayment = 250;
+                            }
+                            else 
+                            if (Convert.ToDouble(model.TotalArea) > 0.25 && Convert.ToDouble(model.TotalArea) <= 0.50)
+                            {
+                                TotalPayment = 500;
+                            }
+                            else if (Convert.ToDouble(model.TotalArea) > 0.50 && Convert.ToDouble(model.TotalArea) <= 1)
+                            {
+                                TotalPayment = 1000;
+                            }
+                            else if (Convert.ToDouble(model.TotalArea) > 1)
+                            {
+                                double area=Convert.ToDouble(model.TotalArea) - 1;
+                                TotalPayment = 1000;
+                                int count = 0;
+                                do
+                                {
+                                    count++;
+                                    area = area - 1;
+                                } while (area> 0);
+                                TotalPayment = TotalPayment + (count * 250);
+                            }
+                            if (TotalPayment > 0)
+                            {
+                                TempData["TotalAreaAmount"] = TotalPayment.ToString();
+                                TempData["GrantID"] = obj.Id.ToString();
+                                return RedirectToAction("Index", "Checkout");
+                            }
+                            else {
+                                return RedirectToAction("Index", "Grant", new { Id = obj.Id });
+                            }
+
                         }
                         else
                         {
