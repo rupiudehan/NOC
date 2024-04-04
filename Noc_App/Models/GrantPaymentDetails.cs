@@ -18,6 +18,9 @@ namespace Noc_App.Models
         public string? sessionid { get; set; }
         public string? Paymentstatus { get; set; }
         public string? PaymentOrderId { get; set; }
+        public string PayerName { get; set; }
+        public string PayerEmail { get; set; }
+        public string PayerId { get; set; }
         public DateTime CreatedOn { get; set; }
     }
 }

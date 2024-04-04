@@ -131,7 +131,11 @@ namespace Noc_App.Controllers
                         Paymentstatus = "A",
                         sessionid = payerID,
                         referenceId = reference,
-                        GrantID = grantId
+                        GrantID = grantId,
+                        PayerName=response.payer.name.given_name,
+                        PayerEmail=response.payer.email_address,
+                        PayerId=payerID
+
                     };
 
                     await _repo.CreateAsync(paymentDetails);
