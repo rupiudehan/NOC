@@ -35,8 +35,8 @@ namespace Noc_App.Controllers
                 //var cart = SessionHelper.GetObjectFromJson<List<Item>>(HttpContext.Session, "cart");
                 //ViewBag.cart = cart;
                 //ViewBag.DollarAmount = cart.Sum(item => item.Grant.Khasras.Select(x => x.MarlaOrBiswansi).FirstOrDefault() * item.Quantity);
-                ViewBag.total = TempData["TotalAreaAmount"]!=null?(Convert.ToDecimal(TempData["TotalAreaAmount"])/60).ToString():"0";
-                ViewBag.Id = TempData["GrantID"];
+                ViewBag.total =  TempData["TotalAreaAmount"]!=null?(Convert.ToDecimal(TempData["TotalAreaAmount"]) * Convert.ToDecimal(0.012)).ToString():"0";
+                ViewBag.Id =  TempData["GrantID"];
                 double total = Convert.ToDouble(ViewBag.total);
                 TotalAmount = total.ToString();
                 TempData["TotalAmount"] = TotalAmount;

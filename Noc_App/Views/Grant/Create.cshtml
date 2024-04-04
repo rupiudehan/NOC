@@ -169,17 +169,18 @@
                                             <table id="khasraTable" class="table">
                                                 <thead>
                                                     <tr>
-                                                        @* <th>#</th> *@
+                                                        <th>#</th>
                                                         <th>Khasra No.</th>
                                                         <th>Marla/Biswansi</th>
                                                         <th>Kanal/Biswa</th>
                                                         <th>Sarsai/Bigha</th>
+                                                        <th></th>
                                                         <!-- Add more columns as needed -->
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr class="khasra-entry">
-                                                        @* <td>1</td> *@
+                                                        <td><span class="srKhasra">1</span></td>
                                                         <td>
                                                             <input type="text" asp-for=GrantKhasras[0].KhasraNo class="form-control" placeholder="Khasra No." />
                                                             <span asp-validation-for="GrantKhasras[0].KhasraNo" class="text-danger"></span>
@@ -196,7 +197,7 @@
                                                             <input type="text" asp-for=GrantKhasras[0].SarsaiOrBigha class="form-control numericField B3" placeholder="Sarsai/Bigha" />
                                                             <span asp-validation-for="GrantKhasras[0].SarsaiOrBigha" class="text-danger"></span>
                                                         </td>
-
+                                                        <td class="delKhasra"></td>
                                                         <!-- Render more columns as needed -->
                                                     </tr>
                                                 </tbody>
@@ -235,9 +236,9 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label asp-for="KMLLinkName" class="control-label"></label>
-                                            <input asp-for="KMLLinkName" class="form-control form-control-user" />
-                                            <span asp-validation-for="KMLLinkName" class="text-danger"></span>
+                                            <label asp-for="KmlLinkName" class="control-label"></label>
+                                            <input asp-for="KmlLinkName" class="form-control form-control-user" />
+                                            <span asp-validation-for="KmlLinkName" class="text-danger"></span>
                                         </div>
                                         @*   <div class="form-group">
                                         <label asp-for="Latitude" class="control-label"></label>
@@ -296,18 +297,20 @@
                                             <table id="ownerTable" class="table">
                                                 <thead>
                                                     <tr>
-                                                        @* <th>#</th> *@
+                                                        <th>#</th>
                                                         <th>OwnerType</th>
                                                         <th>Name</th>
                                                         <th>Address</th>
                                                         <th>Mobile Number</th>
                                                         <th>Email</th>
+                                                        <th></th>
                                                         <!-- Add more columns as needed -->
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr class="owner-entry">
-                                                        @* <td>1</td> *@
+
+                                                        <td><span class="srOwner">1</span></td>
                                                         <td>
                                                             <select asp-for="SelectedOwnerTypeID" asp-items="@Model.OwnerType" class="form-control">
                                                                 <option value="">Select</option>
@@ -330,7 +333,7 @@
                                                             <input type="text" asp-for=Owners[0].Email class="form-control" placeholder="Email" />
                                                             <span asp-validation-for="Owners[0].Email" class="text-danger"></span>
                                                         </td>
-
+                                                        <td class="delOwner"></td>
                                                         <!-- Render more columns as needed -->
                                                     </tr>
                                                 </tbody>
@@ -476,21 +479,21 @@
                         }
                         if (_thisInner.find('.Biswansi').length>0) {
 
-                            Biswansi = _thisInner.find('.Biswansi').val()!=''?parseFloat(_thisInner.find('.Biswansi').val()) / 0.000625:0.0;
+                            Biswansi = _thisInner.find('.Biswansi').val()!=''?parseFloat(_thisInner.find('.Biswansi').val()) * 0.000625:0.0;
                         }
                         if (_thisInner.find('.Kanal').length > 0) {
                             Kanal = _thisInner.find('.Kanal').val()!=''?parseFloat(_thisInner.find('.Kanal').val()) / 8:0.0;
                         }
 
                         if (_thisInner.find('.Biswa').length > 0) {
-                            Biswa = _thisInner.find('.Biswa').val()!=''?parseFloat(_thisInner.find('.Biswa').val()) / 0.0125:0.0;
+                            Biswa = _thisInner.find('.Biswa').val()!=''?parseFloat(_thisInner.find('.Biswa').val()) * 0.0125:0.0;
                         }
 
                         if (_thisInner.find('.Sarsai').length > 0) {
                             Sarsai = _thisInner.find('.Sarsai').val()!=''?parseFloat(_thisInner.find('.Sarsai').val()) / 1440:0.0;
                         }
                         if (_thisInner.find('.Bigha').length > 0) {
-                            Bigha = _thisInner.find('.Bigha').val()!=''?parseFloat(_thisInner.find('.Bigha').val()) / 0.25:0.0;
+                            Bigha = _thisInner.find('.Bigha').val()!=''?parseFloat(_thisInner.find('.Bigha').val()) * 0.25:0.0;
                         }
                         grandTotal = parseFloat(grandTotal) + Marla + Biswansi + Kanal + Biswa + Sarsai + Bigha;
                         total = grandTotal;
@@ -561,8 +564,10 @@
                 $(this).attr("name", name);
                 $(this).val("");
             });
+            newEntry.find('.delOwner').append('<button type="button" id="owner' + ownerIndex + '" onclick="deleteRow(this,\'owner\',\'Owner\')" class="btn btn-danger btn-user btn-block">Delete</button>');
             ownerIndex++;
             $("#ownerTable tbody").append(newEntry);
+            SetSerialNo('owner', 'Owner');
         });
 
         var khasraIndex = 1;
@@ -576,13 +581,22 @@
                 $(this).attr("id", id);
                 $(this).val("");
             });
+            newEntry.find('.delKhasra').append('<button type="button" id="khasra' + khasraIndex + '" onclick="deleteRow(this,\'khasra\',\'Khasra\')" class="btn btn-danger btn-user btn-block">Delete</button>');
             khasraIndex++;
             $("#khasraTable tbody").append(newEntry);
+            SetSerialNo('khasra', 'Khasra');
         });
+        function SetSerialNo(classname,className2){
+            var sr = 1;
+            $("." + classname + "-entry").parent().find('tr').each(function () {
+                $(this).find('.sr' + className2 + ':first').text(sr++);
+            });
+        }
 
-        function deleteRow(button) {
+        function deleteRow(button, classname, className2) {
             var row = button.parentNode.parentNode;
             row.parentNode.removeChild(row);
+            SetSerialNo(classname, className2);
         }
     </script>
     <script>

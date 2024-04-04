@@ -12,6 +12,7 @@ using Noc_App.Helpers;
 using Noc_App.UtilityService;
 using System.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.RegularExpressions;
 
 namespace Noc_App.Controllers
 {
@@ -149,7 +150,7 @@ namespace Noc_App.Controllers
                         //Latitude = model.Latitude,
                         //Longitute = model.Longitute
                     };
-                    if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.KMLLinkName != null && model.KMLLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
+                    if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.KmlLinkName != null && model.KmlLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
                         && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 /*&& model.Latitude > 0 && model.Longitute > 0*/ && model.ApplicantName != null
                         && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.IsConfirmed
                         )

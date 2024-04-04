@@ -65,7 +65,9 @@ namespace Noc_App.Models.ViewModel
         [Required]
         public IFormFile KMLFile { get; set; }
         [Required]
-        public string KMLLinkName { get; set; }
+        [RegularExpression(@"https:\/\/earth\.google\.com\/web\/\S+", ErrorMessage = "Invalid link")]
+        [Display(Name = "KML Link Name")]
+        public string KmlLinkName { get; set; }
         [Required]
         [Display(Name = "Applicant Name")]
         public string ApplicantName { get; set; }
