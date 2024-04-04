@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Noc_App.Clients;
 using Noc_App.Helpers;
 using Noc_App.Models;
@@ -13,14 +14,16 @@ namespace Noc_App.Controllers
     public class CheckoutController : Controller
     {
         private readonly IRepository<GrantPaymentDetails> _repo;
+        private readonly IRepository<GrantDetails> _repoGrant;
         [TempData]
         public string TotalAmount { get; set; } = null;
 
         private readonly PaypalClient _paypalClient;
-        public CheckoutController(PaypalClient paypalClient, IRepository<GrantPaymentDetails> repo)
+        public CheckoutController(PaypalClient paypalClient, IRepository<GrantPaymentDetails> repo, IRepository<GrantDetails> repoGrant)
         {
             this._paypalClient = paypalClient;
             this._repo = repo;
+            this._repoGrant = repoGrant;
         }
 
 
@@ -35,8 +38,8 @@ namespace Noc_App.Controllers
                 //var cart = SessionHelper.GetObjectFromJson<List<Item>>(HttpContext.Session, "cart");
                 //ViewBag.cart = cart;
                 //ViewBag.DollarAmount = cart.Sum(item => item.Grant.Khasras.Select(x => x.MarlaOrBiswansi).FirstOrDefault() * item.Quantity);
-                ViewBag.total =  TempData["TotalAreaAmount"]!=null?(Convert.ToDecimal(TempData["TotalAreaAmount"]) * Convert.ToDecimal(0.012)).ToString():"0";
-                ViewBag.Id =  TempData["GrantID"];
+                ViewBag.total = TempData["TotalAreaAmount"]!=null?(Convert.ToDecimal(TempData["TotalAreaAmount"]) * Convert.ToDecimal(0.012)).ToString():"0";
+                ViewBag.Id = TempData["GrantID"];
                 double total = Convert.ToDouble(ViewBag.total);
                 TotalAmount = total.ToString();
                 TempData["TotalAmount"] = TotalAmount;
@@ -155,9 +158,11 @@ namespace Noc_App.Controllers
         {
             return new Random().Next(999999).ToString();
         }
-        public IActionResult Success()
+
+        [AllowAnonymous]
+        public IActionResult Success(int id)
         {
-            return View();
+            return RedirectToAction("Index", "Grant", new { Id = id });
         }
     }
 }
