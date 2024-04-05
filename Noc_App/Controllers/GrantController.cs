@@ -124,18 +124,18 @@ namespace Noc_App.Controllers
                 var nocType = _nocTypeRepo.GetAll();
                 var ownerType = _ownerTypeRepo.GetAll();
                 var siteUnits = _siteUnitsRepo.GetAll();
-                var filteredSubdivisions = _subDivisionRepo.GetAll().Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
-                var filteredtehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == model.SelectedSubDivisionId).ToList();
-                var fileteedvillage = _villageRpo.GetAll().Where(c => c.TehsilBlockId == model.SelectedTehsilBlockId).ToList();
+                var filteredSubdivisions = await _subDivisionRepo.FindAsync(c => c.DivisionId == model.SelectedDivisionId);
+                var filteredtehsilBlock = await _tehsilBlockRepo.FindAsync(c => c.SubDivisionId == model.SelectedSubDivisionId);
+                var fileteedvillage = await _villageRpo.FindAsync(c => c.TehsilBlockId == model.SelectedTehsilBlockId);
                 var selectedvillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID ?? 0);
                 string ErrorMessage = string.Empty;
-                if (filteredSubdivisions.Count > 0 && filteredtehsilBlock.Count > 0 && fileteedvillage.Count > 0 && selectedvillage != null)
+                if (filteredSubdivisions.Count() > 0 && filteredtehsilBlock.Count() > 0 && fileteedvillage.Count() > 0 && selectedvillage != null)
                 {
                     var viewModel = new GrantViewModelCreate
                     {
                         Village = new SelectList(fileteedvillage, "Id", "Name"),
                         TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name"),
-                        SubDivision = new SelectList(filteredSubdivisions, "Id", "Name"),// new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
+                        SubDivision = new SelectList(filteredSubdivisions, "Id", "Name"),
                         Divisions = new SelectList(divisions, "Id", "Name"),
                         ProjectType = new SelectList(projectType, "Id", "Name"),
                         NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
@@ -144,14 +144,10 @@ namespace Noc_App.Controllers
                         SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
                         GrantKhasras=model.GrantKhasras,
                         Owners = model.Owners,
-                        Pincode = selectedvillage.PinCode.ToString(),
-                        //SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
-                        //SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
-                        //Latitude = model.Latitude,
-                        //Longitute = model.Longitute
+                        Pincode = selectedvillage.PinCode.ToString()
                     };
                     if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.KmlLinkName != null && model.KmlLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
-                        && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 /*&& model.Latitude > 0 && model.Longitute > 0*/ && model.ApplicantName != null
+                        && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.ApplicantName != null
                         && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.IsConfirmed
                         )
                     {
@@ -256,7 +252,7 @@ namespace Noc_App.Controllers
                                 return View(viewModel);
                             }
                         }
-                        if (/*model.Khasra == null &&*/ model.Hadbast == null && model.PlotNo == null)
+                        if (model.Hadbast == null && model.PlotNo == null)
                         {
                             isValid = false;
 
@@ -278,12 +274,12 @@ namespace Noc_App.Controllers
                         {
 
                             string inputString = string.Empty;
-                            var grant = _repo.GetAll();
-                            if (grant != null && grant.Count() > 0)
+                            var grant = _repo.GetAll().OrderByDescending(x=>x.Id).Select(x=>x.Id).FirstOrDefault();
+                            if (grant>0)
                             {
-                                int grantId = Convert.ToInt32((from g in grant
+                                int grantId = grant;/* Convert.ToInt32((from g in grant
                                                                select new { id = g.Id }
-                                            ).AsEnumerable().Max(x => x.id));
+                                            ).AsEnumerable().Max(x => x.id));*/
                                 var specificGrant = await _repo.GetByIdAsync(grantId);
                                 int extractedNumber = Convert.ToInt32(ExtractNumber(specificGrant.ApplicationID)) + 1;
                                 inputString = "GNTNOC" + extractedNumber.ToString();
@@ -296,18 +292,13 @@ namespace Noc_App.Controllers
                             {
                                 Name = model.Name,
                                 SiteAreaUnitId = model.SelectedSiteAreaUnitId,
-                                //SiteAreaOrSizeInFeet = model.SiteAreaOrSizeInFeet,
-                                //SiteAreaOrSizeInInches = model.SiteAreaOrSizeInInches,
                                 IDProofPhotoPath = uniqueIDProofFileName,
                                 AddressProofPhotoPath = uniqueAddressProofFileName,
                                 AuthorizationLetterPhotoPath = uniqueAuthLetterFileName,
                                 VillageID = model.SelectedVillageID ?? 0,
                                 ProjectTypeId = model.SelectedProjectTypeId ?? 0,
-                                //Khasra = model.Khasra,
                                 Hadbast = model.Hadbast,
                                 PlotNo = model.PlotNo,
-                                //Latitude = model.Latitude,
-                                //Longitute = model.Longitute,
                                 ApplicantName = model.ApplicantName,
                                 ApplicantEmailID = model.ApplicantEmailID,
                                 NocPermissionTypeID = model.SelectedNocPermissionTypeID ?? 0,

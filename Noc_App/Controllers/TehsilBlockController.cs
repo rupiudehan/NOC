@@ -43,7 +43,7 @@ namespace Noc_App.Controllers
             try
             {
                 model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name");
-                var filteredSubdivisions = _subDivisionRepo.GetAll().Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
+                var filteredSubdivisions = await _subDivisionRepo.FindAsync(c => c.DivisionId == model.SelectedDivisionId);
                 model.SubDivision = new SelectList(filteredSubdivisions, "Id", "Name");
                 if (ModelState.IsValid)
                 {
@@ -130,7 +130,7 @@ namespace Noc_App.Controllers
                     SelectedDivisionId = obj.SubDivision.DivisionId,
                     Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name", obj.SubDivision.DivisionId),
                     SelectedSubDivisionId= obj.SubDivisionId,
-                    SubDivisions = new SelectList(_subDivisionRepo.GetAll().Where(x => x.DivisionId == obj.SubDivision.DivisionId), "Id", "Name", obj.SubDivisionId)
+                    SubDivisions = new SelectList(await _subDivisionRepo.FindAsync(x => x.DivisionId == obj.SubDivision.DivisionId), "Id", "Name", obj.SubDivisionId)
                 };
 
                 return View(model);
@@ -155,7 +155,7 @@ namespace Noc_App.Controllers
                 }
                 else
                 {
-                    model.SubDivisions = new SelectList(_subDivisionRepo.GetAll().Where(x => x.DivisionId == model.SelectedDivisionId), "Id", "Name", model.SelectedSubDivisionId);
+                    model.SubDivisions = new SelectList(await _subDivisionRepo.FindAsync(x => x.DivisionId == model.SelectedDivisionId), "Id", "Name", model.SelectedSubDivisionId);
                     model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name", model.SelectedDivisionId);
                     //model.SelectedDivisionId = obj.SubDivision.DivisionId;
                     bool IsDuplicate = _repo.IsUniqueName(model.Name, model.Id);
