@@ -496,7 +496,7 @@
                             Bigha = _thisInner.find('.Bigha').val()!=''?parseFloat(_thisInner.find('.Bigha').val()) * 0.25:0.0;
                         }
                         grandTotal = parseFloat(grandTotal) + Marla + Biswansi + Kanal + Biswa + Sarsai + Bigha;
-                        total = grandTotal;
+                        total = parseFloat(grandTotal).toFixed(2);
                         
                     });
                 }
