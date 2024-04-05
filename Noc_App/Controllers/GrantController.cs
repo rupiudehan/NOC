@@ -315,12 +315,12 @@ namespace Noc_App.Controllers
                             var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
                             _emailService.SendEmail(emailModel, "Punjab Irrigation Department");
                             double TotalPayment = 0;
-                            if (Convert.ToDouble(model.TotalArea) <= 0.25)
-                            {
-                                TotalPayment = 250;
-                            }
-                            else 
-                            if (Convert.ToDouble(model.TotalArea) > 0.25 && Convert.ToDouble(model.TotalArea) <= 0.50)
+                            //if (Convert.ToDouble(model.TotalArea) <= 0.25)
+                            //{
+                            //    TotalPayment = 250;
+                            //}
+                            //else 
+                            if (Convert.ToDouble(model.TotalArea) <= 0.50)
                             {
                                 TotalPayment = 500;
                             }
