@@ -416,7 +416,34 @@
         });
         var today = new Date().toISOString().split('T')[0];
         document.getElementById('PreviousDate').setAttribute('max', today);
+        function Test(){
+            if ((($('#IDProofPhoto').files[0].size) > (4 * 1024 * 1024)) || (($('#AuthorizationLetterPhoto').files[0].size) > (4 * 1024 * 1024)) || (($('#AddressProofPhoto').files[0].size) > (4 * 1024 * 1024)) || (($('#KMLFile').files[0].size) > (4 * 1024 * 1024))) {
+                return false;
+            }else{
+                return true;
+            }
+        }
         $(function () {
+            $('#IDProofPhoto').on('change', function () {
+                if ((this.files[0].size) > (4 * 1024 * 1024)) {
+                    $('#IDProofPhoto-error').text('File size cannot be greater than 4MB');
+                } 
+            });
+            $('#AuthorizationLetterPhoto').on('change', function () {
+                if ((this.files[0].size) > (4 * 1024 * 1024)) {
+                    $('#AuthorizationLetterPhoto-error').text('File size cannot be greater than 4MB');
+                }
+            });
+            $('#AddressProofPhoto').on('change', function () {
+                if ((this.files[0].size) > (4 * 1024 * 1024)) {
+                    $('#AddressProofPhoto-error').text('File size cannot be greater than 4MB');
+                }
+            });
+            $('#KMLFile').on('change', function () {
+                if ((this.files[0].size) > (4 * 1024 * 1024)) {
+                    $('#KMLFile-error').text('File size cannot be greater than 4MB');
+                }
+            });
             var total = 0.0;
             // if ($('#Latitude').val() == '0') $('#Latitude').val('');
             // if ($('#Longitute').val() == '0') $('#Longitute').val('');
@@ -496,7 +523,7 @@
                             Bigha = _thisInner.find('.Bigha').val()!=''?parseFloat(_thisInner.find('.Bigha').val()) * 0.25:0.0;
                         }
                         grandTotal = parseFloat(grandTotal) + Marla + Biswansi + Kanal + Biswa + Sarsai + Bigha;
-                        total = parseFloat(grandTotal).toFixed(2);
+                        total = parseFloat(grandTotal).toFixed(4);
                         
                     });
                 }
