@@ -10,11 +10,22 @@
 {
     <input hidden asp-for="Id" />
     <p>
-        Your application has been received successfully.<br /> Track its status with the following tracking number:<br />
+        
+        @if (Model.OrderId != "0")
+        {
+            @:"Your application has been received successfully. <br/>Payment has been done with transaction number "@Model.OrderId
+        }
+        else
+        {
+            @:"Your application has been received successfully, but payment is <b style="color:red">pending</b>"
+        }
+        <br /> Track its status with the following tracking number:<br />
         <b style="color:#76ac23">
-            @Model.ApplicationID.
+            @Model.ApplicationID. <a asp-controller="Grant" asp-action="GeneratePdf" asp-route-Id="@Model.ApplicationID">Click here to download application</a>
         </b>
-    </p><br />
+    </p>
+    
+    <br />
     <p>
         <a class="btn btn-secondary btn-user btn-block" asp-controller="HomeLanding" asp-action="Index">Back To Home</a>
     </p>

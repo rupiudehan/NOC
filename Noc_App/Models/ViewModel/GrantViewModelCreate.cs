@@ -39,7 +39,7 @@ namespace Noc_App.Models.ViewModel
         public string? PlotNo { get; set; }
         [Required]
         [Display(Name = "Owner Type")]
-        public int? SelectedOwnerTypeID { get; set; }
+        //public int? SelectedOwnerTypeID { get; set; }
         public IEnumerable<SelectListItem> OwnerType { get; set; }
         [Display(Name="Pin Code")]
         public string Pincode { get; set; }

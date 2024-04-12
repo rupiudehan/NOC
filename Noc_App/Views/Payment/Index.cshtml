@@ -1,0 +1,202 @@
+﻿@model Noc_App.Models.Payment.PaymentRequest
+@{
+    ViewData["Title"] = "Payment";
+    Layout = "";
+    // double amount = Convert.ToDouble(@ViewBag.total);
+    // int Id = Convert.ToInt32(@ViewBag.Id);
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>@ViewBag.Title</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/landingpage/assets/img/favicon.png" rel="icon">
+    <link href="~/landingpage/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/landingpage/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="~/landingpage/assets/css/style.css" rel="stylesheet">
+    <style>
+        footer {
+            position: fixed;
+            height: 88px;
+            bottom: 0;
+            width: 100%;
+        }
+
+        main, #hero {
+            min-height: 82vh;
+            height: auto !important;
+            height: 100%;
+            margin: 0 auto 60px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header" class="d-flex align-items-center">
+        <div class="container d-flex align-items-center">
+            <img src="~/landingpage/assets/img/favicon.png" alt="NOC" height="45" width="45" style="margin-right:5px;" />
+            <h1 class="logo me-auto"><a href="#">NOC, Department of Water Resources , Punjab</a></h1>
+        </div>
+    </header><!-- End Header -->
+
+    <main id="main">
+        <section id="contact" class="contact">
+            <div class="container">
+
+                <div class="section-title">
+                    <h2>Payment</h2>
+                    @* <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p> *@
+                </div>
+
+                <div class="row">
+
+                    <div class="col-lg-12 mt-5 mt-lg-0 d-flex align-items-stretch">
+                        <div class="card shadow mb-4 col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-header py-3">
+                                        <h2 class="m-0 font-weight-bold text-primary">Total Amount : ₹@Model.Amount</h2>
+                                    </div>
+                                    <div class="card-body">
+                                        @* @if (@Model.Amount > 0)
+                                        { *@
+                                            <form class="well form-horizontal" asp-action="ProcessRequestOrder" method="post" id="contact_form">
+                                                <center><h2><b>Applicant Details For Payment</b></h2></center>
+                                            <center><h5>Name : @Model.Name</h5></center>
+                                            <center><h5>Email : @Model.Email</h5></center>
+                                            <center><h5>Address : @Model.Address</h5></center>
+                                            <center><h5>Total Amount : ₹@Model.Amount</h5></center>
+                                            <input hidden asp-for="Amount" />
+                                            <input hidden asp-for="GrantId" />
+                                            <input hidden asp-for="Name" />
+                                            <input hidden asp-for="Email" />
+                                            <input hidden asp-for="Address" />
+                                                @* <div class="form-group">
+                                                <b><label class="col-md-4 control-label">Customer Name</label></b>
+                                                    <div class="col-md-4 inputGroupContainer">
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                                        <span class"control-label col-md-6">
+                                                            @Html.DisplayFor(model => model.Name, new { @class = "form-control" })
+                                                            </span>
+                                                            <input placeholder="Name" class="form-control" type="text" asp-for="Name" autocomplete="off" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4 control-label">E-Mail</label>
+                                                    <div class="col-md-4 inputGroupContainer">
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-envelope" style="font-size:11px"></i></span>
+                                                        @Html.DisplayFor(model => model.Email, new { @class = "form-control" })
+                                                            <input placeholder="E-Mail Address" class="form-control" type="text" asp-for="Email" autocomplete="off" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4 control-label">Phone Number</label>
+                                                    <div class="col-md-4 inputGroupContainer">
+                                                        <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                                                        @Html.DisplayFor(model => model.PhoneNumber, new { @class = "form-control" })
+                                                            <input placeholder="Phone" class="form-control" type="text" asp-for="PhoneNumber" autocomplete="off" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4 control-label">Address</label>
+                                                    <div class="col-md-4 inputGroupContainer">
+                                                        <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-address-book-o" style="font-size:11px"></i></span>
+                                                        @Html.DisplayFor(model => model.Address, new { @class = "form-control" })
+                                                            <input placeholder="Address" class="form-control" type="text" asp-for="Address" autocomplete="off" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4 control-label">Amount (INR)</label>
+                                                    <div class="col-md-4 inputGroupContainer">
+                                                        <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-inr" style="font-size:19px"></i></span>
+                                                        ₹@Html.DisplayFor(model => model.Amount, new { @class = "form-control" })
+                                                            <input placeholder="Amount (INR)" class="form-control" type="text" asp-for="Amount" autocomplete="off" required>
+                                                        </div>
+                                                    </div>
+                                                </div> *@
+                                                <div class="row col-md-12">
+                                                    <label class="col-md-4 control-label"></label>
+                                                    <div class="col-md-2" style="text-align:center;">
+                                                        <button type="submit" class="btn btn-warning">Pay Now <span class="glyphicon glyphicon-send"></span></button>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <a class="btn btn-primary btn-user btn-block col-sm-12" asp-controller="Grant" asp-action="Index" asp-route-Id="@Model.GrantId">Pay Later</a>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                       @*  }
+                                        else
+                                        {
+                                            <div class="col-sm-4 offset-sm-5">
+                                                <a class="btn btn-success btn-user btn-block" asp-controller="HomeLanding" asp-action="Index">Back To Home Page</a>
+                                            </div>
+                                        } *@
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer id="footer">
+        <div class="container">
+            @* <h3>Green</h3>
+            <p>Et aut eum quis fuga eos sunt ipsa nihil. Labore corporis magni eligendi fuga maxime saepe commodi placeat.</p> *@
+
+            <div class="copyright">
+                &copy; Copyright <strong><span>NOC</span></strong>. All Rights Reserved
+            </div>
+        </div>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Vendor JS Files -->
+    <script src="~/landingpage/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/landingpage/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="~/landingpage/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/landingpage/assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="~/landingpage/assets/js/main.js"></script>
+
+</body>
+
+</html>

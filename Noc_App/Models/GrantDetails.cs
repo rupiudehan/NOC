@@ -20,7 +20,7 @@ namespace Noc_App.Models
         public int ProjectTypeId { get; set; }
         public ProjectTypeDetails ProjectType { get; set; }
         public string? OtherProjectTypeDetail { get; set; }
-        public ICollection<GrantKhasraDetails> Khasras { get; set; }
+        public List<GrantKhasraDetails> Khasras { get; set; }
         //public string? Khasra { get; set; }
         public string? Hadbast { get; set; }
         public string? PlotNo { get; set; }

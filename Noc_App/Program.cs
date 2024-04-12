@@ -10,6 +10,7 @@ using Noc_App.Models;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.Repository;
 using Noc_App.UtilityService;
+using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,8 +46,6 @@ builder.Services.AddScoped<IRepository<DivisionDetails>, Repository<DivisionDeta
 builder.Services.AddScoped<IRepository<SubDivisionDetails>, Repository<SubDivisionDetails>>();
 builder.Services.AddScoped<IRepository<TehsilBlockDetails>, Repository<TehsilBlockDetails>>();
 builder.Services.AddScoped<IRepository<VillageDetails>, Repository<VillageDetails>>();
-//builder.Services.AddScoped<IRepository<DrainCoordinatesDetails>, Repository<DrainCoordinatesDetails>>();
-//builder.Services.AddScoped<IRepository<DrainDetails>, Repository<DrainDetails>>();
 builder.Services.AddScoped<IRepository<OwnerTypeDetails>, Repository<OwnerTypeDetails>>();
 builder.Services.AddScoped<IRepository<OwnerDetails>, Repository<OwnerDetails>>();
 builder.Services.AddScoped<IRepository<NocPermissionTypeDetails>, Repository<NocPermissionTypeDetails>>();
@@ -68,13 +67,25 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddTransient<IPaymentService, PaymentService>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.Configure<PaymentConfig>(builder.Configuration.GetSection("RazorPayOptions"));
+
+//builder.Services.AddSingleton(x =>
+//    new PaypalClient(
+//        builder.Configuration["PayPalOptions:ClientId"],
+//        builder.Configuration["PayPalOptions:ClientSecret"],
+//        builder.Configuration["PayPalOptions:Mode"]
+//    )
+//);
 builder.Services.AddSingleton(x =>
-    new PaypalClient(
-        builder.Configuration["PayPalOptions:ClientId"],
-        builder.Configuration["PayPalOptions:ClientSecret"],
-        builder.Configuration["PayPalOptions:Mode"]
+    new PaymentConfig(
+        builder.Configuration["RazorPayOptions:ClientId"],
+        builder.Configuration["RazorPayOptions:ClientSecret"]
     )
 );
+//builder.Services.AddScoped<IOrderDetail, OrderDetail>();
 
 var app = builder.Build();
 
@@ -105,5 +116,6 @@ app.MapControllerRoute(
     pattern: "{controller=HomeLanding}/{action=Index}/{id?}");
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+app.UseRotativa();
 
 app.Run();

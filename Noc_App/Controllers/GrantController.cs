@@ -13,6 +13,12 @@ using Noc_App.UtilityService;
 using System.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.RegularExpressions;
+using Noc_App.Models.Payment;
+using Microsoft.AspNetCore.Http;
+using Rotativa.AspNetCore;
+using System;
+using Razorpay.Api;
+using System.Collections.ObjectModel;
 
 namespace Noc_App.Controllers
 {
@@ -29,6 +35,8 @@ namespace Noc_App.Controllers
         private readonly IRepository<OwnerTypeDetails> _ownerTypeRepo;
         private readonly IRepository<GrantKhasraDetails> _khasraRepo;
         private readonly IRepository<SiteAreaUnitDetails> _siteUnitsRepo;
+        private readonly IRepository<GrantPaymentDetails> _grantPaymentRepo;
+        private readonly IRepository<OwnerDetails> _grantOwnersRepo;
         private readonly IEmailService _emailService;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -36,7 +44,8 @@ namespace Noc_App.Controllers
         public GrantController(IRepository<GrantDetails> repo,IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo, 
             IRepository<DivisionDetails> divisionRepo, IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo, 
             IRepository<NocTypeDetails> nocTypeRepo,IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment,
-            IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService)
+            IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService, 
+            IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo)
         {
             _villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
@@ -51,19 +60,166 @@ namespace Noc_App.Controllers
             _emailService = emailService;
             _khasraRepo = khasraRepo;
             _siteUnitsRepo = siteUnitsRepo;
+            _grantPaymentRepo = grantPaymentRepo;
+            _grantOwnersRepo = grantOwnersRepo;
         }
         [AllowAnonymous]
-        public async Task<ViewResult> Index(int Id)
+        public async Task<ViewResult> Index(string Id)
         {
             try
             {
-                GrantDetails obj = await _repo.GetByIdAsync(Id);
-                GrantViewModel model = new GrantViewModel
+                GrantDetails obj = (await _repo.FindAsync(x=>x.ApplicationID==Id)).FirstOrDefault();
+                var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
+                if (payment == null || payment.Count() == 0)
                 {
-                    Id = obj.Id,
-                    ApplicationID = obj.ApplicationID
-                };
-                return View(model);
+                    GrantViewModel model = new GrantViewModel
+                    {
+                        Id = obj.Id,
+                        ApplicationID = obj.ApplicationID,
+                        OrderId = "0",
+                        Message="Payment is not successfull"
+                    };
+                    return View(model);
+                }
+                else
+                {
+                    GrantPaymentDetails objPyment = (payment).FirstOrDefault();
+                    GrantViewModel model = new GrantViewModel
+                    {
+                        Id = obj.Id,
+                        ApplicationID = obj.ApplicationID,
+                        OrderId = objPyment.PaymentOrderId,
+                        Message = "Payment is successfull"
+                    };
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return View();
+            }
+        }
+
+        [AllowAnonymous]
+        public async Task<ViewResult> GeneratePdf(string Id)
+        {
+            try
+            {
+                GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID == Id)).FirstOrDefault();
+                VillageDetails village = await _villageRpo.GetByIdAsync(obj.VillageID);
+                TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(village.TehsilBlockId);
+                SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(tehsil.SubDivisionId);
+                DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
+                NocPermissionTypeDetails permission = await _nocPermissionTypeRepo.GetByIdAsync(obj.NocPermissionTypeID);
+                NocTypeDetails noctype = await _nocTypeRepo.GetByIdAsync(obj.NocTypeId);
+                SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(obj.SiteAreaUnitId);
+                List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == obj.Id)).ToList();
+                List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
+                List<OwnerTypeDetails> ownertype = new List<OwnerTypeDetails>();
+                foreach (OwnerDetails item in owners)
+                {
+                    OwnerTypeDetails type = await _ownerTypeRepo.GetByIdAsync(item.OwnerTypeId);
+                    item.OwnerType = type;
+                }
+                double totalArea = 0;
+                foreach (GrantKhasraDetails item in khasras)
+                {
+                    double marla = 0,kanal=0,sarsai=0,biswansi=0,biswa=0,bigha=0;
+                    if(unit.Name== @"Marla/Kanal/Sarsai")
+                    {
+                        marla = item.MarlaOrBiswansi / 160;
+                        kanal = item.KanalOrBiswa / 8;
+                        sarsai = item.SarsaiOrBigha / 1440;
+                    }
+                    else
+                    {
+                        biswansi = item.MarlaOrBiswansi * 0.000625;
+                        biswa = item.KanalOrBiswa * 0.0125;
+                        bigha = item.SarsaiOrBigha * 0.25;
+                    }
+                    totalArea= totalArea+marla + kanal+ sarsai+ biswansi+ biswa+ bigha;
+                }
+                var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
+                if (payment == null || payment.Count() == 0)
+                {
+                    GrantDetailViewModel model = new GrantDetailViewModel
+                    {
+                        Id = obj.Id,
+                        ApplicationID = obj.ApplicationID,
+                        PaymentOrderId = "0",
+                        Name=obj.Name,
+                        VillageName= village.Name,
+                        TehsilBlockName=tehsil.Name,
+                        SubDivisionName=subDivision.Name,
+                        DivisionName= division.Name,
+                        AddressProofPhotoPath=obj.AddressProofPhotoPath,
+                        ApplicantEmailID=obj.ApplicantEmailID,
+                        ApplicantName=obj.ApplicantName,
+                        AuthorizationLetterPhotoPath=obj.AuthorizationLetterPhotoPath,
+                        Hadbast=obj.Hadbast,
+                        IDProofPhotoPath=obj.IDProofPhotoPath,
+                        KMLFilePath=obj.KMLFilePath,
+                        KmlLinkName=obj.KMLFilePath,
+                        NocNumber=obj.NocNumber,
+                        NocPermissionTypeName= permission.Name,
+                        NocTypeName= noctype.Name,
+                        OtherProjectTypeDetail=obj.OtherProjectTypeDetail,
+                        Pincode=village.PinCode.ToString(),
+                        PlotNo=obj.PlotNo,
+                        PreviousDate=string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
+                        ProjectTypeName= obj.Name,
+                        SiteAreaUnitName= unit.Name,
+                        TotalArea= totalArea.ToString(),
+                        Owners= owners,
+                        Khasras=khasras
+                    };
+                    //return new ViewAsPdf(model);
+                    return new ViewAsPdf(model)
+                    {
+                        FileName = model.ApplicationID + ".pdf"
+                    };
+                }
+                else
+                {
+                    GrantPaymentDetails objPyment = (payment).FirstOrDefault();
+                    GrantDetailViewModel model = new GrantDetailViewModel
+                    {
+                        Id = obj.Id,
+                        ApplicationID = obj.ApplicationID,
+                        PaymentOrderId = objPyment.PaymentOrderId,
+                        Name = obj.Name,
+                        VillageName = village.Name,
+                        TehsilBlockName = tehsil.Name,
+                        SubDivisionName = subDivision.Name,
+                        DivisionName = division.Name,
+                        AddressProofPhotoPath = obj.AddressProofPhotoPath,
+                        ApplicantEmailID = obj.ApplicantEmailID,
+                        ApplicantName = obj.ApplicantName,
+                        AuthorizationLetterPhotoPath = obj.AuthorizationLetterPhotoPath,
+                        Hadbast = obj.Hadbast,
+                        IDProofPhotoPath = obj.IDProofPhotoPath,
+                        KMLFilePath = obj.KMLFilePath,
+                        KmlLinkName = obj.KMLFilePath,
+                        NocNumber = obj.NocNumber,
+                        NocPermissionTypeName = permission.Name,
+                        NocTypeName = noctype.Name,
+                        OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
+                        Pincode = village.PinCode.ToString(),
+                        PlotNo = obj.PlotNo,
+                        PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
+                        ProjectTypeName = obj.Name,
+                        SiteAreaUnitName = unit.Name,
+                        TotalArea = totalArea.ToString(),
+                        Owners = owners,
+                        Khasras = khasras
+                    };
+                    //return new ViewAsPdf(model);
+                    return new ViewAsPdf(model)
+                    {
+                        FileName = model.ApplicationID + ".pdf"
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -94,13 +250,13 @@ namespace Noc_App.Controllers
                 ProjectType = new SelectList(projectType, "Id", "Name"),
                 NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
                 NocType = new SelectList(nocType, "Id", "Name"),
-                OwnerType = new SelectList(ownerType, "Id", "Name"),
+                //OwnerType = new SelectList(ownerType, "Id", "Name"),
                 Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
                 SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
                 SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
                 GrantKhasras = new List<GrantKhasraViewModelCreate> { new GrantKhasraViewModelCreate { KanalOrBiswa = 0, KhasraNo = "", MarlaOrBiswansi = 0, SarsaiOrBigha = 0/*,SelectedUnitId= siteUnits.OrderBy(x=>x.Name).Select(x=>x.Id).FirstOrDefault()*/ } },
-                Owners = new List<OwnerViewModelCreate> { new OwnerViewModelCreate { Name = "", Address = "",MobileNo="",Email="" } },
+                Owners = new List<OwnerViewModelCreate> { new OwnerViewModelCreate { Name = "", Address = "",MobileNo="",Email="",OwnerType= new SelectList(ownerType, "Id", "Name") } },
                 IsOtherTypeSelected=0,
                 IsPaymentDone = false,
                 IsConfirmed =false,
@@ -287,7 +443,6 @@ namespace Noc_App.Controllers
                             else inputString = "GNTNOC1";
 
                             model.ApplicationID = inputString;
-
                             GrantDetails obj = new GrantDetails
                             {
                                 Name = model.Name,
@@ -312,6 +467,38 @@ namespace Noc_App.Controllers
                                 CreatedOn = DateTime.Now
                             };
                             await _repo.CreateAsync(obj);
+                            //model.SelectedOwnerTypeID
+                            List<OwnerDetails> ownerList = new List<OwnerDetails>();
+                            foreach (OwnerViewModelCreate item in viewModel.Owners)
+                            {
+                                OwnerDetails owner = new OwnerDetails
+                                {
+                                    Address = item.Address,
+                                    Email = item.Email,
+                                    GrantId = obj.Id,
+                                    MobileNo= item.MobileNo,
+                                    Name=item.Name,
+                                    OwnerTypeId=item.SelectedOwnerTypeID
+                                };
+                                ownerList.Add(owner);
+                            }
+                            List<GrantKhasraDetails> khasraList = new List<GrantKhasraDetails>();
+                            foreach (GrantKhasraViewModelCreate item in viewModel.GrantKhasras)
+                            {
+                                GrantKhasraDetails khasra = new GrantKhasraDetails
+                                {
+                                    KanalOrBiswa=item.KanalOrBiswa,
+                                    KhasraNo=item.KhasraNo,
+                                    MarlaOrBiswansi=item.MarlaOrBiswansi,
+                                    SarsaiOrBigha=item.SarsaiOrBigha,
+                                    UnitId = obj.SiteAreaUnitId,
+                                    GrantID=obj.Id
+                                };
+                                khasraList.Add(khasra);
+                            }
+                            obj.Owners= ownerList;
+                            obj.Khasras= khasraList;
+                            await _repo.UpdateAsync(obj);
                             var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
                             _emailService.SendEmail(emailModel, "Punjab Irrigation Department");
                             double TotalPayment = 0;
@@ -342,12 +529,22 @@ namespace Noc_App.Controllers
                             }
                             if (TotalPayment > 0)
                             {
-                                TempData["TotalAreaAmount"] = TotalPayment.ToString();
-                                TempData["GrantID"] = obj.Id.ToString();
-                                return RedirectToAction("Index", "Checkout");
+                                VillageDetails applicantVillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID ?? 0);
+                                TehsilBlockDetails applicantteh = await _tehsilBlockRepo.GetByIdAsync(model.SelectedTehsilBlockId ?? 0);
+                                SubDivisionDetails applicantsubdiv = await _subDivisionRepo.GetByIdAsync(model.SelectedSubDivisionId ?? 0);
+                                DivisionDetails applicantdiv = await _divisionRepo.GetByIdAsync(model.SelectedDivisionId ?? 0);
+                                PaymentRequest paymentRequestDetail = new PaymentRequest
+                                {
+                                    Name= model.ApplicantName,
+                                    Email=model.ApplicantEmailID,
+                                    Address= "Division:" + applicantdiv.Name + ",Sub-Division:" + applicantsubdiv.Name + ",Tehsil/Block:" + applicantteh.Name + ",Village:" + applicantVillage.Name+",Pincode:"+applicantVillage.PinCode,
+                                    Amount=TotalPayment,
+                                    GrantId= obj.Id
+                                };
+                                return RedirectToAction("Index", "Payment",paymentRequestDetail);
                             }
                             else {
-                                return RedirectToAction("Index", "Grant", new { Id = obj.Id });
+                                return RedirectToAction("Index", "Grant", new { Id = obj.ApplicationID });
                             }
 
                         }

@@ -5,7 +5,8 @@ namespace Noc_App.Models.ViewModel
 {
     public class OwnerViewModelCreate
     {
-        public int OwnerTypeId { get; set; }
+        [Required]
+        public int SelectedOwnerTypeID { get; set; }
         public IEnumerable<SelectListItem> OwnerType { get; set; }
         [Required]
         public string Name { get; set; }

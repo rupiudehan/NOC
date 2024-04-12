@@ -439,15 +439,6 @@ namespace NocApp.Migrations
                     b.Property<int>("GrantID")
                         .HasColumnType("integer");
 
-                    b.Property<string>("PayerEmail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PayerId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PayerName")
-                        .HasColumnType("text");
-
                     b.Property<string>("PaymentOrderId")
                         .HasColumnType("text");
 
@@ -457,13 +448,7 @@ namespace NocApp.Migrations
                     b.Property<decimal?>("TotalAmount")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("paymentid")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("referenceId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("sessionid")
+                    b.Property<string>("paymentid")
                         .HasColumnType("text");
 
                     b.HasKey("Id");

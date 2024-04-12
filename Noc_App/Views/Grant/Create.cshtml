@@ -312,10 +312,11 @@
 
                                                         <td><span class="srOwner">1</span></td>
                                                         <td>
-                                                            <select asp-for="SelectedOwnerTypeID" asp-items="@Model.OwnerType" class="form-control">
+                                                            <select asp-for="Owners[0].SelectedOwnerTypeID" asp-items="@Model.Owners[0].OwnerType" class="form-control">
                                                                 <option value="">Select</option>
                                                             </select>
-                                                            <span asp-validation-for="SelectedOwnerTypeID" class="text-danger"></span>
+                                                            <input hidden asp-for="Owners[0].SelectedOwnerTypeID" />
+                                                            <span asp-validation-for="Owners[0].SelectedOwnerTypeID" class="text-danger"></span>
                                                         </td>
                                                         <td>
                                                             <input type="text" asp-for=Owners[0].Name class="form-control" placeholder="Owner Name" />
@@ -642,6 +643,22 @@
 
         $("#addMoreBtn").on("click", function () {
             var newEntry = $(".owner-entry:first").clone();
+
+            // newEntry.find("span").each(function () {
+            //     var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
+            //     $(this).attr("name", name);
+            //     $(this).text("");
+            // });
+            newEntry.find("select").each(function () {
+                var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
+                $(this).attr("name", name);
+                $(this).val("");
+            });
+            newEntry.find("hidden").each(function () {
+                var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
+                $(this).attr("name", name);
+                $(this).val("");
+            });
             newEntry.find("input").each(function () {
                 var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
                 $(this).attr("name", name);
