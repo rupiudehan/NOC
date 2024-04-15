@@ -59,7 +59,7 @@
 
                     @* <div class="section-title"> *@
                     <center><h2>Application Form</h2></center>
-                        @* <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p> *@
+                    @* <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p> *@
                     @* </div> *@
 
                     <div class="row">
@@ -98,23 +98,11 @@
                                                     </div>
                                                 }
                                             </div>
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label asp-for="ApplicantName" class="control-label"></label>
-                                                    <input asp-for="ApplicantName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="ApplicantEmailID" class="control-label"></label>
-                                                    <input asp-for="ApplicantEmailID" readonly class="form-control form-control-user" />
-                                                </div>
-                                            </div>
+
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Address Details of Site</h6>
+                                                <h6 class="m-0 font-weight-bold text-primary">Site Address Details</h6>
                                             </div>
                                             <div class="card-body">
                                                 <div class="form-group">
@@ -147,18 +135,18 @@
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Details of Khasra</h6>
+                                                <h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6>
                                             </div>
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <table id="khasraTable" class="table table-bordered table-striped">
+                                                    <table id="khasraTable" class="table table-responsive table-bordered table-striped">
                                                         <thead>
                                                             <tr>
                                                                 @* <th>#</th> *@
                                                                 <th>Khasra No.</th>
-                                                                <th>Marla/Biswansi</th>
-                                                                <th>Kanal/Biswa</th>
-                                                                <th>Sarsai/Bigha</th>
+                                                                <th>Kanal/Bigha</th>
+                                                                <th>Marla/Biswa</th>
+                                                                <th>Sarsai/Biswansi</th>
                                                                 @* <th></th> *@
                                                                 <!-- Add more columns as needed -->
                                                             </tr>
@@ -172,10 +160,10 @@
                                                                         <input asp-for="Khasras[i].KhasraNo" readonly class="form-control form-control-user" />
                                                                     </td>
                                                                     <td>
-                                                                        <input asp-for="Khasras[i].MarlaOrBiswansi" readonly class="form-control form-control-user" />
+                                                                        <input asp-for="Khasras[i].KanalOrBiswa" readonly class="form-control form-control-user" />
                                                                     </td>
                                                                     <td>
-                                                                        <input asp-for="Khasras[i].KanalOrBiswa" readonly class="form-control form-control-user" />
+                                                                        <input asp-for="Khasras[i].MarlaOrBiswansi" readonly class="form-control form-control-user" />
                                                                     </td>
                                                                     <td>
                                                                         <input asp-for="Khasras[i].SarsaiOrBigha" readonly class="form-control form-control-user" />
@@ -188,11 +176,29 @@
 
                                                 </div>
                                                 <div class="row">
-                                                    <div class="col-sm-4">
-                                                        <input hidden asp-for="TotalArea" value="0" id="TotalSiteArea" />
-                                                        <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
-                                                        @* </div> *@
-                                                    </div>
+                                                    <table class="table table-striped table-">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="col-sm-3">
+                                                                    <label class="control-label">Total Area in Acres: </label>
+                                                                    <input hidden asp-for="TotalArea" value="0" id="TotalSiteArea" />
+                                                                    <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
+
+                                                                </td>
+                                                                <td class="col-sm-3">
+                                                                    <label class="control-label">Total Area in Sq Feet: </label>
+                                                                    <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
+
+                                                                </td>
+                                                                <td class="col-sm-3">
+                                                                    <label class="control-label">Total Area in Sq Metre(s): </label>
+                                                                    <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
+
+                                                                </td>
+                                                                <td></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
@@ -319,18 +325,45 @@
 
                                         <div class="col-lg-6">
                                             <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Payment Detail</h6>
+                                                <h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label asp-for="ApplicantName" class="control-label"></label>
+                                                    <input asp-for="ApplicantName" readonly class="form-control form-control-user" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="ApplicantEmailID" class="control-label"></label>
+                                                    <input asp-for="ApplicantEmailID" readonly class="form-control form-control-user" />
+                                                </div>
+                                            </div>
+                                            <div class="card-header py-3">
+                                                <h6 class="m-0 font-weight-bold text-primary">Application Detail</h6>
                                             </div>
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label asp-for="ApplicationID" class="control-label">Application ID</label>
                                                     <input asp-for="ApplicationID" readonly class="form-control form-control-user" />
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="card-header py-3">
+                                                <h6 class="m-0 font-weight-bold text-primary">Payment Detail</h6>
+                                            </div>
+                                            <div class="card-body">
                                                 @if (Model.PaymentOrderId != "0")
                                                 {
                                                     <div class="form-group">
                                                         <label asp-for="PaymentOrderId" class="control-label">Transaction ID</label>
                                                         <input asp-for="PaymentOrderId" readonly class="form-control form-control-user" />
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="form-group">
+                                                        <label name="PaymentOrderId" class="control-label">Payment</label>
+                                                        <input name="PaymentOrderStatus" readonly class="form-control form-control-user" value="Pending" />
                                                     </div>
                                                 }
                                             </div>

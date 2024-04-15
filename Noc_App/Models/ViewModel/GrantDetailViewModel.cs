@@ -11,6 +11,8 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Unit of Site Area")]
         public string SiteAreaUnitName { get; set; }
         public string TotalArea { get; set; }
+        public string TotalAreaSqFeet { get; set; }
+        public string TotalAreaSqMetre { get; set; }
         [Display(Name = "Project Type")]
         public string ProjectTypeName { get; set; }
         [Display(Name = "Specify Other Detail")]

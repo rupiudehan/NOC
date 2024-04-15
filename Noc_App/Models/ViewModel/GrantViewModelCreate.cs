@@ -17,6 +17,10 @@ namespace Noc_App.Models.ViewModel
         public List<GrantKhasraViewModelCreate> GrantKhasras { get; set; }
         [Display(Name = "Total Area")]
         public string TotalArea { get; set; }
+        [Display(Name = "Total Area in Sq Feet")]
+        public string TotalAreaSqFeet { get; set; }
+        [Display(Name = "Total Area in Sq Metre")]
+        public string TotalAreaSqMetre { get; set; }
         //[Required]
         //[Display(Name ="Site Size in Feet")]
         //[NumericValidation(typeof(double))]
@@ -66,7 +70,7 @@ namespace Noc_App.Models.ViewModel
         public IFormFile KMLFile { get; set; }
         [Required]
         [RegularExpression(@"https:\/\/earth\.google\.com\/web\/\S+", ErrorMessage = "Invalid link")]
-        [Display(Name = "KML Link Name")]
+        [Display(Name = "KML Link")]
         public string KmlLinkName { get; set; }
         [Required]
         [Display(Name = "Applicant Name")]

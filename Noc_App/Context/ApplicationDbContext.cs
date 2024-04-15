@@ -168,8 +168,8 @@ namespace Noc_App.Context
                 .HasForeignKey(s => s.NocTypeId);
 
             modelBuilder.Entity<SiteAreaUnitDetails>().HasData(
-                new SiteAreaUnitDetails { Id = 1, Name ="Biswansi/Biswa/Bigha"},
-                new SiteAreaUnitDetails { Id = 2, Name = "Marla/Kanal/Sarsai" }
+                new SiteAreaUnitDetails { Id = 1, Name = "Bigha/Biswa/Biswansi" },
+                new SiteAreaUnitDetails { Id = 2, Name = "Kanal/Marla/Sarsai" }
                 );
             modelBuilder.Entity<ProjectTypeDetails>().HasData(
                 new ProjectTypeDetails { Id = 1,Name = "Residentials" },

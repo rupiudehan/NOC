@@ -16,5 +16,7 @@ namespace Noc_App.Models.Payment
         public double Amount { get; set; }
         [Required]
         public int GrantId { get; set; }
+        [Required]
+        public string ApplicationId { get; set; }
     }
 }

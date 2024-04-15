@@ -68,30 +68,37 @@ namespace Noc_App.Controllers
         {
             try
             {
-                GrantDetails obj = (await _repo.FindAsync(x=>x.ApplicationID==Id)).FirstOrDefault();
-                var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
-                if (payment == null || payment.Count() == 0)
+                GrantDetails obj = (await _repo.FindAsync(x=> x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
+                if (obj != null)
                 {
-                    GrantViewModel model = new GrantViewModel
+                    var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
+                    if (payment == null || payment.Count() == 0)
                     {
-                        Id = obj.Id,
-                        ApplicationID = obj.ApplicationID,
-                        OrderId = "0",
-                        Message="Payment is not successfull"
-                    };
-                    return View(model);
+                        GrantViewModel model = new GrantViewModel
+                        {
+                            Id = obj.Id,
+                            ApplicationID = obj.ApplicationID,
+                            OrderId = "0",
+                            Message = "Payment is not successfull"
+                        };
+                        return View(model);
+                    }
+                    else
+                    {
+                        GrantPaymentDetails objPyment = (payment).FirstOrDefault();
+                        GrantViewModel model = new GrantViewModel
+                        {
+                            Id = obj.Id,
+                            ApplicationID = obj.ApplicationID,
+                            OrderId = objPyment.PaymentOrderId,
+                            Message = "Payment is successfull"
+                        };
+                        return View(model);
+                    }
                 }
                 else
                 {
-                    GrantPaymentDetails objPyment = (payment).FirstOrDefault();
-                    GrantViewModel model = new GrantViewModel
-                    {
-                        Id = obj.Id,
-                        ApplicationID = obj.ApplicationID,
-                        OrderId = objPyment.PaymentOrderId,
-                        Message = "Payment is successfull"
-                    };
-                    return View(model);
+                    return View(null);
                 }
             }
             catch (Exception ex)
@@ -101,12 +108,42 @@ namespace Noc_App.Controllers
             }
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<ViewResult> Search(string searchString)
+        {
+            GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == searchString.ToLower())).FirstOrDefault();
+            if (obj != null)
+            {
+                GrantPaymentDetails payment = (await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id)).FirstOrDefault();
+
+                GrantStatusViewModel model = new GrantStatusViewModel
+                {
+                    ApplicationID = obj.ApplicationID,
+                    CreatedOn = string.Format("{0:dd/MM/yyyy}", obj.CreatedOn),
+                    ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
+                };
+                return View(model);
+            }
+            else
+            {
+                return View(null);
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult TrackStatus()
+        {
+            return View();
+        }
+
         [AllowAnonymous]
         public async Task<ViewResult> GeneratePdf(string Id)
         {
             try
             {
-                GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID == Id)).FirstOrDefault();
+                GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
                 VillageDetails village = await _villageRpo.GetByIdAsync(obj.VillageID);
                 TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(village.TehsilBlockId);
                 SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(tehsil.SubDivisionId);
@@ -171,14 +208,16 @@ namespace Noc_App.Controllers
                         ProjectTypeName= obj.Name,
                         SiteAreaUnitName= unit.Name,
                         TotalArea= totalArea.ToString(),
-                        Owners= owners,
+                        TotalAreaSqFeet = (totalArea* 43560).ToString(),
+                        TotalAreaSqMetre = (totalArea* 4046.86).ToString(),
+                        Owners = owners,
                         Khasras=khasras
                     };
-                    //return new ViewAsPdf(model);
-                    return new ViewAsPdf(model)
-                    {
-                        FileName = model.ApplicationID + ".pdf"
-                    };
+                    return new ViewAsPdf(model);
+                    //return new ViewAsPdf(model)
+                    //{
+                    //    FileName = model.ApplicationID + ".pdf"
+                    //};
                 }
                 else
                 {
@@ -214,11 +253,11 @@ namespace Noc_App.Controllers
                         Owners = owners,
                         Khasras = khasras
                     };
-                    //return new ViewAsPdf(model);
-                    return new ViewAsPdf(model)
-                    {
-                        FileName = model.ApplicationID + ".pdf"
-                    };
+                    return new ViewAsPdf(model);
+                    //return new ViewAsPdf(model)
+                    //{
+                    //    FileName = model.ApplicationID + ".pdf"
+                    //};
                 }
             }
             catch (Exception ex)
@@ -229,9 +268,71 @@ namespace Noc_App.Controllers
         }
 
         [AllowAnonymous]
-        public ViewResult PayNow()
+        public async Task<IActionResult> PayNow(string Id)
         {
-            return View();
+            GrantDetails model = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
+            if (model != null)
+            {
+                VillageDetails village = await _villageRpo.GetByIdAsync(model.VillageID);
+                TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(village.TehsilBlockId);
+                SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(tehsil.SubDivisionId);
+                DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
+                SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(model.SiteAreaUnitId);
+                List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == model.Id)).ToList();
+                double totalArea = 0;
+                foreach (GrantKhasraDetails item in khasras)
+                {
+                    double marla = 0, kanal = 0, sarsai = 0, biswansi = 0, biswa = 0, bigha = 0;
+                    if (unit.Name == @"Marla/Kanal/Sarsai")
+                    {
+                        marla = item.MarlaOrBiswansi / 160;
+                        kanal = item.KanalOrBiswa / 8;
+                        sarsai = item.SarsaiOrBigha / 1440;
+                    }
+                    else
+                    {
+                        biswansi = item.MarlaOrBiswansi * 0.000625;
+                        biswa = item.KanalOrBiswa * 0.0125;
+                        bigha = item.SarsaiOrBigha * 0.25;
+                    }
+                    totalArea = totalArea + marla + kanal + sarsai + biswansi + biswa + bigha;
+                }
+                double TotalPayment = 0;
+                if (Convert.ToDouble(totalArea) <= 0.50)
+                {
+                    TotalPayment = 500;
+                }
+                else if (Convert.ToDouble(totalArea) > 0.50 && Convert.ToDouble(totalArea) <= 1)
+                {
+                    TotalPayment = 1000;
+                }
+                else if (Convert.ToDouble(totalArea) > 1)
+                {
+                    double area = Convert.ToDouble(totalArea) - 1;
+                    TotalPayment = 1000;
+                    int count = 0;
+                    do
+                    {
+                        count++;
+                        area = area - 1;
+                    } while (area > 0);
+                    TotalPayment = TotalPayment + (count * 250);
+                }
+                PaymentRequest paymentRequestDetail = new PaymentRequest
+                {
+                    Name = model.ApplicantName,
+                    Email = model.ApplicantEmailID,
+                    Address = "Division:" + division.Name + ", Sub-Division:" + subDivision.Name + ", Tehsil/Block:" + tehsil.Name + ", Village:" + village.Name + ", Pincode:" + village.PinCode,
+                    Amount = TotalPayment,
+                    GrantId = model.Id,
+                    ApplicationId=Id
+                };
+                return RedirectToAction("Index", "Payment", paymentRequestDetail);
+            }
+            else
+            {
+                return View(model);
+            }
         }
 
         [HttpGet]
@@ -260,7 +361,9 @@ namespace Noc_App.Controllers
                 IsOtherTypeSelected=0,
                 IsPaymentDone = false,
                 IsConfirmed =false,
-                IsExtension=0
+                IsExtension=0,
+                TotalAreaSqFeet="0",
+                TotalAreaSqMetre="0"
             };
 
             return View(viewModel);
@@ -539,7 +642,8 @@ namespace Noc_App.Controllers
                                     Email=model.ApplicantEmailID,
                                     Address= "Division:" + applicantdiv.Name + ",Sub-Division:" + applicantsubdiv.Name + ",Tehsil/Block:" + applicantteh.Name + ",Village:" + applicantVillage.Name+",Pincode:"+applicantVillage.PinCode,
                                     Amount=TotalPayment,
-                                    GrantId= obj.Id
+                                    GrantId= obj.Id,
+                                    ApplicationId=obj.ApplicationID
                                 };
                                 return RedirectToAction("Index", "Payment",paymentRequestDetail);
                             }

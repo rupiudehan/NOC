@@ -13,7 +13,7 @@
         
         @if (Model.OrderId != "0")
         {
-            @:"Your application has been received successfully. <br/>Payment has been done with transaction number "@Model.OrderId
+            @:Your application has been received successfully. <br/>Payment has been done with transaction number @Model.OrderId
         }
         else
         {
@@ -21,10 +21,12 @@
         }
         <br /> Track its status with the following tracking number:<br />
         <b style="color:#76ac23">
-            @Model.ApplicationID. <a asp-controller="Grant" asp-action="GeneratePdf" asp-route-Id="@Model.ApplicationID">Click here to download application</a>
+            @Model.ApplicationID. 
         </b>
     </p>
-    
+    <p>
+        <a asp-controller="Grant" asp-action="GeneratePdf" asp-route-Id="@Model.ApplicationID">Click here to download application</a>
+    </p>
     <br />
     <p>
         <a class="btn btn-secondary btn-user btn-block" asp-controller="HomeLanding" asp-action="Index">Back To Home</a>
