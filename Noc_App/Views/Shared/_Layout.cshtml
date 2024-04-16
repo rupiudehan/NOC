@@ -54,26 +54,41 @@
                     <span>Dashboard</span>
                 </a>
             </li> *@
+            @if (signInManager.IsSignedIn(User) && User.IsInRole("Administrator"))
+                        {
             <li class="nav-item active">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
                    aria-expanded="true" aria-controls="masters">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Masters</span>
                 </a>
+                
                 <div id="masters" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         @* <h6 class="collapse-header">Custom Components:</h6> *@
                        @*  <a class="collapse-item" asp-action="ListRoles" asp-controller="Administration">Roles</a> *@
-                        <a class="collapse-item" asp-action="List" asp-controller="Division">Division</a>
-                        <a class="collapse-item" asp-action="List" asp-controller="SubDivision">SubDivision</a>
-                        <a class="collapse-item" asp-action="List" asp-controller="TehsilBlock">Tehsil/Block</a>
-                        <a class="collapse-item" asp-action="List" asp-controller="Village">Village</a>
-                        <a class="collapse-item" asp-action="List" asp-controller="Account">User</a>
-                        <a class="collapse-item" asp-action="Index" asp-controller="Drain">Drain</a>
+                        
+                            <a class="collapse-item" asp-action="List" asp-controller="Division">Division</a>
+                            <a class="collapse-item" asp-action="List" asp-controller="SubDivision">SubDivision</a>
+                            <a class="collapse-item" asp-action="List" asp-controller="TehsilBlock">Tehsil/Block</a>
+                            <a class="collapse-item" asp-action="List" asp-controller="Village">Village</a>
+                            <a class="collapse-item" asp-action="List" asp-controller="Account">User</a>
+                        
                     </div>
                 </div>
+                
+                
             </li>
-
+            }
+            else if (signInManager.IsSignedIn(User))
+            {
+                <li class="nav-item active">
+                    <a class="nav-link" asp-action="Index" asp-controller="ApprovalProcess">
+                        <i class="fas fa-fw fa-tachometer-alt"></i>
+                        <span>Approve/Reject NOC</span>
+                    </a>
+                </li>
+            }
             <!-- Divider -->
            @*  <hr class="sidebar-divider">
 
