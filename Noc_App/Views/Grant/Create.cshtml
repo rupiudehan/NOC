@@ -597,6 +597,8 @@
                 $("#khasraTable tbody").empty();
                 $("#khasraTable tbody").append(newEntry);
                 $('#TotalArea').text(0.0);
+                $('#TotalSiteAreaSqFeet').text(0.0);
+                $('#TotalSiteAreaSqMetre').text(0.0);
             });
             $('#khasraTable tbody').on('change', '.numericField', function () {
                 var grandTotal = 0.0;
