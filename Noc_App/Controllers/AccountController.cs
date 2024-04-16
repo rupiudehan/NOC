@@ -219,7 +219,7 @@ namespace Noc_App.Controllers
                         }
                         user.UserVillages = list;
                     }
-                    if (registerViewModel.SelectedTehsilBlockId!=null && registerViewModel.SelectedTehsilBlockId.Count > 0)
+                    else if (registerViewModel.SelectedTehsilBlockId!=null && registerViewModel.SelectedTehsilBlockId.Count > 0)
                     {
                         List<UserTehsil> list = new List<UserTehsil>();
                         foreach (var tehsilid in registerViewModel.SelectedTehsilBlockId)
@@ -232,7 +232,7 @@ namespace Noc_App.Controllers
                         }
                         user.UserTehsils=list;
                     }
-                    if (registerViewModel.SelectedSubDivisionId!=null && registerViewModel.SelectedSubDivisionId.Count > 0)
+                    else if (registerViewModel.SelectedSubDivisionId!=null && registerViewModel.SelectedSubDivisionId.Count > 0)
                     {
                         List<UserSubdivision> list = new List<UserSubdivision>();
                         foreach (var subdivisionID in registerViewModel.SelectedSubDivisionId)
@@ -246,7 +246,7 @@ namespace Noc_App.Controllers
                         user.UserSubdivisions = list;
                     }
 
-                    if (registerViewModel.SelectedDivisionId!=null && registerViewModel.SelectedDivisionId.Count > 0)
+                    else if (registerViewModel.SelectedDivisionId!=null && registerViewModel.SelectedDivisionId.Count > 0)
                     {
                         List<UserDivision> list = new List<UserDivision>();
                         foreach (var divisionID in registerViewModel.SelectedDivisionId)
