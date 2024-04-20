@@ -7,7 +7,6 @@ namespace Noc_App.Models.interfaces
     {
         Task<T> GetByIdAsync(int id);
         IQueryable<T> GetAll();
-
         Task CreateAsync(T division);
         Task UpdateAsync(T division);
         Task DeleteAsync(int id);

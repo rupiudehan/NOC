@@ -58,8 +58,8 @@ namespace NocApp.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { 1, "Biswansi/Biswa/Bigha" },
-                    { 2, "Marla/Kanal/Sarsai" }
+                    { 1, "Bigha/Biswa/Biswansi" },
+                    { 2, "Kanal/Marla/Sarsai" }
                 });
         }
 

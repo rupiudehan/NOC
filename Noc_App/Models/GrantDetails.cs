@@ -58,7 +58,7 @@ namespace Noc_App.Models
         public bool IsRejected { get; set; }
         public bool IsApproved { get; set; }
         public bool IsForwarded { get; set; }
-        public int ForwardLevel { get; set; }
+        public int ProcessLevel { get; set; }
         public bool IsSentBack { get; set; }
         public int SentBackLevel { get; set; }
         public DateTime CreatedOn { get; set; }

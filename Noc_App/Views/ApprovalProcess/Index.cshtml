@@ -1,5 +1,97 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<GrantUnprocessedAppDetails>;
 @{
+    ViewBag.Title = "Manage Unprocessed Applications";
+}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Manage Unprocessed Applications</h1>
+</div>
+<!-- Content Row -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="d-sm-flex align-items-center justify-content-between card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">List Of Unprocessed Applications</h6>
+                @* <a asp-controller="Division" asp-action="Create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    Add New
+                </a> *@
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    @if (Model!=null && Model.Any())
+                    {
+                        int @count = 1;
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <td>#</td>
+                                    <th>Application Id</th>
+                                    <th>Project Name</th>
+                                    <th>Location Details</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (GrantUnprocessedAppDetails data in Model)
+                                {
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@data.ApplicationID</td>
+                                        <td>@data.Name</td>
+                                        <td>@data.LocationDetails </td>
+                                        <td>
+                                            <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                            <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a>
+                                            @* <a asp-action="Reject" href="#" data-toggle="modal" data-target="#rejectModal" asp-controller="ApprovalProcess" asp-route-id="@data.Id" class="btn btn-danger">Reject</a> *@
+                                        </td>
+                                    </tr>
+                                    count=count + 1;
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <tbody>
+                                <tr>
+                                    <td>No Record Found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" asp-action="Reject" asp-controller="ApprovalProcess">
+                <div class="modal-header">
+                    <input type="hidden" id="id" name="id" />
+                    <h5 class="modal-title" id="exampleModalLabel">Are you sure, you want to reject application?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Reject" below if you are ready to reject application.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" type="submit">Reject</button>
+                    @* <a class="btn btn-primary" asp-action="Logout" asp-controller="Account">Logout</a> *@
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section  Scripts {
+    <script>
+        function SetValue(id) {
+            $('#id').val(id);
+        }
+    </script>
 }

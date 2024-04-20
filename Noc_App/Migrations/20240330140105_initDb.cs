@@ -474,7 +474,7 @@ namespace NocApp.Migrations
                     IsRejected = table.Column<bool>(type: "boolean", nullable: false),
                     IsApproved = table.Column<bool>(type: "boolean", nullable: false),
                     IsForwarded = table.Column<bool>(type: "boolean", nullable: false),
-                    ForwardLevel = table.Column<int>(type: "integer", nullable: false),
+                    ProcessLevel = table.Column<int>(type: "integer", nullable: false),
                     IsSentBack = table.Column<bool>(type: "boolean", nullable: false),
                     SentBackLevel = table.Column<int>(type: "integer", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

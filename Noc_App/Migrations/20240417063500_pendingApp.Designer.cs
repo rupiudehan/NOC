@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240331053138_seedData")]
-    partial class seedData
+    [Migration("20240417063500_pendingApp")]
+    partial class pendingApp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -258,6 +258,47 @@ namespace NocApp.Migrations
                     b.ToTable("DivisionDetails");
                 });
 
+            modelBuilder.Entity("Noc_App.Models.GrantApprovalDetail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("ApprovalID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProcessLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProcessedToRole")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProcessedToUser")
+                        .HasColumnType("text");
+
+                    b.Property<int>("GrantID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProcessedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProcessedByRole")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ProcessedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovalID");
+
+                    b.HasIndex("GrantID");
+
+                    b.ToTable("GrantApprovalDetails");
+                });
+
             modelBuilder.Entity("Noc_App.Models.GrantApprovalMaster", b =>
                 {
                     b.Property<int>("Id")
@@ -275,6 +316,63 @@ namespace NocApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("GrantApprovalMaster");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantApprovalProcessDocumentsDetails", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CatchmentAreaAndFlowPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CrossSectionOrCalculationSheetReportPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DistanceFromCreekPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DrainLSectionPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GISOrDWSReportPath")
+                        .HasColumnType("text");
+
+                    b.Property<long>("GrantApprovalID")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("KmlFileVerificationReportPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProcessedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProcessedByRole")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ProcessedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SiteConditionReportPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UpdatedByRole")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrantApprovalID");
+
+                    b.ToTable("GrantApprovalProcessDocumentsDetails");
                 });
 
             modelBuilder.Entity("Noc_App.Models.GrantDetails", b =>
@@ -426,6 +524,39 @@ namespace NocApp.Migrations
                     b.HasIndex("UnitId");
 
                     b.ToTable("GrantKhasraDetails");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantPaymentDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("GrantID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PaymentOrderId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Paymentstatus")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("TotalAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("paymentid")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrantID");
+
+                    b.ToTable("GrantPaymentDetails");
                 });
 
             modelBuilder.Entity("Noc_App.Models.NocPermissionTypeDetails", b =>
@@ -619,12 +750,12 @@ namespace NocApp.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Biswansi/Biswa/Bigha"
+                            Name = "Bigha/Biswa/Biswansi"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Marla/Kanal/Sarsai"
+                            Name = "Kanal/Marla/Sarsai"
                         });
                 });
 
@@ -883,6 +1014,36 @@ namespace NocApp.Migrations
                     b.Navigation("User2");
                 });
 
+            modelBuilder.Entity("Noc_App.Models.GrantApprovalDetail", b =>
+                {
+                    b.HasOne("Noc_App.Models.GrantApprovalMaster", "GrantApproval")
+                        .WithMany()
+                        .HasForeignKey("ApprovalID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Noc_App.Models.GrantDetails", "Grant")
+                        .WithMany()
+                        .HasForeignKey("GrantID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Grant");
+
+                    b.Navigation("GrantApproval");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantApprovalProcessDocumentsDetails", b =>
+                {
+                    b.HasOne("Noc_App.Models.GrantApprovalDetail", "GrantApproval")
+                        .WithMany()
+                        .HasForeignKey("GrantApprovalID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GrantApproval");
+                });
+
             modelBuilder.Entity("Noc_App.Models.GrantDetails", b =>
                 {
                     b.HasOne("Noc_App.Models.NocPermissionTypeDetails", "NocPermissionType")
@@ -943,6 +1104,17 @@ namespace NocApp.Migrations
                     b.Navigation("Grant");
 
                     b.Navigation("Units");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantPaymentDetails", b =>
+                {
+                    b.HasOne("Noc_App.Models.GrantDetails", "Grant")
+                        .WithMany()
+                        .HasForeignKey("GrantID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Grant");
                 });
 
             modelBuilder.Entity("Noc_App.Models.OwnerDetails", b =>

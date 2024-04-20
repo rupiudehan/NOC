@@ -377,31 +377,124 @@ namespace Noc_App.Controllers
                 {
 
                     var roles =  userManager.GetRolesAsync(user).Result;
-                    user.UserDivisions = (await _userDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-                    user.UserSubdivisions = (await _userSubDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-                    user.UserTehsils = (await _userTehsilRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-                    user.UserVillages = (await _userVillageRepository.FindAsync(x => x.UserId == user.Id)).ToList();
+                    
+                        var div= (await _userDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
+                    
+                    var subdiv= (await _userSubDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
+                    
+                    var tehsil= (await _userTehsilRepository.FindAsync(x => x.UserId == user.Id)).ToList();
+                    var vil=(await _userVillageRepository.FindAsync(x => x.UserId == user.Id));
 
-                    foreach (var location in user.UserDivisions)
+                    List<UserLocationViewModel> listLocation = new List<UserLocationViewModel>();
+                    if (vil.Count() > 0)
                     {
-                        location.Division = await _divisionRepository.GetByIdAsync(location.DivisionId);
-
-                    }
-
-                    foreach (var location in user.UserSubdivisions)
+                        listLocation = (from v in vil
+                                        join vl in _villageRepository.GetAll() on v.VillageId equals (vl.Id)
+                                        join t in _tehsilBlockRepository.GetAll() on vl.TehsilBlockId equals (t.Id)
+                                        join s in _subDivisionRepository.GetAll() on t.SubDivisionId equals (s.Id)
+                                        join d in _divisionRepository.GetAll() on s.DivisionId equals (d.Id)
+                                        select new UserLocationViewModel
+                                        {
+                                            Village = new UserVillage { Village = vl },
+                                            Tehsil = new UserTehsil { Tehsil = t },
+                                            Subdivision = new UserSubdivision { Subdivision = s },
+                                            Division = new UserDivision { Division = d }
+                                        }
+                                   ).ToList();
+                    }else if (tehsil.Count() > 0)
                     {
-                        location.Subdivision = await _subDivisionRepository.GetByIdAsync(location.SubdivisionId);
-
+                        listLocation = (from v in tehsil
+                                        join t in _tehsilBlockRepository.GetAll() on v.TehsilId equals (t.Id)
+                                        join s in _subDivisionRepository.GetAll() on t.SubDivisionId equals (s.Id)
+                                        join d in _divisionRepository.GetAll() on s.DivisionId equals (d.Id)
+                                        select new UserLocationViewModel
+                                        {
+                                            Village = null,
+                                            Tehsil = new UserTehsil { Tehsil = t },
+                                            Subdivision = new UserSubdivision { Subdivision = s },
+                                            Division = new UserDivision { Division = d }
+                                        }
+                                   ).ToList();
                     }
-
-                    foreach (var location in user.UserTehsils)
+                    else if (subdiv.Count() > 0)
                     {
-                        location.Tehsil = await _tehsilBlockRepository.GetByIdAsync(location.TehsilId);
+                        listLocation = (from v in subdiv
+                                        join s in _subDivisionRepository.GetAll() on v.SubdivisionId equals (s.Id)
+                                        join d in _divisionRepository.GetAll() on s.DivisionId equals (d.Id)
+                                        select new UserLocationViewModel
+                                        {
+                                            Village = null,
+                                            Tehsil = null,
+                                            Subdivision = new UserSubdivision { Subdivision = s },
+                                            Division = new UserDivision { Division = d }
+                                        }
+                                   ).ToList();
                     }
-                    foreach (var location in user.UserVillages)
+                    else if (div.Count() > 0)
                     {
-                        location.Village = await _villageRepository.GetByIdAsync(location.VillageId);
+                        listLocation = (from v in div
+                                        join d in _divisionRepository.GetAll() on v.DivisionId equals (d.Id)
+                                        select new UserLocationViewModel
+                                        {                                            
+                                            Village = null,
+                                            Tehsil = null,
+                                            Subdivision = null,
+                                            Division = new UserDivision { Division = d }
+                                        }
+                                   ).ToList();
                     }
+                    List<UserVillage> uv = new List<UserVillage>();
+                    List<UserTehsil> tb = new List<UserTehsil>();
+                    List<UserSubdivision> sb = new List<UserSubdivision>();
+                    List<UserDivision> dv = new List<UserDivision>();
+                    foreach (var item in listLocation)
+                    {
+                        if (item.Division != null)
+                        {
+                            UserDivision obj = new UserDivision { Division = item.Division.Division };
+                            dv.Add(obj);
+                        }
+                        if (item.Tehsil != null)
+                        {
+                            UserTehsil obj = new UserTehsil { Tehsil = item.Tehsil.Tehsil };
+                            tb.Add(obj);
+                        }
+                        if (item.Subdivision != null)
+                        {
+                            UserSubdivision obj = new UserSubdivision { Subdivision = item.Subdivision.Subdivision };
+                            sb.Add(obj);
+                        }
+                        if (item.Village != null)
+                        {
+                            UserVillage obj = new UserVillage { Village = item.Village.Village };
+                            uv.Add(obj);
+                        }
+                    }
+                    user.UserVillages = uv;
+                    user.UserDivisions = dv;
+                    user.UserSubdivisions = sb;
+                    user.UserTehsils = tb;
+
+                    //foreach (var location in user.UserDivisions)
+                    //{
+                    //    location.Division = await _divisionRepository.GetByIdAsync(location.DivisionId);
+
+                    //}
+
+                    //foreach (var location in user.UserSubdivisions)
+                    //{
+                    //    location.Subdivision = await _subDivisionRepository.GetByIdAsync(location.SubdivisionId);
+
+                    //}
+
+                    //foreach (var location in user.UserTehsils)
+                    //{
+                    //    location.Tehsil = await _tehsilBlockRepository.GetByIdAsync(location.TehsilId);
+                    //}
+                    //foreach (var location in user.UserVillages)
+                    //{
+                    //    location.Village = await _villageRepository.GetByIdAsync(location.VillageId);
+                    //}
                     //user.LocatioinUserMapping=_locationUserRepository.GetAll().Where(x=>x.UserID==user.Id).ToList();
 
                     //foreach (var location in user.LocatioinUserMapping)
@@ -557,6 +650,9 @@ namespace Noc_App.Controllers
                     return View(user);
                 }
                 await _userVillageRepository.DeleteNonPrimaryAsync(x => x.UserId == user.Id);
+                await _userTehsilRepository.DeleteNonPrimaryAsync(x => x.UserId == user.Id);
+                await _userSubDivisionRepository.DeleteNonPrimaryAsync(x => x.UserId == user.Id);
+                await _userDivisionRepository.DeleteNonPrimaryAsync(x => x.UserId == user.Id);
                 if (model.SelectedVillageId != null && model.SelectedVillageId.Count > 0)
                 {
                     List<UserVillage> list = new List<UserVillage>();
@@ -572,9 +668,9 @@ namespace Noc_App.Controllers
                     }
                     user.UserVillages=list;
                 }
-                await _userTehsilRepository.DeleteNonPrimaryAsync(x => x.UserId == user.Id);
-                if (model.SelectedTehsilBlockId != null && model.SelectedTehsilBlockId.Count > 0)
+                else if (model.SelectedTehsilBlockId != null && model.SelectedTehsilBlockId.Count > 0)
                 {
+                
                     List<UserTehsil> list = new List<UserTehsil>();
                     foreach (var tehsilid in model.SelectedTehsilBlockId)
                     {
@@ -588,8 +684,7 @@ namespace Noc_App.Controllers
                         }
                     }
                     user.UserTehsils=list;
-                }
-                await _userSubDivisionRepository.DeleteNonPrimaryAsync(x => x.UserId == user.Id );
+                }else
                 if (model.SelectedSubDivisionId != null && model.SelectedSubDivisionId.Count > 0)
                 {
                     List<UserSubdivision> list = new List<UserSubdivision>();
@@ -604,8 +699,7 @@ namespace Noc_App.Controllers
                         }
                     }
                     user.UserSubdivisions = list;
-                }
-                await _userDivisionRepository.DeleteNonPrimaryAsync(x => x.UserId == user.Id);
+                }else
                 if (model.SelectedDivisionId != null && model.SelectedDivisionId.Count > 0)
                 {
                     List<UserDivision> list = new List<UserDivision>();

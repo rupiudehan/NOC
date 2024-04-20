@@ -48,7 +48,7 @@ namespace Noc_App.Controllers
         {
             PaymentConfig settings = new PaymentConfig(_configuration["RazorPayOptions:ClientId"], _configuration["RazorPayOptions:ClientSecret"]);
             GrantDetails grant= await _repo.GetByIdAsync(Itemid);
-            var detail = await _service.CompleteOrderProcess(_httpContextAccessor, Itemid, settings);
+            var detail = _service.CompleteOrderProcess(_httpContextAccessor, Itemid, settings);
             var paymentDetails = new GrantPaymentDetails
             {
                 CreatedOn = DateTime.Now,

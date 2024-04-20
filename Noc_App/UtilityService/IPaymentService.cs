@@ -7,6 +7,6 @@ namespace Noc_App.UtilityService
     public interface IPaymentService
     {
         Task<GrantNocPaymentOrderDetail> ProcessMerchantOrder(PaymentRequest payRequest, PaymentConfig _settings);
-        Task<OrderCompletionDetail> CompleteOrderProcess(IHttpContextAccessor _httpContextAccessor, int grantid, PaymentConfig _settings);
+        OrderCompletionDetail CompleteOrderProcess(IHttpContextAccessor _httpContextAccessor, int grantid, PaymentConfig _settings);
     }
 }

@@ -303,7 +303,7 @@ namespace NocApp.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("ForwardLevel")
+                    b.Property<int>("ProcessLevel")
                         .HasColumnType("integer");
 
                     b.Property<string>("Hadbast")

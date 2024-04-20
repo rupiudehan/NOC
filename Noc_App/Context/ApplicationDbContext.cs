@@ -33,6 +33,8 @@ namespace Noc_App.Context
         public DbSet<GrantDetails> GrantDetails { get; set; }
         public DbSet<GrantKhasraDetails> GrantKhasraDetails { get; set; }
         public DbSet<GrantPaymentDetails> GrantPaymentDetails { get; set; }
+        public DbSet<GrantApprovalDetail> GrantApprovalDetails { get; set; }
+        public DbSet<GrantApprovalProcessDocumentsDetails> GrantApprovalProcessDocumentsDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -192,6 +194,11 @@ namespace Noc_App.Context
                 new NocTypeDetails {Id = 1, Name = "New" },
                 new NocTypeDetails { Id = 2, Name = "Extension of Existing Project" }
                 );
+            //modelBuilder.Entity<GrantApprovalMaster>().HasData(
+            //    new GrantApprovalMaster { Id = 1, Name = "Pending",Code="P" },
+            //    new GrantApprovalMaster { Id = 2, Name = "Reject",Code="R" },
+            //    new GrantApprovalMaster { Id = 2, Name = "Forward", Code = "F" }
+            //    );
 
             base.OnModelCreating(modelBuilder);
         }

@@ -567,7 +567,8 @@ namespace Noc_App.Controllers
                                 IsConfirmed = model.IsConfirmed,
                                 ApplicationID = model.ApplicationID,
                                 OtherProjectTypeDetail=model.OtherProjectTypeDetail,                                
-                                CreatedOn = DateTime.Now
+                                CreatedOn = DateTime.Now,
+                                IsPending=true
                             };
                             await _repo.CreateAsync(obj);
                             //model.SelectedOwnerTypeID

@@ -48,7 +48,7 @@ namespace Noc_App.UtilityService
                 throw;
             }
         }
-        public async Task<OrderCompletionDetail> CompleteOrderProcess(IHttpContextAccessor _httpContextAccessor,int grantid, PaymentConfig _settings)
+        public OrderCompletionDetail CompleteOrderProcess(IHttpContextAccessor _httpContextAccessor,int grantid, PaymentConfig _settings)
         {
             try
             {
