@@ -32,5 +32,6 @@ namespace Noc_App.Models.ViewModel
         public bool IsForwarded { get; set; }
         public string LoggedInRole { get; set; }
         public long GrantApprovalId { get; set; }
+        public string ProcessedToRole { get; set; }
     }
 }

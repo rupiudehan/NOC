@@ -127,7 +127,7 @@ namespace Noc_App.Controllers
                                  SubDivisionId = sub.Id,
                                  VillageName = v.Name,
                                  IsForwarded=g.IsForwarded,
-                                 LoggedInRole=role,
+                                 LoggedInRole =role,
                                  LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + v.Name + ", Pincode: " + v.PinCode,
                              }).ToList();
                 }
@@ -308,40 +308,83 @@ namespace Noc_App.Controllers
                                  LocationDetails = m.LocationDetails
                              }).ToList();
                 }
-                var model1 = (from g in model
-                                 join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID into ad
-                                 from app1 in ad.DefaultIfEmpty()
-                                  join appDoc in _repoApprovalDocument.GetAll() on app1.Id equals appDoc.GrantApprovalID into adDoc
-                                  from appDoc1 in adDoc.DefaultIfEmpty()
+                IEnumerable<GrantUnprocessedAppDetails> model1 =null;
+                if (role == "EXECUTIVE ENGINEER")
+                {
+                    model1 = (from g in model
+                              join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID into ad
+                              from app1 in ad.DefaultIfEmpty()
+                                  //join appDoc in _repoApprovalDocument.GetAll() on app1.Id equals appDoc.GrantApprovalID into adDoc
+                                  //from appDoc1 in adDoc.DefaultIfEmpty()
                               where app1 != null ? app1.ProcessedToRole == role : true
-                                
-                                 select new GrantUnprocessedAppDetails
-                                 {
-                                     Id = g.Id,
-                                     Name = g.Name,
-                                     ApplicantEmailID = g.ApplicantEmailID,
-                                     ApplicantName = g.ApplicantName,
-                                     ApplicationID = g.ApplicationID,
-                                     DivisionName = g.Name,
-                                     Hadbast = g.Hadbast,
-                                     NocNumber = g.NocNumber,
-                                     NocPermissionTypeID = g.NocPermissionTypeID,
-                                     NocTypeId = g.NocTypeId,
-                                     OtherProjectTypeDetail = g.OtherProjectTypeDetail,
-                                     PlotNo = g.PlotNo,
-                                     PreviousDate = g.PreviousDate,
-                                     ProjectTypeId = g.ProjectTypeId,
-                                     SiteAreaUnitId = g.SiteAreaUnitId,
-                                     SubDivisionName = g.Name,
-                                     TehsilBlockName = g.Name,
-                                     VillageID = g.VillageID,
-                                     DivisionId = g.Id,
-                                     SubDivisionId = g.Id,
-                                     VillageName = g.Name,
-                                     LocationDetails = g.LocationDetails,
-                                     LoggedInRole=role,
-                                     GrantApprovalId=appDoc1 != null ? appDoc1.GrantApprovalID : 0
-                                 }).Distinct().ToList().Distinct(new GrantUnprocessedAppDetailsComparer()); ;
+
+                              select new GrantUnprocessedAppDetails
+                              {
+                                  Id = g.Id,
+                                  Name = g.Name,
+                                  ApplicantEmailID = g.ApplicantEmailID,
+                                  ApplicantName = g.ApplicantName,
+                                  ApplicationID = g.ApplicationID,
+                                  DivisionName = g.Name,
+                                  Hadbast = g.Hadbast,
+                                  NocNumber = g.NocNumber,
+                                  NocPermissionTypeID = g.NocPermissionTypeID,
+                                  NocTypeId = g.NocTypeId,
+                                  OtherProjectTypeDetail = g.OtherProjectTypeDetail,
+                                  PlotNo = g.PlotNo,
+                                  PreviousDate = g.PreviousDate,
+                                  ProjectTypeId = g.ProjectTypeId,
+                                  SiteAreaUnitId = g.SiteAreaUnitId,
+                                  SubDivisionName = g.Name,
+                                  TehsilBlockName = g.Name,
+                                  VillageID = g.VillageID,
+                                  DivisionId = g.Id,
+                                  SubDivisionId = g.Id,
+                                  VillageName = g.Name,
+                                  LocationDetails = g.LocationDetails,
+                                  LoggedInRole = role,
+                                  ProcessedToRole = app1 != null ? app1.ProcessedToRole : ""
+                                  //GrantApprovalId=appDoc1 != null ? appDoc1.GrantApprovalID : 0
+                              }).Distinct().ToList().Distinct(new GrantUnprocessedAppDetailsComparer());
+                }
+                else
+                {
+                    model1 = (from g in model
+                              join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID into ad
+                              from app1 in ad.DefaultIfEmpty()
+                              join appDoc in _repoApprovalDocument.GetAll() on app1.Id equals appDoc.GrantApprovalID into adDoc
+                              from appDoc1 in adDoc.DefaultIfEmpty()
+                              where app1 != null ? app1.ProcessedToRole == role : true
+
+                              select new GrantUnprocessedAppDetails
+                              {
+                                  Id = g.Id,
+                                  Name = g.Name,
+                                  ApplicantEmailID = g.ApplicantEmailID,
+                                  ApplicantName = g.ApplicantName,
+                                  ApplicationID = g.ApplicationID,
+                                  DivisionName = g.Name,
+                                  Hadbast = g.Hadbast,
+                                  NocNumber = g.NocNumber,
+                                  NocPermissionTypeID = g.NocPermissionTypeID,
+                                  NocTypeId = g.NocTypeId,
+                                  OtherProjectTypeDetail = g.OtherProjectTypeDetail,
+                                  PlotNo = g.PlotNo,
+                                  PreviousDate = g.PreviousDate,
+                                  ProjectTypeId = g.ProjectTypeId,
+                                  SiteAreaUnitId = g.SiteAreaUnitId,
+                                  SubDivisionName = g.Name,
+                                  TehsilBlockName = g.Name,
+                                  VillageID = g.VillageID,
+                                  DivisionId = g.Id,
+                                  SubDivisionId = g.Id,
+                                  VillageName = g.Name,
+                                  LocationDetails = g.LocationDetails,
+                                  LoggedInRole = role,
+                                  ProcessedToRole = app1 != null ? app1.ProcessedToRole : "",
+                                  GrantApprovalId = appDoc1 != null ? appDoc1.GrantApprovalID : 0
+                              }).Distinct().ToList().Distinct(new GrantUnprocessedAppDetailsComparer());
+                }
                 return View(model1);
             }
            catch(Exception ex){
