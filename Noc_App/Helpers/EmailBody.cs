@@ -1,4 +1,6 @@
-﻿namespace Noc_App.Helpers
+﻿using System;
+
+namespace Noc_App.Helpers
 {
     public static class EmailBody
     {
@@ -57,6 +59,26 @@
                         <p>Dear {applicantName},</p>
                         
                         <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been successfully submitted.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
+                        <p>Best Regards,<br><br>
+                        Punjab Irrigation Department</p>
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>";
+        }
+
+        public static string EmailStringBodyForRejection(string applicantName, string applicationID)
+        {
+            return $@"<htm>
+            <head></head>
+            <body style=""margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;"">
+            <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
+                <div>
+                    <div>
+                        <p>Dear {applicantName},</p>
+                        
+                        <p>Your application for the NOC Certificate with ID <b>{applicationID}</b> has been rejected.</p><p>Please apply again to get NOC certificate</p><br>
                         <p>Best Regards,<br><br>
                         Punjab Irrigation Department</p>
                     </div>

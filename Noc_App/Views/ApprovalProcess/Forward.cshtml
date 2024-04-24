@@ -7,7 +7,7 @@
 
 <div class="row">
 
-    <div class="col-lg-6">
+    <div class="col-lg-12">
 
         <!-- Circle Buttons -->
         <div class="card shadow mb-4">
@@ -15,38 +15,127 @@
                 <h6 class="m-0 font-weight-bold text-primary">Forward</h6>
             </div>
             <div class="card-body">
-                <form class="user" asp-action="Forward" method="post">
+                <form class="user" enctype="multipart/form-data" asp-action="Forward" method="post">
                     <input type="hidden" asp-for="Id" />
-                    <div class="form-group">
-                        <label asp-for="Name" class="control-label">Project</label>
-                        <input asp-for="Name" readonly class="form-control form-control-user" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label">Project</label>
+                                <input asp-for="Name" readonly class="form-control form-control-user" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="ApplicationID" class="control-label">Application Id</label>
+                                <input asp-for="ApplicationID" readonly class="form-control form-control-user" />
+                                <span asp-validation-for="ApplicationID" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="LocationDetails" class="control-label">Location</label>
+                                <input asp-for="LocationDetails" readonly class="form-control form-control-user" />
+                                <span asp-validation-for="LocationDetails" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="ApplicationID" class="control-label">Application Id</label>
-                        <input asp-for="ApplicationID" readonly class="form-control form-control-user" />
-                        <span asp-validation-for="ApplicationID" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="LocationDetails" class="control-label">Location</label>
-                        <input asp-for="LocationDetails" readonly class="form-control form-control-user" />
-                        <span asp-validation-for="LocationDetails" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="SelectedOfficerId" class="control-label">Forward To</label>
-                        @if (Model.Officers.Count() > 0)
-                        {
-                            <select asp-for="SelectedOfficerId" asp-items="@Model.Officers" class="form-control">
-                                <option value="">Select</option>
-                            </select>
-                        }
-                        else
-                        {
-                            <select name="SelectedOfficerId" disabled class="form-control">
-                                <option value="">Select</option>
-                            </select>
-                        }
-                        <span asp-validation-for="SelectedOfficerId" class="text-danger"></span>
+                    @if (Model.LoggedInRole == "JUNIOR ENGINEER" && Model.TotalArea <= 2.00)
+                    {
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="SiteConditionReportFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                    <div class="custom-file1">
+                                        <input asp-for="SiteConditionReportFile" class="form-control custom-file-input1" accept=".pdf" />
+                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                        <span asp-validation-for="SiteConditionReportFile" id="SiteConditionReportFile-error" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="CatchmentAreaFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                    <div class="custom-file1">
+                                        <input asp-for="CatchmentAreaFile" class="form-control custom-file-input1" accept=".pdf" />
+                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                        <span asp-validation-for="CatchmentAreaFile" id="CatchmentAreaFile-error" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="DistanceFromCreekFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                    <div class="custom-file1">
+                                        <input asp-for="DistanceFromCreekFile" class="form-control custom-file-input1" accept=".pdf" />
+                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                        <span asp-validation-for="DistanceFromCreekFile" id="DistanceFromCreekFile-error" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="GisOrDwsFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                    <div class="custom-file1">
+                                        <input asp-for="GisOrDwsFile" class="form-control custom-file-input1" accept=".pdf" />
+                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                        <span asp-validation-for="GisOrDwsFile" id="GisOrDwsFile-error" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="KmlFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                    <div class="custom-file1">
+                                        <input asp-for="KmlFile" class="form-control custom-file-input1" accept=".pdf" />
+                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                        <span asp-validation-for="KmlFile" id="KmlFile-error" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="CrossSectionOrCalculationFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                    <div class="custom-file1">
+                                        <input asp-for="CrossSectionOrCalculationFile" class="form-control custom-file-input1" accept=".pdf" />
+                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                        <span asp-validation-for="CrossSectionOrCalculationFile" id="CrossSectionOrCalculationFile-error" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="LSectionOfDrainFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                    <div class="custom-file1">
+                                        <input asp-for="LSectionOfDrainFile" class="form-control custom-file-input1" accept=".pdf" />
+                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                        <span asp-validation-for="LSectionOfDrainFile" id="LSectionOfDrainFile-error" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="SelectedOfficerId" class="control-label">Forward To @Model.ForwardToRole</label>
+                                @if (Model.Officers.Count() > 0)
+                                {
+                                    <select asp-for="SelectedOfficerId" asp-items="@Model.Officers" class="form-control">
+                                        <option value="">Select</option>
+                                    </select>
+                                }
+                                else
+                                {
+                                    <select name="SelectedOfficerId" disabled class="form-control">
+                                        <option value="">Select</option>
+                                    </select>
+                                }
+                                <span asp-validation-for="SelectedOfficerId" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="row">
@@ -60,10 +149,11 @@
                                 <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
                             </div>
                         }
-                        else{
-                        <div class="col-lg-6 offset-lg-3">
-                            <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
-                        </div>
+                        else
+                        {
+                            <div class="col-lg-6 offset-lg-3">
+                                <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                            </div>
                         }
                     </div>
                 </form>

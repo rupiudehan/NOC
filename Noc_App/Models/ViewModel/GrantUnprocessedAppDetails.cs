@@ -29,5 +29,8 @@ namespace Noc_App.Models.ViewModel
         public string LocationDetails { get; set; }
         public int DivisionId { get; set; }
         public int SubDivisionId { get; set; }
+        public bool IsForwarded { get; set; }
+        public string LoggedInRole { get; set; }
+        public long GrantApprovalId { get; set; }
     }
 }

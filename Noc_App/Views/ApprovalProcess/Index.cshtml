@@ -1,17 +1,19 @@
 ﻿@model IEnumerable<GrantUnprocessedAppDetails>;
 @{
-    ViewBag.Title = "Manage Unprocessed Applications";
+    var str = Model.Select(x => x.IsForwarded).FirstOrDefault() ? "Manage Unprocessed Applications" : "Manage Forwarded Applications";
+    var str2 = Model.Select(x => x.IsForwarded).FirstOrDefault() ? "List Of Unprocessed Applications" : "List Of Forwarded Applications";
+    ViewBag.Title = str;
 }
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Manage Unprocessed Applications</h1>
+    <h1 class="h3 mb-0 text-gray-800">@str</h1>
 </div>
 <!-- Content Row -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card shadow mb-4">
             <div class="d-sm-flex align-items-center justify-content-between card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">List Of Unprocessed Applications</h6>
+                <h6 class="m-0 font-weight-bold text-primary">@str2</h6>
                 @* <a asp-controller="Division" asp-action="Create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                     Add New
                 </a> *@
@@ -29,6 +31,11 @@
                                     <th>Application Id</th>
                                     <th>Project Name</th>
                                     <th>Location Details</th>
+                                    <th>View</th>
+                                    @if (Model.FirstOrDefault().LoggedInRole == "SUB DIVISIONAL OFFICER")
+                                    {
+                                        <th>Edit</th>
+                                    }
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -41,8 +48,23 @@
                                         <td>@data.Name</td>
                                         <td>@data.LocationDetails </td>
                                         <td>
+                                            <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
+                                        </td>
+                                        @if (data.LoggedInRole == "SUB DIVISIONAL OFFICER")
+                                        {
+                                            <td>
+                                                @if (data.GrantApprovalId != 0)
+                                                {
+                                                    <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a>
+                                                }
+                                            </td>
+                                        }
+                                        <td>
                                             <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
-                                            <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a>
+                                            @if (data.LoggedInRole == "EXECUTIVE ENGINEER")
+                                            {
+                                                <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a>
+                                            }
                                             @* <a asp-action="Reject" href="#" data-toggle="modal" data-target="#rejectModal" asp-controller="ApprovalProcess" asp-route-id="@data.Id" class="btn btn-danger">Reject</a> *@
                                         </td>
                                     </tr>

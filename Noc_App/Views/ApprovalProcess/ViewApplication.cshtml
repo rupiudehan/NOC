@@ -1,0 +1,254 @@
+﻿@model GrantDetailViewModel
+@{
+    ViewBag.Title = "View Application Details";
+}
+
+<h1 class="h3 mb-4 text-gray-800">View Application</h1>
+
+<div class="row">
+
+    <div class="col-lg-12">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">View</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    @if (Model != null)
+                    {
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <tbody>
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Application Details</h6></td></tr>
+                                <tr>
+                                    <td class="boldText">Application ID</td>
+                                    <td>@Model.ApplicationID</td>
+                                    <td></td>
+                                    <td></td>
+
+                                </tr>
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6></td></tr>
+                                <tr>
+                                    <td class="boldText">Applicant Name</td>
+                                    <td>@Model.ApplicantName</td>
+                                    <td class="boldText">Applicant Email</td>
+                                    <td>@Model.ApplicantEmailID</td>
+
+                                </tr>
+                                <tr>
+
+                                    <td class="boldText">ID Proof</td>
+                                    <td>
+                                        <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.IDProofPhotoPath })">Download File</a>
+                                    </td>
+                                    <td class="boldText">Authorization Letter</td>
+                                    <td>
+                                        <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.AuthorizationLetterPhotoPath })">Download File</a>
+                                    </td>
+                                </tr>
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Project Details</h6></td></tr>
+                                <tr>
+                                    <td class="boldText">Project Name</td>
+                                    <td>@Model.Name</td>
+                                    <td class="boldText">Project Type</td>
+                                    <td>@Model.ProjectTypeName</td>
+
+                                </tr>
+                                @if (Model.ProjectTypeName == "Any Other")
+                                {
+                                    <tr>
+                                        <td class="boldText">Other</td>
+                                        <td>@Model.OtherProjectTypeDetail</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                }
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Site Address Details</h6></td></tr>
+                                <tr>
+                                    <td class="boldText">Location</td>
+                                    <td>@Model.LocationDetail</td>
+                                    <td class="boldText">Address Proof Document</td>
+                                    <td>
+                                        <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.AddressProofPhotoPath })">Download File</a>
+                                    </td>
+
+                                </tr>
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6></td></tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="col-lg-4">
+                                            <label class="control-label">Unit of Site Area: </label>
+                                            <label asp-for="SiteAreaUnitName" id="SiteAreaUnitName" class="form-control form-control-user">@Model.SiteAreaUnitName</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="col-lg-12">
+                                        <table id="khasraTable" class="table table-responsive table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    @* <th>#</th> *@
+                                                    <th>Khasra No.</th>
+                                                    <th>Kanal/Bigha</th>
+                                                    <th>Marla/Biswa</th>
+                                                    <th>Sarsai/Biswansi</th>
+                                                    @* <th></th> *@
+                                                    <!-- Add more columns as needed -->
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (int i = 0; i < Model.Khasras.Count(); i++)
+                                                {
+                                                    <tr class="khasra-entry">
+                                                        @* <td><span class="srKhasra">1</span></td> *@
+                                                        <td>
+                                                            <input asp-for="Khasras[i].KhasraNo" readonly class="form-control form-control-user" />
+                                                        </td>
+                                                        <td>
+                                                            <input asp-for="Khasras[i].KanalOrBiswa" readonly class="form-control form-control-user" />
+                                                        </td>
+                                                        <td>
+                                                            <input asp-for="Khasras[i].MarlaOrBiswansi" readonly class="form-control form-control-user" />
+                                                        </td>
+                                                        <td>
+                                                            <input asp-for="Khasras[i].SarsaiOrBigha" readonly class="form-control form-control-user" />
+                                                        </td>
+                                                        <!-- Render more columns as needed -->
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <table class="table table-striped table-">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="col-sm-3">
+                                                        <label class="control-label">Total Area in Acres: </label>
+                                                        <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
+
+                                                    </td>
+                                                    <td class="col-sm-3">
+                                                        <label class="control-label">Total Area in Sq Feet: </label>
+                                                        <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
+
+                                                    </td>
+                                                    <td class="col-sm-3">
+                                                        <label class="control-label">Total Area in Sq Metre(s): </label>
+                                                        <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
+
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Site KML File Details</h6></td></tr>
+                                <tr>
+
+                                    <td class="boldText">KML File</td>
+                                    <td>
+                                        <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.KMLFilePath })">Download File</a>
+                                    </td>
+                                    <td class="boldText">Authorization Letter</td>
+                                    <td>
+                                        <a href="@Url.Action("RedirectToExternalSite", "ApprovalProcess",new{siteAddress=Model.KmlLinkName})" )" target="_blank">KML Link</a>
+                                    </td>
+                                </tr>
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Details of Owners/Partners/Chief Executive/Full Time Directors</h6></td></tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="col-lg-12">
+                                            <table id="ownerTable" class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        @* <th>#</th> *@
+                                                        <th>OwnerType</th>
+                                                        <th>Name</th>
+                                                        <th>Address</th>
+                                                        <th>Mobile Number</th>
+                                                        <th>Email</th>
+                                                        <!-- Add more columns as needed -->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @for (int i = 0; i < Model.Owners.Count(); i++)
+                                                    {
+                                                        <tr class="owner-entry">
+                                                            @* <td><span class="srKhasra">1</span></td> *@
+                                                            <td>
+                                                                <input asp-for="Owners[i].OwnerType.Name" readonly class="form-control form-control-user" />
+                                                            </td>
+                                                            <td>
+                                                                <input asp-for="Owners[i].Name" readonly class="form-control form-control-user" />
+                                                            </td>
+                                                            <td>
+                                                                <input asp-for="Owners[i].Address" readonly class="form-control form-control-user" />
+                                                            </td>
+                                                            <td>
+                                                                <input asp-for="Owners[i].MobileNo" readonly class="form-control form-control-user" />
+                                                            </td>
+                                                            <td>
+                                                                <input asp-for="Owners[i].Email" readonly class="form-control form-control-user" />
+                                                            </td>
+                                                            <!-- Render more columns as needed -->
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Types of Permissions</h6></td></tr>
+                                <tr>
+                                    <td class="boldText">NOC Permission Type</td>
+                                    <td>@Model.NocPermissionTypeName</td>
+                                    <td class="boldText">NOC Type</td>
+                                    <td>@Model.NocTypeName</td>
+
+                                </tr>
+                                @if (Model.NocTypeName.ToUpper() != "NEW")
+                                {
+                                    <tr>
+                                        <td class="boldText">NOC Number</td>
+                                        <td>@Model.NocNumber</td>
+                                        <td class="boldText">Previous Date</td>
+                                        <td>@Model.PreviousDate</td>
+                                    </tr>
+                                }
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="col-lg-6 offset-lg-3">
+                                            <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back to List</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <tbody>
+                                <tr>
+                                    <td>No Record Found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+</div>
