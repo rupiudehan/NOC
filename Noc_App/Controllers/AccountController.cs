@@ -4,13 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using Noc_App.Helpers;
 using Noc_App.Models;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.ViewModel;
 using Noc_App.UtilityService;
+using Org.BouncyCastle.Ocsp;
 using System.Data;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Noc_App.Controllers
 {
@@ -115,6 +120,35 @@ namespace Noc_App.Controllers
                 }
                 if (ModelState.IsValid)
                 {
+                    string baseUrl = "https://wrdpbind.com/api/user_login.php";
+                    string salt = "8QCHhk3cJ6OMGfEW";
+                    string checksum = "zUOwFCGMqKvJARC1tU6l4r24";
+                    string combinedPassword = model.Email + "|" + model.Password + "|" + checksum;
+
+                    string plainText = combinedPassword;
+
+                    var keyBytes = new byte[16];
+                    var ivBytes = new byte[16];
+
+                    string key = salt;
+                    var keySalt = Encoding.UTF8.GetBytes(key);
+                    var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
+
+                    Array.Copy(pdb.GetBytes(16), keyBytes, 16);
+                    Array.Copy(pdb.GetBytes(16), ivBytes, 16);
+                    string encryptedString = NCC_encryptHelper(plainText, key, key);
+                    //Console.WriteLine("Encrypted Data: " + encryptedString);
+
+                    HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+                    HttpClient client = new HttpClient(handler);
+                    client.BaseAddress = new Uri(baseUrl);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
+                    var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
+                    string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
+                    //var jObj = (JObject)JsonConvert.DeserializeObject(resultContent);
+                    //LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
+
                     var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
 
                     if (result.Succeeded)
@@ -133,6 +167,38 @@ namespace Noc_App.Controllers
 
             }
             return View(model);
+        }
+
+        private string NCC_encryptHelper(string plainText, string key, string iv)
+        {
+            // Pad text and encrypt
+            string paddedString = _NCC_addpadding(plainText);
+
+            using (Aes aes = Aes.Create())
+            {
+                aes.KeySize = 128;
+                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.IV = Encoding.UTF8.GetBytes(iv);
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+
+                // Encrypt the data
+                using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+                {
+                    byte[] dataBytes = Encoding.UTF8.GetBytes(plainText);
+                    byte[] encryptedData = encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
+                    return Convert.ToBase64String(encryptedData);
+                }
+            }
+        }
+
+        private string _NCC_addpadding(string inputString)
+        {
+            // Implement your padding logic here, if required
+            // In this example, we're just using PKCS7 padding
+            int paddingSize = 16 - (inputString.Length % 16);
+            string paddedString = inputString + new string((char)paddingSize, paddingSize);
+            return paddedString;
         }
 
         [HttpGet]

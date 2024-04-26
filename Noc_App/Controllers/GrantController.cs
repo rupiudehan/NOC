@@ -779,7 +779,7 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> IsEmailExists(string applicantEmailID)
         {
-            var user = await _repo.GetAll().AnyAsync(x=>x.ApplicantEmailID == applicantEmailID);
+            var user = await _repo.GetAll().AnyAsync(x=>x.ApplicantEmailID == applicantEmailID && x.IsRejected!=true);
 
             if (!user)
             {

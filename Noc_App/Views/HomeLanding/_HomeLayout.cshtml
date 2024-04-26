@@ -68,14 +68,14 @@
     <header id="header" class="d-flex align-items-center">
         <div class="container d-flex align-items-center">
             <img src="~/landingpage/assets/img/favicon.png" alt="NOC" height="45" width="45" style="margin-right:5px;" />
-            <h1 class="logo me-auto"><a asp-action="Index" asp-controller="HomeLanding">NOC, Department of Water Resources , Punjab</a></h1>
+            <h1 class="logo me-auto"><a asp-action="Create" asp-controller="Grant">NOC Drainage, Department of Water Resources, Punjab</a></h1>
             <!-- Uncomment below if you prefer to use an image logo -->
             <!-- <a href="index.html" class="logo me-auto"><img src="~/landingpage/assets/img/logo.png" alt="" class="img-fluid"></a>-->
 
             <nav id="navbar" class="navbar">
                 <ul>
-                    <li><a class="nav-link scrollto @(IsLinkActive("HomeLanding","Index") ? "active" : "")" id="home" asp-action="Index" asp-controller="HomeLanding" asp onclick="SetActive(event)">Home</a></li>
-                    <li><a class="nav-link scrollto @(IsLinkActive("Account","Login") ? "active" : "")" id="login" asp-action="Login" asp-controller="Account">Login</a></li>
+                    @* <li><a class="nav-link scrollto @(IsLinkActive("HomeLanding","Index") ? "active" : "")" id="home" asp-action="Index" asp-controller="HomeLanding" asp onclick="SetActive(event)">Home</a></li> *@
+                    <li><a class="nav-link scrollto @(IsLinkActive("Account","Login") ? "active" : "")" id="login" asp-action="Department Login" asp-controller="Account">Login</a></li>
                     <li><a class="nav-link scrollto @(IsLinkActive("Grant","Create") ? "active" : "")" id="GrantCreate" asp-action="Create" asp-controller="Grant">Apply For NOC</a></li>
                     <li><a class="nav-link scrollto @(IsLinkActive("Grant","TrackStatus") ? "active" : "")" id="GrantTrackStatus" asp-action="TrackStatus" asp-controller="Grant">Track Status</a></li>
                 </ul>

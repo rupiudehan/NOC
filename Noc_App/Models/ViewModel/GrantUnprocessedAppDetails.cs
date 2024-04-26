@@ -33,5 +33,6 @@ namespace Noc_App.Models.ViewModel
         public string LoggedInRole { get; set; }
         public long GrantApprovalId { get; set; }
         public string ProcessedToRole { get; set; }
+        public long GrantApprovalDocId { get; set; }
     }
 }

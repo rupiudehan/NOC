@@ -6,6 +6,7 @@ namespace Noc_App.Models.interfaces
     public interface IRepository<T>
     {
         Task<T> GetByIdAsync(int id);
+        Task<T> GetBylongIdAsync(long id);
         IQueryable<T> GetAll();
         Task CreateAsync(T division);
         Task UpdateAsync(T division);
@@ -14,6 +15,7 @@ namespace Noc_App.Models.interfaces
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         bool IsDuplicateName(string name);
         bool IsUniqueName(string name,int id);
+        IQueryable<T> Include(params string[] navigationProperties);
         //void UpdateUserAssociations(ApplicationUser user, List<int> selectedDivisionIds, List<int> selectedSubdivisionIds, List<int> selectedTehsilIds, List<int> selectedVillageIds);
     }
 }

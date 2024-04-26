@@ -55,7 +55,8 @@
                                             <td>
                                                 @if (data.GrantApprovalId != 0)
                                                 {
-                                                    <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a>
+                                                    <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.GrantApprovalId,docId=data.GrantApprovalDocId })" class="btn btn-success">Edit</a>
+                                                    @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
                                                 }
                                             </td>
                                         }

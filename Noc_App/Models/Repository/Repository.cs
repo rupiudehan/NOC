@@ -101,6 +101,18 @@ namespace Noc_App.Models.Repository
             }
             finally { _context.Dispose(); }
         }
+        public async Task<T> GetBylongIdAsync(long id)
+        {
+            try
+            {
+                return await _dbSet.FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally { _context.Dispose(); }
+        }
 
         public async Task UpdateAsync(T entity)
         {
@@ -130,6 +142,16 @@ namespace Noc_App.Models.Repository
         public bool IsUniqueName(string name, int id)
         {
             return _dbSet.AsEnumerable().Any(e => e.GetType().GetProperty("Name").GetValue(e).ToString() == name && e.GetType().GetProperty("Id").GetValue(e).ToString()!=id.ToString());
+        }
+
+        public IQueryable<T> Include(params string[] navigationProperties)
+        {
+            IQueryable<T> query = _dbSet;
+            foreach (string navigationProperty in navigationProperties)
+            {
+                query = query.Include(navigationProperty);
+            }
+            return query;
         }
 
         //public void UpdateUserAssociations(ApplicationUser user, List<int> selectedDivisionIds, List<int> selectedSubdivisionIds, List<int> selectedTehsilIds, List<int> selectedVillageIds)

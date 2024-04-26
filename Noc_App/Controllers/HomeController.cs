@@ -26,10 +26,10 @@ namespace Noc_App.Controllers
             //_hostingEnvironment = hostingEnvironment;
         }
          
-        public ViewResult Index()
+        public IActionResult Index()
         {
             //return View(_employeeRepository.GetAllEmployees());
-            return View();
+            return RedirectToAction("Create","Grant");
         }
 
         //public ViewResult Details(int id)
