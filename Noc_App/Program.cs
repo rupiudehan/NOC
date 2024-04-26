@@ -116,7 +116,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=HomeLanding}/{action=Index}/{id?}");
+    pattern: "{controller=Grant}/{action=Create}/{id?}");
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 app.UseRotativa();
