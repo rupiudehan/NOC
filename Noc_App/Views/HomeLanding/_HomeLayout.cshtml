@@ -75,7 +75,7 @@
             <nav id="navbar" class="navbar">
                 <ul>
                     @* <li><a class="nav-link scrollto @(IsLinkActive("HomeLanding","Index") ? "active" : "")" id="home" asp-action="Index" asp-controller="HomeLanding" asp onclick="SetActive(event)">Home</a></li> *@
-                    <li><a class="nav-link scrollto @(IsLinkActive("Account","Login") ? "active" : "")" id="login" asp-action="Department Login" asp-controller="Account">Login</a></li>
+                    <li><a class="nav-link scrollto @(IsLinkActive("Account","Login") ? "active" : "")" id="login" asp-action="login" asp-controller="Account">Department Login</a></li>
                     <li><a class="nav-link scrollto @(IsLinkActive("Grant","Create") ? "active" : "")" id="GrantCreate" asp-action="Create" asp-controller="Grant">Apply For NOC</a></li>
                     <li><a class="nav-link scrollto @(IsLinkActive("Grant","TrackStatus") ? "active" : "")" id="GrantTrackStatus" asp-action="TrackStatus" asp-controller="Grant">Track Status</a></li>
                 </ul>

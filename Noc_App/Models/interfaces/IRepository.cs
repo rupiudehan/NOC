@@ -16,6 +16,7 @@ namespace Noc_App.Models.interfaces
         bool IsDuplicateName(string name);
         bool IsUniqueName(string name,int id);
         IQueryable<T> Include(params string[] navigationProperties);
+        Task<List<T>> ExecuteStoredProcedureAsync<T2>(string storedProcedureName, params object[] parameters);
         //void UpdateUserAssociations(ApplicationUser user, List<int> selectedDivisionIds, List<int> selectedSubdivisionIds, List<int> selectedTehsilIds, List<int> selectedVillageIds);
     }
 }

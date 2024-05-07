@@ -16,6 +16,7 @@ using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Security.Claims;
 
 namespace Noc_App.Controllers
 {
@@ -107,6 +108,7 @@ namespace Noc_App.Controllers
         }
 
         [HttpPost]
+        [Obsolete]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
@@ -153,8 +155,21 @@ namespace Noc_App.Controllers
 
                     if (result.Succeeded)
                     {
+                        var user = await userManager.GetUserAsync(User);
+                        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                        // Retrieve the user object
+                        var userDetail = await userManager.FindByIdAsync(userId);
+
+                        // Retrieve roles associated with the user
+                        var role = (await userManager.GetRolesAsync(userDetail)).FirstOrDefault();
                         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
-                        else return RedirectToAction("index", "home");
+                        else {
+                            if (role.ToUpper() == "ADMINISTRATOR")
+                                return RedirectToAction("index", "home");
+                            else
+                                return RedirectToAction("Index", "ApprovalProcess");
+                        }
                     }
 
 
@@ -164,7 +179,7 @@ namespace Noc_App.Controllers
             }
             catch (Exception ex)
             {
-
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             return View(model);
         }

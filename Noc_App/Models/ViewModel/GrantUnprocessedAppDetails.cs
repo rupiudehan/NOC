@@ -34,5 +34,8 @@ namespace Noc_App.Models.ViewModel
         public long GrantApprovalId { get; set; }
         public string ProcessedToRole { get; set; }
         public long GrantApprovalDocId { get; set; }
+        public string LastForwardedByRole { get; set; }
+        public int PreviousProcessLevel { get; set; }
+        public int ProcessedLevel { get; set; }
     }
 }

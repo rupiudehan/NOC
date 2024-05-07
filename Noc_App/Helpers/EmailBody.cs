@@ -68,7 +68,7 @@ namespace Noc_App.Helpers
             </html>";
         }
 
-        public static string EmailStringBodyForRejection(string applicantName, string applicationID)
+        public static string EmailStringBodyForRejection(string applicantName, string applicationID, string reason)
         {
             return $@"<htm>
             <head></head>
@@ -78,7 +78,7 @@ namespace Noc_App.Helpers
                     <div>
                         <p>Dear {applicantName},</p>
                         
-                        <p>Your application for the NOC Certificate with ID <b>{applicationID}</b> has been rejected.</p><p>Please apply again to get NOC certificate</p><br>
+                        <p>Your application for the NOC Certificate with ID <b>{applicationID}</b> has been rejected due to {reason}.</p><p>Please apply again to get NOC certificate</p><br>
                         <p>Best Regards,<br><br>
                         Punjab Irrigation Department</p>
                     </div>

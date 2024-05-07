@@ -17,11 +17,13 @@
         }
         else
         {
-            @:"Your application has been received successfully, but payment is <b style="color:red">pending</b>"
+            @:Your application has been received successfully, but payment is <b style="color:red">pending</b>.
+            <br />
+            @:Your application will be processed only after successful payment.
         }
         <br /> Track its status with the following tracking number:<br />
         <b style="color:#76ac23">
-            @Model.ApplicationID. 
+            @Model.ApplicationID 
         </b>
     </p>
     <p>

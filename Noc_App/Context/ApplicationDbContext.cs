@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Noc_App.Models;
+using Noc_App.Models.ViewModel;
 
 namespace Noc_App.Context
 {
@@ -38,6 +39,7 @@ namespace Noc_App.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<GrantUnprocessedAppDetails>().HasNoKey();
             modelBuilder.Entity<UserDivision>()
             .HasKey(ud => new { ud.UserId, ud.DivisionId });
 
@@ -197,7 +199,8 @@ namespace Noc_App.Context
             //modelBuilder.Entity<GrantApprovalMaster>().HasData(
             //    new GrantApprovalMaster { Id = 1, Name = "Pending",Code="P" },
             //    new GrantApprovalMaster { Id = 2, Name = "Reject",Code="R" },
-            //    new GrantApprovalMaster { Id = 2, Name = "Forward", Code = "F" }
+            //    new GrantApprovalMaster { Id = 3, Name = "Forward", Code = "F" }
+            //    new GrantApprovalMaster { Id = 4, Name = "Approved", Code = "A" }
             //    );
 
             base.OnModelCreating(modelBuilder);

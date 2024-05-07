@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Noc_App.Context;
 using Noc_App.Models.interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Noc_App.Models.Repository
@@ -152,6 +153,22 @@ namespace Noc_App.Models.Repository
                 query = query.Include(navigationProperty);
             }
             return query;
+        }
+
+        public async Task<List<T>> ExecuteStoredProcedureAsync<T2>(string storedProcedureName, params object[] parameters)
+        {
+            try
+            {
+                var parameterNames = string.Join(", ", parameters);
+                var sql = $"SELECT * FROM {storedProcedureName} ({parameterNames})";
+                List<T> list = await _dbSet.FromSqlRaw(sql).ToListAsync();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            
         }
 
         //public void UpdateUserAssociations(ApplicationUser user, List<int> selectedDivisionIds, List<int> selectedSubdivisionIds, List<int> selectedTehsilIds, List<int> selectedVillageIds)

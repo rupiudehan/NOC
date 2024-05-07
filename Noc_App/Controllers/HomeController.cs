@@ -29,7 +29,7 @@ namespace Noc_App.Controllers
         public IActionResult Index()
         {
             //return View(_employeeRepository.GetAllEmployees());
-            return RedirectToAction("Create","Grant");
+            return View();
         }
 
         //public ViewResult Details(int id)

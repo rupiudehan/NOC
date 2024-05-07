@@ -9,6 +9,7 @@ using Noc_App.Helpers;
 using Noc_App.Models;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.Repository;
+using Noc_App.Models.ViewModel;
 using Noc_App.UtilityService;
 using Rotativa.AspNetCore;
 
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IRepository<GrantPaymentDetails>, Repository<GrantPay
 builder.Services.AddScoped<IRepository<GrantApprovalDetail>, Repository<GrantApprovalDetail>>();
 builder.Services.AddScoped<IRepository<GrantApprovalProcessDocumentsDetails>, Repository<GrantApprovalProcessDocumentsDetails>>();
 builder.Services.AddScoped<IRepository<GrantApprovalMaster>, Repository<GrantApprovalMaster>>();
+builder.Services.AddScoped<IRepository<GrantUnprocessedAppDetails>, Repository<GrantUnprocessedAppDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

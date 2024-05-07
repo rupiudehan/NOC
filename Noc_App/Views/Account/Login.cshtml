@@ -22,7 +22,7 @@
                         <div class="row">
                             <div class="form-group mt-3">
                                 <label asp-for="Email"></label>
-                                <input id="loginToken" type="hidden" asp-for="Token" />
+                                <input id="loginToken" value="0" type="hidden" asp-for="Token" />
                                 <input asp-for="Email" class="form-control form-control-user" placeholder="Enter Email Address...">
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
@@ -41,7 +41,7 @@
                             <div asp-validation-summary="All" class="text-danger validateAll"></div>
                         </div>
                         
-                        <div class="text-center"><button type="submit" class="btn btn-success btn-user btn-block">Login</button></div>
+                        <div class="text-center"><button type="submit" id="login" style="visibility:hidden" class="btn btn-success btn-user btn-block">Login</button></div>
                     </form>
                 </div>
 
@@ -55,9 +55,11 @@
     <script src="https://www.google.com/recaptcha/api.js?render=@GoogleCaptchaConfig.Value.SiteKey"></script>
     <script>
         grecaptcha.ready(function () {
+            $('button[type=submit]').css("visibility", "hidden");
             grecaptcha.execute('@GoogleCaptchaConfig.Value.SiteKey', { action: 'submit' }).then(function (token) {
                 // Add your logic to submit to your backend server here.
                 $('#loginToken').val(token);
+                $('button[type=submit]').css("visibility", "unset");
             });
         });
     </script>

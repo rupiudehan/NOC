@@ -1,7 +1,13 @@
 ﻿@model IEnumerable<GrantUnprocessedAppDetails>;
 @{
-    var str = Model.Select(x => x.IsForwarded).FirstOrDefault() ? "Manage Unprocessed Applications" : "Manage Forwarded Applications";
-    var str2 = Model.Select(x => x.IsForwarded).FirstOrDefault() ? "List Of Unprocessed Applications" : "List Of Forwarded Applications";
+    string str = "Manage Unprocessed/Forwarded Applications", str2 = "List Of Unprocessed/Forwarded Applications";
+    if (Model != null)
+    {
+        var query = Model.Select(x => new { IsForwarded = x.IsForwarded, LastForwardedByRole = x.LastForwardedByRole, LoggedInRole = x.LoggedInRole });
+        str = query.Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.IsForwarded) ? "Manage Unprocessed and Forwarded Applications" : query.Any(x => x.IsForwarded == true) ? "Manage Forwarded Applications" : "Manage Unprocessed Applications";
+        str2 = query.Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.IsForwarded) ? "List Of Unprocessed and Forwarded Applications" : query.Any(x => x.IsForwarded == true) ? "List Of Forwarded Applications" : "List Of Unprocessed Applications";
+        
+    }
     ViewBag.Title = str;
 }
 
@@ -31,12 +37,26 @@
                                     <th>Application Id</th>
                                     <th>Project Name</th>
                                     <th>Location Details</th>
+                                    <th>Forwarded By</th>
                                     <th>View</th>
-                                    @if (Model.FirstOrDefault().LoggedInRole == "SUB DIVISIONAL OFFICER")
+                                    @if (Model.Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.IsForwarded==true))
                                     {
-                                        <th>Edit</th>
+                                        @if (Model.Any(x => x.GrantApprovalDocId != 0))
+                                        {
+                                            <th>Edit</th>
+                                        }
                                     }
-                                    <th>Action</th>
+                                    <th>Forward</th>
+                                    @if (Model.Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || x.LoggedInRole == "CHIEF ENGINEER HQ"))
+                                    {
+                                        <th>Issue NOC</th>
+                                        <th>Reject</th>
+                                    }
+                                    else if (Model.Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.LoggedInRole != "SUB DIVISIONAL OFFICER"))
+                                    {
+                                        <th>Reject</th>
+                                    }
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,27 +67,98 @@
                                         <td>@data.ApplicationID</td>
                                         <td>@data.Name</td>
                                         <td>@data.LocationDetails </td>
-                                        <td>
-                                            <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
-                                        </td>
-                                        @if (data.LoggedInRole == "SUB DIVISIONAL OFFICER")
+                                        @if (data.LastForwardedByRole != "")
                                         {
                                             <td>
-                                                @if (data.GrantApprovalId != 0)
+                                                @if (data.LastForwardedByRole == null)
                                                 {
-                                                    <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.GrantApprovalId,docId=data.GrantApprovalDocId })" class="btn btn-success">Edit</a>
-                                                    @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
+                                                    @:Unprocessed Application
+                                                }
+                                                else
+                                                {
+                                                    @data.LastForwardedByRole
                                                 }
                                             </td>
                                         }
+                                        else
+                                        {
+                                            <td>New Applied Application </td>
+                                        }
+                                        <td>
+                                            <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
+                                        </td>
+                                        @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == false)
+                                        {
+                                            @if (data.GrantApprovalDocId != 0)
+                                            {
+                                                <td>
+                                                    <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.GrantApprovalId,docId=data.GrantApprovalDocId })" class="btn btn-success">Edit</a>
+                                                    @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
+
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                @if (Model.Any(x => x.GrantApprovalDocId != 0))
+                                                {
+                                                    <td></td>
+                                                }
+                                            }
+                                        }
+                                        else @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == true)
+                                        {
+                                            @if (data.GrantApprovalDocId != 0)
+                                            {
+                                                <td>
+                                                        <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.GrantApprovalId,docId=data.GrantApprovalDocId })" class="btn btn-success">Edit</a>
+                                                        @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
+                                               
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                @if (Model.Any(x => x.GrantApprovalDocId != 0))
+                                                {
+                                                    <td></td>
+                                                }
+                                            }
+                                        }
                                         <td>
                                             <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
-                                            @if (data.LoggedInRole == "EXECUTIVE ENGINEER")
-                                            {
-                                                <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a>
-                                            }
-                                            @* <a asp-action="Reject" href="#" data-toggle="modal" data-target="#rejectModal" asp-controller="ApprovalProcess" asp-route-id="@data.Id" class="btn btn-danger">Reject</a> *@
                                         </td>
+                                        @if ((data.LoggedInRole == "EXECUTIVE ENGINEER"  && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                        {
+                                                    <td>
+                                                        <form method="post" asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID">
+                                                            <button class="btn btn-success" type="submit">Issue</button>
+                                                        </form>
+                                                    </td>
+                                            <td>
+                                                <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+                                                @* <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a> *@
+                                            </td>
+
+
+
+                                        }
+                                        else if (data.LoggedInRole != "JUNIOR ENGINEER" && data.LoggedInRole != "SUB DIVISIONAL OFFICER")
+                                        {
+                                            @* @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                            {
+                                                <td></td>
+                                            }
+                                            else  *@
+                                            @if (Model.Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                            {
+                                                <td></td>
+                                            }
+                                            <td>
+                                                <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+                                                @* <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a> *@
+                                            </td>
+                                        }
+                                        @* <a asp-action="Reject" href="#" data-toggle="modal" data-target="#rejectModal" asp-controller="ApprovalProcess" asp-route-id="@data.Id" class="btn btn-danger">Reject</a> *@
+                                        
                                     </tr>
                                     count=count + 1;
                                 }
@@ -101,7 +192,16 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">Select "Reject" below if you are ready to reject application.</div>
+                <div class="modal-body">@* Select "Reject" below if you are ready to reject application. *@
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label name="lblRemarks" class="control-label">Remarks</label>
+                                <input name="Remarks" id="Remarks" class="form-control form-control-user" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                     <button class="btn btn-danger" type="submit">Reject</button>
