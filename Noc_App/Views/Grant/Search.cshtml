@@ -51,7 +51,7 @@
                                             @if (Model.IsApproved)
                                             {
                                                 <td>
-                                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.CertificateFilePath })">@Model.ApprovalStatus</a>
+                                                    <a href="@Url.Action("Download", "Grant", new { fileName = Model.CertificateFilePath })">@Model.ApprovalStatus</a>
                                                 </td>
                                             }
                                             else

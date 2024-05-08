@@ -113,6 +113,7 @@ namespace Noc_App.Controllers
             }
         }
 
+        [AllowAnonymous]
         public IActionResult Download(string fileName)
         {
             // Replace "path_to_your_file" with the actual path to your file
