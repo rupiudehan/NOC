@@ -171,20 +171,20 @@
                                                         </td>
                                                         <td>
                                                             <div class="col-sm-12">
-                                                            <input type="text" asp-for=GrantKhasras[0].KanalOrBiswa class="form-control numericField K2" placeholder="Kanal/Bigha" />
-                                                            <span asp-validation-for="GrantKhasras[0].KanalOrBiswa" class="text-danger"></span>
+                                                            <input type="text" asp-for=GrantKhasras[0].KanalOrBigha class="form-control numericField K2" placeholder="Kanal/Bigha" />
+                                                            <span asp-validation-for="GrantKhasras[0].KanalOrBigha" class="text-danger"></span>
                                                         </div>
                                                         </td>
                                                         <td>
                                                             <div class="col-sm-12">
-                                                            <input type="text" asp-for=GrantKhasras[0].MarlaOrBiswansi class="form-control numericField M1" placeholder="Marla/Biswa" />
-                                                            <span asp-validation-for="GrantKhasras[0].MarlaOrBiswansi" class="text-danger"></span>
+                                                            <input type="text" asp-for=GrantKhasras[0].MarlaOrBiswa class="form-control numericField M1" placeholder="Marla/Biswa" />
+                                                            <span asp-validation-for="GrantKhasras[0].MarlaOrBiswa" class="text-danger"></span>
                                                         </div>
                                                         </td>
                                                         <td>
                                                             <div class="col-sm-12">
-                                                            <input type="text" asp-for=GrantKhasras[0].SarsaiOrBigha class="form-control numericField B3" placeholder="Sarsai/Biswansi" />
-                                                            <span asp-validation-for="GrantKhasras[0].SarsaiOrBigha" class="text-danger"></span>
+                                                            <input type="text" asp-for=GrantKhasras[0].SarsaiOrBiswansi class="form-control numericField B3" placeholder="Sarsai/Biswansi" />
+                                                            <span asp-validation-for="GrantKhasras[0].SarsaiOrBiswansi" class="text-danger"></span>
                                                         </div>
                                                         </td>
                                                         <td class="delKhasra"></td>
@@ -569,20 +569,21 @@
             });
             $('body').on('change', '#SelectedSiteAreaUnitId', function () {
                 var list = ($(this).find("option:selected").text()).split('/');
-                var Biswansi = list[0];
+                var Bigha = list[0];
                 var Biswa = list[1];
-                var Bigha = list[2];
+                var Biswansi = list[2];
+                
                 $('#khasraTable .M1').each(function () {
                     $(this).removeAttr('class');
-                    $(this).attr('class', 'form-control numericField M1 ' + Biswansi);
+                    $(this).attr('class', 'form-control numericField M1 ' + Biswa);
                 });
                 $('#khasraTable .K2').each(function () {
                     $(this).removeAttr('class');
-                    $(this).attr('class', 'form-control numericField K2 ' + Biswa);
+                    $(this).attr('class', 'form-control numericField K2 ' + Bigha);
                 });
                 $('#khasraTable .B3').each(function () {
                     $(this).removeAttr('class');
-                    $(this).attr('class', 'form-control numericField B3 ' + Bigha);
+                    $(this).attr('class', 'form-control numericField B3 ' + Biswansi);
                 });
                 var khasraIndex = 0;
                 var newEntry = $(".khasra-entry:first").clone();

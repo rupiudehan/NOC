@@ -63,5 +63,9 @@ namespace Noc_App.Models
         public int SentBackLevel { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
+        public string CertificateFilePath { get; set; }
+        public DateTime UploadedOn { get; set; }
+        public string UploadedByRole { get; set; }
+        public string UploadedBy { get; set; }
     }
 }

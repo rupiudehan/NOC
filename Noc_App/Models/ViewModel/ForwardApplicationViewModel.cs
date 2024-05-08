@@ -13,6 +13,9 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Applicant Email")]
         public string ApplicantEmailID { get; set; }
         public string ForwardToRole { get; set; }
+        [Display(Name = "Officer")]
+        public string SelectedSubDivisionId { get; set; }
+        public IEnumerable<SelectListItem> SubDivisions { get; set; }
         [Required]
         [Display(Name = "Officer")]
         public string SelectedOfficerId { get; set; }
@@ -41,5 +44,6 @@ namespace Noc_App.Models.ViewModel
         //[Required]
         [Display(Name = "L-Section of the Drain if Sanctioned")]
         public IFormFile LSectionOfDrainFile { get; set; }
+        public bool IsForwarded { get; set; }
     }
 }

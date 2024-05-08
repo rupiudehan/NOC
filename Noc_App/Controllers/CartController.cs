@@ -24,7 +24,7 @@ namespace Noc_App.Controllers
                 ViewBag.cart = cart;
                 if (cart != null)
                 {
-                    ViewBag.total = cart.Sum(item => item.Grant.Khasras.Select(x => x.MarlaOrBiswansi).FirstOrDefault() * item.Quantity);
+                    ViewBag.total = cart.Sum(item => item.Grant.Khasras.Select(x => x.MarlaOrBiswa).FirstOrDefault() * item.Quantity);
                 }
                 else { ViewBag.total = "0"; }
             }

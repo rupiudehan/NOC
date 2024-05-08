@@ -129,9 +129,10 @@
                                         @if ((data.LoggedInRole == "EXECUTIVE ENGINEER"  && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
                                         {
                                                     <td>
-                                                        <form method="post" asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID">
+                                                        <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue</a>
+                                                        @* <form method="post" asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID">
                                                             <button class="btn btn-success" type="submit">Issue</button>
-                                                        </form>
+                                                        </form> *@
                                                     </td>
                                             <td>
                                                 <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>

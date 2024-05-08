@@ -37,7 +37,9 @@ namespace Noc_App.Controllers
         private readonly IRepository<SiteAreaUnitDetails> _siteUnitsRepo;
         private readonly IRepository<GrantPaymentDetails> _grantPaymentRepo;
         private readonly IRepository<OwnerDetails> _grantOwnersRepo;
+        private readonly IRepository<GrantApprovalDetail> _repoApprovalDetail;
         private readonly IEmailService _emailService;
+        private readonly IWebHostEnvironment _hostEnvironment;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
@@ -45,7 +47,8 @@ namespace Noc_App.Controllers
             IRepository<DivisionDetails> divisionRepo, IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo, 
             IRepository<NocTypeDetails> nocTypeRepo,IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService, 
-            IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo)
+            IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo, 
+            IRepository<GrantApprovalDetail> repoApprovalDetail, IWebHostEnvironment hostEnvironment)
         {
             _villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
@@ -62,6 +65,8 @@ namespace Noc_App.Controllers
             _siteUnitsRepo = siteUnitsRepo;
             _grantPaymentRepo = grantPaymentRepo;
             _grantOwnersRepo = grantOwnersRepo;
+            _repoApprovalDetail = repoApprovalDetail;
+            _hostEnvironment= hostEnvironment;
         }
         [AllowAnonymous]
         public async Task<ViewResult> Index(string Id)
@@ -108,23 +113,64 @@ namespace Noc_App.Controllers
             }
         }
 
+        public IActionResult Download(string fileName)
+        {
+            // Replace "path_to_your_file" with the actual path to your file
+            string relativeFilePath = "../wwwroot/Documents/" + fileName;
+            string filePath = Path.Combine(_hostEnvironment.WebRootPath, relativeFilePath);
+            //var fileName = "your_file_name.extension"; // Specify the file name
+
+            // Check if the file exists
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound();
+            }
+
+            // Determine the MIME type
+            var mimeType = "application/octet-stream"; // Default MIME type
+            var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+            if (provider.TryGetContentType(fileName, out var resolvedContentType))
+            {
+                mimeType = resolvedContentType;
+            }
+
+            // Return the file
+            return PhysicalFile(filePath, mimeType, fileName);
+        }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ViewResult> Search(string searchString)
+        public IActionResult Search(string searchString)
         {
-            GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == searchString.ToLower())).FirstOrDefault();
-            if (obj != null)
-            {
-                GrantPaymentDetails payment = (await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id)).FirstOrDefault();
+            var model = (from g in _repo.GetAll()
+                     join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID into grantPayment
+                     from payment in grantPayment.DefaultIfEmpty()
+                     join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID into grantApproval
+                     from approval in grantApproval.DefaultIfEmpty()
+                     where g.ApplicationID.ToLower()==searchString.ToLower()
+                     select new GrantStatusViewModel
+                     {
+                         ApplicationID = g.ApplicationID,
+                         IsApproved=g.IsApproved,
+                         CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
+                         ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
+                         ApprovalStatus = g.IsPending==true? g.IsRejected?"Rejected": g.IsForwarded?approval != null ? "Pending With "+approval.ProcessedToRole : "Pending" : "Pending" : g.IsApproved ? "NOC Issued" : "Pending",
+                         CertificateFilePath= g.CertificateFilePath
+                     }
+                     ).FirstOrDefault();
+            if (model != null) return View(model);
+            //GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == searchString.ToLower())).FirstOrDefault();
+            //if (obj != null)
+            //{
+            //    GrantPaymentDetails payment = (await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id)).FirstOrDefault();
 
-                GrantStatusViewModel model = new GrantStatusViewModel
-                {
-                    ApplicationID = obj.ApplicationID,
-                    CreatedOn = string.Format("{0:dd/MM/yyyy}", obj.CreatedOn),
-                    ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
-                };
-                return View(model);
-            }
+            //    GrantStatusViewModel model = new GrantStatusViewModel
+            //    {
+            //        ApplicationID = obj.ApplicationID,
+            //        CreatedOn = string.Format("{0:dd/MM/yyyy}", obj.CreatedOn),
+            //        ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
+            //    };
+            //    return View(model);
+            //}
             else
             {
                 return View(null);
@@ -165,15 +211,15 @@ namespace Noc_App.Controllers
                     double marla = 0,kanal=0,sarsai=0,biswansi=0,biswa=0,bigha=0;
                     if(unit.Name== @"Marla/Kanal/Sarsai")
                     {
-                        marla = item.MarlaOrBiswansi / 160;
-                        kanal = item.KanalOrBiswa / 8;
-                        sarsai = item.SarsaiOrBigha / 1440;
+                        marla = item.MarlaOrBiswa / 160;
+                        kanal = item.KanalOrBigha / 8;
+                        sarsai = item.SarsaiOrBiswansi / 1440;
                     }
                     else
                     {
-                        biswansi = item.MarlaOrBiswansi * 0.000625;
-                        biswa = item.KanalOrBiswa * 0.0125;
-                        bigha = item.SarsaiOrBigha * 0.25;
+                        biswansi = item.SarsaiOrBiswansi * 0.000625;
+                        biswa = item.MarlaOrBiswa * 0.0125;
+                        bigha = item.KanalOrBigha * 0.25;
                     }
                     totalArea= Math.Round(totalArea+marla + kanal+ sarsai+ biswansi+ biswa+ bigha,4);
                 }
@@ -287,15 +333,15 @@ namespace Noc_App.Controllers
                     double marla = 0, kanal = 0, sarsai = 0, biswansi = 0, biswa = 0, bigha = 0;
                     if (unit.Name == @"Marla/Kanal/Sarsai")
                     {
-                        marla = item.MarlaOrBiswansi / 160;
-                        kanal = item.KanalOrBiswa / 8;
-                        sarsai = item.SarsaiOrBigha / 1440;
+                        marla = item.MarlaOrBiswa / 160;
+                        kanal = item.KanalOrBigha / 8;
+                        sarsai = item.SarsaiOrBiswansi / 1440;
                     }
                     else
                     {
-                        biswansi = item.MarlaOrBiswansi * 0.000625;
-                        biswa = item.KanalOrBiswa * 0.0125;
-                        bigha = item.SarsaiOrBigha * 0.25;
+                        biswansi = item.SarsaiOrBiswansi * 0.000625;
+                        biswa = item.MarlaOrBiswa * 0.0125;
+                        bigha = item.KanalOrBigha * 0.25;
                     }
                     totalArea = totalArea + marla + kanal + sarsai + biswansi + biswa + bigha;
                 }
@@ -358,7 +404,7 @@ namespace Noc_App.Controllers
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
                 SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
                 SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
-                GrantKhasras = new List<GrantKhasraViewModelCreate> { new GrantKhasraViewModelCreate { KanalOrBiswa = 0, KhasraNo = "", MarlaOrBiswansi = 0, SarsaiOrBigha = 0/*,SelectedUnitId= siteUnits.OrderBy(x=>x.Name).Select(x=>x.Id).FirstOrDefault()*/ } },
+                GrantKhasras = new List<GrantKhasraViewModelCreate> { new GrantKhasraViewModelCreate { KanalOrBigha = 0, KhasraNo = "", MarlaOrBiswa = 0, SarsaiOrBiswansi = 0/*,SelectedUnitId= siteUnits.OrderBy(x=>x.Name).Select(x=>x.Id).FirstOrDefault()*/ } },
                 Owners = new List<OwnerViewModelCreate> { new OwnerViewModelCreate { Name = "", Address = "",MobileNo="",Email="",OwnerType= new SelectList(ownerType, "Id", "Name") } },
                 IsOtherTypeSelected=0,
                 IsPaymentDone = false,
@@ -597,10 +643,10 @@ namespace Noc_App.Controllers
                                 {
                                     GrantKhasraDetails khasra = new GrantKhasraDetails
                                     {
-                                        KanalOrBiswa = item.KanalOrBiswa,
+                                        KanalOrBigha = item.KanalOrBigha,
                                         KhasraNo = item.KhasraNo,
-                                        MarlaOrBiswansi = item.MarlaOrBiswansi,
-                                        SarsaiOrBigha = item.SarsaiOrBigha,
+                                        MarlaOrBiswa = item.MarlaOrBiswa,
+                                        SarsaiOrBiswansi = item.SarsaiOrBiswansi,
                                         UnitId = obj.SiteAreaUnitId,
                                         GrantID = obj.Id
                                     };

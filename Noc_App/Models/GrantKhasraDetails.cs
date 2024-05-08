@@ -14,8 +14,8 @@ namespace Noc_App.Models
         public int GrantID { get; set; }
         [ForeignKey(nameof(GrantID))]
         public GrantDetails Grant { get; set; }
-        public double MarlaOrBiswansi { get; set; }
-        public double KanalOrBiswa { get; set; }
-        public double SarsaiOrBigha { get; set; }
+        public double MarlaOrBiswa { get; set; }
+        public double KanalOrBigha { get; set; }
+        public double SarsaiOrBiswansi { get; set; }
     }
 }

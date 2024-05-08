@@ -179,7 +179,7 @@ namespace Noc_App.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, ex.Message);
+                ModelState.AddModelError(string.Empty, "Invalid Token");
             }
             return View(model);
         }

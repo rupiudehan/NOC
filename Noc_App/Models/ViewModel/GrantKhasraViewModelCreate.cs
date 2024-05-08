@@ -12,14 +12,14 @@ namespace Noc_App.Models.ViewModel
         public string KhasraNo { get; set; }
         //public int SelectedUnitId { get; set; }
         public IEnumerable<SelectListItem> Units { get; set; }
-        [Display(Name = "Marla/Biswansi")]
+        [Display(Name = "Marla/Biswa")]
         [NumericValidation(typeof(double))]
-        public double MarlaOrBiswansi { get; set; }
-        [Display(Name = "Kanal/Biswa")]
+        public double MarlaOrBiswa { get; set; }
+        [Display(Name = "Kanal/")]
         [NumericValidation(typeof(double))]
-        public double KanalOrBiswa { get; set; }
-        [Display(Name = "Sarsai/Bigha")]
+        public double KanalOrBigha { get; set; }
+        [Display(Name = "Sarsai/Biswansi")]
         [NumericValidation(typeof(double))]
-        public double SarsaiOrBigha { get; set; }
+        public double SarsaiOrBiswansi { get; set; }
     }
 }

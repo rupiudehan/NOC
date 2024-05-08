@@ -44,6 +44,24 @@
                                         </tr>
 
                                     }
+                                    @if (Model.ApplicationStatus.ToLower() != "pending")
+                                    {
+                                        <tr>
+                                            <td><b>Status</b></td>
+                                            @if (Model.IsApproved)
+                                            {
+                                                <td>
+                                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.CertificateFilePath })">@Model.ApprovalStatus</a>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    @Model.ApprovalStatus
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
                                 }
                                 else
                                 {
