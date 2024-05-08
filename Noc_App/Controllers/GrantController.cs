@@ -38,7 +38,9 @@ namespace Noc_App.Controllers
         private readonly IRepository<GrantPaymentDetails> _grantPaymentRepo;
         private readonly IRepository<OwnerDetails> _grantOwnersRepo;
         private readonly IRepository<GrantApprovalDetail> _repoApprovalDetail;
+        private readonly IRepository<SiteUnitMaster> _repoSiteUnitMaster;
         private readonly IEmailService _emailService;
+        private readonly ICalculations _calculations;
         private readonly IWebHostEnvironment _hostEnvironment;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -48,7 +50,8 @@ namespace Noc_App.Controllers
             IRepository<NocTypeDetails> nocTypeRepo,IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService, 
             IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo, 
-            IRepository<GrantApprovalDetail> repoApprovalDetail, IWebHostEnvironment hostEnvironment)
+            IRepository<GrantApprovalDetail> repoApprovalDetail, IWebHostEnvironment hostEnvironment, IRepository<SiteUnitMaster> repoSiteUnitMaster
+            ,ICalculations calculations)
         {
             _villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
@@ -67,6 +70,8 @@ namespace Noc_App.Controllers
             _grantOwnersRepo = grantOwnersRepo;
             _repoApprovalDetail = repoApprovalDetail;
             _hostEnvironment= hostEnvironment;
+            _repoSiteUnitMaster = repoSiteUnitMaster;
+            _calculations = calculations;
         }
         [AllowAnonymous]
         public async Task<ViewResult> Index(string Id)
@@ -200,6 +205,7 @@ namespace Noc_App.Controllers
                 SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(obj.SiteAreaUnitId);
                 List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == obj.Id)).ToList();
                 List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
+                //List<SiteUnitMaster> unitMaster = (await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == obj.SiteAreaUnitId)).ToList();
                 List<OwnerTypeDetails> ownertype = new List<OwnerTypeDetails>();
                 foreach (OwnerDetails item in owners)
                 {
@@ -210,19 +216,29 @@ namespace Noc_App.Controllers
                 foreach (GrantKhasraDetails item in khasras)
                 {
                     double marla = 0,kanal=0,sarsai=0,biswansi=0,biswa=0,bigha=0;
-                    if(unit.Name== @"Marla/Kanal/Sarsai")
+                    //var units = unitMaster.Any(x => unit.Name.Contains(x.UnitName));
+                    SiteUnitsViewModel unitDetails = new SiteUnitsViewModel
                     {
-                        marla = item.MarlaOrBiswa / 160;
-                        kanal = item.KanalOrBigha / 8;
-                        sarsai = item.SarsaiOrBiswansi / 1440;
-                    }
-                    else
-                    {
-                        biswansi = item.SarsaiOrBiswansi * 0.000625;
-                        biswa = item.MarlaOrBiswa * 0.0125;
-                        bigha = item.KanalOrBigha * 0.25;
-                    }
-                    totalArea= Math.Round(totalArea+marla + kanal+ sarsai+ biswansi+ biswa+ bigha,4);
+                        KanalOrBigha=item.KanalOrBigha,
+                        MarlaOrBiswa=item.MarlaOrBiswa,
+                        SarsaiOrBiswansi=item.SarsaiOrBiswansi,
+                        SiteUnitId=unit.Id
+                    };
+                    var units=await _calculations.CalculateUnits(unitDetails);
+                    //if (unit.Name== @"Marla/Kanal/Sarsai")
+                    //{
+                    //    marla = item.MarlaOrBiswa / 160;
+                    //    kanal = item.KanalOrBigha / 8;
+                    //    sarsai = item.SarsaiOrBiswansi / 1440;
+                    //}
+                    //else
+                    //{
+                    //    biswansi = item.SarsaiOrBiswansi * 0.000625;
+                    //    biswa = item.MarlaOrBiswa * 0.0125;
+                    //    bigha = item.KanalOrBigha * 0.25;
+                    //}
+                    //totalArea= Math.Round(totalArea+marla + kanal+ sarsai+ biswansi+ biswa+ bigha,4);
+                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
                 }
                 var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
                 if (payment == null || payment.Count() == 0)
@@ -331,20 +347,16 @@ namespace Noc_App.Controllers
                 double totalArea = 0;
                 foreach (GrantKhasraDetails item in khasras)
                 {
-                    double marla = 0, kanal = 0, sarsai = 0, biswansi = 0, biswa = 0, bigha = 0;
-                    if (unit.Name == @"Marla/Kanal/Sarsai")
+                    SiteUnitsViewModel unitDetails = new SiteUnitsViewModel
                     {
-                        marla = item.MarlaOrBiswa / 160;
-                        kanal = item.KanalOrBigha / 8;
-                        sarsai = item.SarsaiOrBiswansi / 1440;
-                    }
-                    else
-                    {
-                        biswansi = item.SarsaiOrBiswansi * 0.000625;
-                        biswa = item.MarlaOrBiswa * 0.0125;
-                        bigha = item.KanalOrBigha * 0.25;
-                    }
-                    totalArea = totalArea + marla + kanal + sarsai + biswansi + biswa + bigha;
+                        KanalOrBigha = item.KanalOrBigha,
+                        MarlaOrBiswa = item.MarlaOrBiswa,
+                        SarsaiOrBiswansi = item.SarsaiOrBiswansi,
+                        SiteUnitId = unit.Id
+                    };
+                    var units = await _calculations.CalculateUnits(unitDetails);
+                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
+                    
                 }
                 double TotalPayment = 0;
                 if (Convert.ToDouble(totalArea) <= 0.50)
@@ -878,6 +890,13 @@ namespace Noc_App.Controllers
         {
             var village = await _villageRpo.GetByIdAsync(villageId);
             return Json(village);
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUnitsDetail(int unitId)
+        {
+            var obj = await _repoSiteUnitMaster.FindAsync(x=>x.SiteAreaUnitId==unitId);
+            return Json(obj);
         }
     }
 }

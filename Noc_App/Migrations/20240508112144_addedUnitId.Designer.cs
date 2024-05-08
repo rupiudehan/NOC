@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Noc_App.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240508112144_addedUnitId")]
+    partial class addedUnitId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -816,8 +819,8 @@ namespace NocApp.Migrations
                             DivideBy = 1.0,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "M",
-                            UnitName = "Biswa",
+                            UnitCode = "BSI",
+                            UnitName = "Biswa-I",
                             UnitValue = 0.012500000000000001
                         },
                         new
@@ -826,8 +829,8 @@ namespace NocApp.Migrations
                             DivideBy = 1.0,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "K",
-                            UnitName = "Bigha",
+                            UnitCode = "BGI",
+                            UnitName = "Bigha-I",
                             UnitValue = 0.25
                         },
                         new
@@ -836,8 +839,8 @@ namespace NocApp.Migrations
                             DivideBy = 1.0,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "S",
-                            UnitName = "Biswansi",
+                            UnitCode = "BWI",
+                            UnitName = "Biswansi-I",
                             UnitValue = 0.00062500000000000001
                         },
                         new
@@ -846,8 +849,8 @@ namespace NocApp.Migrations
                             DivideBy = 1.0,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "M",
-                            UnitName = "Biswa",
+                            UnitCode = "BSI",
+                            UnitName = "Biswa-II",
                             UnitValue = 0.012500000000000001
                         },
                         new
@@ -856,8 +859,8 @@ namespace NocApp.Migrations
                             DivideBy = 1.0,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "K",
-                            UnitName = "Bigha",
+                            UnitCode = "BGI",
+                            UnitName = "Bigha-II",
                             UnitValue = 0.25
                         },
                         new
@@ -866,8 +869,8 @@ namespace NocApp.Migrations
                             DivideBy = 1.0,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "S",
-                            UnitName = "Biswansi",
+                            UnitCode = "BWI",
+                            UnitName = "Biswansi-II",
                             UnitValue = 0.00062500000000000001
                         },
                         new
@@ -886,7 +889,7 @@ namespace NocApp.Migrations
                             DivideBy = 8.0,
                             SiteAreaUnitId = 2,
                             Timesof = 1.0,
-                            UnitCode = "M",
+                            UnitCode = "K",
                             UnitName = "Marla",
                             UnitValue = 1.0
                         },
@@ -896,7 +899,7 @@ namespace NocApp.Migrations
                             DivideBy = 1440.0,
                             SiteAreaUnitId = 2,
                             Timesof = 1.0,
-                            UnitCode = "S",
+                            UnitCode = "K",
                             UnitName = "Sarsai",
                             UnitValue = 1.0
                         });

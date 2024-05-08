@@ -42,13 +42,17 @@ namespace Noc_App.Controllers
         private readonly IRepository<GrantUnprocessedAppDetails> _grantUnprocessedAppDetailsRepo;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IEmailService _emailService;
+        private readonly ICalculations _calculations;
+        private readonly IRepository<SiteUnitMaster> _repoSiteUnitMaster;
+
         public ApprovalProcessController(IRepository<GrantDetails> repo, IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<UserDivision> userDivisionRepository, UserManager<ApplicationUser> userManager, IRepository<GrantPaymentDetails> repoPayment, RoleManager<IdentityRole> roleManager
             , IRepository<UserVillage> userVillageRepository, IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster, IRepository<UserSubdivision> userSubDivisionRepository
             , IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo,
             IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IWebHostEnvironment hostingEnvironment, IEmailService emailService
-            , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo)
+            , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
+            , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster)
         {
             _repo = repo;
             _villageRpo = villageRepo;
@@ -75,6 +79,9 @@ namespace Noc_App.Controllers
             _emailService = emailService;
             _repoApprovalDocument = repoApprovalDocument;
             _grantUnprocessedAppDetailsRepo = grantUnprocessedAppDetailsRepo;
+            _calculations = calculations;
+            _repoSiteUnitMaster = repoSiteUnitMaster;
+
         }
 
         public async Task<ViewResult> Index()
@@ -118,6 +125,7 @@ namespace Noc_App.Controllers
 
                     return View("NotFound");
                 }
+                
                 double total = 0;
                 var divisionDetail = (from g in (await _repo.FindAsync(x => x.ApplicationID == Id))
                                    join v in _villageRpo.GetAll() on g.VillageID equals (v.Id)
@@ -155,16 +163,16 @@ namespace Noc_App.Controllers
                 
                 if (role == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
                 {
+                    var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
+                    SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
+                    SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
+                    SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
                     total = Math.Round(((from kh in _khasraRepo.GetAll()
-                                         join u in _siteUnitsRepo.GetAll().AsEnumerable() on kh.UnitId equals u.Id
-                                         into grouped
                                          where kh.GrantID == grant.Id
                                          select new
                                          {
-                                             TotalArea =
-                                             grouped.FirstOrDefault().Name.ToUpper() == "KANAL/MARLA/SARSAI" ?
-                                             (kh.KanalOrBigha / 8) + (kh.MarlaOrBiswa / 160) + (kh.SarsaiOrBiswansi / 1440)
-                                             : (kh.MarlaOrBiswa * 0.0125) + (kh.SarsaiOrBiswansi * 0.000625) + (kh.KanalOrBigha * 0.25)
+                                             TotalArea = ((kh.KanalOrBigha*k.UnitValue*k.Timesof)/k.DivideBy)+ ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy)+ ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
+                                            
                                          }).Sum(d => d.TotalArea)), 4);
                     subdivisions = (from u in _userDivisionRepository.GetAll()
                                     join sub in _subDivisionRepo.GetAll() on u.DivisionId equals (sub.DivisionId)
@@ -285,17 +293,17 @@ namespace Noc_App.Controllers
 
                     return View("NotFound");
                 }
-
+                var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
+                SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
+                SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
+                SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
+                
                 var total = Math.Round(((from kh in _khasraRepo.GetAll()
-                                         join u in _siteUnitsRepo.GetAll().AsEnumerable() on kh.UnitId equals u.Id
-                                         into grouped
                                          where kh.GrantID == grant.Id
                                          select new
                                          {
-                                             TotalArea =
-                                             grouped.FirstOrDefault().Name.ToUpper() == "KANAL/MARLA/SARSAI" ?
-                                             (kh.KanalOrBigha / 8) + (kh.MarlaOrBiswa / 160) + (kh.SarsaiOrBiswansi / 1440)
-                                             :(kh.MarlaOrBiswa * 0.0125) + (kh.SarsaiOrBiswansi * 0.000625) + (kh.KanalOrBigha * 0.25)
+                                             TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
+
                                          }).Sum(d => d.TotalArea)), 4);
                 // Get the current user's ID
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -1034,20 +1042,16 @@ namespace Noc_App.Controllers
                 double totalArea = 0;
                 foreach (GrantKhasraDetails item in khasras)
                 {
-                    double marla = 0, kanal = 0, sarsai = 0, biswansi = 0, biswa = 0, bigha = 0;
-                    if (unit.Name == @"Marla/Kanal/Sarsai")
+                    SiteUnitsViewModel unitDetails = new SiteUnitsViewModel
                     {
-                        marla = item.MarlaOrBiswa / 160;
-                        kanal = item.KanalOrBigha / 8;
-                        sarsai = item.SarsaiOrBiswansi / 1440;
-                    }
-                    else
-                    {
-                        biswansi = item.SarsaiOrBiswansi * 0.000625;
-                        biswa = item.MarlaOrBiswa * 0.0125;
-                        bigha = item.KanalOrBigha * 0.25;
-                    }
-                    totalArea = Math.Round(totalArea + marla + kanal + sarsai + biswansi + biswa + bigha, 4);
+                        KanalOrBigha = item.KanalOrBigha,
+                        MarlaOrBiswa = item.MarlaOrBiswa,
+                        SarsaiOrBiswansi = item.SarsaiOrBiswansi,
+                        SiteUnitId = unit.Id
+                    };
+                    var units = await _calculations.CalculateUnits(unitDetails);
+                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
+                   
                 }
                 var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
                 if (payment == null || payment.Count() == 0)

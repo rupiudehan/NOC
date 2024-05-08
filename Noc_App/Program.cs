@@ -43,6 +43,7 @@ builder.Services.Configure<GoogleCaptchaConfig>(builder.Configuration.GetSection
 //builder.Services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
 builder.Services.AddTransient<GoogleCaptchaService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICalculations, Calculations>();
 builder.Services.AddScoped<IRepository<DivisionDetails>, Repository<DivisionDetails>>();
 builder.Services.AddScoped<IRepository<SubDivisionDetails>, Repository<SubDivisionDetails>>();
 builder.Services.AddScoped<IRepository<TehsilBlockDetails>, Repository<TehsilBlockDetails>>();
@@ -64,6 +65,7 @@ builder.Services.AddScoped<IRepository<GrantApprovalDetail>, Repository<GrantApp
 builder.Services.AddScoped<IRepository<GrantApprovalProcessDocumentsDetails>, Repository<GrantApprovalProcessDocumentsDetails>>();
 builder.Services.AddScoped<IRepository<GrantApprovalMaster>, Repository<GrantApprovalMaster>>();
 builder.Services.AddScoped<IRepository<GrantUnprocessedAppDetails>, Repository<GrantUnprocessedAppDetails>>();
+builder.Services.AddScoped<IRepository<SiteUnitMaster>, Repository<SiteUnitMaster>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Noc_App.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240508111539_unitmaster")]
+    partial class unitmaster
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -788,9 +791,6 @@ namespace NocApp.Migrations
                     b.Property<double>("DivideBy")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("SiteAreaUnitId")
-                        .HasColumnType("integer");
-
                     b.Property<double>("Timesof")
                         .HasColumnType("double precision");
 
@@ -805,8 +805,6 @@ namespace NocApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SiteAreaUnitId");
-
                     b.ToTable("SiteUnitMaster");
 
                     b.HasData(
@@ -814,67 +812,60 @@ namespace NocApp.Migrations
                         {
                             Id = 1,
                             DivideBy = 1.0,
-                            SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "M",
-                            UnitName = "Biswa",
+                            UnitCode = "BSI",
+                            UnitName = "Biswa-I",
                             UnitValue = 0.012500000000000001
                         },
                         new
                         {
                             Id = 2,
                             DivideBy = 1.0,
-                            SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "K",
-                            UnitName = "Bigha",
+                            UnitCode = "BGI",
+                            UnitName = "Bigha-I",
                             UnitValue = 0.25
                         },
                         new
                         {
                             Id = 3,
                             DivideBy = 1.0,
-                            SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "S",
-                            UnitName = "Biswansi",
+                            UnitCode = "BWI",
+                            UnitName = "Biswansi-I",
                             UnitValue = 0.00062500000000000001
                         },
                         new
                         {
                             Id = 4,
                             DivideBy = 1.0,
-                            SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "M",
-                            UnitName = "Biswa",
+                            UnitCode = "BSI",
+                            UnitName = "Biswa-II",
                             UnitValue = 0.012500000000000001
                         },
                         new
                         {
                             Id = 5,
                             DivideBy = 1.0,
-                            SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "K",
-                            UnitName = "Bigha",
+                            UnitCode = "BGI",
+                            UnitName = "Bigha-II",
                             UnitValue = 0.25
                         },
                         new
                         {
                             Id = 6,
                             DivideBy = 1.0,
-                            SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "S",
-                            UnitName = "Biswansi",
+                            UnitCode = "BWI",
+                            UnitName = "Biswansi-II",
                             UnitValue = 0.00062500000000000001
                         },
                         new
                         {
                             Id = 7,
                             DivideBy = 160.0,
-                            SiteAreaUnitId = 2,
                             Timesof = 1.0,
                             UnitCode = "K",
                             UnitName = "Kanal",
@@ -884,9 +875,8 @@ namespace NocApp.Migrations
                         {
                             Id = 8,
                             DivideBy = 8.0,
-                            SiteAreaUnitId = 2,
                             Timesof = 1.0,
-                            UnitCode = "M",
+                            UnitCode = "K",
                             UnitName = "Marla",
                             UnitValue = 1.0
                         },
@@ -894,9 +884,8 @@ namespace NocApp.Migrations
                         {
                             Id = 9,
                             DivideBy = 1440.0,
-                            SiteAreaUnitId = 2,
                             Timesof = 1.0,
-                            UnitCode = "S",
+                            UnitCode = "K",
                             UnitName = "Sarsai",
                             UnitValue = 1.0
                         });
@@ -1372,17 +1361,6 @@ namespace NocApp.Migrations
                     b.Navigation("Grant");
 
                     b.Navigation("OwnerType");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.SiteUnitMaster", b =>
-                {
-                    b.HasOne("Noc_App.Models.SiteAreaUnitDetails", "SiteAreaUnits")
-                        .WithMany()
-                        .HasForeignKey("SiteAreaUnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SiteAreaUnits");
                 });
 
             modelBuilder.Entity("Noc_App.Models.SubDivisionDetails", b =>

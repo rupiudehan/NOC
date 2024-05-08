@@ -141,6 +141,15 @@
                                         <div class="row">
                                             <div class="col-lg-6">
                                                 <div class="form-group">
+                                                    <input type="hidden" id="KUnitValue" value="0" />
+                                                    <input type="hidden" id="KTimesof" value="1" />
+                                                    <input type="hidden" id="KDivideBy" value="1" />
+                                                    <input type="hidden" id="MUnitValue" value="0" />
+                                                    <input type="hidden" id="MTimesof" value="1" />
+                                                    <input type="hidden" id="MDivideBy" value="1" />
+                                                    <input type="hidden" id="SUnitValue" value="0" />
+                                                    <input type="hidden" id="STimesof" value="1" />
+                                                    <input type="hidden" id="SDivideBy" value="1" />
                                                     <label asp-for="SelectedSiteAreaUnitId" class="control-label ">Unit of Site Area</label>
                                                     <select asp-for="SelectedSiteAreaUnitId" asp-items="@Model.SiteAreaUnit" class="form-control">
                                                         <option value="">Select</option>
@@ -245,16 +254,6 @@
                                             <input asp-for="KmlLinkName" class="form-control form-control-user" />
                                             <span asp-validation-for="KmlLinkName" class="text-danger"></span>
                                         </div>
-                                        @*   <div class="form-group">
-                                        <label asp-for="Latitude" class="control-label"></label>
-                                        <input asp-for="Latitude" class="form-control form-control-user numericField" />
-                                        <span asp-validation-for="Latitude" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                        <label asp-for="Longitute" class="control-label"></label>
-                                        <input asp-for="Longitute" class="form-control form-control-user numericField" />
-                                        <span asp-validation-for="Latitude" class="text-danger"></span>
-                                        </div> *@
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
@@ -569,10 +568,31 @@
             });
             $('body').on('change', '#SelectedSiteAreaUnitId', function () {
                 var list = ($(this).find("option:selected").text()).split('/');
-                var Bigha = list[0];
-                var Biswa = list[1];
-                var Biswansi = list[2];
-                
+                var Bigha = 'K';
+                var Biswa = 'M';
+                var Biswansi = 'S';
+                var unitId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetUnitsDetail",
+                    type: "POST",
+                    data: { unitId: unitId },
+                    async: false,
+                    success: function (data) {
+                        $.each(data, function (key, value) {
+                            $('#' +value.unitCode+ 'UnitValue').val(value.unitValue);
+                            $('#' +value.unitCode+  'Timesof').val(value.timesof);
+                            $('#' +value.unitCode+ 'DivideBy').val(value.divideBy);
+                        });
+                        
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+
                 $('#khasraTable .M1').each(function () {
                     $(this).removeAttr('class');
                     $(this).attr('class', 'form-control numericField M1 ' + Biswa);
@@ -614,26 +634,17 @@
                         var Biswa = 0;
                         var Sarsai = 0;
                         var Bigha = 0;
-                        if (_thisInner.find('.Marla').length > 0) {
-                            Marla = _thisInner.find('.Marla').val() != '' ? parseFloat(_thisInner.find('.Marla').val()) / 160 : 0.0;
+                           
+                        var k = 'K';var m = 'M';var s = 'S';
+                        if (_thisInner.find('.'+m).length > 0) {
+                            Marla = _thisInner.find('.'+m).val() != '' ? (parseFloat(_thisInner.find('.'+m).val())*parseFloat($('#'+m+'UnitValue').val())*parseFloat($('#'+m+'Timesof').val()))/parseFloat($('#'+m+'DivideBy').val()) : 0.0;
                         }
-                        if (_thisInner.find('.Biswansi').length > 0) {
+                        if (_thisInner.find('.'+s).length > 0) {
 
-                            Biswansi = _thisInner.find('.Biswansi').val() != '' ? parseFloat(_thisInner.find('.Biswansi').val()) * 0.000625 : 0.0;
+                            Biswansi = _thisInner.find('.'+s).val() != '' ? (parseFloat(_thisInner.find('.'+s).val())*parseFloat($('#'+s+'UnitValue').val())*parseFloat($('#'+s+'Timesof').val()))/parseFloat($('#'+s+'DivideBy').val()) : 0.0;
                         }
-                        if (_thisInner.find('.Kanal').length > 0) {
-                            Kanal = _thisInner.find('.Kanal').val() != '' ? parseFloat(_thisInner.find('.Kanal').val()) / 8 : 0.0;
-                        }
-
-                        if (_thisInner.find('.Biswa').length > 0) {
-                            Biswa = _thisInner.find('.Biswa').val() != '' ? parseFloat(_thisInner.find('.Biswa').val()) * 0.0125 : 0.0;
-                        }
-
-                        if (_thisInner.find('.Sarsai').length > 0) {
-                            Sarsai = _thisInner.find('.Sarsai').val() != '' ? parseFloat(_thisInner.find('.Sarsai').val()) / 1440 : 0.0;
-                        }
-                        if (_thisInner.find('.Bigha').length > 0) {
-                            Bigha = _thisInner.find('.Bigha').val() != '' ? parseFloat(_thisInner.find('.Bigha').val()) * 0.25 : 0.0;
+                        if (_thisInner.find('.'+k).length > 0) {
+                            Kanal = _thisInner.find('.'+k).val() != '' ? (parseFloat(_thisInner.find('.'+k).val())*parseFloat($('#'+k+'UnitValue').val())*parseFloat($('#'+k+'Timesof').val()))/parseFloat($('#'+k+'DivideBy').val()) : 0.0;
                         }
                         grandTotal = parseFloat(grandTotal) + Marla + Biswansi + Kanal + Biswa + Sarsai + Bigha;
                         total = parseFloat(grandTotal).toFixed(4);
