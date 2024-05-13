@@ -344,6 +344,7 @@ namespace Noc_App.Controllers
                 DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
                 SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(model.SiteAreaUnitId);
                 List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == model.Id)).ToList();
+                OwnerDetails owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == model.Id)).ToList().FirstOrDefault();
                 double totalArea = 0;
                 foreach (GrantKhasraDetails item in khasras)
                 {
@@ -386,9 +387,22 @@ namespace Noc_App.Controllers
                     Address = "Division:" + division.Name + ", Sub-Division:" + subDivision.Name + ", Tehsil/Block:" + tehsil.Name + ", Village:" + village.Name + ", Pincode:" + village.PinCode,
                     Amount = TotalPayment,
                     GrantId = model.Id,
-                    ApplicationId=Id
+                    ApplicationId=Id,
+                    Hadbast=model.Hadbast,
+                    PlotNo=model.PlotNo==null?"": model.PlotNo,
+                    Division=division.Name,
+                    SubDivision=subDivision.Name,
+                    Tehsil=tehsil.Name,
+                    Village=village.Name+"-"+village.PinCode.ToString(),
+                    Pincode=village.PinCode.ToString(),
+                    TehsilId=tehsil.Id.ToString(),
+                    DistrictId=division.Id.ToString(),
+                    PayerName= model.ApplicantName,
+                    MobileNo=owners.MobileNo,
+                    PhoneNumber=owners.MobileNo
                 };
-                return RedirectToAction("Index", "Payment", paymentRequestDetail);
+                //return RedirectToAction("Index", "Payment", paymentRequestDetail);
+                return RedirectToAction("ProcessChallan", "Payment", paymentRequestDetail);
             }
             else
             {

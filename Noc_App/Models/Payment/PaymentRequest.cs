@@ -14,6 +14,17 @@ namespace Noc_App.Models.Payment
         public string Address { get; set; }
         [Required]
         public double Amount { get; set; }
+        public string Hadbast { get; set; }
+        public string PlotNo { get; set; }
+        public string Division { get; set; }
+        public string SubDivision { get; set; }
+        public string Tehsil { get; set; }
+        public string Village { get; set; }
+        public string TehsilId { get; set; }
+        public string DistrictId { get; set; }
+        public string Pincode { get; set; }
+        public string PayerName { get; set; }
+        public string MobileNo { get; set; }
         [Required]
         public int GrantId { get; set; }
         [Required]

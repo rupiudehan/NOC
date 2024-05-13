@@ -1,9 +1,7 @@
-﻿@model Noc_App.Models.Payment.PaymentRequest
+﻿@model Noc_App.Models.IFMSPayment.DepartmentModel.IFMSHeader
 @{
     ViewData["Title"] = "Payment";
     Layout = "";
-    // double amount = Convert.ToDouble(@ViewBag.total);
-    // int Id = Convert.ToInt32(@ViewBag.Id);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -50,7 +48,6 @@
 </head>
 
 <body>
-    <!-- ======= Header ======= -->
     <header id="header" class="d-flex align-items-center">
         <div class="container d-flex align-items-center">
             <img src="~/landingpage/assets/img/favicon.png" alt="NOC" height="45" width="45" style="margin-right:5px;" />
@@ -74,44 +71,24 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card-header py-3">
-                                        <h2 class="m-0 font-weight-bold text-primary">Total Amount : ₹@Model.Amount</h2>
+                                        <h2 class="m-0 font-weight-bold text-primary">Payment</h2>
                                     </div>
                                     <div class="card-body">
-                                        <form class="well form-horizontal" asp-action="ProcessChallan" method="post" id="contact_form">
-                                            <center><h2><b>Applicant Details For Payment</b></h2></center>
-                                            <center><h5>Payer Name : @Model.PayerName</h5></center>
-                                            <center><h5>Name : @Model.Name</h5></center>
-                                            <center><h5>Email : @Model.Email</h5></center>
-                                            <center><h5>Mobile Number : @Model.MobileNo</h5></center>
-                                            <center><h5>Address : @Model.Address</h5></center>
-                                            <center><h5>Total Amount : ₹@Model.Amount</h5></center>
-                                            <input hidden asp-for="Amount" />
-                                            <input hidden asp-for="GrantId" />
-                                            <input hidden asp-for="Name" />
-                                            <input hidden asp-for="Email" />
-                                            <input hidden asp-for="Address" />
-                                            <input hidden asp-for="ApplicationId" />
-                                            <input hidden asp-for="Hadbast" />
-                                            <input hidden asp-for="PlotNo" />
-                                            <input hidden asp-for="Division" />
-                                            <input hidden asp-for="SubDivision" />
-                                            <input hidden asp-for="Tehsil" />
-                                            <input hidden asp-for="Village" />
-                                            <input hidden asp-for="Pincode" />
-                                            <input hidden asp-for="TehsilId" />
-                                            <input hidden asp-for="DistrictId" />
-                                            <input hidden asp-for="PayerName" />
-                                            <input hidden asp-for="MobileNo" />
-                                                <div class="row col-md-12">
-                                                    <label class="col-md-4 control-label"></label>
-                                                    <div class="col-md-2" style="text-align:center;">
-                                                        <button type="submit" class="btn btn-warning">Pay Now <span class="glyphicon glyphicon-send"></span></button>
-                                                    </div>
-                                                    <div class="col-sm-2">
-                                                    <a class="btn btn-primary btn-user btn-block col-sm-12" asp-controller="Grant" asp-action="Index" asp-route-Id="@Model.ApplicationId">Pay Later</a>
-                                                    </div>
+                                        <form class="well form-horizontal" id="contact_form" name="PostForm" action="ChallanFormPost" method="post">
+                                            <input type="hidden" asp-for="encdata" />
+                                            <input type="hidden" asp-for="encdata" />
+                                            <input type="hidden" asp-for="ApplicationId" />
+                                            <input type="hidden" asp-for="clientSecret" />
+                                            <input type="hidden" asp-for="integratingAgency" />
+                                            <input type="hidden" asp-for="ipAddress" />
+                                            <input type="hidden" asp-for="transactionID" />
+                                            <div class="row col-md-12">
+                                                <label class="col-md-4 control-label"></label>
+                                                <div class="col-md-2" style="text-align:center;">
+                                                    <button type="submit" class="btn btn-success">Pay<span class="glyphicon glyphicon-send"></span></button>
                                                 </div>
-                                            </form>
+                                            </div>
+                                        </form>
 
 
                                     </div>

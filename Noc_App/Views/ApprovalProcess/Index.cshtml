@@ -1,12 +1,16 @@
-﻿@model IEnumerable<GrantUnprocessedAppDetails>;
+﻿@model IEnumerable<List<GrantUnprocessedAppDetails>>;
 @{
+    List<GrantUnprocessedAppDetails>[] arry =new List<GrantUnprocessedAppDetails>[3];
     string str = "Manage Unprocessed/Forwarded Applications", str2 = "List Of Unprocessed/Forwarded Applications";
-    if (Model != null)
+    if (Model != null && Model.Count()>0)
     {
-        var query = Model.Select(x => new { IsForwarded = x.IsForwarded, LastForwardedByRole = x.LastForwardedByRole, LoggedInRole = x.LoggedInRole });
-        str = query.Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.IsForwarded) ? "Manage Unprocessed and Forwarded Applications" : query.Any(x => x.IsForwarded == true) ? "Manage Forwarded Applications" : "Manage Unprocessed Applications";
-        str2 = query.Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.IsForwarded) ? "List Of Unprocessed and Forwarded Applications" : query.Any(x => x.IsForwarded == true) ? "List Of Forwarded Applications" : "List Of Unprocessed Applications";
-        
+        if (Model.FirstOrDefault() != null && Model.FirstOrDefault().Count() > 0)
+        {
+            var query = Model.FirstOrDefault().Select(x => new { IsForwarded = x.IsForwarded, LastForwardedByRole = x.LastForwardedByRole, LoggedInRole = x.LoggedInRole });
+            str = "Manage Applications"/* query.Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.IsForwarded) ? "Manage Unprocessed and Forwarded Applications" : query.Any(x => x.IsForwarded == true) ? "Manage Forwarded Applications" : "Manage Unprocessed Applications" */;
+            str2 = query.Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.IsForwarded) ? "List Of Unprocessed and Forwarded Applications" : query.Any(x => x.IsForwarded == true) ? "List Of Forwarded Applications" : "List Of Unprocessed Applications";
+        }
+        arry = Model.ToArray();
     }
     ViewBag.Title = str;
 }
@@ -19,164 +23,314 @@
     <div class="col-lg-12">
         <div class="card shadow mb-4">
             <div class="d-sm-flex align-items-center justify-content-between card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">@str2</h6>
+                <h6 class="m-0 font-weight-bold text-primary">List Of Applications@* @str2 *@</h6>
                 @* <a asp-controller="Division" asp-action="Create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                    Add New
+                Add New
                 </a> *@
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <div asp-validation-summary="All" class="text-danger"></div>
-                    @if (Model!=null && Model.Any())
-                    {
-                        int @count = 1;
-                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <td>#</td>
-                                    <th>Application Id</th>
-                                    <th>Project Name</th>
-                                    <th>Location Details</th>
-                                    <th>Forwarded By</th>
-                                    <th>View</th>
-                                    @if (Model.Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.IsForwarded==true))
-                                    {
-                                        @if (Model.Any(x => x.GrantApprovalDocId != 0))
-                                        {
-                                            <th>Edit</th>
-                                        }
-                                    }
-                                    <th>Forward</th>
-                                    @if (Model.Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || x.LoggedInRole == "CHIEF ENGINEER HQ"))
-                                    {
-                                        <th>Issue NOC</th>
-                                        <th>Reject</th>
-                                    }
-                                    else if (Model.Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.LoggedInRole != "SUB DIVISIONAL OFFICER"))
-                                    {
-                                        <th>Reject</th>
-                                    }
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (GrantUnprocessedAppDetails data in Model)
+                <div class="default-tab">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Pending</a>
+                            <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Forwarded</a>
+                            @if (!arry[2].Any(x => x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER"))
+                            {
+                                <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Rejected</a>
+                            }
+                        </div>
+                    </nav>
+                    <div class="tab-content pl-3 pt-2" id="nav-tabContent">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                            <div class="table-responsive">
+                                @if (arry[0] != null && arry[0].Any())
                                 {
-                                    <tr>
-                                        <td>@count</td>
-                                        <td>@data.ApplicationID</td>
-                                        <td>@data.Name</td>
-                                        <td>@data.LocationDetails </td>
-                                        @if (data.LastForwardedByRole != "")
-                                        {
-                                            <td>
-                                                @if (data.LastForwardedByRole == null)
+                                    int @count = 1;
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <td>#</td>
+                                                <th>Application Id</th>
+                                                <th>Project Name</th>
+                                                <th>Location Details</th>
+                                                <th>Forwarded By</th>
+                                                <th>View</th>
+                                                @if (arry[0].Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.IsForwarded == true))
                                                 {
-                                                    @:Unprocessed Application
+                                                    @if (arry[0].Any(x => x.GrantApprovalDocId != 0))
+                                                    {
+                                                        <th>Edit</th>
+                                                    }
                                                 }
-                                                else
+                                                <th>Forward</th>
+                                                @if (arry[0].Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || x.LoggedInRole == "CHIEF ENGINEER HQ"))
                                                 {
-                                                    @data.LastForwardedByRole
+                                                    <th>Issue NOC</th>
+                                                    <th>Reject</th>
                                                 }
-                                            </td>
-                                        }
-                                        else
-                                        {
-                                            <td>New Applied Application </td>
-                                        }
-                                        <td>
-                                            <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
-                                        </td>
-                                        @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == false)
-                                        {
-                                            @if (data.GrantApprovalDocId != 0)
-                                            {
-                                                <td>
-                                                    <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.GrantApprovalId,docId=data.GrantApprovalDocId })" class="btn btn-success">Edit</a>
-                                                    @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
+                                                else if (arry[0].Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.LoggedInRole != "SUB DIVISIONAL OFFICER"))
+                                                {
+                                                    <th>Reject</th>
+                                                }
 
-                                                </td>
-                                            }
-                                            else
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (GrantUnprocessedAppDetails data in arry[0])
                                             {
-                                                @if (Model.Any(x => x.GrantApprovalDocId != 0))
-                                                {
-                                                    <td></td>
-                                                }
-                                            }
-                                        }
-                                        else @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == true)
-                                        {
-                                            @if (data.GrantApprovalDocId != 0)
-                                            {
-                                                <td>
-                                                        <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.GrantApprovalId,docId=data.GrantApprovalDocId })" class="btn btn-success">Edit</a>
-                                                        @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
-                                               
-                                                </td>
-                                            }
-                                            else
-                                            {
-                                                @if (Model.Any(x => x.GrantApprovalDocId != 0))
-                                                {
-                                                    <td></td>
-                                                }
-                                            }
-                                        }
-                                        <td>
-                                            <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
-                                        </td>
-                                        @if ((data.LoggedInRole == "EXECUTIVE ENGINEER"  && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
-                                        {
+                                                <tr>
+                                                    <td>@count</td>
+                                                    <td>@data.ApplicationID</td>
+                                                    <td>@data.Name</td>
+                                                    <td>@data.LocationDetails </td>
+                                                    @if (data.LastForwardedByRole != "")
+                                                    {
+                                                        <td>
+                                                            @if (data.LastForwardedByRole == null)
+                                                            {
+                                                                @:Unprocessed Application
+                                                            }
+                                                            else
+                                                            {
+                                                                @data.LastForwardedByRole
+                                                            }
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>New Applied Application </td>
+                                                    }
                                                     <td>
-                                                        <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue</a>
-                                                        @* <form method="post" asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID">
-                                                            <button class="btn btn-success" type="submit">Issue</button>
-                                                        </form> *@
+                                                        <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                     </td>
-                                            <td>
-                                                <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
-                                                @* <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a> *@
-                                            </td>
+                                                    @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == false)
+                                                    {
+                                                        @if (data.GrantApprovalDocId != 0)
+                                                        {
+                                                            <td>
+                                                                <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.GrantApprovalId,docId=data.GrantApprovalDocId })" class="btn btn-success">Edit</a>
+                                                                @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
+
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (arry[0].Any(x => x.GrantApprovalDocId != 0))
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        }
+                                                    }
+                                                    else @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == true)
+                                                    {
+                                                        @if (data.GrantApprovalDocId != 0)
+                                                        {
+                                                            <td>
+                                                                <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.GrantApprovalId,docId=data.GrantApprovalDocId })" class="btn btn-success">Edit</a>
+                                                                @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
+
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (arry[0].Any(x => x.GrantApprovalDocId != 0))
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        }
+                                                    }
+                                                    <td>
+                                                        <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                                    </td>
+                                                    @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                                    {
+                                                        <td>
+                                                            <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue</a>
+                                                            @* <form method="post" asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID">
+                                                <button class="btn btn-success" type="submit">Issue</button>
+                                                </form> *@
+                                                        </td>
+                                                        <td>
+                                                            <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+                                                            @* <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a> *@
+                                                        </td>
 
 
 
-                                        }
-                                        else if (data.LoggedInRole != "JUNIOR ENGINEER" && data.LoggedInRole != "SUB DIVISIONAL OFFICER")
-                                        {
-                                            @* @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                                    }
+                                                    else if (data.LoggedInRole != "JUNIOR ENGINEER" && data.LoggedInRole != "SUB DIVISIONAL OFFICER")
+                                                    {
+                                                        @* @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
                                             {
-                                                <td></td>
+                                            <td></td>
                                             }
                                             else  *@
-                                            @if (Model.Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
-                                            {
-                                                <td></td>
+                                                        @if (arry[0].Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                                        {
+                                                            <td></td>
+                                                        }
+                                                        <td>
+                                                            <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+                                                            @* <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a> *@
+                                                        </td>
+                                                    }
+                                                    @* <a asp-action="Reject" href="#" data-toggle="modal" data-target="#rejectModal" asp-controller="ApprovalProcess" asp-route-id="@data.Id" class="btn btn-danger">Reject</a> *@
+
+                                                </tr>
+                                                count = count + 1;
                                             }
-                                            <td>
-                                                <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
-                                                @* <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a> *@
-                                            </td>
-                                        }
-                                        @* <a asp-action="Reject" href="#" data-toggle="modal" data-target="#rejectModal" asp-controller="ApprovalProcess" asp-route-id="@data.Id" class="btn btn-danger">Reject</a> *@
-                                        
-                                    </tr>
-                                    count=count + 1;
+                                        </tbody>
+                                    </table>
                                 }
-                            </tbody>
-                        </table>
-                    }
-                    else
-                    {
-                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                            <tbody>
-                                <tr>
-                                    <td>No Record Found</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    }
+                                else
+                                {
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <tbody>
+                                            <tr>
+                                                <td>No Record Found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                            <div class="table-responsive">
+                                @if (arry[1] != null && arry[1].Any())
+                                {
+                                    int @count = 1;
+                                    <table class="table table-bordered" id="dataTableForwarded" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <td>#</td>
+                                                <th>Application Id</th>
+                                                <th>Project Name</th>
+                                                <th>Location Details</th>
+                                                <th>Forwarded To</th>
+                                                <th>View</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (GrantUnprocessedAppDetails data in arry[1])
+                                            {
+                                                <tr>
+                                                    <td>@count</td>
+                                                    <td>@data.ApplicationID</td>
+                                                    <td>@data.Name</td>
+                                                    <td>@data.LocationDetails </td>
+                                                    @if (data.LastForwardedByRole != "")
+                                                    {
+                                                        <td>
+                                                            @if (data.LastForwardedByRole == null)
+                                                            {
+                                                                @:Unprocessed Application
+                                                            }
+                                                            else
+                                                            {
+                                                                @data.ProcessedToRole
+                                                            }
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>New Applied Application </td>
+                                                    }
+                                                    <td>
+                                                        <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
+                                                    </td>
+
+                                                </tr>
+                                                count = count + 1;
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                        <tbody>
+                                            <tr>
+                                                <td>No Record Found</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                        </div>
+                        @if (!arry[2].Any(x => x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER"))
+                        @* @if (Model.Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.LoggedInRole != "SUB DIVISIONAL OFFICER")) *@
+                        {
+                            <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+                                <div class="table-responsive">
+                                    @if (arry[2] != null && arry[2].Any())
+                                    {
+                                        int @count = 1;
+                                        <table class="table table-bordered" id="dataTableForwarded" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <td>#</td>
+                                                    <th>Application Id</th>
+                                                    <th>Project Name</th>
+                                                    <th>Location Details</th>
+                                                    <th>Rejected By</th>
+                                                    <th>View</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (GrantUnprocessedAppDetails data in arry[2])
+                                                {
+                                                    <tr>
+                                                        <td>@count</td>
+                                                        <td>@data.ApplicationID</td>
+                                                        <td>@data.Name</td>
+                                                        <td>@data.LocationDetails </td>
+                                                        @if (data.LastForwardedByRole != "")
+                                                        {
+                                                            <td>
+                                                                @if (data.LastForwardedByRole == null)
+                                                                {
+                                                                    @:Unprocessed Application
+                                                                }
+                                                                else
+                                                                {
+                                                                    @data.LastForwardedByRole
+                                                                }
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>New Applied Application </td>
+                                                        }
+                                                        <td>
+                                                            <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
+                                                        </td>
+
+                                                    </tr>
+                                                    count = count + 1;
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                            <tbody>
+                                                <tr>
+                                                    <td>No Record Found</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
                 </div>
+
             </div>
         </div>
     </div>
@@ -193,7 +347,8 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">@* Select "Reject" below if you are ready to reject application. *@
+                <div class="modal-body">
+                    @* Select "Reject" below if you are ready to reject application. *@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="form-group">
@@ -212,10 +367,15 @@
         </div>
     </div>
 </div>
-@section  Scripts {
+@section Scripts {
     <script>
         function SetValue(id) {
             $('#id').val(id);
         }
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.table').DataTable();
+        });
     </script>
 }

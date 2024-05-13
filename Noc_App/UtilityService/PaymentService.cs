@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Noc_App.Helpers;
 using Noc_App.Models;
 using Noc_App.Models.Payment;
@@ -8,6 +9,58 @@ namespace Noc_App.UtilityService
     public class PaymentService : IPaymentService
     {
         private PaymentConfig settings;
+        //private IFMS_PaymentConfig paymentConfig;
+
+        //public Task<GrantNocPaymentOrderDetail> ProcessOrder(PaymentRequest payRequest, IFMS_PaymentConfig _paymentConfig)
+        //{
+        //    try
+        //    {
+        //        paymentConfig = _paymentConfig;
+        //        string key = _paymentConfig.clientId;
+        //        string secret = _paymentConfig.clientSecret;
+        //        // Generate random receipt number for order
+        //        Random randomObj = new Random();
+        //        string transactionId = randomObj.Next(10000000, 100000000).ToString();
+        //        string data = JsonConvert.SerializeObject(payRequest);
+
+        //        string baseUrl = "https://ifmstg.punjab.gov.in/eRctDeptInt/Server/ProcessChallan";
+        //        HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+        //        HttpClient client = new HttpClient(handler);
+        //        client.BaseAddress = new Uri(baseUrl);
+        //        client.DefaultRequestHeaders.Accept.Clear();
+        //        string encryptedString = "";
+        //        client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
+        //        var content = new StringContent(data, System.Text.Encoding.UTF8, "application/json");
+        //        var response = await client.PostAsync(client.BaseAddress.ToString(), content);
+                
+        //        Dictionary<string, object> options = new Dictionary<string, object>();
+        //        options.Add("amount", payRequest.Amount * 100);
+        //        options.Add("receipt", transactionId);
+        //        options.Add("currency", "INR");
+        //        options.Add("payment_capture", "0"); // 1 - automatic  , 0 - manual
+        //        //options.Add("Notes", "Test Payment of Merchant");
+        //        Razorpay.Api.Order orderResponse = client.Order.Create(options);
+        //        string orderId = orderResponse["id"].ToString();
+        //        GrantNocPaymentOrderDetail order = new GrantNocPaymentOrderDetail
+        //        {
+        //            OrderId = orderResponse.Attributes["id"],
+        //            RazorpayKey = key,//"rzp_test_8P7RhnsImxd2OR",
+        //            Amount = payRequest.Amount * 100,
+        //            Currency = "INR",
+        //            Name = payRequest.Name,
+        //            Email = payRequest.Email,
+        //            PhoneNumber = payRequest.PhoneNumber,
+        //            Address = payRequest.Address,
+        //            Description = "NOC Payment",
+        //            GrantId = payRequest.GrantId
+        //        };
+        //        return Task.FromResult(order);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw;
+        //    }
+        //}
         public Task<GrantNocPaymentOrderDetail> ProcessMerchantOrder(PaymentRequest payRequest, PaymentConfig _settings)
         {
             try

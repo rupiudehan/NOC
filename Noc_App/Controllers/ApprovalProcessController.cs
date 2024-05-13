@@ -101,11 +101,17 @@ namespace Noc_App.Controllers
                 List<UserDivision> userDiv = (await _userDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
                 List<UserSubdivision> userSubdiv = (await _userSubDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
                 List<UserVillage> userVillage = (await _userVillageRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-
+                List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
                 List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
                 model=await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", "0", "'" +role+"'", "'" + userId + "'");
+                var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
+                var modelRejected = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsrejected", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
                 
-                return View(model);
+                modelView.Add(model);
+                modelView.Add(modelForwarded);
+                modelView.Add(modelRejected);
+
+                return View(modelView);
             }
            catch(Exception ex){
                 ModelState.AddModelError(string.Empty, ex.Message);
