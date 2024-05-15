@@ -204,6 +204,273 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        [Obsolete]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Transfer(ForwardApplicationViewModel model)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(model.ApplicationID))
+                {
+                    ViewBag.ErrorMessage = $"Grant with Application Id = {model.ApplicationID} cannot be found";
+                    return View("NotFound");
+                }
+
+                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == model.ApplicationID)).FirstOrDefault();
+
+                if (grant == null)
+                {
+                    ViewBag.ErrorMessage = $"Grant with Application Id = {model.ApplicationID} cannot be found";
+
+                    return View("NotFound");
+                }
+                var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
+                SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
+                SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
+                SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
+
+                var total = Math.Round(((from kh in _khasraRepo.GetAll()
+                                         where kh.GrantID == grant.Id
+                                         select new
+                                         {
+                                             TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
+
+                                         }).Sum(d => d.TotalArea)), 4);
+                // Get the current user's ID
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Retrieve the user object
+                var user = await _userManager.FindByIdAsync(userId);
+
+                // Retrieve roles associated with the user
+                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "F")).FirstOrDefault();
+                var forwardedUser = await _userManager.FindByIdAsync(model.SelectedOfficerId);
+                var forwardedRole = (await _userManager.GetRolesAsync(forwardedUser)).FirstOrDefault();
+                int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
+                GrantApprovalDetail approvalDetail = new GrantApprovalDetail
+                {
+                    GrantID = grant.Id,
+                    ApprovalID = master.Id,
+                    ProcessedBy = User.Identity.Name,
+                    ProcessedOn = DateTime.Now,
+                    ProcessedByRole = role,
+                    ProcessLevel = approvalLevel + 1,
+                    ProcessedToRole = forwardedRole,
+                    ProcessedToUser = forwardedUser.Email
+                };
+
+                if (total <= 2 && role == "JUNIOR ENGINEER")
+                {
+                    if (model.SiteConditionReportFile != null && model.CatchmentAreaFile != null && model.DistanceFromCreekFile != null && model.GisOrDwsFile != null && model.KmlFile != null && model.CrossSectionOrCalculationFile != null && model.LSectionOfDrainFile != null)
+                    {
+                        string ErrorMessage = string.Empty;
+                        int siteConditionValidation = AllowedCheckExtensions(model.SiteConditionReportFile);
+                        int CatchmentAreaValidation = AllowedCheckExtensions(model.CatchmentAreaFile);
+                        int DistanceFromCreekFileValidation = AllowedCheckExtensions(model.DistanceFromCreekFile);
+                        int GisOrDwsFileValidation = AllowedCheckExtensions(model.GisOrDwsFile);
+                        int KmlFileValidation = AllowedCheckExtensions(model.KmlFile);
+                        int CrossSectionOrCalculationFileValidation = AllowedCheckExtensions(model.CrossSectionOrCalculationFile);
+                        int LSectionOfDrainFileValidation = AllowedCheckExtensions(model.LSectionOfDrainFile);
+                        if (siteConditionValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid site condition report file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return View(model);
+
+                        }
+                        else if (siteConditionValidation == 2)
+                        {
+                            ErrorMessage = "Site condition report field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (CatchmentAreaValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid catchment area file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+
+                        }
+                        else if (CatchmentAreaValidation == 2)
+                        {
+                            ErrorMessage = "Catchment area field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (DistanceFromCreekFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid distance from creek file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+
+                        }
+                        else if (DistanceFromCreekFileValidation == 2)
+                        {
+                            ErrorMessage = "Distance from creek file field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+
+                        if (LSectionOfDrainFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid GIS/DWS file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return View(model);
+
+                        }
+                        else if (GisOrDwsFileValidation == 2)
+                        {
+                            ErrorMessage = "GIS/DWS File field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+
+                        if (KmlFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return View(model);
+
+                        }
+                        else if (KmlFileValidation == 2)
+                        {
+                            ErrorMessage = "KML File field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (CrossSectionOrCalculationFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid Cross-Section/Calculation file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return View(model);
+
+                        }
+                        else if (CrossSectionOrCalculationFileValidation == 2)
+                        {
+                            ErrorMessage = "Cross-Section/Calculation file field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (LSectionOfDrainFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid L-Section of drain file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return View(model);
+
+                        }
+                        else if (LSectionOfDrainFileValidation == 2)
+                        {
+                            ErrorMessage = "L-Section of drain file field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+
+                        if (!AllowedFileSize(model.SiteConditionReportFile))
+                        {
+                            ErrorMessage = "Site condition report size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (!AllowedFileSize(model.CatchmentAreaFile))
+                        {
+                            ErrorMessage = "Catchment area file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (!AllowedFileSize(model.DistanceFromCreekFile))
+                        {
+                            ErrorMessage = "Distance from creek file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+
+                        if (!AllowedFileSize(model.GisOrDwsFile))
+                        {
+                            ErrorMessage = "GIS/DWS file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+
+                        if (!AllowedFileSize(model.KmlFile))
+                        {
+                            ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+
+                        if (!AllowedFileSize(model.CrossSectionOrCalculationFile))
+                        {
+                            ErrorMessage = "Cross-Section/Calculation file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+
+                        if (!AllowedFileSize(model.LSectionOfDrainFile))
+                        {
+                            ErrorMessage = "L-Section of drain file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        string uniqueSiteConditionFileName = ProcessUploadedFile(model.SiteConditionReportFile, "SiteCondition");
+                        string uniqueCatchmentAreaFileName = ProcessUploadedFile(model.CatchmentAreaFile, "CatchmentArea");
+                        string uniqueDistanceFromCreekFileName = ProcessUploadedFile(model.DistanceFromCreekFile, "DistanceFromCreek");
+                        string uniqueGisOrDwsFileName = ProcessUploadedFile(model.GisOrDwsFile, "GisOrDws");
+                        string uniqueCrossSectionOrCalculationFileName = ProcessUploadedFile(model.CrossSectionOrCalculationFile, "CrossSectionOrCalculation");
+                        string uniqueLSectionOfDrainFileName = ProcessUploadedFile(model.LSectionOfDrainFile, "LSectionOfDrain");
+                        string uniqueKmlFileName = ProcessUploadedFile(model.KmlFile, "kmlReport");
+
+                        await _repoApprovalDetail.CreateAsync(approvalDetail);
+
+                        GrantApprovalProcessDocumentsDetails approvalObj = new GrantApprovalProcessDocumentsDetails
+                        {
+                            SiteConditionReportPath = uniqueSiteConditionFileName,
+                            CatchmentAreaAndFlowPath = uniqueCatchmentAreaFileName,
+                            CrossSectionOrCalculationSheetReportPath = uniqueCrossSectionOrCalculationFileName,
+                            DistanceFromCreekPath = uniqueDistanceFromCreekFileName,
+                            DrainLSectionPath = uniqueLSectionOfDrainFileName,
+                            GISOrDWSReportPath = uniqueGisOrDwsFileName,
+                            KmlFileVerificationReportPath = uniqueKmlFileName,
+                            ProcessedBy = User.Identity.Name,
+                            ProcessedOn = DateTime.Now,
+                            ProcessedByRole = role
+                        };
+
+                        approvalDetail.GrantApprovalProcessDocuments = approvalObj;
+                        await _repoApprovalDetail.UpdateAsync(approvalDetail);
+
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "All documents are required to be uploaded");
+                        return View(model);
+                    }
+                }
+                else
+                {
+                    await _repoApprovalDetail.CreateAsync(approvalDetail);
+                }
+
+                grant.IsForwarded = true;
+                grant.ProcessLevel = approvalDetail.ProcessLevel;
+                grant.UpdatedOn = DateTime.Now;
+                await _repo.UpdateAsync(grant);
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(model);
+            }
+        }
+
         [HttpGet]
         public async Task<ViewResult> Forward(string Id)
         {
