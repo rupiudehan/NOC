@@ -12,6 +12,7 @@ using Noc_App.UtilityService;
 using Noc_App.Helpers;
 using System.Threading.Tasks.Dataflow;
 using System.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Noc_App.Controllers
 {
@@ -143,6 +144,32 @@ namespace Noc_App.Controllers
                 ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
                 return View("NotFound");
             }
+
+            var grantdetail = (from g in _repo.GetAll()
+                               join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
+                               join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
+                               join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                               join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                               join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals sub.Id
+                               join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
+                               where a.ProcessedToRole.ToUpper() == "JUNIOR ENGINEER" && g.ApplicationID == id
+                               select new
+                               {
+                                   Grant = g,
+                                   subdiv= sub,
+                                   division=div,
+                                   village=v,
+                                   tehsil=t,
+                                   Approval = a
+                               }).FirstOrDefault();
+           
+            GrantDetails grant = grantdetail.Grant;
+            if (grant == null)
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+
+                return View("NotFound");
+            }
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Retrieve the user object
@@ -168,6 +195,11 @@ namespace Noc_App.Controllers
             {
                 id = id,
                 SubDivisions = subdivisions != null ? new SelectList(subdivisions, "Id", "Name") : null,
+                 Name = grantdetail.Grant.Name,
+                ApplicantEmailID = grantdetail.Grant.ApplicantEmailID,
+                ApplicantName = grantdetail.Grant.ApplicantName,
+                ApplicationID = grantdetail.Grant.ApplicationID,
+                LocationDetails = "Division: " + grantdetail.division.Name + ", Sub-Division: " + grantdetail.subdiv.Name + ", Tehsil/Block: " + grantdetail.tehsil.Name + ", Village: " + grantdetail.village.Name + ", Pincode: " + grantdetail.village.PinCode,
             };
             return View(model);
         }
