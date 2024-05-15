@@ -136,6 +136,43 @@ namespace Noc_App.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Transfer(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+                return View("NotFound");
+            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Retrieve the user object
+            var userDetail = await _userManager.FindByIdAsync(userId);
+
+            // Retrieve roles associated with the user
+            var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
+
+            List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
+            subdivisions = (from u in _userDivisionRepository.GetAll()
+                            join sub in _subDivisionRepo.GetAll() on u.DivisionId equals (sub.DivisionId)
+                            where u.UserId == userId
+                            select new SubDivisionDetails
+                            {
+                                Id = sub.Id,
+                                Name = sub.Name
+                            }
+                                    ).ToList();
+
+            List<OfficerDetails> officerDetail = new List<OfficerDetails>();
+
+            GrantApprovalDetailTransferCreate model = new GrantApprovalDetailTransferCreate
+            {
+                id = id,
+                SubDivisions = subdivisions != null ? new SelectList(subdivisions, "Id", "Name") : null,
+            };
+            return View(model);
+        }
+
+        [HttpGet]
         public async Task<ViewResult> Forward(string Id)
         {
             try
