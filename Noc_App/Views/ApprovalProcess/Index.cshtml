@@ -34,7 +34,7 @@
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                             <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Pending</a>
                             <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Forwarded</a>
-                            @if (!arry[2].Any(x => x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER"))
+                            @if (arry[2] != null && arry[2].Any() && !arry[2].Any(x => x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER"))
                             {
                                 <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Rejected</a>
                             }
@@ -207,7 +207,8 @@
                                                 <th>Application Id</th>
                                                 <th>Project Name</th>
                                                 <th>Location Details</th>
-                                                <th>Forwarded To</th>
+                                                <th>Forwarded To Role</th>
+                                                <th>Forwarded To User</th>
                                                 <th>View</th>
 
                                             </tr>
@@ -237,6 +238,23 @@
                                                     {
                                                         <td>New Applied Application </td>
                                                     }
+                                                    @if (data.ProcessedToUser != "")
+                                                    {
+                                                        <td>
+                                                            @if (data.ProcessedToUser == null)
+                                                            {
+                                                                @:Unprocessed Application
+                                                            }
+                                                            else
+                                                            {
+                                                                @data.ProcessedToUser
+                                                            }
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>New Applied Application </td>
+                                                    }
                                                     <td>
                                                         <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                     </td>
@@ -259,7 +277,7 @@
                                 }
                             </div>
                         </div>
-                        @if (!arry[2].Any(x => x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER"))
+                        @if (arry[2] != null && arry[2].Any() && !arry[2].Any(x => x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER"))
                         @* @if (Model.Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.LoggedInRole != "SUB DIVISIONAL OFFICER")) *@
                         {
                             <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">

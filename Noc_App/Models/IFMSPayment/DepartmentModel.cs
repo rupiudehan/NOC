@@ -41,19 +41,19 @@
         }
         public class Challandata
         {
-            public DateTime expiryDate { get; set; }
-            public string ddoCode { get; set; }
-            public string payLocCode { get; set; }
             public string deptRefNo { get; set; }
             public string receiptNo { get; set; }
             public string clientId { get; set; }
-            public DateTime challanDate { get; set; }
+            public string challanDate { get; set; }
+            public string expiryDate { get; set; }
             public string companyName { get; set; }
             public string deptCode { get; set; }
             public string totalAmt { get; set; }
             public string trsyAmt { get; set; }
             public string nonTrsyAmt { get; set; }
             public string noOfTrans { get; set; }
+            public string ddoCode { get; set; }
+            public string payLocCode { get; set; }
             public string add1 { get; set; }
             public string add2 { get; set; }
             public string add3 { get; set; }
@@ -61,9 +61,9 @@
             public string add5 { get; set; }
             public string sURL { get; set; }
             public string fURL { get; set; }
-            public PayeeInfo payee_info { get; set; }
             public List<trsyPayments> trsyPayments { get; set; }
             public List<nonTrsyPayments> nonTrsyPayments { get; set; }
+            public PayeeInfo payee_info { get; set; }
         }
         public class Checkdata
         {

@@ -12,44 +12,55 @@ namespace Noc_App.Controllers
     [AllowAnonymous]
     public class ClientController : Controller
     {
-        private IFMS_PaymentConfig _settings;
-        public ClientController(IOptions<IFMS_PaymentConfig> settings)
+        private readonly IConfiguration _configuration;
+        public ClientController(IConfiguration configuration)
         {
-            _settings = settings.Value;
+            _configuration = configuration;
         }
-        //[Obsolete]
-        //public ActionResult ChallanView()
-        //{
-        //    DepartmentDl dpt = new DepartmentDl();
+        [AllowAnonymous]
+        [Obsolete]
+        [HttpGet]
+        public ActionResult ChallanView()
+        {
+            IFMS_PaymentConfig _settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
+                    _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
+                    _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
+                    _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
+                    , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
+                    , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+            DepartmentDl dpt = new DepartmentDl();
 
-        //    IFMS_EncrDecr obj = new IFMS_EncrDecr();
-        //    ifms_data data = new ifms_data();
-        //    data.challandata = dpt.FillChallanData();
-        //    string json = JsonConvert.SerializeObject(data.challandata);
-        //    data.chcksum = obj.CheckSum(json);
-        //    string jsonCHK = JsonConvert.SerializeObject(data);
-        //    string encData = obj.Encrypt(jsonCHK);
-        //    IFMSHeader cHeader = new IFMSHeader();
-        //    cHeader.clientId = _settings.clientId;
-        //    cHeader.clientSecret = _settings.clientSecret;
-        //    cHeader.transactionID = new Random().Next(100000, 999999).ToString();
-        //    cHeader.ipAddress = _settings.IpAddress;
-        //    cHeader.integratingAgency = _settings.IntegratingAgency;
-        //    ViewBag.HtmlStr = PreparePOSTForm("ChallanForm", encData, cHeader);
-        //    hrmsView pay = new hrmsView();
-        //    pay.encdata = encData;
-        //    return View();
-        //}
+            IFMS_EncrDecr obj = new IFMS_EncrDecr(_configuration["IFMSPayOptions:ChecksumKey"],
+                    _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"]);
+            ifms_data data = new ifms_data();
+            data.challandata = dpt.FillChallanData();
+            string json = JsonConvert.SerializeObject(data.challandata);
+            data.chcksum = obj.CheckSum(json);
+            string jsonCHK = JsonConvert.SerializeObject(data);
+            string encData = obj.Encrypt(jsonCHK);
+            IFMSHeader cHeader = new IFMSHeader();
+            cHeader.clientId = _settings.headerClientId;
+            cHeader.clientSecret = _settings.clientSecret;
+            cHeader.transactionID = new Random().Next(100000, 999999).ToString();
+            cHeader.ipAddress = _settings.IpAddress;
+            cHeader.integratingAgency = _settings.IntegratingAgency;
+            string d = PreparePOSTForm("ChallanForm", encData, cHeader);
+            ViewBag.HtmlStr = d;
+            hrmsView pay = new hrmsView();
+            pay.encdata = encData;
+            return View();
+        }
+        [AllowAnonymous]
         private string PreparePOSTForm(string url, string encData, IFMSHeader cHeader)
         // post form
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("<html><header>");
+            sb.Append("<html><head>");
             sb.AppendFormat(@"<meta name='ContentType' content='application/json' />");
             sb.AppendFormat(@"<meta name='Accept' content='application/json' />");
-            sb.AppendFormat(@"<header>");
+            sb.AppendFormat(@"</head>");
             string formID = "PostForm";
-            sb.Append(@"<body><form id=\"+ formID+"\" name=\"" + formID + "\" action =\"" + url + "\" method=\"POST\">");
+            sb.Append(@"<body><form id=\"""+ formID+"\" name=\"" + formID + "\" action =\"" + url + "\" method=\"POST\">").Replace("id=\\\"PostForm\"", "id =\"PostForm\"");
             sb.AppendFormat("<input type='hidden' name='encData' value='{0}'/>",
            encData);
             sb.AppendFormat("<input type='hidden' name='clientId' value='{0}'/>",
@@ -62,13 +73,22 @@ namespace Noc_App.Controllers
            cHeader.ipAddress);
             sb.AppendFormat("<input type='hidden' name='transactionID' value='{0}'/>",
            cHeader.transactionID);
-            sb.AppendFormat("</form></body></html>");
+            //sb.AppendFormat("</form></body></html>");
+            //StringBuilder strScript = new StringBuilder();
+            //strScript.Append("<script language='javascript'>");
+            //strScript.Append("var v" + formID + " = document." + formID + ";");
+            //strScript.Append("v" + formID + ".submit();");
+            //strScript.Append("</script>");
+            sb.AppendFormat("</form>");
             StringBuilder strScript = new StringBuilder();
             strScript.Append("<script language='javascript'>");
             strScript.Append("var v" + formID + " = document." + formID + ";");
             strScript.Append("v" + formID + ".submit();");
             strScript.Append("</script>");
-            return sb.ToString() + strScript.ToString();
+            sb.AppendFormat(strScript.ToString());
+            sb.AppendFormat("</body></html>");
+            //return sb.ToString() + strScript.ToString();
+            return sb.ToString();
         }
         [HttpPost]
         public ActionResult succesfulURL([FromForm] Checkdata model)

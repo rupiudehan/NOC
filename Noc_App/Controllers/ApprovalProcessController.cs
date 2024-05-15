@@ -96,7 +96,23 @@ namespace Noc_App.Controllers
 
                 // Retrieve roles associated with the user
                 var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
+                //List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
+                
+                //List<OfficerDetails> officerDetail = new List<OfficerDetails>();
 
+                //if (role == "EXECUTIVE ENGINEER")
+                //{
+                //    subdivisions = (from u in _userDivisionRepository.GetAll()
+                //                    join sub in _subDivisionRepo.GetAll() on u.DivisionId equals (sub.DivisionId)
+                //                    where u.UserId == userId
+                //                    select new SubDivisionDetails
+                //                    {
+                //                        Id = sub.Id,
+                //                        Name = sub.Name
+                //                    }
+                //                    ).ToList();
+                //}
+                
                 //var user2 = await _userManager.FindByNameAsync(user.UserName);
                 List<UserDivision> userDiv = (await _userDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
                 List<UserSubdivision> userSubdiv = (await _userSubDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();

@@ -16,6 +16,11 @@ using System.Runtime;
 using System.Text;
 using static Org.BouncyCastle.Math.EC.ECCurve;
 using Noc_App.Models.IFMSPayment;
+using Org.BouncyCastle.Asn1.Cmp;
+using Org.BouncyCastle.Asn1.Crmf;
+using Razorpay.Api;
+using RestSharp;
+using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Noc_App.Controllers
 {
@@ -40,7 +45,7 @@ namespace Noc_App.Controllers
 
         [AllowAnonymous]
         [Obsolete]
-        public async Task<IActionResult> ProcessChallan(PaymentRequest _paymentRequest)
+        public IActionResult ProcessChallan(PaymentRequest _paymentRequest)
         {
             try
             {
@@ -49,7 +54,7 @@ namespace Noc_App.Controllers
                     _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
                     _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
                     , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
-                    , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"]);
+                    , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
 
                 string ChecksumKey = settings.ChecksumKey;
                 string edKey = settings.edKey;
@@ -67,10 +72,10 @@ namespace Noc_App.Controllers
                     challandata = new Challandata()
                     {
                         deptRefNo = transactionId,
-                        receiptNo = transactionId,
+                        receiptNo = "",
                         clientId = settings.clientId,
-                        challanDate = Convert.ToDateTime(DateTime.Now),
-                        expiryDate = Convert.ToDateTime(DateTime.Now/*"2018-10-25T00:00:00"*/),
+                        challanDate = DateTime.Now.ToString("yyyy-MM-ddT00:00:00"),
+                        expiryDate = DateTime.Now.ToString("yyyy-MM-ddT00:00:00"),
                         companyName = settings.companyName,
                         deptCode = settings.deptCode,
                         totalAmt = _paymentRequest.Amount.ToString(),
@@ -80,12 +85,13 @@ namespace Noc_App.Controllers
                         ddoCode = settings.ddoCode,
                         payLocCode = settings.payLocCode,
                         add1 = _paymentRequest.Hadbast,
-                        add2 = _paymentRequest.PlotNo,
+                       // add2 = _paymentRequest.PlotNo,
+                        add2 = "",
                         add3 = _paymentRequest.Address,
                         add4 = "",
                         add5 = "",
-                        sURL = Url.Action("succesfulURL", "Payment", new { id = _paymentRequest.GrantId }),
-                        fURL = Url.Action("succesfulURL", "Payment", new { id = _paymentRequest.GrantId }),//"?failureURL",
+                        sURL = Url.Action("succesfulURL", "Payment", new { id = _paymentRequest.ApplicationId }),
+                        fURL = Url.Action("succesfulURL", "Payment", new { id = _paymentRequest.ApplicationId }),//"?failureURL",
 
                         payee_info = new PayeeInfo()
                         {
@@ -93,11 +99,14 @@ namespace Noc_App.Controllers
                             teleNumber = _paymentRequest.MobileNo,
                             mobNumber = _paymentRequest.MobileNo,
                             emailId = _paymentRequest.Email,
+                            //teleNumber = "9478215852",
+                            //mobNumber = "9478215852",
+                            //emailId = "rupi.udhehan@gmail.com",
                             addLine1 = _paymentRequest.Village,
                             addLine2 = _paymentRequest.Tehsil,
                             addPincode = _paymentRequest.Pincode,
-                            district = _paymentRequest.DistrictId,
-                            tehsil = _paymentRequest.TehsilId
+                            district = 28.ToString(),//_paymentRequest.DistrictId,
+                            tehsil = 245.ToString(),//_paymentRequest.TehsilId
                         },
                         trsyPayments = new List<trsyPayments>()
                                          {
@@ -117,7 +126,7 @@ namespace Noc_App.Controllers
 
                 ViewBag.GrantId = _paymentRequest.ApplicationId;
                 IFMSHeader cHeader = new IFMSHeader();
-                cHeader.clientId = settings.clientId;
+                cHeader.clientId = settings.headerClientId;
                 cHeader.clientSecret = settings.clientSecret;
                 cHeader.transactionID = transactionId;
                 cHeader.ipAddress = settings.IpAddress;
@@ -125,6 +134,10 @@ namespace Noc_App.Controllers
                 cHeader.encdata = encData;
                 cHeader.ApplicationId = _paymentRequest.ApplicationId;
                 return View(cHeader);
+                //ViewBag.HtmlStr = PreparePOSTForm("ChallanFormPost", encData, cHeader, _paymentRequest.ApplicationId);
+               // hrmsView pay = new hrmsView();
+                //pay.encdata = encData;
+                //return View();
             }
             catch (Exception ex)
             {
@@ -137,68 +150,117 @@ namespace Noc_App.Controllers
         private string PreparePOSTForm(string url, string encData, IFMSHeader cHeader,string GrantId)
         // post form
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("<html><head>");
-            sb.AppendFormat(@"<meta name='ContentType' content='application/json' />");
-            sb.AppendFormat(@"<meta name='Accept' content='application/json' />");
-            sb.AppendFormat(@"</head>");
-            string formID = "PostForm";
-            sb.Append(@"<body><form id=\""" + formID + "\" name=\"" + formID + "\" action=\"" + url + "\" method=\"POST\">");
-            sb.AppendFormat("<input type='hidden' name='encData' value='{0}'/>",
-           encData);
-            sb.AppendFormat("<input type='hidden' name='clientId' value='{0}'/>",
-           cHeader.clientId);
-            sb.AppendFormat("<input type='hidden' name='GrantId' value='{0}'/>",
-           GrantId);
-            sb.AppendFormat("<input type='hidden' name='clientSecret' value='{0}'/>",
-           cHeader.clientSecret);
-            sb.AppendFormat("<input type='hidden' name='integratingAgency' value = '{0}' /> ", cHeader.integratingAgency);
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("<html><head>");
+                sb.AppendFormat(@"<meta name='ContentType' content='application/json' />");
+                sb.AppendFormat(@"<meta name='Accept' content='application/json' />");
+                sb.AppendFormat(@"</head>");
+                string formID = "PostForm";
+                sb.Append(@"<body><form id=\""" + formID + "\" name=\"" + formID + "\" action=\"" + url + "\" method=\"POST\">").Replace("id=\\\"PostForm\"", "id =\"PostForm");
+                sb.AppendFormat("<input type='hidden' name='encData' value='{0}'/>",
+               encData);
+                sb.AppendFormat("<input type='hidden' name='clientId' value='{0}'/>",
+               cHeader.clientId);
+                sb.AppendFormat("<input type='hidden' name='ApplicationId' value='{0}'/>",
+               GrantId);
+                sb.AppendFormat("<input type='hidden' name='clientSecret' value='{0}'/>",
+               cHeader.clientSecret);
+                sb.AppendFormat("<input type='hidden' name='integratingAgency' value = '{0}' /> ", cHeader.integratingAgency);
 
-            sb.AppendFormat("<input type='hidden' name='ipAddress' value='{0}'/>",
-           cHeader.ipAddress);
-            sb.AppendFormat("<input type='hidden' name='transactionID' value='{0}'/>",
-           cHeader.transactionID);
-            sb.AppendFormat("</form></body></html>");
-            StringBuilder strScript = new StringBuilder();
-            strScript.Append("<script language='javascript'>");
-            strScript.Append("var v" + formID + " = document." + formID + ";");
-            strScript.Append("v" + formID + ".submit();");
-            strScript.Append("</script>");
-            sb.AppendFormat(strScript.ToString());
-            sb.AppendFormat("</body></html>");
-            return sb.ToString();
+                sb.AppendFormat("<input type='hidden' name='ipAddress' value='{0}'/>",
+               cHeader.ipAddress);
+                sb.AppendFormat("<input type='hidden' name='transactionID' value='{0}'/>",
+               cHeader.transactionID);
+                sb.AppendFormat("</form>");
+                StringBuilder strScript = new StringBuilder();
+                strScript.Append("<script language='javascript'>document.addEventListener(\"load\", (event) => {");
+                strScript.Append("var v" + formID + " = document.forms['" + formID + "'];");
+                strScript.Append("v" + formID + ".submit();");
+                strScript.Append("});</script>");
+                sb.Append(strScript);
+                sb.AppendFormat("</body></html>");
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
                 ;
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult ChallanForm()
+        {
+            ViewBag.HtmlContent = TempData["Message"] as string;
+            return View();
+        }
         [HttpPost]
         public async Task<IActionResult> ChallanFormPost(IFMSHeader data)
         {
-            Checkdata cHeader = new Checkdata { 
-                clientId=data.clientId,
-                clientSecret=data.clientSecret,
-                encData=data.encdata,
-                integratingAgency=data.integratingAgency,
-                ipAddress= data.ipAddress,
-                transactionID=data.transactionID
-            };
-            var reqData = JsonConvert.SerializeObject(cHeader);
-            HttpResponseMessage resMsg = await ExecuteAPI(_configuration["IFMSPayOptions:PostUrl"],reqData);
-            if (resMsg.IsSuccessStatusCode)
+            var options = new RestClientOptions(_configuration["IFMSPayOptions:PostUrl"])
             {
-                var msg= resMsg.Content.ReadAsStringAsync().Result;
-                string resultContent = await ChallanVerify(cHeader);
-                ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
-                if(root.statusCode!= "SC300") return RedirectToAction("Failed", new { id = data.ApplicationId });
-                else return RedirectToAction("Success", new { GrantId = data.ApplicationId });
+                MaxTimeout = -1,
+            };
+            var client = new RestSharp.RestClient(options);
+            var request = new RestRequest(_configuration["IFMSPayOptions:PostUrl"], Method.Post);
+            request.AddHeader("Cookie", ".AspNetCore.Antiforgery.FHElugoL8ws=CfDJ8ML4BLgAq9lJmJpxAKvSYEz0j8fWp731M3vXH0c2v3Rn5rwpkNkVhJ1RkvwgBgl2tLfMj2P4zhVDSLUqY8aOaI2zuVuLKncGT5ZsYLkzC9a7ap59SkEvg5wKDcGkor04CFb9gedXetHF7x4zh6m1Eog");
+            request.AlwaysMultipartFormData = true;
+            request.AddParameter("encData", data.encdata);
+            request.AddParameter("clientId", data.clientId);
+            request.AddParameter("clientSecret", data.clientSecret);
+            request.AddParameter("integratingAgency", data.integratingAgency);
+            request.AddParameter("ipAddress", data.ipAddress);
+            request.AddParameter("transactionID", data.transactionID);
+            RestResponse response = await client.ExecuteAsync(request);
+            if (response.IsSuccessful)
+            {
+                var content = response.Content.Replace("/eRctDeptInt", "https://ifmstg.punjab.gov.in/eRctDeptInt");
+                //string resultContent = await ChallanVerify(cHeader);
+                //ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
+                //if(root.statusCode!= "SC300") return RedirectToAction("Failed", new { id = data.ApplicationId });
+                //else
+                //return RedirectToAction("ChallanFormPost", new { content = msg });
+                TempData["Message"] = content;
+                //ViewBag.HtmlContent = content;
+                return RedirectToAction("ChallanForm");
+                //return View();
             }
             else
             {
                 // Handle unsuccessful response
                 return RedirectToAction("Failed", new { id = data.ApplicationId });
             }
+            //Checkdata cHeader = new Checkdata { 
+            //    clientId=data.clientId,
+            //    clientSecret=data.clientSecret,
+            //    encData=data.encdata,
+            //    integratingAgency=data.integratingAgency,
+            //    ipAddress= data.ipAddress,
+            //    transactionID=data.transactionID
+            //};
+            //var reqData = JsonConvert.SerializeObject(cHeader);
+            //HttpResponseMessage resMsg = await ExecuteAPI(_configuration["IFMSPayOptions:PostUrl"],reqData);
+            //if (resMsg.IsSuccessStatusCode)
+            //{
+            //    var msg= resMsg.Content.ReadAsStringAsync().Result;
+            //    //string resultContent = await ChallanVerify(cHeader);
+            //    //ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
+            //    //if(root.statusCode!= "SC300") return RedirectToAction("Failed", new { id = data.ApplicationId });
+            //    //else
+            //    return RedirectToAction("Success", new { GrantId = data.ApplicationId });
+            //}
+            //else
+            //{
+            //    // Handle unsuccessful response
+            //    return RedirectToAction("Failed", new { id = data.ApplicationId });
+            //}
         }
 
-        public async Task<string> ChallanVerify(/*ifms_data dataFrm*/Checkdata cHeader)
+        public string ChallanVerify(/*ifms_data dataFrm*/Checkdata cHeader)
         {
             //DepartmentDl dpt = new DepartmentDl();
             //ifms_data data = new ifms_data();
@@ -225,13 +287,13 @@ namespace Noc_App.Controllers
             //    integratingAgency = _configuration["IFMSPayOptions:integratingAgency"]
             //};
             var reqData = JsonConvert.SerializeObject(cHeader);
-            HttpResponseMessage resMsg = await ExecuteAPI(_configuration["IFMSPayOptions:Verify"],reqData);
+            HttpResponseMessage resMsg = ExecuteAPI(_configuration["IFMSPayOptions:Verify"],reqData);
             string retJson = resMsg.Content.ReadAsStringAsync().Result;
             return retJson;
 
         }
 
-        private async Task<HttpResponseMessage> ExecuteAPI(string URL, string PostData)
+        private HttpResponseMessage ExecuteAPI(string URL, string PostData)
         {
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();

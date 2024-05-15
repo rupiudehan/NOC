@@ -7,6 +7,7 @@ using Noc_App.Clients;
 using Noc_App.Context;
 using Noc_App.Helpers;
 using Noc_App.Models;
+using Noc_App.Models.IFMSPayment;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.Repository;
 using Noc_App.Models.ViewModel;
@@ -45,7 +46,6 @@ builder.Services.Configure<IFMS_PaymentConfig>(builder.Configuration.GetSection(
 //builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 //builder.Services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
 builder.Services.AddTransient<GoogleCaptchaService>();
-//builder.Services.AddTransient<IFMS_EncrDecr>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICalculations, Calculations>();
 builder.Services.AddScoped<IRepository<DivisionDetails>, Repository<DivisionDetails>>();
@@ -114,7 +114,7 @@ else
 }
 
 app.UseSession();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();

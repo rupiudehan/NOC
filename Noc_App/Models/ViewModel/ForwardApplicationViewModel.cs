@@ -13,7 +13,7 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Applicant Email")]
         public string ApplicantEmailID { get; set; }
         public string ForwardToRole { get; set; }
-        [Display(Name = "Officer")]
+        [Display(Name = "Sub-Division")]
         public string SelectedSubDivisionId { get; set; }
         public IEnumerable<SelectListItem> SubDivisions { get; set; }
         [Required]

@@ -4,6 +4,7 @@
     {
         public string IpAddress { get; set; }
         public string IntegratingAgency { get; set; }
+        public string headerClientId { get; set; }
         public string clientSecret { get; set; }
         public string clientId { get; set; }
         public string ChecksumKey { get; set; }
@@ -18,7 +19,7 @@
 
         public IFMS_PaymentConfig(string _IpAddress, string _IntegratingAgency,string _clientSecret,string _clientId,
             string _ChecksumKey,string _edKey,string _edIV,string _ddoCode,string _companyName,string _deptCode,string _payLocCode
-            ,string _trsyPaymentHead,string _PostUrl)
+            ,string _trsyPaymentHead,string _PostUrl,string _headerClientId)
         {
             IpAddress = _IpAddress;
             IntegratingAgency = _IntegratingAgency;
@@ -33,6 +34,7 @@
             payLocCode = _payLocCode;
             trsyPaymentHead= _trsyPaymentHead;
             PostUrl= _PostUrl;
+            headerClientId = _headerClientId;
         }
     }
 }

@@ -147,39 +147,47 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public IActionResult Search(string searchString)
         {
-            var model = (from g in _repo.GetAll()
-                     join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID into grantPayment
-                     from payment in grantPayment.DefaultIfEmpty()
-                     join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID into grantApproval
-                     from approval in grantApproval.DefaultIfEmpty()
-                     where g.ApplicationID.ToLower()==searchString.ToLower()
-                     select new GrantStatusViewModel
-                     {
-                         ApplicationID = g.ApplicationID,
-                         IsApproved=g.IsApproved,
-                         CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
-                         ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
-                         ApprovalStatus = g.IsPending==true? g.IsRejected?"Rejected": g.IsForwarded?approval != null ? "Pending With "+approval.ProcessedToRole : "Pending" : "Pending" : g.IsApproved ? "NOC Issued" : "Pending",
-                         CertificateFilePath= g.CertificateFilePath
-                     }
-                     ).FirstOrDefault();
-            if (model != null) return View(model);
-            //GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == searchString.ToLower())).FirstOrDefault();
-            //if (obj != null)
-            //{
-            //    GrantPaymentDetails payment = (await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id)).FirstOrDefault();
+            if (searchString != "" && searchString != null)
+            {
+                var model = (from g in _repo.GetAll()
+                             join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID into grantPayment
+                             from payment in grantPayment.DefaultIfEmpty()
+                             join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID into grantApproval
+                             from approval in grantApproval.DefaultIfEmpty()
+                             where g.ApplicationID.ToLower() == searchString.ToLower()
+                             select new GrantStatusViewModel
+                             {
+                                 ApplicationID = g.ApplicationID,
+                                 IsApproved = g.IsApproved,
+                                 CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
+                                 ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
+                                 ApprovalStatus = g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "Pending" : "Pending" : g.IsApproved ? "NOC Issued" : "Pending",
+                                 CertificateFilePath = g.CertificateFilePath
+                             }
+                         ).FirstOrDefault();
+                if (model != null) return View(model);
+                //GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == searchString.ToLower())).FirstOrDefault();
+                //if (obj != null)
+                //{
+                //    GrantPaymentDetails payment = (await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id)).FirstOrDefault();
 
-            //    GrantStatusViewModel model = new GrantStatusViewModel
-            //    {
-            //        ApplicationID = obj.ApplicationID,
-            //        CreatedOn = string.Format("{0:dd/MM/yyyy}", obj.CreatedOn),
-            //        ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
-            //    };
-            //    return View(model);
-            //}
+                //    GrantStatusViewModel model = new GrantStatusViewModel
+                //    {
+                //        ApplicationID = obj.ApplicationID,
+                //        CreatedOn = string.Format("{0:dd/MM/yyyy}", obj.CreatedOn),
+                //        ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
+                //    };
+                //    return View(model);
+                //}
+                else
+                {
+                    return View(null);
+                }
+            }
             else
             {
-                return View(null);
+                ModelState.AddModelError("", "Application ID field is required");
+                return View();
             }
         }
 

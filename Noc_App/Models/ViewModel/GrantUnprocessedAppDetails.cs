@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Noc_App.Models.ViewModel
 {
@@ -32,10 +33,14 @@ namespace Noc_App.Models.ViewModel
         public bool IsForwarded { get; set; }
         public string LoggedInRole { get; set; }
         public long GrantApprovalId { get; set; }
+        public string ProcessedToUser { get; set; }
         public string ProcessedToRole { get; set; }
         public long GrantApprovalDocId { get; set; }
         public string LastForwardedByRole { get; set; }
         public int PreviousProcessLevel { get; set; }
         public int ProcessedLevel { get; set; }
+        //[Display(Name = "Sub-Division")]
+        //public string SelectedSubDivisionId { get; set; }
+        //public IEnumerable<SelectListItem> SubDivisions { get; set; }
     }
 }

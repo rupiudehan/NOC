@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\ClientController.cs" />
+    <Compile Remove="Controllers\ApprovalProcessController - Copy.cs" />
     <Compile Remove="Models\Repository\SqlEmployeeRepository.cs" />
   </ItemGroup>
 
@@ -33,6 +33,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0" />
     <PackageReference Include="RazorPay.Core" Version="1.0.2" />
+    <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="Rotativa.AspNetCore" Version="1.3.2" />
   </ItemGroup>
 
