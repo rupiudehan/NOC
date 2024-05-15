@@ -207,7 +207,7 @@ namespace Noc_App.Controllers
             };
             var client = new RestSharp.RestClient(options);
             var request = new RestRequest(_configuration["IFMSPayOptions:PostUrl"], Method.Post);
-            request.AddHeader("Cookie", ".AspNetCore.Antiforgery.FHElugoL8ws=CfDJ8ML4BLgAq9lJmJpxAKvSYEz0j8fWp731M3vXH0c2v3Rn5rwpkNkVhJ1RkvwgBgl2tLfMj2P4zhVDSLUqY8aOaI2zuVuLKncGT5ZsYLkzC9a7ap59SkEvg5wKDcGkor04CFb9gedXetHF7x4zh6m1Eog");
+            //request.AddHeader("Cookie", ".AspNetCore.Antiforgery.FHElugoL8ws=CfDJ8ML4BLgAq9lJmJpxAKvSYEz0j8fWp731M3vXH0c2v3Rn5rwpkNkVhJ1RkvwgBgl2tLfMj2P4zhVDSLUqY8aOaI2zuVuLKncGT5ZsYLkzC9a7ap59SkEvg5wKDcGkor04CFb9gedXetHF7x4zh6m1Eog");
             request.AlwaysMultipartFormData = true;
             request.AddParameter("encData", data.encdata);
             request.AddParameter("clientId", data.clientId);
