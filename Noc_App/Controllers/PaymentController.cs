@@ -14,6 +14,7 @@ using Noc_App.Models.IFMSPayment;
 using RestSharp;
 using HttpMethod = System.Net.Http.HttpMethod;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Noc_App.Controllers
 {
@@ -235,7 +236,7 @@ namespace Noc_App.Controllers
         public async Task<IActionResult> ChallanFormPost(IFMSHeader data)
         {
             try
-            {
+            {                
                 var options = new RestClientOptions(_configuration["IFMSPayOptions:PostUrl"])
                 {
                     MaxTimeout = -1,
@@ -254,15 +255,11 @@ namespace Noc_App.Controllers
                 if (response.IsSuccessful)
                 {
                     var content = response.Content.Replace("/eRctDeptInt", "https://ifmstg.punjab.gov.in/eRctDeptInt");
-                    //string resultContent = await ChallanVerify(cHeader);
-                    //ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
-                    //if(root.statusCode!= "SC300") return RedirectToAction("Failed", new { id = data.ApplicationId });
-                    //else
-                    //return RedirectToAction("ChallanFormPost", new { content = msg });
-                    TempData["Message"] = content;
-                    //ViewBag.HtmlContent = content;
+                    var url = "DistOptions.url = vdir + \"Server/SelectTel?DistCode=\" + $(\"#DistrictCode\").val()";
+                    var actual = "DistOptions.url = \"/Payment/TrpSarthi?DistCode=\" + $(\"#DistrictCode\").val()";
+                    
+                    TempData["Message"] = content.Replace(url,actual);
                     return RedirectToAction("ChallanForm", "Payment");
-                    //return View();
                 }
                 else
                 {
@@ -342,82 +339,6 @@ namespace Noc_App.Controllers
             var challanDetail = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == ResponseData.challandata.deptRefNo /*&& x.RequestStatus == "Fresh Request"*/)).FirstOrDefault();
 
             string id = challanDetail.ApplicationId;
-            ////IFMS_EncrDecr obj = new IFMS_EncrDecr();
-            ////sendClient data = new sendClient();
-            ////string encData = obj.Decrypt(model.data);
-            ////sendClient reqData = JsonConvert.DeserializeObject<sendClient>(encData);
-            //ViewBag.paymentid = "";
-            //ViewBag.amount = "";
-            //ViewBag.status = "success";
-            //return View();
-
-
-            //DepartmentDl dpt = new DepartmentDl();
-
-            //ifms_data objPayment = new ifms_data
-            //{
-            //    challandata = new Challandata()
-            //    {
-            //        deptRefNo = challanDetail.deptRefNo,
-            //        receiptNo = "",
-            //        clientId = settings.clientId,
-            //        challanDate = DateTime.Now.ToString("yyyy-MM-ddT00:00:00"),
-            //        expiryDate = DateTime.Now.ToString("yyyy-MM-ddT00:00:00"),
-            //        companyName = settings.companyName,
-            //        deptCode = settings.deptCode,
-            //        totalAmt = challanDetail.totalAmt.ToString(),
-            //        trsyAmt = challanDetail.trsyAmt.ToString(),
-            //        nonTrsyAmt = "0",
-            //        noOfTrans = "1",
-            //        ddoCode = settings.ddoCode,
-            //        payLocCode = settings.payLocCode,
-            //        add1 = challanDetail.add1,
-            //        add2 = challanDetail.add2,
-            //        add3 = challanDetail.add3,
-            //        add4 = challanDetail.add4,
-            //        add5 = challanDetail.add5,
-            //        sURL = challanDetail.sURL,
-            //        fURL = challanDetail.fURL,
-
-            //        payee_info = new PayeeInfo()
-            //        {
-            //            payerName = challanDetail.payerName,
-            //            teleNumber = challanDetail.teleNumber,
-            //            mobNumber = challanDetail.mobNumber,
-            //            emailId = challanDetail.emailId,
-            //            addLine1 = challanDetail.addLine1,
-            //            addLine2 = challanDetail.addLine2,
-            //            addPincode = challanDetail.addPincode,
-            //            district = challanDetail.district,
-            //            tehsil = challanDetail.tehsil,
-            //        },
-            //        trsyPayments = new List<trsyPayments>()
-            //                             {
-            //                             new trsyPayments(){
-            //                             Head= settings.trsyPaymentHead,
-            //                             amt= challanDetail.totalAmt.ToString()}
-            //                             }
-
-            //    }
-            //};
-            ////objPayment.challandata = dpt.FillChallanData();
-            //string json = JsonConvert.SerializeObject(objPayment.challandata);
-            //objPayment.chcksum = obj.CheckSum(json);
-            ////string jsonCHK = JsonConvert.SerializeObject(objPayment);
-            //string jsonCHK = JsonConvert.SerializeObject(objPayment);
-            //string encData = obj.Encrypt(jsonCHK);
-            //Checkdata cHeader = new Checkdata()
-            //{
-            //    encData = encData,
-            //    clientId = settings.clientId,
-            //    clientSecret = settings.clientSecret,
-            //    transactionID = challanDetail.deptRefNo,
-            //    ipAddress = settings.IpAddress,
-            //    integratingAgency = settings.IntegratingAgency
-            //};
-
-            //string resultContent = ChallanVerify(cHeader);
-            //ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
             if (ResponseData.challandata.bank_Res.status.ToLower() == "failure")
             {
                 challanDetail.RequestStatus = "Failed";
@@ -562,6 +483,29 @@ namespace Noc_App.Controllers
             {
                 ViewBag.ErrorMessage = ex.Message;
                 return View();
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> TrpSarthi(string DistCode)
+        {
+            try
+            {
+                var options2 = new RestClientOptions(_configuration["IFMSPayOptions:PostUrl"])
+                {
+                    MaxTimeout = -1,
+                };
+                var client2 = new RestClient(options2);
+                var request2 = new RestRequest("https://ifmstg.punjab.gov.in/eRctDeptInt/TrpSarthi/SelectTel?DistCode=" + DistCode, Method.Post);
+                RestResponse response2 = await client2.ExecuteAsync(request2);
+                List<tehsildetailViewModel> ResponseData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<tehsildetailViewModel>>(response2.Content);
+
+                return Json(ResponseData);
+            }
+            catch (Exception)
+            {
+                return Json(null);
             }
         }
     }
