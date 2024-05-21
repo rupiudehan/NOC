@@ -165,10 +165,10 @@ namespace Noc_App.Controllers
                         var role = (await userManager.GetRolesAsync(userDetail)).FirstOrDefault();
                         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
                         else {
-                            if (role.ToUpper() == "ADMINISTRATOR")
+                            //if (role.ToUpper() == "ADMINISTRATOR")
                                 return RedirectToAction("index", "home");
-                            else
-                                return RedirectToAction("Index", "ApprovalProcess");
+                            //else
+                            //    return RedirectToAction("Index", "ApprovalProcess");
                         }
                     }
 

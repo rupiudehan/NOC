@@ -63,6 +63,7 @@ namespace Noc_App.Controllers
                 string transaction = randomObj.Next(10, 100).ToString();
                 string transactionId = DateTime.Now.ToString("yyyyMMddHHmmssff") + transaction;
                 var d = HttpContext.Request.Host.Value;
+                var scheme=HttpContext.Request.Scheme;
                 //var base_url = "@Request.Url.GetLeftPart(UriPartial.Authority)@Url.Content("~/ ")";
                 //string domainName = Request.Url.GetLeftPart(UriPartial.Authority);
                 ifms_data objPayment = new ifms_data
@@ -87,8 +88,8 @@ namespace Noc_App.Controllers
                         add3 = _paymentRequest.Address,
                         add4 = "",
                         add5 = "",
-                        sURL = "http://" + d + Url.Action("succesfulURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),
-                        fURL = "http://" + d + Url.Action("failureURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),//"?failureURL",
+                        sURL = scheme+"://" + d + Url.Action("succesfulURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),
+                        fURL = scheme + "://" + d + Url.Action("failureURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),//"?failureURL",
 
                         payee_info = new PayeeInfo()
                         {
