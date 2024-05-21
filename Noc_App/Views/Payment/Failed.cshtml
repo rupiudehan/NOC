@@ -8,31 +8,40 @@
 <h1> Congratulations!</h1>
 @if (Model != null)
 {
-    <input hidden asp-for="Id" />
-    <p>
+    if (Model.Id != 0)
+    {
+        <input hidden asp-for="Id" />
+        <p>
 
-        @if (Model.OrderId != "0")
-        {
-            @:Your application has been received successfully. <br />Payment has been done with transaction number @Model.OrderId
-        }
-        else
-        {
-            @:Your application has been received successfully, but payment is <b style="color:red">unsuccessful</b>.
-            <br />
-            @:Your application will be processed only after successful payment.
-        }
-        <br /> Track its status with the following tracking number:<br />
-        <b style="color:#76ac23">
-            @Model.ApplicationID
-        </b>
-    </p>
-    <p>
-        <a asp-controller="Grant" asp-action="Search" asp-route-searchString="@Model.ApplicationID">Please Click here for payment</a>
-    </p>
-    <p>
-        <a asp-controller="Grant" asp-action="GeneratePdf" asp-route-Id="@Model.ApplicationID">Click here to download application</a>
-    </p>
-    <br />
+            @if (Model.OrderId != "0")
+            {
+                @:Your application has been received successfully. <br />Payment has been done with transaction number @Model.OrderId
+            }
+            else
+            {
+                @:Your application has been received successfully, but payment is <b style="color:red">unsuccessful</b>.
+                <br />
+                @:Your application will be processed only after successful payment.
+            }
+            <br /> Track its status with the following tracking number:<br />
+            <b style="color:#76ac23">
+                @Model.ApplicationID
+            </b>
+        </p>
+        <p>
+            <a asp-controller="Grant" asp-action="Search" asp-route-searchString="@Model.ApplicationID">Please Click here for payment</a>
+        </p>
+        <p>
+            <a asp-controller="Grant" asp-action="GeneratePdf" asp-route-Id="@Model.ApplicationID">Click here to download application</a>
+        </p>
+        <br />
+    }
+    else
+    {
+        <p>
+            Your application has been received successfully, but payment is <b style="color:red">unsuccessful</b>.
+        </p>
+    }
     <p>
         <a class="btn btn-secondary btn-user btn-block" asp-controller="Grant" asp-action="Create">Back</a>
     </p>

@@ -1,24 +1,209 @@
-﻿@* @model IEnumerable<Employee> *@
+﻿@model DashboardDropdownViewModelView
 @{
     // Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="card-deck">
-   
-    @* @foreach (Employee employee in Model)
-    {
-        var photoPath = "~/images/" + (employee.PhotoPath ?? "noimage.png");
-        <div class="card m-3">
-            <div class="card-header">
-                <h3>@employee.Name</h3>
-            </div>
-            <img class="card-img-top" width="50" height="300" src="@photoPath" asp-append-version="true" />
-            <div class="card-footer text-center">
-                <a asp-controller="home" asp-action="details" asp-route-id="@employee.Id" class="btn btn-primary">View</a>
-                <a asp-action="edit" asp-controller="home" asp-route-id="@employee.Id" class="btn btn-warning">Edit</a>
-                <a href="#" class="btn btn-danger">Delete</a>
-            </div>
+<h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+
+@if (Model != null)
+{
+    <div class="row">
+
+        <div class="col-lg-12">
+            @if (Model != null)
+            {
+                <div id="divLoader" style="display:none;text-align:center"> <img src="~/images/ajax-loader.gif" alt="Loader" /> </div>
+                <!-- Circle Buttons -->
+                <div class="card shadow mb-4 drpd">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Charts</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <input type="hidden" asp-for="RoleName" id="RoleName" />
+                                    <label asp-for="SelectedDivisionId" class="control-label">Division</label>
+                                    <select asp-for="SelectedDivisionId" id="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <input type="hidden" asp-for="RoleName" id="RoleName" />
+                                    <label asp-for="SelectedSubDivisionId" class="control-label"></label>
+                                    <select asp-for="SelectedSubDivisionId" id="SelectedSubDivisionId" asp-items="@Model.SubDivisions" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class=" col-md-12 barcontainer">
+                                <div id="chart_div" class="chart_wrap"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-    } *@
-</div>
+    </div>
+}
+@section  Scripts {
+    <script>
+        // $(window).resize(function () {
+        //     LoadBarPendancyChart();
+        // });
+        
+        google.charts.load('current', { packages: ['corechart', 'bar'], fontName: 'Arial' });
+        google.charts.setOnLoadCallback(drawMultSeries);
+        function drawMultSeries() {
+            var DivisionId = $('#SelectedDivisionId').val();
+            var subdivisionId = $('#SelectedSubDivisionId').val();
+            var role=$('#RoleName').val();
+            var options = {
+                title: 'Pendency Role Wise ',
+                width: 1440,
+                height: 700,
+                responsive:true,
+                hAxis: {
+                    title: 'Division',
+                    bar: { groupWidth: '35%' },
+                },
+                vAxis: {
+                    title: 'Pending Applications To Forward (in numbers)', format: ''
+                },
+            };
+            $("#divLoader").show(); $('.barcontainer,.drpd').hide();
+            $.ajax({
+                type: "POST",
+                url: "/Home/GetPendency",
+                data: '{divisionId:' + DivisionId + ',subdivisionId:' + subdivisionId + '}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async:true,
+                complete: function (r) {
+                    $("#divLoader").hide();
+                    $('.barcontainer,.drpd').show();
+                    $(".barcontainer text:contains('0')").each(function () {
+                        var text = $(this).text();
+                        if (text == '0') $(this).hide();
+                    });
+
+                },
+                success: function (r) {
+                    var isValidNumNonZero = 0
+                    var values = '[';
+                    var outervalues = '';
+                    $.each(r, function (key, value) {
+                        $.each(value, function (key1, value1) {
+
+                            if (!isNaN(value1)) { if (value1 != '0') isValidNumNonZero = 1 }
+                        });
+                        if (isValidNumNonZero == 1) {
+                            $("#chart_div").show();
+
+                            var data = google.visualization.arrayToDataTable(r);
+
+                            var totalColumns = data['bf'].length - 1
+                            var view = new google.visualization.DataView(data);
+                            var columns = [];
+                            for (var i = 0; i <= totalColumns; i++) {
+                                if (i > 0) {
+                                    columns.push(i);
+                                    columns.push({
+                                        calc: "stringify",
+                                        sourceColumn: i,
+                                        type: "string",
+                                        role: "annotation"
+                                    });
+
+                                } else {
+                                    columns.push(i);
+                                }
+                            }
+
+                            view.setColumns(columns);
+                            var chart = new google.visualization.ColumnChart($("#chart_div")[0]);
+                            chart.draw(view, options);
+                            google.visualization.events.addListener(chart, 'select', setOption);
+                            function setOption(e) {
+                                var selection = chart.getSelection();
+                                item = selection[0]
+                                var column = 0;
+                                if (selection.length > 0) {
+                                    if ((item.column) == 1)
+                                        column = item.column;
+                                    else if ((item.column - 1) == 2)
+                                        column = item.column - 1;
+                                    else if ((item.column - 2) == 3)
+                                        column = item.column - 2;
+                                    else if ((item.column - 3) == 4)
+                                        column = item.column - 3;
+                                    else if ((item.column - 4) == 5)
+                                        column = item.column - 4;
+                                    else if ((item.column - 5) == 6)
+                                        column = item.column - 5;
+                                    else if ((item.column - 6) == 7)
+                                        column = item.column - 6;
+                                    else if ((item.column - 7) == 8)
+                                        column = item.column - 7;
+                                    var category = data.getValue(item.row, 0);
+                                    //LoadReport(DisciplinaryActionID, category, data['bf'][column]['label'], ProcessedBy);
+                                } //else $("#myModal").modal();
+                            }
+                        } else $("#chart_div").hide();
+                    });
+                },
+                failure: function (r) {
+                    alert(JSON.stringify(r))
+                },
+                error: function (r) {
+                    alert(r.d);
+                }
+            });
+        }
+
+        function LoadBarPendancyChart() {
+            // google.charts.load('current', { packages: ['corechart', 'bar'] });
+            // google.charts.setOnLoadCallback(drawMultSeries);
+
+            drawMultSeries();
+        }
+        function populateDropdown(data, dropdownId) {
+            var dropdown = $("#Selected" + dropdownId);
+            dropdown.html('<option value="">Select</option>');
+            $.each(data, function (key, value) {
+                console.log(value);
+                dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
+            });
+        }
+        $(function () {
+            $("#SelectedDivisionId").change(function () {
+                var divisionId = $(this).val();
+                $.ajax({
+                    url: "/Home/GetSubDivisions",
+                    type: "POST",
+                    data: { divisionId: divisionId },
+                    success: function (data) {
+                        populateDropdown(data, "SubDivisionId");
+                        //LoadBarPendancyChart();
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+            $("#SelectedSubDivisionId").change(function () {
+                LoadBarPendancyChart();
+            });
+        });
+        // Notice that e is not used or needed.
+
+    </script>
+}
+

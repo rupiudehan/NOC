@@ -726,12 +726,24 @@ namespace Noc_App.Controllers
                                     DivisionDetails applicantdiv = await _divisionRepo.GetByIdAsync(model.SelectedDivisionId ?? 0);
                                     PaymentRequest paymentRequestDetail = new PaymentRequest
                                     {
-                                        Name = model.ApplicantName,
+                                        Name = model.Name,
+                                        PayerName = model.Owners.FirstOrDefault().Name,
+                                        MobileNo= viewModel.Owners.FirstOrDefault().MobileNo,
                                         Email = model.ApplicantEmailID,
                                         Address = "Division:" + applicantdiv.Name + ",Sub-Division:" + applicantsubdiv.Name + ",Tehsil/Block:" + applicantteh.Name + ",Village:" + applicantVillage.Name + ",Pincode:" + applicantVillage.PinCode,
                                         Amount = TotalPayment,
                                         GrantId = obj.Id,
-                                        ApplicationId = obj.ApplicationID
+                                        ApplicationId = obj.ApplicationID,
+                                        DistrictId="27",
+                                        Hadbast= model.Hadbast,
+                                        PhoneNumber= viewModel.Owners.FirstOrDefault().MobileNo,
+                                        Pincode= applicantVillage.PinCode.ToString(),
+                                        PlotNo= model.PlotNo != null && model.PlotNo !=""?model.PlotNo:"0",
+                                        TehsilId="255",
+                                        Division=applicantdiv.Name,
+                                        SubDivision=applicantsubdiv.Name,
+                                        Tehsil=applicantteh.Name,
+                                        Village=applicantVillage.Name
                                     };
                                     return RedirectToAction("Index", "Payment", paymentRequestDetail);
                                 }

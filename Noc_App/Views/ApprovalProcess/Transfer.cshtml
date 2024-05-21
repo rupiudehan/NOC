@@ -17,6 +17,7 @@
             <div class="card-body">
                 <form class="user" asp-action="Transfer" method="post">
                     <input type="hidden" asp-for="id" />
+                    <input type="hidden" asp-for="ApprovalId" />
                     <div class="row">
                         <div class="col-lg-3">
                             <div class="form-group">
@@ -39,11 +40,18 @@
                                 <span asp-validation-for="LocationDetails" class="text-danger"></span>
                             </div>
                         </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="CurrentOfficer" class="control-label">Project</label>
+                                <input asp-for="CurrentOfficer" readonly class="form-control form-control-user" />
+                                <span asp-validation-for="CurrentOfficer" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>                    
                     <div class="row">
                         <div class="col-lg-3">
                             <div class="form-group">
-                                <label asp-for="SelectedSubDivisionId" class="control-label">@Model.SubDivisions</label>
+                                <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
                                 @if (Model.SubDivisions != null)
                                 {
                                     @if (Model.SubDivisions.Count() > 0)
@@ -101,13 +109,6 @@
                     <div class="row">
                        
                         @if (Model.SubDivisions.Count() <=0)
-                        {
-                            <div class="col-lg-6 offset-lg-3">
-                                <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
-                            </div>
-                        }
-                         
-                        else @if (Model.Officers.Count() <= 0)
                         {
                             <div class="col-lg-6 offset-lg-3">
                                 <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>

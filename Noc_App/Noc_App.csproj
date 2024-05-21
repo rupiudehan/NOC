@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\ApprovalProcessController - Copy.cs" />
+    <Compile Remove="Models\IFMSPayment\LoggingMiddleware.cs" />
     <Compile Remove="Models\Repository\SqlEmployeeRepository.cs" />
   </ItemGroup>
 

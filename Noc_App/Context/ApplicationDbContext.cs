@@ -37,10 +37,12 @@ namespace Noc_App.Context
         public DbSet<GrantApprovalDetail> GrantApprovalDetails { get; set; }
         public DbSet<GrantApprovalProcessDocumentsDetails> GrantApprovalProcessDocumentsDetails { get; set; }
         public DbSet<SiteUnitMaster> SiteUnitMaster { get; set; }
+        public DbSet<ChallanDetails> ChallanDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GrantUnprocessedAppDetails>().HasNoKey();
+            modelBuilder.Entity<DashboardPendencyAll>().HasNoKey();
             modelBuilder.Entity<UserDivision>()
             .HasKey(ud => new { ud.UserId, ud.DivisionId });
 

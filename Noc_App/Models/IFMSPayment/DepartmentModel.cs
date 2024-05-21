@@ -85,6 +85,7 @@
             public string dateTime { get; set; }
             public string ApplicationId { get; set; }
             public string encdata { get; set; }
+            public long ChallanId { get; set; }
         }
         public class ClientHeader
         {

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Noc_App.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240515111227_addedupdatedoninapproval")]
+    partial class addedupdatedoninapproval
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,106 +219,6 @@ namespace NocApp.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Noc_App.Models.ChallanDetails", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("ApplicationId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RequestStatus")
-                        .HasColumnType("text");
-
-                    b.Property<string>("add1")
-                        .HasColumnType("text");
-
-                    b.Property<string>("add2")
-                        .HasColumnType("text");
-
-                    b.Property<string>("add3")
-                        .HasColumnType("text");
-
-                    b.Property<string>("add4")
-                        .HasColumnType("text");
-
-                    b.Property<string>("add5")
-                        .HasColumnType("text");
-
-                    b.Property<string>("addLine1")
-                        .HasColumnType("text");
-
-                    b.Property<string>("addLine2")
-                        .HasColumnType("text");
-
-                    b.Property<string>("addPincode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("challanDate")
-                        .HasColumnType("text");
-
-                    b.Property<string>("companyName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ddoCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("deptCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("deptRefNo")
-                        .HasColumnType("text");
-
-                    b.Property<string>("district")
-                        .HasColumnType("text");
-
-                    b.Property<string>("emailId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("expiryDate")
-                        .HasColumnType("text");
-
-                    b.Property<string>("fURL")
-                        .HasColumnType("text");
-
-                    b.Property<string>("mobNumber")
-                        .HasColumnType("text");
-
-                    b.Property<string>("noOfTrans")
-                        .HasColumnType("text");
-
-                    b.Property<string>("nonTrsyAmt")
-                        .HasColumnType("text");
-
-                    b.Property<string>("payLocCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("payerName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("sURL")
-                        .HasColumnType("text");
-
-                    b.Property<string>("tehsil")
-                        .HasColumnType("text");
-
-                    b.Property<string>("teleNumber")
-                        .HasColumnType("text");
-
-                    b.Property<string>("totalAmt")
-                        .HasColumnType("text");
-
-                    b.Property<string>("trsyAmt")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ChallanDetails");
                 });
 
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>
@@ -656,19 +559,16 @@ namespace NocApp.Migrations
                     b.Property<int>("GrantID")
                         .HasColumnType("integer");
 
-                    b.Property<string>("PayerEmail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PayerName")
-                        .HasColumnType("text");
-
                     b.Property<string>("PaymentOrderId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Paymentstatus")
                         .HasColumnType("text");
 
                     b.Property<decimal?>("TotalAmount")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("deptRefNo")
+                    b.Property<string>("paymentid")
                         .HasColumnType("text");
 
                     b.HasKey("Id");

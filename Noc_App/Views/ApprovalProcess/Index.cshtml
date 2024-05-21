@@ -210,6 +210,7 @@
                                                 <th>Forwarded To Role</th>
                                                 <th>Forwarded To User</th>
                                                 <th>View</th>
+                                                <th>Action</th>
 
                                             </tr>
                                         </thead>
@@ -257,6 +258,9 @@
                                                     }
                                                     <td>
                                                         <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
+                                                    </td>
+                                                    <td>
+                                                        <a asp-action="Transfer" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Transfer</a>
                                                     </td>
 
                                                 </tr>

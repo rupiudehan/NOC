@@ -21,5 +21,7 @@ namespace Noc_App.Models.ViewModel
         public string SelectedOfficerId { get; set; }
         public IEnumerable<SelectListItem> Officers { get; set; }
         public string LocationDetails { get; set; }
+        public string CurrentOfficer { get; set; }
+        public long ApprovalId { get; set; }
     }
 }

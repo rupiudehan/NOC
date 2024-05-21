@@ -19,5 +19,6 @@ namespace Noc_App.Models
         public string ProcessedBy { get; set; }
         public string ProcessedByRole { get; set; }
         public DateTime ProcessedOn { get; set; } = DateTime.Now;
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
     }
 }

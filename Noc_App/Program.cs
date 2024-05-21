@@ -70,6 +70,8 @@ builder.Services.AddScoped<IRepository<GrantApprovalProcessDocumentsDetails>, Re
 builder.Services.AddScoped<IRepository<GrantApprovalMaster>, Repository<GrantApprovalMaster>>();
 builder.Services.AddScoped<IRepository<GrantUnprocessedAppDetails>, Repository<GrantUnprocessedAppDetails>>();
 builder.Services.AddScoped<IRepository<SiteUnitMaster>, Repository<SiteUnitMaster>>();
+builder.Services.AddScoped<IRepository<ChallanDetails>, Repository<ChallanDetails>>();
+builder.Services.AddScoped<IRepository<DashboardPendencyAll>, Repository<DashboardPendencyAll>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -128,5 +130,5 @@ app.MapControllerRoute(
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 app.UseRotativa();
-
+//app.UseMiddleware<LoggingMiddleware>();
 app.Run();

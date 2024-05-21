@@ -5,22 +5,15 @@ using Noc_App.Models.interfaces;
 using Noc_App.Models;
 using Noc_App.Models.Payment;
 using Noc_App.UtilityService;
-using Noc_App.Clients;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Noc_App.Models.ViewModel;
 using static Noc_App.Models.IFMSPayment.DepartmentModel;
 using Newtonsoft.Json;
 using Noc_App.PaymentUtilities;
-using Microsoft.AspNetCore.DataProtection;
-using System.Runtime;
 using System.Text;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 using Noc_App.Models.IFMSPayment;
-using Org.BouncyCastle.Asn1.Cmp;
-using Org.BouncyCastle.Asn1.Crmf;
-using Razorpay.Api;
 using RestSharp;
 using HttpMethod = System.Net.Http.HttpMethod;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Noc_App.Controllers
 {
@@ -33,24 +26,26 @@ namespace Noc_App.Controllers
         private readonly IConfiguration _configuration;
         private readonly IRepository<GrantPaymentDetails> _repoPayment;
         private readonly IRepository<GrantDetails> _repo;
-        public PaymentController(ILogger<PaymentController> logger, IRepository<GrantDetails> repo, IRepository<GrantPaymentDetails> repoPayment, IPaymentService service, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        private readonly IRepository<ChallanDetails> _repoChallanDetails;
+        public PaymentController(ILogger<PaymentController> logger, IRepository<GrantDetails> repo, IRepository<GrantPaymentDetails> repoPayment, IPaymentService service, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IRepository<ChallanDetails> repoChallanDetails)
         {
             _logger = logger;
             _service = service;
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _repoPayment = repoPayment;
-            _repo=repo;
+            _repo = repo;
+            _repoChallanDetails = repoChallanDetails;
         }
 
         [AllowAnonymous]
         [Obsolete]
-        public IActionResult ProcessChallan(PaymentRequest _paymentRequest)
+        public async Task<IActionResult> ProcessChallan(PaymentRequest _paymentRequest)
         {
             try
             {
                 IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
-                    _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"], 
+                    _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
                     _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
                     _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
                     , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
@@ -64,9 +59,11 @@ namespace Noc_App.Controllers
 
                 IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
                 Random randomObj = new Random();
-                //string transactionId = randomObj.Next(10000000, 100000000).ToString();
-                string transactionId = DateTime.Now.ToString("yyyyMMddHHmmssff");
-
+                string transaction = randomObj.Next(10, 100).ToString();
+                string transactionId = DateTime.Now.ToString("yyyyMMddHHmmssff") + transaction;
+                var d = HttpContext.Request.Host.Value;
+                //var base_url = "@Request.Url.GetLeftPart(UriPartial.Authority)@Url.Content("~/ ")";
+                //string domainName = Request.Url.GetLeftPart(UriPartial.Authority);
                 ifms_data objPayment = new ifms_data
                 {
                     challandata = new Challandata()
@@ -85,13 +82,12 @@ namespace Noc_App.Controllers
                         ddoCode = settings.ddoCode,
                         payLocCode = settings.payLocCode,
                         add1 = _paymentRequest.Hadbast,
-                       // add2 = _paymentRequest.PlotNo,
-                        add2 = "",
+                         add2 = _paymentRequest.PlotNo,
                         add3 = _paymentRequest.Address,
                         add4 = "",
                         add5 = "",
-                        sURL = Url.Action("succesfulURL", "Payment", new { id = _paymentRequest.ApplicationId }),
-                        fURL = Url.Action("succesfulURL", "Payment", new { id = _paymentRequest.ApplicationId }),//"?failureURL",
+                        sURL = "http://" + d + Url.Action("succesfulURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),
+                        fURL = "http://" + d + Url.Action("failureURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),//"?failureURL",
 
                         payee_info = new PayeeInfo()
                         {
@@ -114,7 +110,7 @@ namespace Noc_App.Controllers
                                          Head= settings.trsyPaymentHead,
                                          amt= _paymentRequest.Amount.ToString()}
                                          }
-                        
+
                     }
                 };
                 //objPayment.challandata = dpt.FillChallanData();
@@ -133,21 +129,56 @@ namespace Noc_App.Controllers
                 cHeader.integratingAgency = settings.IntegratingAgency;
                 cHeader.encdata = encData;
                 cHeader.ApplicationId = _paymentRequest.ApplicationId;
+                ChallanDetails data = new ChallanDetails
+                {
+                    addLine1 = objPayment.challandata.payee_info.addLine1,
+                    addLine2 = objPayment.challandata.payee_info.addLine2,
+                    addPincode = objPayment.challandata.payee_info.addPincode,
+                    totalAmt = objPayment.challandata.totalAmt,
+                    ApplicationId = _paymentRequest.ApplicationId,
+                    challanDate = objPayment.challandata.challanDate,
+                    companyName = objPayment.challandata.companyName,
+                    ddoCode = objPayment.challandata.ddoCode,
+                    deptCode = objPayment.challandata.deptCode,
+                    deptRefNo = objPayment.challandata.deptRefNo,
+                    district = objPayment.challandata.payee_info.district,
+                    emailId = objPayment.challandata.payee_info.emailId,
+                    expiryDate = objPayment.challandata.expiryDate,
+                    fURL = objPayment.challandata.fURL,
+                    mobNumber = objPayment.challandata.payee_info.mobNumber,
+                    nonTrsyAmt = objPayment.challandata.nonTrsyAmt,
+                    noOfTrans = objPayment.challandata.noOfTrans,
+                    payerName = objPayment.challandata.payee_info.payerName,
+                    payLocCode = objPayment.challandata.payLocCode,
+                    sURL = objPayment.challandata.sURL,
+                    tehsil = objPayment.challandata.payee_info.tehsil,
+                    teleNumber = objPayment.challandata.payee_info.teleNumber,
+                    trsyAmt = objPayment.challandata.trsyAmt,
+                    RequestStatus = "Fresh Request",
+                    add1 = objPayment.challandata.add1,
+                    add2 = objPayment.challandata.add2,
+                    add3 = objPayment.challandata.add3,
+                    add4 = objPayment.challandata.add4,
+                    add5 = objPayment.challandata.add5
+                };
+                await _repoChallanDetails.CreateAsync(data);
+                cHeader.ChallanId = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == objPayment.challandata.deptRefNo)).FirstOrDefault().Id;
+                ViewBag.HtmlStr = PreparePOSTForm("ChallanFormPost", encData, cHeader, _paymentRequest.ApplicationId);
                 return View(cHeader);
-                //ViewBag.HtmlStr = PreparePOSTForm("ChallanFormPost", encData, cHeader, _paymentRequest.ApplicationId);
-               // hrmsView pay = new hrmsView();
+                //
+                // hrmsView pay = new hrmsView();
                 //pay.encdata = encData;
                 //return View();
             }
             catch (Exception ex)
             {
 
-               // return ex.Message;
+                // return ex.Message;
             }
             return View();
         }
 
-        private string PreparePOSTForm(string url, string encData, IFMSHeader cHeader,string GrantId)
+        private string PreparePOSTForm(string url, string encData, IFMSHeader cHeader, string GrantId)
         // post form
         {
             try
@@ -165,6 +196,8 @@ namespace Noc_App.Controllers
                cHeader.clientId);
                 sb.AppendFormat("<input type='hidden' name='ApplicationId' value='{0}'/>",
                GrantId);
+                sb.AppendFormat("<input type='hidden' name='ChallanId' value='{0}'/>",
+               cHeader.ChallanId);
                 sb.AppendFormat("<input type='hidden' name='clientSecret' value='{0}'/>",
                cHeader.clientSecret);
                 sb.AppendFormat("<input type='hidden' name='integratingAgency' value = '{0}' /> ", cHeader.integratingAgency);
@@ -201,63 +234,47 @@ namespace Noc_App.Controllers
         [HttpPost]
         public async Task<IActionResult> ChallanFormPost(IFMSHeader data)
         {
-            var options = new RestClientOptions(_configuration["IFMSPayOptions:PostUrl"])
+            try
             {
-                MaxTimeout = -1,
-            };
-            var client = new RestSharp.RestClient(options);
-            var request = new RestRequest(_configuration["IFMSPayOptions:PostUrl"], Method.Post);
-            //request.AddHeader("Cookie", ".AspNetCore.Antiforgery.FHElugoL8ws=CfDJ8ML4BLgAq9lJmJpxAKvSYEz0j8fWp731M3vXH0c2v3Rn5rwpkNkVhJ1RkvwgBgl2tLfMj2P4zhVDSLUqY8aOaI2zuVuLKncGT5ZsYLkzC9a7ap59SkEvg5wKDcGkor04CFb9gedXetHF7x4zh6m1Eog");
-            request.AlwaysMultipartFormData = true;
-            request.AddParameter("encData", data.encdata);
-            request.AddParameter("clientId", data.clientId);
-            request.AddParameter("clientSecret", data.clientSecret);
-            request.AddParameter("integratingAgency", data.integratingAgency);
-            request.AddParameter("ipAddress", data.ipAddress);
-            request.AddParameter("transactionID", data.transactionID);
-            RestResponse response = await client.ExecuteAsync(request);
-            if (response.IsSuccessful)
-            {
-                var content = response.Content.Replace("/eRctDeptInt", "https://ifmstg.punjab.gov.in/eRctDeptInt");
-                //string resultContent = await ChallanVerify(cHeader);
-                //ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
-                //if(root.statusCode!= "SC300") return RedirectToAction("Failed", new { id = data.ApplicationId });
-                //else
-                //return RedirectToAction("ChallanFormPost", new { content = msg });
-                TempData["Message"] = content;
-                //ViewBag.HtmlContent = content;
-                return RedirectToAction("ChallanForm");
-                //return View();
+                var options = new RestClientOptions(_configuration["IFMSPayOptions:PostUrl"])
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestSharp.RestClient(options);
+                var request = new RestRequest(_configuration["IFMSPayOptions:PostUrl"], Method.Post);
+                //request.AddHeader("Cookie", ".AspNetCore.Antiforgery.FHElugoL8ws=CfDJ8ML4BLgAq9lJmJpxAKvSYEz0j8fWp731M3vXH0c2v3Rn5rwpkNkVhJ1RkvwgBgl2tLfMj2P4zhVDSLUqY8aOaI2zuVuLKncGT5ZsYLkzC9a7ap59SkEvg5wKDcGkor04CFb9gedXetHF7x4zh6m1Eog");
+                request.AlwaysMultipartFormData = true;
+                request.AddParameter("encData", data.encdata);
+                request.AddParameter("clientId", data.clientId);
+                request.AddParameter("clientSecret", data.clientSecret);
+                request.AddParameter("integratingAgency", data.integratingAgency);
+                request.AddParameter("ipAddress", data.ipAddress);
+                request.AddParameter("transactionID", data.transactionID);
+                RestResponse response = await client.ExecuteAsync(request);
+                if (response.IsSuccessful)
+                {
+                    var content = response.Content.Replace("/eRctDeptInt", "https://ifmstg.punjab.gov.in/eRctDeptInt");
+                    //string resultContent = await ChallanVerify(cHeader);
+                    //ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
+                    //if(root.statusCode!= "SC300") return RedirectToAction("Failed", new { id = data.ApplicationId });
+                    //else
+                    //return RedirectToAction("ChallanFormPost", new { content = msg });
+                    TempData["Message"] = content;
+                    //ViewBag.HtmlContent = content;
+                    return RedirectToAction("ChallanForm", "Payment");
+                    //return View();
+                }
+                else
+                {
+                    // Handle unsuccessful response
+                    return RedirectToAction("Failed", new { id = data.ApplicationId });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Handle unsuccessful response
-                return RedirectToAction("Failed", new { id = data.ApplicationId });
+                ModelState.AddModelError("", ex.Message);
+                return View();
             }
-            //Checkdata cHeader = new Checkdata { 
-            //    clientId=data.clientId,
-            //    clientSecret=data.clientSecret,
-            //    encData=data.encdata,
-            //    integratingAgency=data.integratingAgency,
-            //    ipAddress= data.ipAddress,
-            //    transactionID=data.transactionID
-            //};
-            //var reqData = JsonConvert.SerializeObject(cHeader);
-            //HttpResponseMessage resMsg = await ExecuteAPI(_configuration["IFMSPayOptions:PostUrl"],reqData);
-            //if (resMsg.IsSuccessStatusCode)
-            //{
-            //    var msg= resMsg.Content.ReadAsStringAsync().Result;
-            //    //string resultContent = await ChallanVerify(cHeader);
-            //    //ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
-            //    //if(root.statusCode!= "SC300") return RedirectToAction("Failed", new { id = data.ApplicationId });
-            //    //else
-            //    return RedirectToAction("Success", new { GrantId = data.ApplicationId });
-            //}
-            //else
-            //{
-            //    // Handle unsuccessful response
-            //    return RedirectToAction("Failed", new { id = data.ApplicationId });
-            //}
         }
 
         public string ChallanVerify(/*ifms_data dataFrm*/Checkdata cHeader)
@@ -287,7 +304,7 @@ namespace Noc_App.Controllers
             //    integratingAgency = _configuration["IFMSPayOptions:integratingAgency"]
             //};
             var reqData = JsonConvert.SerializeObject(cHeader);
-            HttpResponseMessage resMsg = ExecuteAPI(_configuration["IFMSPayOptions:Verify"],reqData);
+            HttpResponseMessage resMsg = ExecuteAPI(_configuration["IFMSPayOptions:Verify"], reqData);
             string retJson = resMsg.Content.ReadAsStringAsync().Result;
             return retJson;
 
@@ -298,16 +315,33 @@ namespace Noc_App.Controllers
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, URL);
-            request.Content = new StringContent(PostData, Encoding.UTF8,"application/json");
-            HttpContent inputContent = new StringContent(PostData, Encoding.UTF8,"application/json");
+            request.Content = new StringContent(PostData, Encoding.UTF8, "application/json");
+            HttpContent inputContent = new StringContent(PostData, Encoding.UTF8, "application/json");
             HttpResponseMessage response = client.PostAsync(URL, inputContent).Result;
             return response;
         }
 
-
+        [Obsolete]
+        [AllowAnonymous]
         [HttpPost]
-        public ActionResult succesfulURL([FromForm] string id)
+        public async Task<ActionResult> succesfulURL([FromForm] Checkdata model)
         {
+            IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
+                    _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
+                    _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
+                    _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
+                    , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
+                    , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+
+            string ChecksumKey = settings.ChecksumKey;
+            string edKey = settings.edKey;
+            string edIV = settings.edIV;
+            IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+            var detail = obj.Decrypt(model.encData);
+            ifms_dataRes ResponseData = Newtonsoft.Json.JsonConvert.DeserializeObject<ifms_dataRes>(detail);
+            var challanDetail = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == ResponseData.challandata.deptRefNo /*&& x.RequestStatus == "Fresh Request"*/)).FirstOrDefault();
+
+            string id = challanDetail.ApplicationId;
             ////IFMS_EncrDecr obj = new IFMS_EncrDecr();
             ////sendClient data = new sendClient();
             ////string encData = obj.Decrypt(model.data);
@@ -316,19 +350,143 @@ namespace Noc_App.Controllers
             //ViewBag.amount = "";
             //ViewBag.status = "success";
             //return View();
-            return RedirectToAction("Index", "Grant", new { Id = id });
+
+
+            //DepartmentDl dpt = new DepartmentDl();
+
+            //ifms_data objPayment = new ifms_data
+            //{
+            //    challandata = new Challandata()
+            //    {
+            //        deptRefNo = challanDetail.deptRefNo,
+            //        receiptNo = "",
+            //        clientId = settings.clientId,
+            //        challanDate = DateTime.Now.ToString("yyyy-MM-ddT00:00:00"),
+            //        expiryDate = DateTime.Now.ToString("yyyy-MM-ddT00:00:00"),
+            //        companyName = settings.companyName,
+            //        deptCode = settings.deptCode,
+            //        totalAmt = challanDetail.totalAmt.ToString(),
+            //        trsyAmt = challanDetail.trsyAmt.ToString(),
+            //        nonTrsyAmt = "0",
+            //        noOfTrans = "1",
+            //        ddoCode = settings.ddoCode,
+            //        payLocCode = settings.payLocCode,
+            //        add1 = challanDetail.add1,
+            //        add2 = challanDetail.add2,
+            //        add3 = challanDetail.add3,
+            //        add4 = challanDetail.add4,
+            //        add5 = challanDetail.add5,
+            //        sURL = challanDetail.sURL,
+            //        fURL = challanDetail.fURL,
+
+            //        payee_info = new PayeeInfo()
+            //        {
+            //            payerName = challanDetail.payerName,
+            //            teleNumber = challanDetail.teleNumber,
+            //            mobNumber = challanDetail.mobNumber,
+            //            emailId = challanDetail.emailId,
+            //            addLine1 = challanDetail.addLine1,
+            //            addLine2 = challanDetail.addLine2,
+            //            addPincode = challanDetail.addPincode,
+            //            district = challanDetail.district,
+            //            tehsil = challanDetail.tehsil,
+            //        },
+            //        trsyPayments = new List<trsyPayments>()
+            //                             {
+            //                             new trsyPayments(){
+            //                             Head= settings.trsyPaymentHead,
+            //                             amt= challanDetail.totalAmt.ToString()}
+            //                             }
+
+            //    }
+            //};
+            ////objPayment.challandata = dpt.FillChallanData();
+            //string json = JsonConvert.SerializeObject(objPayment.challandata);
+            //objPayment.chcksum = obj.CheckSum(json);
+            ////string jsonCHK = JsonConvert.SerializeObject(objPayment);
+            //string jsonCHK = JsonConvert.SerializeObject(objPayment);
+            //string encData = obj.Encrypt(jsonCHK);
+            //Checkdata cHeader = new Checkdata()
+            //{
+            //    encData = encData,
+            //    clientId = settings.clientId,
+            //    clientSecret = settings.clientSecret,
+            //    transactionID = challanDetail.deptRefNo,
+            //    ipAddress = settings.IpAddress,
+            //    integratingAgency = settings.IntegratingAgency
+            //};
+
+            //string resultContent = ChallanVerify(cHeader);
+            //ResponseDetail root = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseDetail>(resultContent);
+            if (ResponseData.challandata.bank_Res.status.ToLower() == "failure")
+            {
+                challanDetail.RequestStatus = "Failed";
+                await _repoChallanDetails.UpdateAsync(challanDetail);
+                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+            }
+            else if (ResponseData.challandata.bank_Res.status.ToLower() == "pending")
+            {
+                challanDetail.RequestStatus = "Pending";
+                await _repoChallanDetails.UpdateAsync(challanDetail);
+                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+            }
+            else
+            {
+                challanDetail.RequestStatus = "Successful";
+                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                GrantPaymentDetails payment = new GrantPaymentDetails
+                {
+                    deptRefNo = challanDetail.deptRefNo,
+                    GrantID = grant.Id,
+                    PayerEmail = challanDetail.emailId,
+                    PayerName = challanDetail.payerName,
+                    PaymentOrderId = challanDetail.deptRefNo,
+                    TotalAmount = Convert.ToDecimal(challanDetail.totalAmt),
+                    CreatedOn = DateTime.Now
+
+                };
+                await _repoPayment.CreateAsync(payment);
+                await _repoChallanDetails.UpdateAsync(challanDetail);
+                return RedirectToAction("Index", "Grant", new { Id = id });
+            }
         }
+        [AllowAnonymous]
         [HttpPost]
-        public ActionResult failureURL([FromForm] Checkdata model)
+        public async Task<ActionResult> failureURL([FromForm] Checkdata model)
         {
             //IFMS_EncrDecr obj = new IFMS_EncrDecr();
             //sendClient data = new sendClient();
             //string encData = obj.Decrypt(model.data);
             //sendClient reqData = JsonConvert.DeserializeObject<sendClient>(encData);
-            ViewBag.paymentid = "";
-            ViewBag.amount = "";
-            ViewBag.status = "failure";
-            return View();
+            IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
+                    _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
+                    _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
+                    _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
+                    , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
+                    , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+
+            string ChecksumKey = settings.ChecksumKey;
+            string edKey = settings.edKey;
+            string edIV = settings.edIV;
+            IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+            var detail = obj.Decrypt(model.encData);
+            ifms_dataRes ResponseData = Newtonsoft.Json.JsonConvert.DeserializeObject<ifms_dataRes>(detail);
+            var challanDetail = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == ResponseData.challandata.deptRefNo /*&& x.RequestStatus == "Fresh Request"*/)).FirstOrDefault();
+
+            string id = challanDetail.ApplicationId;
+            if (ResponseData.challandata.bank_Res.desc == "failure")
+            {
+                challanDetail.RequestStatus = "Failed";
+                await _repoChallanDetails.UpdateAsync(challanDetail);
+                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+            }
+            else if (ResponseData.challandata.bank_Res.desc == "Pending")
+            {
+                challanDetail.RequestStatus = "Pending";
+                await _repoChallanDetails.UpdateAsync(challanDetail);
+                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+            }
+            return View(model);
         }
 
         [AllowAnonymous]
@@ -336,44 +494,7 @@ namespace Noc_App.Controllers
         {
             return View(_paymentRequest);
         }
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<IActionResult> ProcessRequestOrder(PaymentRequest _paymentRequest)
-        {
-            PaymentConfig settings = new PaymentConfig(_configuration["RazorPayOptions:ClientId"], _configuration["RazorPayOptions:ClientSecret"]);
-            
-            GrantNocPaymentOrderDetail _orderDetail = await _service.ProcessMerchantOrder(_paymentRequest, settings);
-            ViewBag.GrantId=_orderDetail.GrantId;
-            return View("Payment", _orderDetail);
-        }
-        [AllowAnonymous]
-        [HttpPost]
-        public async Task<IActionResult> CompleteOrderProcess(int Itemid)
-        {
-            PaymentConfig settings = new PaymentConfig(_configuration["RazorPayOptions:ClientId"], _configuration["RazorPayOptions:ClientSecret"]);
-            GrantDetails grant= await _repo.GetByIdAsync(Itemid);
-            var detail = _service.CompleteOrderProcess(_httpContextAccessor, Itemid, settings);
-            var paymentDetails = new GrantPaymentDetails
-            {
-                CreatedOn = DateTime.Now,
-                TotalAmount = Convert.ToDecimal(detail.Amount),
-                PaymentOrderId = detail.OrderId,
-                paymentid = detail.PaymentId,
-                Paymentstatus = "A",
-                GrantID=detail.GrantId
-            };
 
-            await _repoPayment.CreateAsync(paymentDetails);
-            string PaymentMessage = detail.Status;
-            if (PaymentMessage == "captured")
-            {
-                return RedirectToAction("Success", new {id= grant.ApplicationID });
-            }
-            else
-            {
-                return RedirectToAction("Failed", new { id = grant.ApplicationID });
-            }
-        }
         [AllowAnonymous]
         public IActionResult Success(string GrantId)
         {
@@ -384,37 +505,57 @@ namespace Noc_App.Controllers
         {
             try
             {
-                GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == id.ToLower())).FirstOrDefault();
-                if (obj != null)
+                if (id != null)
                 {
-                    var payment = await _repoPayment.FindAsync(x => x.GrantID == obj.Id);
-                    if (payment == null || payment.Count() == 0)
+                    var challanDetail = (await _repoChallanDetails.FindAsync(x => x.ApplicationId == id && x.RequestStatus == "Fresh Request")).FirstOrDefault();
+
+                    GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == id.ToLower())).FirstOrDefault();
+                    if (obj != null)
                     {
-                        GrantViewModel model = new GrantViewModel
+                        var payment = await _repoPayment.FindAsync(x => x.GrantID == obj.Id);
+                        if (payment == null || payment.Count() == 0)
                         {
-                            Id = obj.Id,
-                            ApplicationID = obj.ApplicationID,
-                            OrderId = "0",
-                            Message = "Payment is unsuccessfull"
-                        };
-                        return View(model);
+                            GrantViewModel model = new GrantViewModel
+                            {
+                                Id = obj.Id,
+                                ApplicationID = obj.ApplicationID,
+                                OrderId = "0",
+                                Message = "Payment is unsuccessful"
+                            };
+                            challanDetail.RequestStatus = "Failed";
+                            await _repoChallanDetails.UpdateAsync(challanDetail);
+                            return View(model);
+                        }
+                        else
+                        {
+                            GrantPaymentDetails objPyment = (payment).FirstOrDefault();
+                            GrantViewModel model = new GrantViewModel
+                            {
+                                Id = obj.Id,
+                                ApplicationID = obj.ApplicationID,
+                                OrderId = objPyment.PaymentOrderId,
+                                Message = "Payment is successful"
+                            };
+                            challanDetail.RequestStatus = "Successful";
+                            await _repoChallanDetails.UpdateAsync(challanDetail);
+                            return View(model);
+                        }
                     }
                     else
                     {
-                        GrantPaymentDetails objPyment = (payment).FirstOrDefault();
-                        GrantViewModel model = new GrantViewModel
-                        {
-                            Id = obj.Id,
-                            ApplicationID = obj.ApplicationID,
-                            OrderId = objPyment.PaymentOrderId,
-                            Message = "Payment is successfull"
-                        };
-                        return View(model);
+                        return View(null);
                     }
                 }
                 else
                 {
-                    return View(null);
+                    GrantViewModel model = new GrantViewModel
+                    {
+                        Id = 0,
+                        ApplicationID = "0",
+                        OrderId = "0",
+                        Message = "Payment is unsuccessful"
+                    };
+                    return View(model);
                 }
             }
             catch (Exception ex)

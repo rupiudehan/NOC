@@ -1,11 +1,16 @@
 ﻿
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Noc_App.Models;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.ViewModel;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Xml.Linq;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 namespace Noc_App.Controllers
@@ -14,22 +19,70 @@ namespace Noc_App.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IRepository<DashboardPendencyAll> _pendencyDetailsRepo;
+        private readonly IRepository<UserDivision> _userDivisionRepository;
+        private readonly IRepository<DivisionDetails> _divisionRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         //private readonly IEmployeeRepository _employeeRepository;
         //[Obsolete]
         //private readonly IHostingEnvironment _hostingEnvironment;
 
         [Obsolete]
-        public HomeController(ILogger<HomeController> logger/*, IEmployeeRepository employeeRepository, IHostingEnvironment hostingEnvironment*/)
+        public HomeController(ILogger<HomeController> logger, IRepository<DashboardPendencyAll> pendencyDetailsRepo, IRepository<UserDivision> userDivisionRepository
+            , IRepository<DivisionDetails> divisionRepo, IRepository<SubDivisionDetails> subDivisionRepo, UserManager<ApplicationUser> userManager/*, IEmployeeRepository employeeRepository, IHostingEnvironment hostingEnvironment*/)
         {
             _logger = logger;
+            _pendencyDetailsRepo = pendencyDetailsRepo;
+            _userDivisionRepository = userDivisionRepository;
+            _divisionRepo = divisionRepo;
+            _userManager = userManager;
+            _subDivisionRepo = subDivisionRepo;
             //_employeeRepository = employeeRepository;
             //_hostingEnvironment = hostingEnvironment;
         }
-         
-        public IActionResult Index()
+
+        public async Task<IActionResult> Index()
         {
-            //return View(_employeeRepository.GetAllEmployees());
-            return View();
+            List<DivisionDetails> divisions = new List<DivisionDetails>();
+            var user = await _userManager.GetUserAsync(User);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Retrieve the user object
+            var userDetail = await _userManager.FindByIdAsync(userId);
+
+            // Retrieve roles associated with the user
+            var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault().ToUpper();
+            
+            if (role.ToUpper() == "ADMINISTRATOR") return View();
+            else
+            {
+                if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS")
+                {
+                    divisions = _divisionRepo.GetAll().ToList();
+                }
+                else
+                {
+                    divisions = (from u in _userDivisionRepository.GetAll()
+                                 join d in _divisionRepo.GetAll() on u.DivisionId equals (d.Id)
+                                 where u.UserId == userId
+                                 select new DivisionDetails
+                                 {
+                                     Id = d.Id,
+                                     Name = d.Name
+                                 }
+                                            ).ToList();
+                }
+                List<SubDivisionDetails> subdivisions = divisions != null ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
+                DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
+                {
+                    Divisions = new SelectList(divisions, "Id", "Name"),
+                    SubDivisions = new SelectList(subdivisions, "Id", "Name"),
+                    RoleName = role
+                };
+                //return View(_employeeRepository.GetAllEmployees());
+                return View(model);
+            }
         }
 
         //public ViewResult Details(int id)
@@ -94,7 +147,7 @@ namespace Noc_App.Controllers
         //            }
         //            employee.PhotoPath = ProcessUploadedFile(employeeEditViewModel);
         //        }
-                
+
         //        _employeeRepository.Update(employee);
         //        return RedirectToAction("index");
         //    }
@@ -128,6 +181,159 @@ namespace Noc_App.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpPost]
+        public IActionResult GetSubDivisions(int divisionId)
+        {
+            var subDivision = _subDivisionRepo.GetAll();
+            var filteredSubdivisions = subDivision.Where(c => c.DivisionId == divisionId).ToList();
+            return Json(new SelectList(filteredSubdivisions, "Id", "Name"));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetPendency(int divisionId, int subdivisionId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Retrieve the user object
+            var userDetail = await _userManager.FindByIdAsync(userId);
+
+            // Retrieve roles associated with the user
+            var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
+            if (role.ToUpper() == "ADMINISTRATOR")
+            {
+                return Json(null);
+            }
+            else
+            {
+                DivisionDetails divisions = new DivisionDetails();
+                if (divisionId == 0)
+                {
+                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS")
+                    {
+                        divisions = _divisionRepo.GetAll().FirstOrDefault();
+                    }
+                    else
+                    {
+                        divisions = (from u in _userDivisionRepository.GetAll()
+                                     join d in _divisionRepo.GetAll() on u.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                            ).FirstOrDefault();
+                    }
+                    divisionId = divisions.Id;
+                }
+                if (subdivisionId == 0)
+                {
+                    subdivisionId = (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisionId)).FirstOrDefault().Id;
+                }
+                List<object> list = new List<object>();
+
+                switch (role)
+                {
+                    //case "JUNIOR ENGINEER":
+                    //    forwardToRole = "SUB DIVISIONAL OFFICER";
+                    //    break;
+                    //case "SUB DIVISIONAL OFFICER":
+                    //    forwardToRole = "EXECUTIVE ENGINEER";
+                    //    break;
+                    case "EXECUTIVE ENGINEER":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER"
+                        });
+                        break;
+                    case "CIRCLE OFFICER":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER"
+                        });
+                        break;
+                    case "DWS":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","CIRCLE OFFICER"
+                        });
+                        break;
+                    case "EXECUTIVE ENGINEER HQ":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","CIRCLE OFFICER","DWS"
+                        });
+                        break;
+                    case "CHIEF ENGINEER HQ":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","CIRCLE OFFICER","DWS","EXECUTIVE ENGINEER HQ"
+                        });
+                        break;
+                    default:
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","CIRCLE OFFICER","DWS","EXECUTIVE ENGINEER HQ","CHIEF ENGINEER HQ"
+                        }); break;
+                }
+
+                List<DashboardPendencyAll> model = (await _pendencyDetailsRepo.ExecuteStoredProcedureAsync<DashboardPendencyAll>("getpendencytoforward", "'" + divisionId + "'", "'" + subdivisionId + "'", "'" + role + "'")).ToList();
+                foreach (DashboardPendencyAll item in model)
+                {
+                    switch (role)
+                    {
+                        //case "JUNIOR ENGINEER":
+                        //    forwardToRole = "SUB DIVISIONAL OFFICER";
+                        //    break;
+                        //case "SUB DIVISIONAL OFFICER":
+                        //    forwardToRole = "EXECUTIVE ENGINEER";
+                        //    break;
+                        case "EXECUTIVE ENGINEER":
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER)
+                               });
+                            break;
+                        case "CIRCLE OFFICER":
+                            list.Add(new object[]
+                                {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+
+                                });
+                            break;
+                        case "DWS":
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                                ,Convert.ToInt32(item.CIRCLE_OFFICER)
+                               });
+                            break;
+                        case "EXECUTIVE ENGINEER HQ":
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                                ,Convert.ToInt32(item.CIRCLE_OFFICER), Convert.ToInt32(item.dws)
+                               });
+                            break;
+                        case "CHIEF ENGINEER HQ":
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                                ,Convert.ToInt32(item.CIRCLE_OFFICER), Convert.ToInt32(item.dws),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ)
+                               });
+                            break;
+                        default:
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                                ,Convert.ToInt32(item.CIRCLE_OFFICER), Convert.ToInt32(item.dws),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ)
+                               }); break;
+                    }
+                }
+                return Json(list);
+            }
         }
     }
 }
