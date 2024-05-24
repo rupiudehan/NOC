@@ -78,11 +78,21 @@ namespace Noc_App.Controllers
         {
             try
             {
-                GrantDetails obj = (await _repo.FindAsync(x=> x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
+                var g=(from gr in _repo.GetAll()
+                       join p in _grantPaymentRepo.GetAll() on gr.Id equals p.GrantID into payment
+                       from pay in payment.DefaultIfEmpty()
+                       where gr.ApplicationID.ToLower()==Id.Trim().ToLower()
+                       select new
+                       {
+                           gr,pay
+
+                       }
+                    ).FirstOrDefault();
+                GrantDetails obj = g.gr;
                 if (obj != null)
                 {
-                    var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
-                    if (payment == null || payment.Count() == 0)
+                    var payment = g.pay;
+                    if (payment == null)
                     {
                         GrantViewModel model = new GrantViewModel
                         {
@@ -95,7 +105,7 @@ namespace Noc_App.Controllers
                     }
                     else
                     {
-                        GrantPaymentDetails objPyment = (payment).FirstOrDefault();
+                        GrantPaymentDetails objPyment = (payment);
                         GrantViewModel model = new GrantViewModel
                         {
                             Id = obj.Id,
@@ -203,14 +213,38 @@ namespace Noc_App.Controllers
         {
             try
             {
-                GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
-                VillageDetails village = await _villageRpo.GetByIdAsync(obj.VillageID);
-                TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(village.TehsilBlockId);
-                SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(tehsil.SubDivisionId);
-                DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
-                NocPermissionTypeDetails permission = await _nocPermissionTypeRepo.GetByIdAsync(obj.NocPermissionTypeID);
-                NocTypeDetails noctype = await _nocTypeRepo.GetByIdAsync(obj.NocTypeId);
-                SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(obj.SiteAreaUnitId);
+                var g = (from gr in _repo.GetAll()
+                         join v in _villageRpo.GetAll() on gr.VillageID equals v.Id
+                         join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                         join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals sub.Id
+                         join d in _divisionRepo.GetAll() on sub.DivisionId equals d.Id
+                         join npt in _nocPermissionTypeRepo.GetAll() on gr.NocPermissionTypeID equals npt.Id
+                         join npr in _nocTypeRepo.GetAll() on gr.NocTypeId equals npr.Id
+                         join un in _siteUnitsRepo.GetAll() on gr.SiteAreaUnitId equals un.Id
+                         join p in _grantPaymentRepo.GetAll() on gr.Id equals p.GrantID into paymentdetail
+                         from pay in paymentdetail.DefaultIfEmpty()
+                         where gr.ApplicationID.ToLower() == Id.Trim().ToLower()
+                         select new
+                         {
+                             Grant=gr,
+                             Payment=pay,
+                             Village=v,
+                             Tehsil=t,
+                             SubDivision=sub,
+                             Division=d,
+                             PermissionType=npt,
+                             NocType=npr,
+                             Unit=un
+                         }
+                   ).FirstOrDefault();
+                GrantDetails obj = g.Grant;
+                VillageDetails village = g.Village;
+                TehsilBlockDetails tehsil = g.Tehsil;
+                SubDivisionDetails subDivision = g.SubDivision;
+                DivisionDetails division = g.Division;
+                NocPermissionTypeDetails permission = g.PermissionType;
+                NocTypeDetails noctype = g.NocType;
+                SiteAreaUnitDetails unit = g.Unit;
                 List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == obj.Id)).ToList();
                 List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 //List<SiteUnitMaster> unitMaster = (await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == obj.SiteAreaUnitId)).ToList();
@@ -223,8 +257,6 @@ namespace Noc_App.Controllers
                 double totalArea = 0;
                 foreach (GrantKhasraDetails item in khasras)
                 {
-                    double marla = 0,kanal=0,sarsai=0,biswansi=0,biswa=0,bigha=0;
-                    //var units = unitMaster.Any(x => unit.Name.Contains(x.UnitName));
                     SiteUnitsViewModel unitDetails = new SiteUnitsViewModel
                     {
                         KanalOrBigha=item.KanalOrBigha,
@@ -233,23 +265,10 @@ namespace Noc_App.Controllers
                         SiteUnitId=unit.Id
                     };
                     var units=await _calculations.CalculateUnits(unitDetails);
-                    //if (unit.Name== @"Marla/Kanal/Sarsai")
-                    //{
-                    //    marla = item.MarlaOrBiswa / 160;
-                    //    kanal = item.KanalOrBigha / 8;
-                    //    sarsai = item.SarsaiOrBiswansi / 1440;
-                    //}
-                    //else
-                    //{
-                    //    biswansi = item.SarsaiOrBiswansi * 0.000625;
-                    //    biswa = item.MarlaOrBiswa * 0.0125;
-                    //    bigha = item.KanalOrBigha * 0.25;
-                    //}
-                    //totalArea= Math.Round(totalArea+marla + kanal+ sarsai+ biswansi+ biswa+ bigha,4);
                     totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
                 }
-                var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
-                if (payment == null || payment.Count() == 0)
+                var payment = g.Payment;
+                if (payment == null)
                 {
                     GrantDetailViewModel model = new GrantDetailViewModel
                     {
@@ -285,14 +304,10 @@ namespace Noc_App.Controllers
                         Khasras=khasras
                     };
                     return new ViewAsPdf(model);
-                    //return new ViewAsPdf(model)
-                    //{
-                    //    FileName = model.ApplicationID + ".pdf"
-                    //};
                 }
                 else
                 {
-                    GrantPaymentDetails objPyment = (payment).FirstOrDefault();
+                    GrantPaymentDetails objPyment = (payment);
                     GrantDetailViewModel model = new GrantDetailViewModel
                     {
                         Id = obj.Id,
@@ -434,7 +449,6 @@ namespace Noc_App.Controllers
                 ProjectType = new SelectList(projectType, "Id", "Name"),
                 NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
                 NocType = new SelectList(nocType, "Id", "Name"),
-                //OwnerType = new SelectList(ownerType, "Id", "Name"),
                 Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
                 SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
