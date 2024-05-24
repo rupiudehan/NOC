@@ -86,6 +86,16 @@ namespace Noc_App.Controllers
                                          Name = d.Name
                                      }
                                                 ).ToList();
+                        subdivisions = (from u in _userDivisionRepository.GetAll()
+                                        join div in _divisionRepo.GetAll() on u.DivisionId equals (div.Id)
+                                        join d in _subDivisionRepo.GetAll() on div.Id equals (d.DivisionId)
+                                        where u.UserId == userId
+                                        select new SubDivisionDetails
+                                        {
+                                            Id = d.Id,
+                                            Name = d.Name
+                                        }
+                                               ).Distinct().ToList();
                     }
                     else if (role == "SUB DIVISIONAL OFFICER")
                     {
