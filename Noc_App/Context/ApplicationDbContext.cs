@@ -40,6 +40,7 @@ namespace Noc_App.Context
         public DbSet<ChallanDetails> ChallanDetails { get; set; }
         public DbSet<UserRoleDetails> UserRoleDetails { get; set; }
         public DbSet<DaysCheckMaster> DaysCheckMaster { get; set; }
+        public DbSet<RecommendationDetail> RecommendationDetail { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -176,6 +177,12 @@ namespace Noc_App.Context
                 .HasOne(s => s.NocType)
                 .WithMany(u => u.Grants)
                 .HasForeignKey(s => s.NocTypeId);
+
+            modelBuilder.Entity<RecommendationDetail>().HasData(
+                new RecommendationDetail{ Id = 1, Name = "Approved", Code = "A" },
+                new RecommendationDetail { Id = 2, Name = "Rejected", Code = "R" },
+                new RecommendationDetail { Id = 3, Name = "Nothing", Code = "NA" }
+                );
 
             modelBuilder.Entity<DaysCheckMaster>().HasData(
                 new DaysCheckMaster { Id = 1, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Executive Engineer", Code = "EEF", NoOfDays = 1,UserRoleID=7 },

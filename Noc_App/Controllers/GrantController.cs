@@ -213,6 +213,8 @@ namespace Noc_App.Controllers
         {
             try
             {
+                var domain = HttpContext.Request.Host.Value;
+                var scheme = HttpContext.Request.Scheme;
                 var g = (from gr in _repo.GetAll()
                          join v in _villageRpo.GetAll() on gr.VillageID equals v.Id
                          join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
@@ -341,6 +343,7 @@ namespace Noc_App.Controllers
                         Owners = owners,
                         Khasras = khasras
                     };
+                    model.Domain = scheme + "://" + domain;
                     return new ViewAsPdf(model);
                     //return new ViewAsPdf(model)
                     //{

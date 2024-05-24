@@ -176,6 +176,44 @@
                                 <span asp-validation-for="SelectedOfficerId" id="SelectedOfficerIdVal" class="text-danger"></span>
                             </div>
                         </div>
+                        @if (Model.IsForwarded == true)
+                        {
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="SelectedRecommendationId" class="control-label"></label>
+                                    @if (Model.Recommendations != null)
+                                    {
+                                        if (Model.Recommendations.Count() > 0)
+                                        {
+                                            <select asp-for="SelectedRecommendationId" id="SelectedRecommendationId" asp-items="@Model.Recommendations" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <select name="SelectedRecommendationId" disabled id="SelectedRecommendationId" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <select name="SelectedRecommendationId" id="SelectedRecommendationId" disabled class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                    <span asp-validation-for="SelectedRecommendationId" id="SelectedRecommendationIdVal" class="text-danger"></span>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="Remarks" class="control-label"></label>
+                                <textarea asp-for="Remarks" placeholder="Remarks" class="form-control" cols="3" rows="2"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="row">

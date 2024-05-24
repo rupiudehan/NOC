@@ -75,6 +75,7 @@ builder.Services.AddScoped<IRepository<DashboardPendencyAll>, Repository<Dashboa
 builder.Services.AddScoped<IRepository<DashboardPendencyViewModel>, Repository<DashboardPendencyViewModel>>();
 builder.Services.AddScoped<IRepository<DaysCheckMaster>, Repository<DaysCheckMaster>>();
 builder.Services.AddScoped<IRepository<UserRoleDetails>, Repository<UserRoleDetails>>();
+builder.Services.AddScoped<IRepository<RecommendationDetail>, Repository<RecommendationDetail>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

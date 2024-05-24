@@ -45,5 +45,9 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "L-Section of the Drain if Sanctioned")]
         public IFormFile LSectionOfDrainFile { get; set; }
         public bool IsForwarded { get; set; }
+        [Display(Name = "Recommendation")]
+        public int SelectedRecommendationId { get; set; }
+        public IEnumerable<SelectListItem> Recommendations { get; set; }
+        public string Remarks { get; set; }
     }
 }

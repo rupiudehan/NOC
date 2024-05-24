@@ -45,6 +45,7 @@ namespace Noc_App.Controllers
         private readonly IEmailService _emailService;
         private readonly ICalculations _calculations;
         private readonly IRepository<SiteUnitMaster> _repoSiteUnitMaster;
+        private readonly IRepository<RecommendationDetail> _repoRecommendation;
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<UserDivision> userDivisionRepository, UserManager<ApplicationUser> userManager, IRepository<GrantPaymentDetails> repoPayment, RoleManager<IdentityRole> roleManager
@@ -53,7 +54,7 @@ namespace Noc_App.Controllers
             IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IWebHostEnvironment hostingEnvironment, IEmailService emailService
             , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
-            , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster)
+            , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation)
         {
             _repo = repo;
             _villageRpo = villageRepo;
@@ -82,7 +83,7 @@ namespace Noc_App.Controllers
             _grantUnprocessedAppDetailsRepo = grantUnprocessedAppDetailsRepo;
             _calculations = calculations;
             _repoSiteUnitMaster = repoSiteUnitMaster;
-
+            _repoRecommendation = repoRecommendation;
         }
 
         public async Task<ViewResult> Index()
@@ -97,24 +98,6 @@ namespace Noc_App.Controllers
 
                 // Retrieve roles associated with the user
                 var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
-                //List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
-                
-                //List<OfficerDetails> officerDetail = new List<OfficerDetails>();
-
-                //if (role == "EXECUTIVE ENGINEER")
-                //{
-                //    subdivisions = (from u in _userDivisionRepository.GetAll()
-                //                    join sub in _subDivisionRepo.GetAll() on u.DivisionId equals (sub.DivisionId)
-                //                    where u.UserId == userId
-                //                    select new SubDivisionDetails
-                //                    {
-                //                        Id = sub.Id,
-                //                        Name = sub.Name
-                //                    }
-                //                    ).ToList();
-                //}
-                
-                //var user2 = await _userManager.FindByNameAsync(user.UserName);
                 List<UserDivision> userDiv = (await _userDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
                 List<UserSubdivision> userSubdiv = (await _userSubDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
                 List<UserVillage> userVillage = (await _userVillageRepository.FindAsync(x => x.UserId == user.Id)).ToList();
@@ -409,7 +392,8 @@ namespace Noc_App.Controllers
                                      }
                                   ).ToList();
                 }
-
+                List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
+                recommendations = _repoRecommendation.GetAll().Where(x=>x.Code!="NA").ToList();
                 ForwardApplicationViewModel model = (from g in _repo.GetAll()
                                                       join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
                                                       join v in _villageRpo.GetAll() on g.VillageID equals v.Id
@@ -428,7 +412,9 @@ namespace Noc_App.Controllers
                                                           ApplicationID = g.ApplicationID,
                                                           ForwardToRole= forwardToRole,
                                                           LoggedInRole = role,
-                                                          SubDivisions= subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
+                                                          Remarks="",
+                                                          Recommendations= recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
+                                                          SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
                                                           Officers = officerDetail!=null? new SelectList(officerDetail, "UserId", "UserName"):null,
                                                           LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + v.Name + ", Pincode: " + v.PinCode,
                                                       }).FirstOrDefault();
@@ -454,7 +440,6 @@ namespace Noc_App.Controllers
                     ViewBag.ErrorMessage = $"Grant with Application Id = {model.ApplicationID} cannot be found";
                     return View("NotFound");
                 }
-
                 GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == model.ApplicationID)).FirstOrDefault();
 
                 if (grant == null)
@@ -483,6 +468,14 @@ namespace Noc_App.Controllers
 
                 // Retrieve roles associated with the user
                 var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+
+
+                if (role != "EXECUTIVE ENGINEER" && model.SelectedRecommendationId == 0)
+                {
+                    ModelState.AddModelError("", $"The Recommendation field is required");
+                    return View(model);
+                }
+
                 GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "F")).FirstOrDefault();
                 var forwardedUser = await _userManager.FindByIdAsync(model.SelectedOfficerId);
                 var forwardedRole = (await _userManager.GetRolesAsync(forwardedUser)).FirstOrDefault();
@@ -496,7 +489,9 @@ namespace Noc_App.Controllers
                     ProcessedByRole = role,
                     ProcessLevel = approvalLevel + 1,
                     ProcessedToRole = forwardedRole,
-                    ProcessedToUser = forwardedUser.Email
+                    ProcessedToUser = forwardedUser.Email,
+                    RecommendationID= role == "EXECUTIVE ENGINEER" && model.SelectedRecommendationId==0?3: model.SelectedRecommendationId,
+                    Remarks=model.Remarks
                 };
 
                 if (total<=2 && role=="JUNIOR ENGINEER")

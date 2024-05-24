@@ -57,5 +57,6 @@ namespace Noc_App.Models.ViewModel
         public List<OwnerDetails> Owners { get; set; }
         public List<GrantKhasraDetails> Khasras { get; set; }
         public string LocationDetail { get; set; }
+        public string Domain { get; set; }
     }
 }
