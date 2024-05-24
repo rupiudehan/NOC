@@ -38,11 +38,14 @@ namespace Noc_App.Context
         public DbSet<GrantApprovalProcessDocumentsDetails> GrantApprovalProcessDocumentsDetails { get; set; }
         public DbSet<SiteUnitMaster> SiteUnitMaster { get; set; }
         public DbSet<ChallanDetails> ChallanDetails { get; set; }
+        public DbSet<UserRoleDetails> UserRoleDetails { get; set; }
+        public DbSet<DaysCheckMaster> DaysCheckMaster { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GrantUnprocessedAppDetails>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyAll>().HasNoKey();
+            modelBuilder.Entity<DashboardPendencyViewModel>().HasNoKey();
             modelBuilder.Entity<UserDivision>()
             .HasKey(ud => new { ud.UserId, ud.DivisionId });
 
@@ -173,6 +176,31 @@ namespace Noc_App.Context
                 .HasOne(s => s.NocType)
                 .WithMany(u => u.Grants)
                 .HasForeignKey(s => s.NocTypeId);
+
+            modelBuilder.Entity<DaysCheckMaster>().HasData(
+                new DaysCheckMaster { Id = 1, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Executive Engineer", Code = "EEF", NoOfDays = 1,UserRoleID=7 },
+                new DaysCheckMaster { Id = 9, IsRelatedToForward = 0, IsRelatedToIssue = 1, CheckFor = "Executive Engineer", Code = "EES", NoOfDays = 2,UserRoleID=7 },
+                new DaysCheckMaster { Id = 2, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Chief Engineer", Code = "CEHQF", NoOfDays =3,UserRoleID=10 },
+                //new DaysCheckMaster { Id = 2, IsRelatedToForward=0, IsRelatedToIssue = 1, CheckFor = "Chief Engineer", Code = "CEHQS", NoOfDays = 1 },
+                new DaysCheckMaster { Id = 3, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Junior Engineer", Code = "JE", NoOfDays = 2,UserRoleID=60 },
+                new DaysCheckMaster { Id = 4, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Sub Divisional Officer", Code = "SDO", NoOfDays = 2,UserRoleID=67 },
+                new DaysCheckMaster { Id = 5, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "XEN HO Drainage", Code = "EEHQ", NoOfDays = 3,UserRoleID=128 },
+                new DaysCheckMaster { Id = 6, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "XEN/DWS", Code = "D", NoOfDays = 1,UserRoleID=83 },
+                new DaysCheckMaster { Id = 7, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Principal Secretary", Code = "PS", NoOfDays = 1,UserRoleID=6 },
+                new DaysCheckMaster { Id = 8, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Superintending Engineer", Code = "CO", NoOfDays = 2,UserRoleID=8 }
+                );
+
+            modelBuilder.Entity<UserRoleDetails>().HasData(
+                new UserRoleDetails { Id=7,RoleName= "Executive Engineer", AppRoleName= "EXECUTIVE ENGINEER", RoleLevel=7 },
+                new UserRoleDetails { Id = 10, RoleName = "Chief Engineer",AppRoleName= "CHIEF ENGINEER HQ", RoleLevel = 3 },
+                new UserRoleDetails { Id =60, RoleName = "Junior Engineer",AppRoleName= "JUNIOR ENGINEER", RoleLevel = 9 },
+                new UserRoleDetails { Id = 67, RoleName = "Sub Divisional Officer",AppRoleName= "SUB DIVISIONAL OFFICER", RoleLevel = 8 },
+                new UserRoleDetails { Id = 128, RoleName = "XEN HO Drainage",AppRoleName= "EXECUTIVE ENGINEER HQ", RoleLevel = 4 },
+                new UserRoleDetails { Id = 83, RoleName = "XEN/DWS",AppRoleName="DWS", RoleLevel = 5 },
+                new UserRoleDetails { Id = 6, RoleName = "Principal Secretary", AppRoleName = "PRINCIPAL SECRETARY", RoleLevel = 2 },
+                new UserRoleDetails { Id = 8, RoleName = "Superintending Engineer", AppRoleName = "CIRCLE OFFICER", RoleLevel = 6 },
+                new UserRoleDetails { Id = 1, RoleName = "Administrator", AppRoleName = "Administrator", RoleLevel = 1 }
+                );
 
             modelBuilder.Entity<SiteUnitMaster>().HasData(
                 new SiteUnitMaster { Id = 1,SiteAreaUnitId=1, UnitName = "Biswa",UnitCode="M",UnitValue= 0.0125,Timesof=1, DivideBy=1 },

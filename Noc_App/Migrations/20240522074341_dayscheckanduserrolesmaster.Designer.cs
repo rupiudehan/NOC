@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Noc_App.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240522074341_dayscheckanduserrolesmaster")]
+    partial class dayscheckanduserrolesmaster
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -370,12 +373,7 @@ namespace NocApp.Migrations
                     b.Property<int>("NoOfDays")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserRoleID")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserRoleID");
 
                     b.ToTable("DaysCheckMaster");
 
@@ -387,8 +385,7 @@ namespace NocApp.Migrations
                             Code = "EEF",
                             IsRelatedToForward = 1,
                             IsRelatedToIssue = 0,
-                            NoOfDays = 1,
-                            UserRoleID = 7
+                            NoOfDays = 1
                         },
                         new
                         {
@@ -397,8 +394,7 @@ namespace NocApp.Migrations
                             Code = "EES",
                             IsRelatedToForward = 0,
                             IsRelatedToIssue = 1,
-                            NoOfDays = 2,
-                            UserRoleID = 7
+                            NoOfDays = 2
                         },
                         new
                         {
@@ -407,8 +403,7 @@ namespace NocApp.Migrations
                             Code = "CEHQF",
                             IsRelatedToForward = 1,
                             IsRelatedToIssue = 0,
-                            NoOfDays = 3,
-                            UserRoleID = 10
+                            NoOfDays = 3
                         },
                         new
                         {
@@ -417,8 +412,7 @@ namespace NocApp.Migrations
                             Code = "JE",
                             IsRelatedToForward = 1,
                             IsRelatedToIssue = 0,
-                            NoOfDays = 2,
-                            UserRoleID = 60
+                            NoOfDays = 2
                         },
                         new
                         {
@@ -427,8 +421,7 @@ namespace NocApp.Migrations
                             Code = "SDO",
                             IsRelatedToForward = 1,
                             IsRelatedToIssue = 0,
-                            NoOfDays = 2,
-                            UserRoleID = 67
+                            NoOfDays = 2
                         },
                         new
                         {
@@ -437,8 +430,7 @@ namespace NocApp.Migrations
                             Code = "EEHQ",
                             IsRelatedToForward = 0,
                             IsRelatedToIssue = 1,
-                            NoOfDays = 3,
-                            UserRoleID = 128
+                            NoOfDays = 3
                         },
                         new
                         {
@@ -447,8 +439,7 @@ namespace NocApp.Migrations
                             Code = "D",
                             IsRelatedToForward = 1,
                             IsRelatedToIssue = 0,
-                            NoOfDays = 1,
-                            UserRoleID = 83
+                            NoOfDays = 1
                         },
                         new
                         {
@@ -457,8 +448,7 @@ namespace NocApp.Migrations
                             Code = "PS",
                             IsRelatedToForward = 1,
                             IsRelatedToIssue = 0,
-                            NoOfDays = 1,
-                            UserRoleID = 6
+                            NoOfDays = 1
                         },
                         new
                         {
@@ -467,8 +457,7 @@ namespace NocApp.Migrations
                             Code = "CO",
                             IsRelatedToForward = 1,
                             IsRelatedToIssue = 0,
-                            NoOfDays = 2,
-                            UserRoleID = 8
+                            NoOfDays = 2
                         });
                 });
 
@@ -1596,17 +1585,6 @@ namespace NocApp.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Noc_App.Models.DaysCheckMaster", b =>
-                {
-                    b.HasOne("Noc_App.Models.UserRoleDetails", "UserRole")
-                        .WithMany()
-                        .HasForeignKey("UserRoleID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>

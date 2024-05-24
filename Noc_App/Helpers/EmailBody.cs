@@ -4,6 +4,7 @@ namespace Noc_App.Helpers
 {
     public static class EmailBody
     {
+
         public static string EmailStringBodyForReset(string email, string emailToken)
         {
             return $@"<htm>
@@ -19,7 +20,7 @@ namespace Noc_App.Helpers
                         <a href=""http://localhost:4200/reset?email={email}&code={emailToken}"" target=""_blank"" style=""background:#0d6efd;padding:10px;border:none;
                         color:white;border-radius:4px;display:block;margin:0 auto; width:50%;text-align:center;text-decoration:none;"">Reset Password</a><br>
                         <p>Best Regards,<br><br>
-                        Punjab Irrigation Department</p>
+                        Department of Water Resources, Punjab</p>
                     </div>
                 </div>
             </div>
@@ -40,7 +41,7 @@ namespace Noc_App.Helpers
                         <p>Password: {password}</p>
                         <br>
                         <p>Best Regards,<br><br>
-                        Punjab Irrigation Department</p>
+                        Department of Water Resources, Punjab</p>
                     </div>
                 </div>
             </div>
@@ -60,7 +61,7 @@ namespace Noc_App.Helpers
                         
                         <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been successfully submitted.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
                         <p>Best Regards,<br><br>
-                        Punjab Irrigation Department</p>
+                        Department of Water Resources, Punjab</p>
                     </div>
                 </div>
             </div>
@@ -80,7 +81,7 @@ namespace Noc_App.Helpers
                         
                         <p>Your application for the NOC Certificate with ID <b>{applicationID}</b> has been rejected due to {reason}.</p><p>Please apply again to get NOC certificate</p><br>
                         <p>Best Regards,<br><br>
-                        Punjab Irrigation Department</p>
+                        Department of Water Resources, Punjab</p>
                     </div>
                 </div>
             </div>

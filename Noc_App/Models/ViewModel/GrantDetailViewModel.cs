@@ -24,9 +24,9 @@ namespace Noc_App.Models.ViewModel
         public string Pincode { get; set; }
         [Display(Name = "Village/Town/City")]
         public string VillageName { get; set; }
-        [Display(Name = "Division")]
+        [Display(Name = "Drainage Division")]
         public string DivisionName { get; set; }
-        [Display(Name = "Sub-Division")]
+        [Display(Name = "Drainage Sub-Division")]
         public string SubDivisionName { get; set; }
         [Display(Name = "Tehsil/Block")]
         public string TehsilBlockName { get; set; }

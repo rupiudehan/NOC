@@ -72,6 +72,9 @@ builder.Services.AddScoped<IRepository<GrantUnprocessedAppDetails>, Repository<G
 builder.Services.AddScoped<IRepository<SiteUnitMaster>, Repository<SiteUnitMaster>>();
 builder.Services.AddScoped<IRepository<ChallanDetails>, Repository<ChallanDetails>>();
 builder.Services.AddScoped<IRepository<DashboardPendencyAll>, Repository<DashboardPendencyAll>>();
+builder.Services.AddScoped<IRepository<DashboardPendencyViewModel>, Repository<DashboardPendencyViewModel>>();
+builder.Services.AddScoped<IRepository<DaysCheckMaster>, Repository<DaysCheckMaster>>();
+builder.Services.AddScoped<IRepository<UserRoleDetails>, Repository<UserRoleDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

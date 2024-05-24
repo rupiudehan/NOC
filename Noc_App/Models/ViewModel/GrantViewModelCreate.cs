@@ -52,11 +52,11 @@ namespace Noc_App.Models.ViewModel
         public int? SelectedVillageID { get; set; }
         public IEnumerable<SelectListItem> Village { get; set; }
         [Required]
-        [Display(Name = "Division")]
+        [Display(Name = "Drainage Division")]
         public int? SelectedDivisionId { get; set; }
         public IEnumerable<SelectListItem> Divisions { get; set; }
         [Required]
-        [Display(Name = "Sub-Division")]
+        [Display(Name = "Drainage Sub-Division")]
         public int? SelectedSubDivisionId { get; set; }
         public IEnumerable<SelectListItem> SubDivision { get; set; }
         [Required]

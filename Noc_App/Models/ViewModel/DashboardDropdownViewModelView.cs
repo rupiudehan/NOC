@@ -5,6 +5,8 @@ namespace Noc_App.Models.ViewModel
 {
     public class DashboardDropdownViewModelView
     {
+        public int hdnDivisionId { get; set; }
+        public int hdnSubDivisionId { get; set; }
         [Display(Name = "Division")]
         public int SelectedDivisionId { get; set; }
         public IEnumerable<SelectListItem> Divisions { get; set; }

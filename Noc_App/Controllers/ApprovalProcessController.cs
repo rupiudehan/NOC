@@ -1019,7 +1019,7 @@ namespace Noc_App.Controllers
                 await _repo.UpdateAsync(grant);
 
                 var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForRejection(grant.ApplicantName, grant.ApplicationID, model.Remarks));
-                _emailService.SendEmail(emailModel, "Punjab Irrigation Department");
+                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
 
                 return RedirectToAction("Index");
             }
@@ -1154,7 +1154,7 @@ namespace Noc_App.Controllers
             await _repo.UpdateAsync(grant);
 
             //var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForRejection(grant.ApplicantName, grant.ApplicationID));
-            //_emailService.SendEmail(emailModel, "Punjab Irrigation Department");
+            //_emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
 
             return RedirectToAction("Index");
         }

@@ -147,21 +147,21 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public IActionResult Search(string searchString)
         {
-            if (searchString != "" && searchString != null)
+            if (searchString != null && searchString.Trim() != "")
             {
                 var model = (from g in _repo.GetAll()
                              join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID into grantPayment
                              from payment in grantPayment.DefaultIfEmpty()
                              join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID into grantApproval
                              from approval in grantApproval.DefaultIfEmpty()
-                             where g.ApplicationID.ToLower() == searchString.ToLower()
+                             where g.ApplicationID.ToLower() == searchString.Trim().ToLower()
                              select new GrantStatusViewModel
                              {
                                  ApplicationID = g.ApplicationID,
                                  IsApproved = g.IsApproved,
                                  CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
                                  ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
-                                 ApprovalStatus = g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "Pending" : "Pending" : g.IsApproved ? "NOC Issued" : "Pending",
+                                 ApprovalStatus = g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "UnProcessed" : "UnProcessed" : g.IsApproved ? "NOC Issued" : "UnProcessed",
                                  CertificateFilePath = g.CertificateFilePath
                              }
                          ).FirstOrDefault();
@@ -691,7 +691,7 @@ namespace Noc_App.Controllers
                                 obj.Khasras = khasraList;
                                 await _repo.UpdateAsync(obj);
                                 var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
-                                _emailService.SendEmail(emailModel, "Punjab Irrigation Department");
+                                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
                                 double TotalPayment = 0;
                                 //if (Convert.ToDouble(model.TotalArea) <= 0.25)
                                 //{

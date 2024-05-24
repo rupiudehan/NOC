@@ -20,17 +20,24 @@ namespace Noc_App.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IRepository<DashboardPendencyAll> _pendencyDetailsRepo;
+        private readonly IRepository<DashboardPendencyViewModel> _pendencyRepo;
         private readonly IRepository<UserDivision> _userDivisionRepository;
+        private readonly IRepository<UserSubdivision> _userSubDivisionRepository;
         private readonly IRepository<DivisionDetails> _divisionRepo;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
+        private readonly IRepository<UserVillage> _userVillageRepository;
+        private readonly IRepository<VillageDetails> _villageRpo;
+        private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         //private readonly IEmployeeRepository _employeeRepository;
         //[Obsolete]
         //private readonly IHostingEnvironment _hostingEnvironment;
 
         [Obsolete]
         public HomeController(ILogger<HomeController> logger, IRepository<DashboardPendencyAll> pendencyDetailsRepo, IRepository<UserDivision> userDivisionRepository
-            , IRepository<DivisionDetails> divisionRepo, IRepository<SubDivisionDetails> subDivisionRepo, UserManager<ApplicationUser> userManager/*, IEmployeeRepository employeeRepository, IHostingEnvironment hostingEnvironment*/)
+            , IRepository<DivisionDetails> divisionRepo, IRepository<DashboardPendencyViewModel> pendencyRepo, IRepository<SubDivisionDetails> subDivisionRepo, 
+            IRepository<UserSubdivision> userSubDivisionRepository, UserManager<ApplicationUser> userManager, IRepository<UserVillage> userVillageRepository
+            , IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo/*, IEmployeeRepository employeeRepository, IHostingEnvironment hostingEnvironment*/)
         {
             _logger = logger;
             _pendencyDetailsRepo = pendencyDetailsRepo;
@@ -38,50 +45,112 @@ namespace Noc_App.Controllers
             _divisionRepo = divisionRepo;
             _userManager = userManager;
             _subDivisionRepo = subDivisionRepo;
+            _pendencyRepo=pendencyRepo;
+            _userSubDivisionRepository=userSubDivisionRepository;
+            _userVillageRepository=userVillageRepository;
+            _villageRpo = villageRepo;
+            _tehsilBlockRepo=tehsilBlockRepo;
             //_employeeRepository = employeeRepository;
             //_hostingEnvironment = hostingEnvironment;
         }
 
         public async Task<IActionResult> Index()
         {
-            List<DivisionDetails> divisions = new List<DivisionDetails>();
-            var user = await _userManager.GetUserAsync(User);
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Retrieve the user object
-            var userDetail = await _userManager.FindByIdAsync(userId);
-
-            // Retrieve roles associated with the user
-            var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault().ToUpper();
-            
-            if (role.ToUpper() == "ADMINISTRATOR") return View();
-            else
+            try
             {
-                if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS")
-                {
-                    divisions = _divisionRepo.GetAll().ToList();
-                }
+                List<DivisionDetails> divisions = new List<DivisionDetails>();
+                List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
+                var user = await _userManager.GetUserAsync(User);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                // Retrieve the user object
+                var userDetail = await _userManager.FindByIdAsync(userId);
+
+                // Retrieve roles associated with the user
+                var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault().ToUpper();
+
+                if (role.ToUpper() == "ADMINISTRATOR") return View();
                 else
                 {
-                    divisions = (from u in _userDivisionRepository.GetAll()
-                                 join d in _divisionRepo.GetAll() on u.DivisionId equals (d.Id)
-                                 where u.UserId == userId
-                                 select new DivisionDetails
-                                 {
-                                     Id = d.Id,
-                                     Name = d.Name
-                                 }
-                                            ).ToList();
+                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS")
+                    {
+                        divisions = _divisionRepo.GetAll().ToList();
+                    }
+                    else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
+                    {
+                        divisions = (from u in _userDivisionRepository.GetAll()
+                                     join d in _divisionRepo.GetAll() on u.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                                ).ToList();
+                    }
+                    else if (role == "SUB DIVISIONAL OFFICER")
+                    {
+                        subdivisions = (from u in _userSubDivisionRepository.GetAll()
+                                        join d in _subDivisionRepo.GetAll() on u.SubdivisionId equals (d.Id)
+                                        where u.UserId == userId
+                                        select new SubDivisionDetails
+                                        {
+                                            Id = d.Id,
+                                            Name = d.Name
+                                        }
+                                               ).Distinct().ToList();
+                        divisions = (from u in _userSubDivisionRepository.GetAll()
+                                     join sub in _subDivisionRepo.GetAll() on u.SubdivisionId equals (sub.Id)
+                                     join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                                ).Distinct().ToList();
+                    }
+                    else
+                    {
+                        subdivisions = (from u in _userVillageRepository.GetAll()
+                                        join v in _villageRpo.GetAll() on u.VillageId equals (v.Id)
+                                        join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
+                                        join d in _subDivisionRepo.GetAll() on t.SubDivisionId equals (d.Id)
+                                        where u.UserId == userId
+                                        select new SubDivisionDetails
+                                        {
+                                            Id = d.Id,
+                                            Name = d.Name
+                                        }
+                                                ).Distinct().ToList();
+                        divisions = (from u in _userVillageRepository.GetAll()
+                                     join v in _villageRpo.GetAll() on u.VillageId equals (v.Id)
+                                     join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
+                                     join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals (sub.Id)
+                                     join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                                ).Distinct().ToList();
+                    }
+                    //subdivisions = divisions != null && divisions.Count()>0 ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
+                    DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
+                    {
+                        Divisions = new SelectList(divisions, "Id", "Name"),
+                        SubDivisions = new SelectList(subdivisions, "Id", "Name"),
+                        RoleName = role.ToUpper(),
+                        hdnDivisionId = divisions.Count()>0? divisions.FirstOrDefault().Id:0,
+                        hdnSubDivisionId = subdivisions.Count() > 0 ? subdivisions.FirstOrDefault().Id : 0
+                    };
+                    //return View(_employeeRepository.GetAllEmployees());
+                    return View(model);
                 }
-                List<SubDivisionDetails> subdivisions = divisions != null ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
-                DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
-                {
-                    Divisions = new SelectList(divisions, "Id", "Name"),
-                    SubDivisions = new SelectList(subdivisions, "Id", "Name"),
-                    RoleName = role
-                };
-                //return View(_employeeRepository.GetAllEmployees());
-                return View(model);
+            }
+            catch (Exception ex)
+            {
+                return View();
             }
         }
 
@@ -192,15 +261,18 @@ namespace Noc_App.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetPendency(int divisionId, int subdivisionId)
+        public async Task<IActionResult> GetRoleLevel(string divisiondetailId, string subdivisiondetailId, string role)
         {
+            int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+            int subdivisionId = subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Retrieve the user object
             var userDetail = await _userManager.FindByIdAsync(userId);
 
             // Retrieve roles associated with the user
-            var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
+
+             role = role==null?(await _userManager.GetRolesAsync(userDetail)).FirstOrDefault(): role;
             if (role.ToUpper() == "ADMINISTRATOR")
             {
                 return Json(null);
@@ -210,11 +282,11 @@ namespace Noc_App.Controllers
                 DivisionDetails divisions = new DivisionDetails();
                 if (divisionId == 0)
                 {
-                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS")
+                    if (role.ToUpper() == "PRINCIPAL SECRETARY" || role.ToUpper() == "EXECUTIVE ENGINEER HQ" || role.ToUpper() == "CHIEF ENGINEER HQ" || role.ToUpper() == "DWS")
                     {
                         divisions = _divisionRepo.GetAll().FirstOrDefault();
                     }
-                    else
+                    else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
                     {
                         divisions = (from u in _userDivisionRepository.GetAll()
                                      join d in _divisionRepo.GetAll() on u.DivisionId equals (d.Id)
@@ -226,22 +298,94 @@ namespace Noc_App.Controllers
                                      }
                                             ).FirstOrDefault();
                     }
+                    else if (role == "SUB DIVISIONAL OFFICER")
+                    {
+                        divisions = (from u in _userSubDivisionRepository.GetAll()
+                                     join sub in _subDivisionRepo.GetAll() on u.SubdivisionId equals (sub.Id)
+                                     join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                                ).FirstOrDefault();
+                    }
+                    else
+                    {
+                        divisions = (from u in _userVillageRepository.GetAll()
+                                     join v in _villageRpo.GetAll() on u.VillageId equals (v.Id)
+                                     join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
+                                     join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals (sub.Id)
+                                     join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                                ).FirstOrDefault();
+                    }
                     divisionId = divisions.Id;
                 }
-                if (subdivisionId == 0)
+                if (role.ToUpper() == "EXECUTIVE ENGINEER")
                 {
-                    subdivisionId = (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisionId)).FirstOrDefault().Id;
+                    if (subdivisionId == 0)
+                    {
+                        var subs = (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisionId));
+                        subdivisionId = subs.Count()>0? subs.FirstOrDefault().Id:0;
+                    }
+                }
+                else if (role.ToUpper() == "SUB DIVISIONAL OFFICER")
+                {
+                    if (subdivisionId == 0)
+                    {
+                        var subs = (from u in _userSubDivisionRepository.GetAll()
+                                    join d in _subDivisionRepo.GetAll() on u.SubdivisionId equals (d.Id)
+                                    where u.UserId == userId && d.DivisionId == divisionId
+                                    select new SubDivisionDetails
+                                    {
+                                        Id = d.Id,
+                                        Name = d.Name
+                                    }
+                                            ).ToList();
+                        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
+                    }
+                }
+                else
+                {
+                    if (subdivisionId == 0)
+                    {
+                        var subs = (from u in _userVillageRepository.GetAll()
+                                    join v in _villageRpo.GetAll() on u.VillageId equals (v.Id)
+                                    join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
+                                    join d in _subDivisionRepo.GetAll() on t.SubDivisionId equals (d.Id)
+                                    where u.UserId == userId && d.DivisionId == divisionId
+                                    select new SubDivisionDetails
+                                    {
+                                        Id = d.Id,
+                                        Name = d.Name
+                                    }
+                                            ).ToList();
+                        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
+                    }
                 }
                 List<object> list = new List<object>();
 
                 switch (role)
                 {
-                    //case "JUNIOR ENGINEER":
-                    //    forwardToRole = "SUB DIVISIONAL OFFICER";
-                    //    break;
-                    //case "SUB DIVISIONAL OFFICER":
-                    //    forwardToRole = "EXECUTIVE ENGINEER";
-                    //    break;
+                    case "JUNIOR ENGINEER":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER"
+                        });
+                        break;
+                    case "SUB DIVISIONAL OFFICER":
+                        list.Add(new object[]
+                        {
+                        "Division","SUB DIVISIONAL OFFICER"
+                        });
+                        break;
                     case "EXECUTIVE ENGINEER":
                         list.Add(new object[]
                         {
@@ -279,17 +423,23 @@ namespace Noc_App.Controllers
                         }); break;
                 }
 
-                List<DashboardPendencyAll> model = (await _pendencyDetailsRepo.ExecuteStoredProcedureAsync<DashboardPendencyAll>("getpendencytoforward", "'" + divisionId + "'", "'" + subdivisionId + "'", "'" + role + "'")).ToList();
+                List<DashboardPendencyAll> model = (await _pendencyDetailsRepo.ExecuteStoredProcedureAsync<DashboardPendencyAll>("getpendencytoforward1", "'" + divisionId + "'", "'" + subdivisionId + "'", "'" + role + "'")).ToList();
                 foreach (DashboardPendencyAll item in model)
                 {
                     switch (role)
                     {
-                        //case "JUNIOR ENGINEER":
-                        //    forwardToRole = "SUB DIVISIONAL OFFICER";
-                        //    break;
-                        //case "SUB DIVISIONAL OFFICER":
-                        //    forwardToRole = "EXECUTIVE ENGINEER";
-                        //    break;
+                        case "JUNIOR ENGINEER":
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER)
+                               });
+                            break;
+                        case "SUB DIVISIONAL OFFICER":
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER)
+                               });
+                            break;
                         case "EXECUTIVE ENGINEER":
                             list.Add(new object[]
                                {
@@ -335,5 +485,124 @@ namespace Noc_App.Controllers
                 return Json(list);
             }
         }
+
+        [HttpPost]
+        public IActionResult GetRoleLevelPendencyReport(string divisiondetailId, string subdivisiondetailId, string role)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            //// Retrieve the user object
+            //var userDetail = await _userManager.FindByIdAsync(userId);
+
+            //// Retrieve roles associated with the user
+            //var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
+
+            int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+            int subdivisionId = subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
+            if (role != null && role.ToUpper() == "ADMINISTRATOR")
+            {
+                return Json(null);
+            }
+            else
+            {
+                DivisionDetails divisions = new DivisionDetails();
+                if (divisionId == 0)
+                {
+                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS")
+                    {
+                        divisions = _divisionRepo.GetAll().FirstOrDefault();
+                    }
+                    else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
+                    {
+                        divisions = (from u in _userDivisionRepository.GetAll()
+                                     join d in _divisionRepo.GetAll() on u.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                            ).FirstOrDefault();
+                    }
+                    else if (role == "SUB DIVISIONAL OFFICER")
+                    {
+                        divisions = (from u in _userSubDivisionRepository.GetAll()
+                                     join sub in _subDivisionRepo.GetAll() on u.SubdivisionId equals (sub.Id)
+                                     join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                                ).FirstOrDefault();
+                    }
+                    else
+                    {
+                        divisions = (from u in _userVillageRepository.GetAll()
+                                     join v in _villageRpo.GetAll() on u.VillageId equals (v.Id)
+                                     join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
+                                     join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals (sub.Id)
+                                     join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                                     where u.UserId == userId
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }
+                                                ).FirstOrDefault();
+                    }
+                    divisionId = divisions.Id;
+                }
+                if (role.ToUpper() == "EXECUTIVE ENGINEER")
+                {
+                    if (subdivisionId == 0)
+                    {
+                        var subs = (_subDivisionRepo.Find(x => x.DivisionId == divisionId));
+                        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
+                    }
+                }
+                else if (role.ToUpper() == "SUB DIVISIONAL OFFICER")
+                {
+                    if (subdivisionId == 0)
+                    {
+                        var subs = (from u in _userSubDivisionRepository.GetAll()
+                                    join d in _subDivisionRepo.GetAll() on u.SubdivisionId equals (d.Id)
+                                    where u.UserId == userId && d.DivisionId == divisionId
+                                    select new SubDivisionDetails
+                                    {
+                                        Id = d.Id,
+                                        Name = d.Name
+                                    }
+                                            ).ToList();
+                        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
+                    }
+                }
+                else
+                {
+                    if (subdivisionId == 0)
+                    {
+                        var subs = (from u in _userVillageRepository.GetAll()
+                                    join v in _villageRpo.GetAll() on u.VillageId equals (v.Id)
+                                    join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
+                                    join d in _subDivisionRepo.GetAll() on t.SubDivisionId equals (d.Id)
+                                    where u.UserId == userId && d.DivisionId == divisionId
+                                    select new SubDivisionDetails
+                                    {
+                                        Id = d.Id,
+                                        Name = d.Name
+                                    }
+                                            ).ToList();
+                        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
+                    }
+                }
+
+
+                List<DashboardPendencyViewModel> model = _pendencyRepo.ExecuteStoredProcedure<DashboardPendencyViewModel>("getpendencytoforwardReport", "'" + divisionId + "'", "'" + subdivisionId + "'", "'" + role + "'").ToList();
+
+                return Json(model);
+            }
+        }
+        
     }
 }

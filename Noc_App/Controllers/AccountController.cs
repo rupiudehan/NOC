@@ -165,10 +165,10 @@ namespace Noc_App.Controllers
                         var role = (await userManager.GetRolesAsync(userDetail)).FirstOrDefault();
                         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
                         else {
-                            //if (role.ToUpper() == "ADMINISTRATOR")
+                            if (role.ToUpper() != "JUNIOR ENGINEER" && role.ToUpper()!= "SUB DIVISIONAL OFFICER")
                                 return RedirectToAction("index", "home");
-                            //else
-                            //    return RedirectToAction("Index", "ApprovalProcess");
+                            else
+                                return RedirectToAction("Index", "ApprovalProcess");
                         }
                     }
 
@@ -362,7 +362,7 @@ namespace Noc_App.Controllers
                     await this.userManager.UpdateAsync(user);
 
                     var emailModel = new EmailModel(user.Email, "Login Credentials", EmailBody.EmailStringBodyForInformation(user.Email, password));
-                    _emailService.SendEmail(emailModel, "Punjab Irrigation Department");
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
 
                     //userManager.AddToRoleAsync(user, "User").Wait();
                     //await signInManager.SignInAsync(user, isPersistent: false);

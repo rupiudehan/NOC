@@ -29,7 +29,18 @@
             font-weight:bolder;
         }
     </style>
-
+    @functions {
+        private bool IsLinkActive(string controller, string action)
+        {
+            // if (controller == "Home") return true;
+            // else
+            // {
+            var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+            var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+            return string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) && string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+            // }
+        }
+    }
 </head>
 
 <body id="page-top">
@@ -53,15 +64,19 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            @* <li class="nav-item active">
-                <a class="nav-link" asp-action="Index" asp-controller="Home">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li> *@
+            @if (signInManager.IsSignedIn(User) && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER")))
+            {
+                <li class="nav-item @(IsLinkActive("Home","Index") ? "active" : "")">
+                    <a class="nav-link" asp-action="Index" asp-controller="Home">
+                        <i class="fas fa-fw fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <hr class="sidebar-divider">
+            }
             @if (signInManager.IsSignedIn(User) && User.IsInRole("Administrator"))
-                        {
-            <li class="nav-item active">
+            {
+                <li class="nav-item active">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
                    aria-expanded="true" aria-controls="masters">
                     <i class="fas fa-fw fa-cog"></i>
@@ -83,16 +98,18 @@
                 </div>
                 
                 
-            </li>
+                </li>
+                <hr class="sidebar-divider">
             }
             else if (signInManager.IsSignedIn(User))
             {
-                <li class="nav-item active">
+                <li class="nav-item @(IsLinkActive("ApprovalProcess","Index") ? "active" : "")">
                     <a class="nav-link" asp-action="Index" asp-controller="ApprovalProcess">
-                        <i class="fas fa-fw fa-tachometer-alt"></i>
+                        <i class="fas fa-fw fa-wrench"></i>
                         <span>Approve/Reject NOC</span>
                     </a>
                 </li>
+                <hr class="sidebar-divider">
             }
             <!-- Divider -->
            @*  <hr class="sidebar-divider">
@@ -293,8 +310,11 @@
             </div>
         </div>
     </div>
+    
 
     <!-- Bootstrap core JavaScript-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="~/vendor/jquery/jquery.min.js"></script>
     <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
@@ -314,7 +334,6 @@
     <script src="~/lib/js/datatables/buttons.print.min.js"></script>
     <script src="~/lib/js/datatables/buttons.colVis.min.js"></script>
     <script src="~/lib/js/init/datatables-init.js"></script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>

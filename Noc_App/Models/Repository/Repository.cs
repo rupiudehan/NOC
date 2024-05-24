@@ -134,6 +134,10 @@ namespace Noc_App.Models.Repository
         {
             return await _dbSet.Where(predicate).ToListAsync();
         }
+        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.Where(predicate).ToList();
+        }
         public bool IsDuplicateName(string name)
         {
             var result = _dbSet.AsEnumerable().Any(e => e.GetType().GetProperty("Name").GetValue(e).ToString() == name);
@@ -169,6 +173,22 @@ namespace Noc_App.Models.Repository
                 return null;
             }
             
+        }
+
+        public List<T> ExecuteStoredProcedure<T2>(string storedProcedureName, params object[] parameters)
+        {
+            try
+            {
+                var parameterNames = string.Join(", ", parameters);
+                var sql = $"SELECT * FROM {storedProcedureName} ({parameterNames})";
+                List<T> list = _dbSet.FromSqlRaw(sql).ToList();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
         }
 
         //public void UpdateUserAssociations(ApplicationUser user, List<int> selectedDivisionIds, List<int> selectedSubdivisionIds, List<int> selectedTehsilIds, List<int> selectedVillageIds)
