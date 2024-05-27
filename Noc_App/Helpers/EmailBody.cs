@@ -59,7 +59,27 @@ namespace Noc_App.Helpers
                     <div>
                         <p>Dear {applicantName},</p>
                         
-                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been successfully submitted.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
+                        <p>Best Regards,<br><br>
+                        Department of Water Resources, Punjab</p>
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>";
+        }
+
+        public static string EmailStringBodyForGrantMessageWithPayment(string applicantName, string applicationID,string transactionID)
+        {
+            return $@"<htm>
+            <head></head>
+            <body style=""margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;"">
+            <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
+                <div>
+                    <div>
+                        <p>Dear {applicantName},</p>
+                        
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully. <br/>Payment has been done with transaction number {transactionID}.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
                         <p>Best Regards,<br><br>
                         Department of Water Resources, Punjab</p>
                     </div>

@@ -119,6 +119,40 @@ namespace Noc_App.Controllers
             } 
         }
 
+        public async Task<ViewResult> Recommendations()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Retrieve the user object
+                var userDetail = await _userManager.FindByIdAsync(userId);
+
+                // Retrieve roles associated with the user
+                var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
+                List<UserDivision> userDiv = (await _userDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
+                List<UserSubdivision> userSubdiv = (await _userSubDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
+                List<UserVillage> userVillage = (await _userVillageRepository.FindAsync(x => x.UserId == user.Id)).ToList();
+                List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
+                List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
+                model = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
+                var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
+                var modelRejected = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsrejected", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
+
+                modelView.Add(model);
+                modelView.Add(modelForwarded);
+                modelView.Add(modelRejected);
+
+                return View(modelView);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View();
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> Transfer(string id)
         {

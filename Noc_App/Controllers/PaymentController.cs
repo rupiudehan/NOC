@@ -28,7 +28,8 @@ namespace Noc_App.Controllers
         private readonly IRepository<GrantPaymentDetails> _repoPayment;
         private readonly IRepository<GrantDetails> _repo;
         private readonly IRepository<ChallanDetails> _repoChallanDetails;
-        public PaymentController(ILogger<PaymentController> logger, IRepository<GrantDetails> repo, IRepository<GrantPaymentDetails> repoPayment, IPaymentService service, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IRepository<ChallanDetails> repoChallanDetails)
+        private readonly IEmailService _emailService;
+        public PaymentController(ILogger<PaymentController> logger, IEmailService emailService, IRepository<GrantDetails> repo, IRepository<GrantPaymentDetails> repoPayment, IPaymentService service, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IRepository<ChallanDetails> repoChallanDetails)
         {
             _logger = logger;
             _service = service;
@@ -37,6 +38,7 @@ namespace Noc_App.Controllers
             _repoPayment = repoPayment;
             _repo = repo;
             _repoChallanDetails = repoChallanDetails;
+            _emailService = emailService;
         }
 
         [AllowAnonymous]
@@ -369,6 +371,8 @@ namespace Noc_App.Controllers
                 };
                 await _repoPayment.CreateAsync(payment);
                 await _repoChallanDetails.UpdateAsync(challanDetail);
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, ResponseData.challandata.deptRefNo));
+                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
                 return RedirectToAction("Index", "Grant", new { Id = id });
             }
         }

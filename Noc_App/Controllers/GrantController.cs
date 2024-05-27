@@ -74,7 +74,7 @@ namespace Noc_App.Controllers
             _calculations = calculations;
         }
         [AllowAnonymous]
-        public async Task<ViewResult> Index(string Id)
+        public ViewResult Index(string Id)
         {
             try
             {
