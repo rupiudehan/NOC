@@ -305,6 +305,46 @@
                 LoadBarPendancyChart();
             });
             LoadBarPendancyChart();
+            $("#tblPendancy").DataTable({
+                dom: 'Blfrtip',
+                buttons: [
+
+                    // {
+                    //     extend: 'copy',
+                    //     text: '<i class="fas fa-copy"></i>',
+                    //     titleAttr: 'Copy',
+                    //     className: 'btn btn-md mr-2 btn-copy'
+                    // },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel"></i>',
+                        titleAttr: 'Excel',
+                        className: 'btn btn-primary btn-sm',
+                        title: 'Pendency Report'
+                    },
+                    // {
+                    //     extend: 'pdf',
+                    //     text: '<i class="fas fa-file-pdf"></i>',
+                    //     titleAttr: 'PDF',
+                    //     className: 'btn btn-md mr-2 btn-pdf'
+                    // },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i>',
+                        titleAttr: 'Print',
+                        className: 'btn btn-md mr-2 btn-print',
+                        title: 'Pendency Report'
+                    },
+
+                ],
+                'ordering': true,
+                'searching': true,
+                'info': false,
+                "serverSide": false,
+                "lengthMenu": [[10, 30, 50 - 1], [10, 30, 50, "All"]],
+                "pageLength": 10,
+
+            });
         });
         // Notice that e is not used or needed.
 
@@ -405,46 +445,6 @@
                             tr += '</tr>';
                             body.append(tr);
                             count++;
-                        });
-                        table.DataTable({
-                            dom: 'Blfrtip',
-                            buttons: [
-
-                                // {
-                                //     extend: 'copy',
-                                //     text: '<i class="fas fa-copy"></i>',
-                                //     titleAttr: 'Copy',
-                                //     className: 'btn btn-md mr-2 btn-copy'
-                                // },
-                                {
-                                    extend: 'excel',
-                                    text: '<i class="fas fa-file-excel"></i>',
-                                    titleAttr: 'Excel',
-                                    className: 'btn btn-primary btn-sm',
-                                    title: 'Pendency Report'
-                                },
-                                // {
-                                //     extend: 'pdf',
-                                //     text: '<i class="fas fa-file-pdf"></i>',
-                                //     titleAttr: 'PDF',
-                                //     className: 'btn btn-md mr-2 btn-pdf'
-                                // },
-                                {
-                                    extend: 'print',
-                                    text: '<i class="fas fa-print"></i>',
-                                    titleAttr: 'Print',
-                                    className: 'btn btn-md mr-2 btn-print',
-                                    title: 'Pendency Report'
-                                },
-
-                            ],
-                            'ordering': true,
-                            'searching': true,
-                            'info': false,
-                            "serverSide": false,
-                            "lengthMenu": [[10, 30, 50 - 1], [10, 30, 50, "All"]],
-                            "pageLength": 10,
-
                         });
                     }
                 },

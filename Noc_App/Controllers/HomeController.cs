@@ -362,7 +362,7 @@ namespace Noc_App.Controllers
                         subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
                     }
                 }
-                else
+                else if (role.ToUpper() == "JUNIOR ENGINEER")
                 {
                     if (subdivisionId == 0)
                     {
@@ -497,21 +497,21 @@ namespace Noc_App.Controllers
         }
 
         [HttpPost]
-        public IActionResult GetRoleLevelPendencyReport(string divisiondetailId, string subdivisiondetailId, string role)
+        public async Task<IActionResult> GetRoleLevelPendencyReport(string divisiondetailId, string subdivisiondetailId, string role)
         {
             try
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 //// Retrieve the user object
-                //var userDetail = await _userManager.FindByIdAsync(userId);
+                var userDetail = await _userManager.FindByIdAsync(userId);
 
                 //// Retrieve roles associated with the user
-                //var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
+                var roleName = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
 
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
                 int subdivisionId = subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
-                if (role != null && role.ToUpper() == "ADMINISTRATOR")
+                if (roleName != null && roleName.ToUpper() == "ADMINISTRATOR")
                 {
                     return Json(null);
                 }
@@ -520,11 +520,11 @@ namespace Noc_App.Controllers
                     DivisionDetails divisions = new DivisionDetails();
                     if (divisionId == 0)
                     {
-                        if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS")
+                        if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER HQ" || roleName == "CHIEF ENGINEER HQ" || roleName == "DWS")
                         {
                             divisions = _divisionRepo.GetAll().FirstOrDefault();
                         }
-                        else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
+                        else if (roleName != "SUB DIVISIONAL OFFICER" && roleName != "JUNIOR ENGINEER")
                         {
                             divisions = (from u in _userDivisionRepository.GetAll()
                                          join d in _divisionRepo.GetAll() on u.DivisionId equals (d.Id)
@@ -536,7 +536,7 @@ namespace Noc_App.Controllers
                                          }
                                                 ).FirstOrDefault();
                         }
-                        else if (role == "SUB DIVISIONAL OFFICER")
+                        else if (roleName == "SUB DIVISIONAL OFFICER")
                         {
                             divisions = (from u in _userSubDivisionRepository.GetAll()
                                          join sub in _subDivisionRepo.GetAll() on u.SubdivisionId equals (sub.Id)
@@ -566,7 +566,7 @@ namespace Noc_App.Controllers
                         }
                         divisionId = divisions.Id;
                     }
-                    if (role.ToUpper() == "EXECUTIVE ENGINEER")
+                    if (roleName.ToUpper() == "EXECUTIVE ENGINEER")
                     {
                         if (subdivisionId == 0)
                         {
@@ -574,7 +574,7 @@ namespace Noc_App.Controllers
                             subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
                         }
                     }
-                    else if (role.ToUpper() == "SUB DIVISIONAL OFFICER")
+                    else if (roleName.ToUpper() == "SUB DIVISIONAL OFFICER")
                     {
                         if (subdivisionId == 0)
                         {
@@ -590,7 +590,7 @@ namespace Noc_App.Controllers
                             subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
                         }
                     }
-                    else
+                    else if (roleName.ToUpper() == "JUNIOR ENGINEER")
                     {
                         if (subdivisionId == 0)
                         {

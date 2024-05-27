@@ -118,41 +118,6 @@ namespace Noc_App.Controllers
                 return View();
             } 
         }
-
-        public async Task<ViewResult> Recommendations()
-        {
-            try
-            {
-                var user = await _userManager.GetUserAsync(User);
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // Retrieve the user object
-                var userDetail = await _userManager.FindByIdAsync(userId);
-
-                // Retrieve roles associated with the user
-                var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
-                List<UserDivision> userDiv = (await _userDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-                List<UserSubdivision> userSubdiv = (await _userSubDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-                List<UserVillage> userVillage = (await _userVillageRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-                List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
-                List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
-                model = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
-                var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
-                var modelRejected = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsrejected", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
-
-                modelView.Add(model);
-                modelView.Add(modelForwarded);
-                modelView.Add(modelRejected);
-
-                return View(modelView);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
-            }
-        }
-
         [HttpGet]
         public async Task<IActionResult> Transfer(string id)
         {
@@ -1412,6 +1377,43 @@ namespace Noc_App.Controllers
                           ).ToList();
             return Json(new SelectList(officerDetail, "UserId", "UserName"));
         }
+
+        [HttpPost]
+        public IActionResult GetRecommendationDetail(string id)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+                    return View("NotFound");
+                }
+
+                List<GrantApprovalRecommendationDetail> model = (from g in _repo.GetAll()
+                                                                 join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
+                                                                 join recommend in _repoRecommendation.GetAll() on a.RecommendationID equals recommend.Id
+                                                                 where g.ApplicationID == id && g.IsPending == true && recommend.Code != "NA"
+                                                                 orderby a.ProcessedOn descending
+                                                                 select new GrantApprovalRecommendationDetail
+                                                                 {
+                                                                     ApplicationId = g.ApplicationID,
+                                                                     Recommended = recommend.Name,
+                                                                     RecommendedBy = a.ProcessedByRole,
+                                                                     RecommendedTo = a.ProcessedToRole,
+                                                                     Remarks = a.Remarks
+                                                                 }).ToList();
+
+
+
+                return Json(model);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                //ModelState.AddModelError(string.Empty, ex.Message);
+                return View();
+            }
+        }
     }
 
     public class GrantUnprocessedAppDetailsComparer : IEqualityComparer<GrantUnprocessedAppDetails>
@@ -1427,5 +1429,6 @@ namespace Noc_App.Controllers
             // Get hash code of Id property
             return obj.Id.GetHashCode();
         }
+
     }
 }
