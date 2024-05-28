@@ -609,7 +609,7 @@ namespace Noc_App.Controllers
                         }
                     }
 
-
+                    
                     List<DashboardPendencyViewModel> model = _pendencyRepo.ExecuteStoredProcedure<DashboardPendencyViewModel>("getpendencytoforwardReport", "'" + divisionId + "'", "'" + subdivisionId + "'", "'" + role + "'").ToList();
                     
                     return Json(model);
