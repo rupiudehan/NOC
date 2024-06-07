@@ -106,7 +106,8 @@
                 </li>
                 <hr class="sidebar-divider">
             }
-            @if (User.Identity.IsAuthenticated && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER") && (!User.IsInRole("Administrator"))))
+            @if (User.Identity.IsAuthenticated && (!User.IsInRole("Junior Engineer")) && (!User.IsInRole("Sub Divisional Officer") && (!User.IsInRole("Administrator"))))
+            @* @if (User.Identity.IsAuthenticated && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER") && (!User.IsInRole("Administrator")))) *@
             {
                 <li class="nav-item @(IsLinkActive("ApprovalProcess","Index") ? "active" : "")">
                     <a class="nav-link" asp-action="Index" asp-controller="ApprovalProcess">

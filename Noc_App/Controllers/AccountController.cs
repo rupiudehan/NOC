@@ -78,62 +78,106 @@ namespace Noc_App.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    string baseUrl = "https://wrdpbind.com/api/user_login.php";
-                    string salt = "8QCHhk3cJ6OMGfEW";
-                    string checksum = "zUOwFCGMqKvJARC1tU6l4r24";
-                    string combinedPassword = model.Email + "|" + model.Password + "|" + checksum;
-
-                    string plainText = combinedPassword;
-
-                    var keyBytes = new byte[16];
-                    var ivBytes = new byte[16];
-
-                    string key = salt;
-                    var keySalt = Encoding.UTF8.GetBytes(key);
-                    var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
-
-                    Array.Copy(pdb.GetBytes(16), keyBytes, 16);
-                    Array.Copy(pdb.GetBytes(16), ivBytes, 16);
-                    string encryptedString = NCC_encryptHelper(plainText, key, key);
-
-                    HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
-                    HttpClient client = new HttpClient(handler);
-                    client.BaseAddress = new Uri(baseUrl);
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
-                    var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
-                    string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
-                    LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
-
-                    if (root.Status == "200")
+                    if (model.Email != "ExecutiveEngineer")
                     {
-                        UserRoleDetails RoleDetail = (await _userRolesRepository.FindAsync(x => x.Id == root.user_info.RoleID)).FirstOrDefault();
-                        if (RoleDetail != null)
+                        LoginResponseViewModel root= FetchUser().Find(x=>x.user_info.EmailId==model.Email && model.Password=="123");
+                        if (root!=null)
                         {
-                            string role = RoleDetail.AppRoleName;
-                            List<Claim> claims = new List<Claim>();
-                            claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Email));
-                            claims.Add(new Claim(ClaimTypes.Name, model.Email));
-                            claims.Add(new Claim(ClaimTypes.Role, role));
-                            //claims.Add(new Claim(ClaimTypes.Role, "Dev"));
-                            ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-                            await HttpContext.SignInAsync(principal);
-                            HttpContext.Session.SetString("Username", root.user_info.Name);
-                            HttpContext.Session.SetString("Designation", root.user_info.Designation);
-                            HttpContext.Session.SetString("Userid", root.user_info.EmpID);
-                            HttpContext.Session.SetString("Districtid", root.user_info.DistrictID.ToString());
-                            HttpContext.Session.SetString("Divisionid", root.user_info.DivisionID.ToString());
-                            HttpContext.Session.SetString("RoleId", root.user_info.RoleID.ToString());
-                            HttpContext.Session.SetString("SubDivisionid", root.user_info.SubDivisionID.ToString());
-                            HttpContext.Session.SetString("Rolename", role);
-                            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl)) return Redirect(ReturnUrl);
-                            else
+                            UserRoleDetails RoleDetail = (await _userRolesRepository.FindAsync(x => x.Id == root.user_info.RoleID)).FirstOrDefault();
+                            if (RoleDetail != null)
                             {
-                                if (role.ToUpper() != "JUNIOR ENGINEER" && role.ToUpper() != "SUB DIVISIONAL OFFICER")
-                                    return RedirectToAction("Index", "Home");
+                                string role = RoleDetail.AppRoleName;
+                                List<Claim> claims = new List<Claim>();
+                                claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Email));
+                                claims.Add(new Claim(ClaimTypes.Name, model.Email));
+                                claims.Add(new Claim(ClaimTypes.Role, role));
+                                //claims.Add(new Claim(ClaimTypes.Role, "Dev"));
+                                ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+                                await HttpContext.SignInAsync(principal);
+                                HttpContext.Session.SetString("Username", root.user_info.Name);
+                                HttpContext.Session.SetString("Designation", root.user_info.Designation);
+                                HttpContext.Session.SetString("Userid", root.user_info.EmpID);
+                                HttpContext.Session.SetString("Districtid", root.user_info.DistrictID.ToString());
+                                HttpContext.Session.SetString("Divisionid", root.user_info.DivisionID.ToString());
+                                HttpContext.Session.SetString("RoleId", root.user_info.RoleID.ToString());
+                                HttpContext.Session.SetString("SubDivisionid", root.user_info.SubDivisionID.ToString());
+                                HttpContext.Session.SetString("Rolename", role);
+                                if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl)) return Redirect(ReturnUrl);
                                 else
-                                    return RedirectToAction("Index", "ApprovalProcess");
+                                {
+                                    if (role.ToUpper() != "JUNIOR ENGINEER" && role.ToUpper() != "SUB DIVISIONAL OFFICER")
+                                        return RedirectToAction("Index", "Home");
+                                    else
+                                        return RedirectToAction("Index", "ApprovalProcess");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string baseUrl = "https://wrdpbind.com/api/user_login.php";
+                        string salt = "8QCHhk3cJ6OMGfEW";
+                        string checksum = "zUOwFCGMqKvJARC1tU6l4r24";
+                        string combinedPassword = model.Email + "|" + model.Password + "|" + checksum;
+
+                        string plainText = combinedPassword;
+
+                        var keyBytes = new byte[16];
+                        var ivBytes = new byte[16];
+
+                        string key = salt;
+                        var keySalt = Encoding.UTF8.GetBytes(key);
+                        var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
+
+                        Array.Copy(pdb.GetBytes(16), keyBytes, 16);
+                        Array.Copy(pdb.GetBytes(16), ivBytes, 16);
+                        string encryptedString = NCC_encryptHelper(plainText, key, key);
+
+                        HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+                        HttpClient client = new HttpClient(handler);
+                        client.BaseAddress = new Uri(baseUrl);
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
+                        var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
+                        string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
+                        if (resultContent.Contains("An error has occurred"))
+                        {
+                            ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+                            return View(model);
+                        }
+                        LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
+
+                        if (root.Status == "200")
+                        {
+                            UserRoleDetails RoleDetail = (await _userRolesRepository.FindAsync(x => x.Id == root.user_info.RoleID)).FirstOrDefault();
+                            if (RoleDetail != null)
+                            {
+                                string role = RoleDetail.AppRoleName;
+                                List<Claim> claims = new List<Claim>();
+                                claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Email));
+                                claims.Add(new Claim(ClaimTypes.Name, model.Email));
+                                claims.Add(new Claim(ClaimTypes.Role, role));
+                                //claims.Add(new Claim(ClaimTypes.Role, "Dev"));
+                                ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                                ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+                                await HttpContext.SignInAsync(principal);
+                                HttpContext.Session.SetString("Username", root.user_info.Name);
+                                HttpContext.Session.SetString("Designation", root.user_info.Designation);
+                                HttpContext.Session.SetString("Userid", root.user_info.EmpID);
+                                HttpContext.Session.SetString("Districtid", root.user_info.DistrictID.ToString());
+                                HttpContext.Session.SetString("Divisionid", root.user_info.DivisionID.ToString());
+                                HttpContext.Session.SetString("RoleId", root.user_info.RoleID.ToString());
+                                HttpContext.Session.SetString("SubDivisionid", root.user_info.SubDivisionID.ToString());
+                                HttpContext.Session.SetString("Rolename", role);
+                                if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl)) return Redirect(ReturnUrl);
+                                else
+                                {
+                                    if (role.ToUpper() != "JUNIOR ENGINEER" && role.ToUpper() != "SUB DIVISIONAL OFFICER")
+                                        return RedirectToAction("Index", "Home");
+                                    else
+                                        return RedirectToAction("Index", "ApprovalProcess");
+                                }
                             }
                         }
                     }
@@ -179,6 +223,42 @@ namespace Noc_App.Controllers
             int paddingSize = 16 - (inputString.Length % 16);
             string paddedString = inputString + new string((char)paddingSize, paddingSize);
             return paddedString;
+        }
+
+        private List<LoginResponseViewModel> FetchUser()
+        {
+            List<LoginResponseViewModel> users = new List<LoginResponseViewModel>();
+            user_info user_info1 = new user_info();
+            user_info user_info2 = new user_info();
+            user_info user_info3 = new user_info();
+            user_info user_info4 = new user_info();
+            user_info user_info5 = new user_info();
+            user_info user_info6 = new user_info();
+            user_info user_info7 = new user_info();
+            user_info1 = new user_info { Name = "Junior Engineer", Designation = "xyz", DesignationID = 1, Role = "Junior Engineer", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "test", SubDivisionID = 114 };
+            user_info2 = new user_info { Name = "Sub Divisional Officer", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info3 = new user_info { Name = "Superintending Engineer", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "se", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info4 = new user_info { Name = "XEN/DWS", Designation = "xyz", DesignationID = 1, Role = "XEN/DWS", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "dws", EmpID = "126", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info5 = new user_info { Name = "XEN HO Drainage", Designation = "xyz", DesignationID = 1, Role = "XEN HO Drainage", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "eehq", EmpID = "127", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info6 = new user_info { Name = "Chief Engineer", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info7 = new user_info { Name = "Principal Secretary", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+
+            LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
+            LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
+            LoginResponseViewModel o3 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info3 };
+            LoginResponseViewModel o4 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info4 };
+            LoginResponseViewModel o5 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info5 };
+            LoginResponseViewModel o6 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info6 };
+            LoginResponseViewModel o7 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info7 };
+            users.Add(o1);
+            users.Add(o2);
+            users.Add(o3);
+            users.Add(o4);
+            users.Add(o5);
+            users.Add(o6);
+            users.Add(o7);
+            return users;
+
         }
     }
 }

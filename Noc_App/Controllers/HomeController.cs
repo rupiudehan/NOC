@@ -353,6 +353,18 @@ namespace Noc_App.Controllers
             }
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
+        private async Task<UserRoleDetails> GetAppRoleName(string rolename)
+        {
+            try
+            {
+                return (await _userRolesRepository.FindAsync(x => x.AppRoleName == rolename)).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
         [HttpPost]
@@ -367,7 +379,8 @@ namespace Noc_App.Controllers
                 // Retrieve roles associated with the user
                 var roleName = LoggedInRoleName();
 
-                roleName = (await GetRoleName(roleName)).AppRoleName;
+                roleName = (await GetAppRoleName(roleName)).RoleName;
+                //roleName = (await GetRoleName(roleName)).AppRoleName;
 
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
                 int subdivisionId = subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
