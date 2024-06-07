@@ -6,10 +6,12 @@ namespace Noc_App.Models.interfaces
     public interface IRepository<T>
     {
         Task<T> GetByIdAsync(int id);
+        T GetById(int id);
         Task<T> GetBylongIdAsync(long id);
         IQueryable<T> GetAll();
-        Task CreateAsync(T division);
-        Task UpdateAsync(T division);
+        Task CreateAsync(T entity);
+        Task UpdateAsync(T entity);
+        void Update(T entity);
         Task DeleteAsync(int id);
         Task DeleteNonPrimaryAsync(Expression<Func<T, bool>> predicate);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);

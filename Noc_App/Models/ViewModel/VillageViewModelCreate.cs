@@ -26,7 +26,7 @@ namespace Noc_App.Models.ViewModel
         public int SelectedTehsilBlockId { get; set; }
         public IEnumerable<SelectListItem> TehsilBlock { get; set; }
         public bool IsActive { get; set; }
-        public List<ApplicationUser> CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
     }
 }

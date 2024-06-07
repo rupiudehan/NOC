@@ -7,6 +7,8 @@ namespace Noc_App.Models.ViewModel
     public class TehsilBlockViewModelCreate
     {
         [Required]
+        public int LGD_ID { get; set; }
+        [Required]
         [MaxLength(150, ErrorMessage = "Name cannot exceed 150 characters")]
         public string Name { get; set; }
         [Required]
@@ -18,7 +20,7 @@ namespace Noc_App.Models.ViewModel
         public int SelectedSubDivisionId { get; set; }
         public IEnumerable<SelectListItem> SubDivision { get; set; }
         public bool IsActive { get; set; }
-        public List<ApplicationUser> CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
     }
 }

@@ -5,7 +5,11 @@ namespace Noc_App.Models.ViewModel
 {
     public class OwnerViewModelCreate
     {
+        public int OId { get; set; }
+        public int RowId { get; set; }
+        public string OwnerTypeName { get; set; }
         [Required]
+        [Display(Name = "Owner Type")]
         public int SelectedOwnerTypeID { get; set; }
         public IEnumerable<SelectListItem> OwnerType { get; set; }
         [Required]

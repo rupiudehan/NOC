@@ -21,18 +21,14 @@ namespace Noc_App.Controllers
     [AllowAnonymous]
     public class PaymentController : Controller
     {
-        private readonly ILogger<PaymentController> _logger;
-        private readonly IPaymentService _service;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
         private readonly IRepository<GrantPaymentDetails> _repoPayment;
         private readonly IRepository<GrantDetails> _repo;
         private readonly IRepository<ChallanDetails> _repoChallanDetails;
         private readonly IEmailService _emailService;
-        public PaymentController(ILogger<PaymentController> logger, IEmailService emailService, IRepository<GrantDetails> repo, IRepository<GrantPaymentDetails> repoPayment, IPaymentService service, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IRepository<ChallanDetails> repoChallanDetails)
+        public PaymentController(IEmailService emailService, IRepository<GrantDetails> repo, IRepository<GrantPaymentDetails> repoPayment, IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IRepository<ChallanDetails> repoChallanDetails)
         {
-            _logger = logger;
-            _service = service;
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _repoPayment = repoPayment;
@@ -105,8 +101,8 @@ namespace Noc_App.Controllers
                             addLine1 = _paymentRequest.Village,
                             addLine2 = _paymentRequest.Tehsil,
                             addPincode = _paymentRequest.Pincode,
-                            district = 28.ToString(),//_paymentRequest.DistrictId,
-                            tehsil = 245.ToString(),//_paymentRequest.TehsilId
+                            district = _paymentRequest.DistrictId,
+                            tehsil = _paymentRequest.TehsilId
                         },
                         trsyPayments = new List<trsyPayments>()
                                          {

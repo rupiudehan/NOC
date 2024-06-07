@@ -6,7 +6,8 @@ namespace Noc_App.Models.ViewModel
 {
     public class GrantKhasraViewModelCreate
     {
-        public int Id { get; set; }
+        public int KId { get; set; }
+        public int RowId { get; set; }
         [Required]
         [MaxLength(50, ErrorMessage = "Khasra cannot exceed 50 characters")]
         public string KhasraNo { get; set; }
@@ -15,7 +16,7 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Marla/Biswa")]
         [NumericValidation(typeof(double))]
         public double MarlaOrBiswa { get; set; }
-        [Display(Name = "Kanal/")]
+        [Display(Name = "Kanal/Bigha")]
         [NumericValidation(typeof(double))]
         public double KanalOrBigha { get; set; }
         [Display(Name = "Sarsai/Biswansi")]

@@ -10,19 +10,17 @@ using System.Xml.Linq;
 
 namespace Noc_App.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     public class SubDivisionController : Controller
     {
         private readonly IRepository<SubDivisionDetails> _repo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
         private readonly IRepository<TehsilBlockDetails> _tehsilRepo;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public SubDivisionController(IRepository<SubDivisionDetails> repo, IRepository<DivisionDetails> divisionRepo, IRepository<TehsilBlockDetails> tehsilRepo, UserManager<ApplicationUser> userManager)
+        public SubDivisionController(IRepository<SubDivisionDetails> repo, IRepository<DivisionDetails> divisionRepo, IRepository<TehsilBlockDetails> tehsilRepo)
         {
             _repo = repo;
             _divisionRepo = divisionRepo;
-            _userManager = userManager;
             _tehsilRepo= tehsilRepo;
         }
         [HttpGet]
@@ -43,7 +41,7 @@ namespace Noc_App.Controllers
                 model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name");
                 if (ModelState.IsValid)
                 {
-                    string userid = await LoggedInUserID();
+                    string userid = LoggedInUserID();
                     bool IsDuplicate = _repo.IsDuplicateName(model.Name);
                     if (IsDuplicate)
                     {
@@ -152,7 +150,7 @@ namespace Noc_App.Controllers
                         ModelState.AddModelError("e", $"Name {model.Name} is already in use");
                         return View(model);
                     }
-                    string userid = await LoggedInUserID();
+                    string userid = LoggedInUserID();
                     obj.Name = model.Name;
                     obj.DivisionId = model.SelectedDivisionId;
                     obj.UpdatedOn = DateTime.Now;
@@ -218,19 +216,10 @@ namespace Noc_App.Controllers
 
             return RedirectToAction("List","SubDivision");
         }
-        private async Task<string> LoggedInUserID()
+        private string LoggedInUserID()
         {
-            string userid = "0";
-            var user = await _userManager.GetUserAsync(User);
-            var user2 = await _userManager.FindByNameAsync(user.UserName);
-
-            if (user != null)
-            {
-                userid = user2.Id;
-            }
-
-
-            return userid;
+            string userId = HttpContext.Session.GetString("Userid");
+            return userId;
         }
 
     } 

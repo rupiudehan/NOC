@@ -25,6 +25,7 @@ namespace Noc_App.Models.Payment
         public string Pincode { get; set; }
         public string PayerName { get; set; }
         public string MobileNo { get; set; }
+        public string AreaCalculation { get; set; }
         [Required]
         public int GrantId { get; set; }
         [Required]

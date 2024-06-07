@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>@ViewBag.Title</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/landingpage/assets/img/favicon.png" rel="icon">
+    <link href="~/landingpage/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/landingpage/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/landingpage/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="~/landingpage/assets/css/style.css" rel="stylesheet">
+    <style>
+        footer {
+            position: fixed;
+            height: 88px;
+            bottom: 0;
+            width: 100%;
+        }
+
+        main, #hero {
+            min-height: 82vh;
+            height: auto !important;
+            height: 100%;
+            margin: 0 auto 60px;
+        }
+    </style>
+    <style>
+        .close-icon {
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="header" class="d-flex align-items-center">
+        <div class="container d-flex align-items-center">
+            <img src="~/landingpage/assets/img/favicon.png" alt="NOC" height="45" width="45" style="margin-right:5px;" />
+            <h1 class="logo me-auto"><a href="#">NOC Drainage, Department of Water Resources, Punjab</a></h1>
+        </div>
+    </header><!-- End Header -->
+
+    <main id="main">
+        <section id="contact" class="contact">
+            <div class="container">
+                @RenderBody()
+            </div>
+        </section>
+    </main>
+    <footer id="footer">
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong><span>NOC</span></strong>. All Rights Reserved
+            </div>
+        </div>
+    </footer><!-- End Footer -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Vendor JS Files -->
+    <script src="~/landingpage/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/landingpage/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="~/landingpage/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="~/landingpage/assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="~/landingpage/assets/js/main.js"></script>
+    @if (IsSectionDefined("Scripts"))
+    {
+        @await RenderSectionAsync("Scripts", required: false)
+    }
+</body>
+
+</html>

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Noc_App.Controllers
 {
+    [Authorize(Roles = "Administrator,EXECUTIVE ENGINEER")]
     public class VillageController : Controller
     {
         private readonly IRepository<VillageDetails> _repo;
@@ -16,15 +17,13 @@ namespace Noc_App.Controllers
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
         private readonly IRepository<GrantDetails> _grantRepo;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public VillageController(IRepository<VillageDetails> repo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<GrantDetails> grantRepo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo, UserManager<ApplicationUser> userManager)
+        public VillageController(IRepository<VillageDetails> repo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<GrantDetails> grantRepo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo)
         {
             _repo = repo;
             _tehsilBlockRepo = tehsilBlockRepo;
             _subDivisionRepo = subDivisionRepo;
             _divisionRepo = divisionRepo;
-            _userManager = userManager;
             _grantRepo = grantRepo;
         }
         [HttpGet]
@@ -59,7 +58,7 @@ namespace Noc_App.Controllers
                         ModelState.AddModelError("e", $"Name {model.Name} is already in use");
                         return View(model);
                     }
-                    string userid = await LoggedInUserID();
+                    string userid = LoggedInUserID();
                     VillageDetails SaveModel = new VillageDetails
                     {
                         Name = model.Name,
@@ -180,7 +179,7 @@ namespace Noc_App.Controllers
                         ModelState.AddModelError("e", $"Name {model.Name} is already in use");
                         return View(model);
                     }
-                    string userid = await LoggedInUserID();
+                    string userid =  LoggedInUserID();
                     obj.Name = model.Name;
                     obj.PinCode=model.PinCode;
                     obj.TehsilBlockId = model.SelectedTehsilBlockId;
@@ -250,19 +249,10 @@ namespace Noc_App.Controllers
 
             return RedirectToAction("List", "Village");
         }
-        private async Task<string> LoggedInUserID()
+        private string LoggedInUserID()
         {
-            string userid = "0";
-            var user = await _userManager.GetUserAsync(User);
-            var user2 = await _userManager.FindByNameAsync(user.UserName);
-
-            if (user != null)
-            {
-                userid = user2.Id;
-            }
-
-
-            return userid;
+            string userId = HttpContext.Session.GetString("Userid");
+            return userId;
         }
 
         [HttpPost]

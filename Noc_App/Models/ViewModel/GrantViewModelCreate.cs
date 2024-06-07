@@ -21,14 +21,6 @@ namespace Noc_App.Models.ViewModel
         public string TotalAreaSqFeet { get; set; }
         [Display(Name = "Total Area in Sq Metre")]
         public string TotalAreaSqMetre { get; set; }
-        //[Required]
-        //[Display(Name ="Site Size in Feet")]
-        //[NumericValidation(typeof(double))]
-        //public double SiteAreaOrSizeInFeet { get; set; }
-        //[Required]
-        //[Display(Name = "Site Size in Inches")]
-        //[NumericValidation(typeof(double))]
-        //public double SiteAreaOrSizeInInches { get; set; }
         [Required]
         [Display(Name = "Project Type")]
         public int? SelectedProjectTypeId { get; set; }
@@ -43,25 +35,24 @@ namespace Noc_App.Models.ViewModel
         public string? PlotNo { get; set; }
         [Required]
         [Display(Name = "Owner Type")]
-        //public int? SelectedOwnerTypeID { get; set; }
         public IEnumerable<SelectListItem> OwnerType { get; set; }
         [Display(Name="Pin Code")]
         public string Pincode { get; set; }
         [Required]
         [Display(Name = "Village/Town/City")]
-        public int? SelectedVillageID { get; set; }
+        public int SelectedVillageID { get; set; }
         public IEnumerable<SelectListItem> Village { get; set; }
         [Required]
         [Display(Name = "Drainage Division")]
-        public int? SelectedDivisionId { get; set; }
+        public int SelectedDivisionId { get; set; }
         public IEnumerable<SelectListItem> Divisions { get; set; }
         [Required]
         [Display(Name = "Drainage Sub-Division")]
-        public int? SelectedSubDivisionId { get; set; }
+        public int SelectedSubDivisionId { get; set; }
         public IEnumerable<SelectListItem> SubDivision { get; set; }
         [Required]
         [Display(Name = "Tehsil/Block")]
-        public int? SelectedTehsilBlockId { get; set; }
+        public int SelectedTehsilBlockId { get; set; }
         public IEnumerable<SelectListItem> TehsilBlock { get; set; }
         [Required]
         [Display(Name = "Address Proof")]

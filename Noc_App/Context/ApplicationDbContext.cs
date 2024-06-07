@@ -6,22 +6,18 @@ using Noc_App.Models.ViewModel;
 
 namespace Noc_App.Context
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
         }
 
-        //public DbSet<Employee> Employee { get; set; }
+        public DbSet<DistrictDetails> DistrictDetails { get; set; }
         public DbSet<DivisionDetails> DivisionDetails { get; set; }
         public DbSet<SubDivisionDetails> SubDivisionDetails { get; set; }
         public DbSet<TehsilBlockDetails> TehsilBlockDetails { get; set; }
         public DbSet<VillageDetails> VillageDetails { get; set; }
-        public DbSet<UserDivision> UserDivision { get; set; }
-        public DbSet<UserSubdivision> UserSubdivision { get; set; }
-        public DbSet<UserTehsil> UserTehsil { get; set; }
-        public DbSet<UserVillage> UserVillage { get; set; }
         //public DbSet<DrainCoordinatesDetails> DrainCoordinatesDetails { get; set; }
         //public DbSet<DrainDetails> DrainDetails { get; set; }
         public DbSet<OwnerTypeDetails> OwnerTypeDetails { get; set; }
@@ -41,142 +37,50 @@ namespace Noc_App.Context
         public DbSet<UserRoleDetails> UserRoleDetails { get; set; }
         public DbSet<DaysCheckMaster> DaysCheckMaster { get; set; }
         public DbSet<RecommendationDetail> RecommendationDetail { get; set; }
+        public DbSet<GrantSectionsDetails> GrantSectionsDetails { get; set; }
+        public DbSet<GrantRejectionShortfallSection> GrantRejectionShortfallSection { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GrantUnprocessedAppDetails>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyAll>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyViewModel>().HasNoKey();
-            modelBuilder.Entity<UserDivision>()
-            .HasKey(ud => new { ud.UserId, ud.DivisionId });
 
-            modelBuilder.Entity<UserDivision>()
-                .HasOne(ud => ud.User)
-                .WithMany(u => u.UserDivisions)
-                .HasForeignKey(ud => ud.UserId);
+            modelBuilder.Entity<DistrictDetails>().HasData(
+               new DistrictDetails { Id = 1, Name = "Amritsar", LGD_ID = 27 },
+               new DistrictDetails { Id = 2, Name = "Barnala", LGD_ID = 605 },
+               new DistrictDetails { Id = 3, Name = "Bathinda", LGD_ID = 28 },
+               new DistrictDetails { Id = 4, Name = "Faridkot", LGD_ID = 29 },
+               new DistrictDetails { Id = 5, Name = "Fatehgarh Sahib", LGD_ID = 30 },
+               new DistrictDetails { Id = 6, Name = "Fazilka", LGD_ID = 651 },
+               new DistrictDetails { Id = 7, Name = "Ferozepur", LGD_ID = 31 },
+               new DistrictDetails { Id = 8, Name = "Gurdaspur", LGD_ID = 32 },
+               new DistrictDetails { Id = 9, Name = "Hoshiarpur", LGD_ID = 33 },
+               new DistrictDetails { Id = 10, Name = "Jalandhar", LGD_ID = 34 },
+               new DistrictDetails { Id = 11, Name = "Kapurthala", LGD_ID = 35 },
+               new DistrictDetails { Id = 12, Name = "Ludhiana", LGD_ID = 36 },
+               new DistrictDetails { Id = 13, Name = "Malerkotla", LGD_ID = 737 },
+               new DistrictDetails { Id = 14, Name = "Mansa", LGD_ID = 37 },
+               new DistrictDetails { Id = 15, Name = "Moga", LGD_ID = 38 },
+               new DistrictDetails { Id = 16, Name = "Pathankot", LGD_ID = 662 },
+               new DistrictDetails { Id = 17, Name = "Patiala", LGD_ID = 41 },
+               new DistrictDetails { Id = 18, Name = "Rupnagar", LGD_ID = 42 },
+               new DistrictDetails { Id = 19, Name = "S.A.S Nagar Mohali", LGD_ID = 608 },
+               new DistrictDetails { Id = 20, Name = "Sangrur", LGD_ID = 43 },
+               new DistrictDetails { Id = 21, Name = "ShahidBhagat Singh Nagar", LGD_ID = 40 },
+               new DistrictDetails { Id = 22, Name = "Sri Muktsar Sahib", LGD_ID = 39 },
+               new DistrictDetails { Id = 23, Name = "Tarn Taran", LGD_ID = 609 }
+               );
 
-            modelBuilder.Entity<UserDivision>()
-                .HasOne(ud => ud.Division)
-                .WithMany(d => d.UserDivisions)
-                .HasForeignKey(ud => ud.DivisionId);
-
-            modelBuilder.Entity<UserSubdivision>()
-            .HasKey(ud => new { ud.UserId, ud.SubdivisionId });
-
-            modelBuilder.Entity<UserSubdivision>()
-                .HasOne(ud => ud.User)
-                .WithMany(u => u.UserSubdivisions)
-                .HasForeignKey(ud => ud.UserId);
-
-            modelBuilder.Entity<UserSubdivision>()
-                .HasOne(ud => ud.Subdivision)
-                .WithMany(d => d.UserSubdivisions)
-                .HasForeignKey(ud => ud.SubdivisionId);
-
-            modelBuilder.Entity<UserTehsil>()
-            .HasKey(ud => new { ud.UserId, ud.TehsilId });
-
-            modelBuilder.Entity<UserTehsil>()
-                .HasOne(ud => ud.User)
-                .WithMany(u => u.UserTehsils)
-                .HasForeignKey(ud => ud.UserId);
-
-            modelBuilder.Entity<UserTehsil>()
-                .HasOne(ud => ud.Tehsil)
-                .WithMany(d => d.UserTehsils)
-                .HasForeignKey(ud => ud.TehsilId);
-
-            modelBuilder.Entity<UserVillage>()
-            .HasKey(ud => new { ud.UserId, ud.VillageId });
-
-            modelBuilder.Entity<UserVillage>()
-                .HasOne(ud => ud.User)
-                .WithMany(u => u.UserVillages)
-                .HasForeignKey(ud => ud.UserId);
-
-            modelBuilder.Entity<UserVillage>()
-                .HasOne(ud => ud.Village)
-                .WithMany(d => d.UserVillages)
-                .HasForeignKey(ud => ud.VillageId);
-
-            modelBuilder.Entity<VillageDetails>()
-                .HasOne(v => v.User)
-                .WithMany(u => u.Villages)
-                .HasForeignKey(v => v.CreatedBy);
-            modelBuilder.Entity<VillageDetails>().Ignore(d => d.User2);
-
-            modelBuilder.Entity<VillageDetails>()
-                .HasOne(v => v.User2)
-                .WithMany(u => u.Villages2)
-                .HasForeignKey(v => v.UpdatedBy);
-
-
-            modelBuilder.Entity<TehsilBlockDetails>()
-                .HasOne(c => c.User)
-                .WithMany(u => u.TehsilBlocks)
-                .HasForeignKey(c => c.CreatedBy);
-            modelBuilder.Entity<TehsilBlockDetails>().Ignore(d => d.User2);
-            modelBuilder.Entity<TehsilBlockDetails>()
-                .HasOne(c => c.User2)
-                .WithMany(u => u.TehsilBlocks2)
-                .HasForeignKey(c => c.UpdatedBy);
-
-            modelBuilder.Entity<SubDivisionDetails>()
-                .HasOne(s => s.User)
-                .WithMany(u => u.SubDivisions)
-                .HasForeignKey(s => s.CreatedBy);
-            modelBuilder.Entity<SubDivisionDetails>().Ignore(d => d.User2);
-            modelBuilder.Entity<SubDivisionDetails>()
-                .HasOne(s => s.User2)
-                .WithMany(u => u.SubDivisions2)
-                .HasForeignKey(s => s.UpdatedBy);
-
-            modelBuilder.Entity<DivisionDetails>()
-                .HasOne(s => s.User)
-                .WithMany(u => u.Divisions)
-                .HasForeignKey(s => s.CreatedBy);
-
-            modelBuilder.Entity<DivisionDetails>().Ignore(d => d.User2);
-
-            modelBuilder.Entity<DivisionDetails>()
-                .HasOne(s => s.User2)
-                .WithMany(u => u.Divisions2)
-                .HasForeignKey(s => s.UpdatedBy);
-
-            modelBuilder.Entity<GrantDetails>()
-                .HasMany(g => g.Owners)
-                .WithOne(o => o.Grant)
-                .HasForeignKey(o => o.GrantId);
-
-            modelBuilder.Entity<GrantDetails>()
-            .HasMany(d => d.Owners)
-            .WithOne(c => c.Grant)
-            .HasForeignKey(c => c.GrantId);
-
-            modelBuilder.Entity<OwnerDetails>()
-                .HasOne(s => s.OwnerType)
-                .WithMany(u => u.Owners)
-                .HasForeignKey(s => s.OwnerTypeId);
-
-            modelBuilder.Entity<GrantDetails>()
-                .HasOne(s => s.ProjectType)
-                .WithMany(u => u.Grants)
-                .HasForeignKey(s => s.ProjectTypeId);
-
-            modelBuilder.Entity<GrantDetails>()
-                .HasOne(s => s.Village)
-                .WithMany(u => u.Grants)
-                .HasForeignKey(s => s.VillageID);
-
-            modelBuilder.Entity<GrantDetails>()
-                .HasOne(s => s.NocPermissionType)
-                .WithMany(u => u.Grants)
-                .HasForeignKey(s => s.NocPermissionTypeID);
-
-            modelBuilder.Entity<GrantDetails>()
-                .HasOne(s => s.NocType)
-                .WithMany(u => u.Grants)
-                .HasForeignKey(s => s.NocTypeId);
+            modelBuilder.Entity<GrantSectionsDetails>().HasData( 
+                new GrantSectionsDetails {Id=1,SectionCode="P",SectionName="Project" }, 
+                new GrantSectionsDetails {Id=2,SectionCode="AD",SectionName="Address" },
+                new GrantSectionsDetails { Id = 3, SectionCode = "KH", SectionName = "Khasra" },
+                new GrantSectionsDetails { Id = 4, SectionCode = "K", SectionName = "KML" },
+                new GrantSectionsDetails { Id = 5, SectionCode = "AP", SectionName = "Applicant" },
+                new GrantSectionsDetails { Id = 6, SectionCode = "OW", SectionName = "Owner" },
+                new GrantSectionsDetails { Id = 7, SectionCode = "PM", SectionName = "Permission" }
+                );
 
             modelBuilder.Entity<RecommendationDetail>().HasData(
                 new RecommendationDetail{ Id = 1, Name = "Approved", Code = "A" },
@@ -247,12 +151,13 @@ namespace Noc_App.Context
                 new NocTypeDetails {Id = 1, Name = "New" },
                 new NocTypeDetails { Id = 2, Name = "Extension of Existing Project" }
                 );
-            //modelBuilder.Entity<GrantApprovalMaster>().HasData(
-            //    new GrantApprovalMaster { Id = 1, Name = "Pending",Code="P" },
-            //    new GrantApprovalMaster { Id = 2, Name = "Reject",Code="R" },
-            //    new GrantApprovalMaster { Id = 3, Name = "Forward", Code = "F" }
-            //    new GrantApprovalMaster { Id = 4, Name = "Approved", Code = "A" }
-            //    );
+            modelBuilder.Entity<GrantApprovalMaster>().HasData(
+                new GrantApprovalMaster { Id = 1, Name = "Pending", Code = "P" },
+                new GrantApprovalMaster { Id = 2, Name = "Reject", Code = "R" },
+                new GrantApprovalMaster { Id = 3, Name = "Forward", Code = "F" },
+                new GrantApprovalMaster { Id = 4, Name = "Approved", Code = "A" },
+                new GrantApprovalMaster { Id = 5, Name = "ShortFall", Code = "SF" }
+                );
 
             base.OnModelCreating(modelBuilder);
         }

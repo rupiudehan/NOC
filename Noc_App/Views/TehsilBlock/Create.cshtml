@@ -33,6 +33,11 @@
                         <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
                     </div>
                     <div class="form-group">
+                        <label asp-for="LGD_ID" class="control-label"></label>
+                        <input asp-for="LGD_ID" id="LGD_ID" class="form-control form-control-user" />
+                        <span asp-validation-for="LGD_ID" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
                         <label asp-for="Name" class="control-label"></label>
                         <input asp-for="Name" class="form-control form-control-user" />
                         <span asp-validation-for="Name" class="text-danger"></span>
@@ -67,6 +72,13 @@
             });
         }
         $(document).ready(function () {
+            $("#LGD_ID").on("keypress", function (event) {
+                // Allow only numeric characters (0-9) in the input field
+                var charCode = event.which;
+                if (charCode < 48 || charCode > 57) {
+                    event.preventDefault();
+                }
+            });
             $("#SelectedDivisionId").change(function () {
                 var divisionId = $(this).val();
                 $.ajax({

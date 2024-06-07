@@ -7,6 +7,7 @@ namespace Noc_App.Models.ViewModel
     public class GrantUnprocessedAppDetails
     {
         public int Id { get; set; }
+        public int rejectionmust { get; set; }
         //[Required]
         public string Name { get; set; }
         public int SiteAreaUnitId { get; set; }

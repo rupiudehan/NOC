@@ -7,24 +7,20 @@ namespace Noc_App.Models
     {
         [Key]
         public int Id { get; set; }
-        //[Required]
         public string Name { get; set; }
         public int SiteAreaUnitId { get; set; }
         [ForeignKey(nameof(SiteAreaUnitId))]
         public SiteAreaUnitDetails SiteAreaUnits { get; set; }
-        //[Required]
-        //public double SiteAreaOrSizeInFeet { get; set; }
-        //[Required]
-        //public double SiteAreaOrSizeInInches { get; set; }
         [Required]
         public int ProjectTypeId { get; set; }
+        [ForeignKey(nameof(ProjectTypeId))]
         public ProjectTypeDetails ProjectType { get; set; }
         public string? OtherProjectTypeDetail { get; set; }
         public List<GrantKhasraDetails> Khasras { get; set; }
-        //public string? Khasra { get; set; }
         public string? Hadbast { get; set; }
         public string? PlotNo { get; set; }
         public int VillageID { get; set; }
+        [ForeignKey(nameof(VillageID))]
         public VillageDetails Village { get; set; }
         //[Required]
         public string AddressProofPhotoPath { get; set; }
@@ -44,9 +40,11 @@ namespace Noc_App.Models
         public List<OwnerDetails> Owners { get; set; }
         //[Required]
         public int NocPermissionTypeID { get; set; }
+        [ForeignKey(nameof(NocPermissionTypeID))]
         public NocPermissionTypeDetails NocPermissionType { get; set; }
         //[Required]
         public int NocTypeId { get; set; }
+        [ForeignKey(nameof(NocTypeId))]
         public NocTypeDetails NocType { get; set; }
         public bool IsExtension { get; set; }
         public string? NocNumber { get; set; }
@@ -61,6 +59,14 @@ namespace Noc_App.Models
         public int ProcessLevel { get; set; }
         public bool IsSentBack { get; set; }
         public int SentBackLevel { get; set; }
+        public bool IsShortFall { get; set; }
+        public int ShortFallLevel { get; set; }
+        public string ShortFallReportedById { get; set; }
+        public string ShortFallReportedByRole { get; set; }
+        public string ShortFallReportedByName { get; set; }
+        public DateTime ShortFallReportedOn { get; set; }
+        public bool IsShortFallCompleted { get; set; }
+        public DateTime ShortFallCompletedOn { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
         public string CertificateFilePath { get; set; }

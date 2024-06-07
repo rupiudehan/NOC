@@ -5,7 +5,7 @@ namespace Noc_App.Models.ViewModel
     public class LoginViewModel
     {
         [Required]
-        [EmailAddress]
+        //[EmailAddress]
         public string Email { get; set; }
         [Required]
         [DataType(DataType.Password)]

@@ -21,6 +21,7 @@
                     <div class="row">
                         <div class="col-lg-3">
                             <div class="form-group">
+                                <input asp-for="ForwardToRole" type="hidden" id="ForwardToRole" />
                                 <label asp-for="Name" class="control-label">Project</label>
                                 <input asp-for="Name" readonly class="form-control form-control-user" />
                                 <span asp-validation-for="Name" class="text-danger"></span>
@@ -148,11 +149,12 @@
         $(document).ready(function () {
             $("#SelectedSubDivisionId").change(function () {
                 var subdivisionId = $(this).val();
+                var role = $('#ForwardToRole').val();
                 $.ajax({
                     url: "/ApprovalProcess/GetOfficers",
                     type: "POST",
-                    data: { subdivisionId: subdivisionId },
-                    async: false,
+                    data: { subdivisionId: subdivisionId, roleName: role },
+                    async: true,
                     success: function (data) {
                         populateDropdown(data, "OfficerId");
                     },

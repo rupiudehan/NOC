@@ -1,0 +1,754 @@
+﻿@model GrantViewModelEdit
+@{
+    ViewBag.Title = "Update Application for Issue of NOC-Drainage";
+    Layout = "~/Views/Shared/_LayoutWithoutLinks.cshtml";
+    string showproject = Model.GrantSections.isPActive == "active" ? "show" : "";
+    string showaddress = Model.GrantSections.isADActive == "active" ? "show" : "";
+    string showkml = Model.GrantSections.isKMLActive == "active" ? "show" : "";
+    string showpermission = Model.GrantSections.isPrActive == "active" ? "show" : "";
+    string showapplicant = Model.GrantSections.isAPActive == "active" ? "show" : "";
+    string showowner = Model.GrantSections.isOActive == "active" ? "show" : "";
+    int AreAllSectionCompleted = Model.AreAllSectionCompleted;
+}
+<style>
+    .checkmark {
+        color: #9ABC66;
+        font-size: 20px;
+        line-height: 33px;
+        margin-left: -12px;
+        font-weight: bolder;
+    }
+
+    .crossmark {
+        color: red;
+        font-size: 20px;
+        line-height: 33px;
+        margin-left: -9px;
+        font-weight: bolder;
+    }
+</style>
+<div class="section-title">
+    <h2>Update Application for Issuance of NOC-Drainage</h2>
+    @* <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p> *@
+</div>
+
+<div class="row">
+
+    <div class="col-lg-12 mt-5 mt-lg-0 d-flex align-items-stretch">
+        <div class="card shadow mb-4 col-lg-12">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card-header py-3">
+                        <h2 class="m-0 font-weight-bold text-success">Update Modifications</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row col-md-12">
+                            <div id="divLoader" style="display:none;text-align:center"> <img src="~/images/ajax-loader.gif" alt="Loader" /> </div>
+                            <input type="hidden" asp-for="AreAllSectionCompleted" id="AreAllSectionCompleted" />
+                            <div class="default-tab">
+                                <div class="row">
+                                    <nav>
+                                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                            @if (Model.GrantSections.project == 1)
+                                            {
+                                                <a class="nav-item nav-link @Model.GrantSections.isPActive" id="nav-project-tab" data-toggle="tab" href="#nav-project" role="tab" aria-controls="nav-project" aria-selected="true">
+                                                    @* <div style="border-radius:200px; height:200px; width:200px; background: red; margin:0 auto;"> *@
+                                                    @if (Model.GrantSections.isprojectCompleted == 1)
+                                                    {
+                                                        <i class="checkmark">✓</i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="crossmark">x</i>
+                                                    }
+                                                    @* </div> *@
+                                                    Project Details
+                                                </a>
+                                            }
+                                            @if (Model.GrantSections.address == 1)
+                                            {
+                                                <a class="nav-item nav-link @Model.GrantSections.isADActive" id="nav-address-tab" data-toggle="tab" href="#nav-address" role="tab" aria-controls="nav-address" aria-selected="false">
+                                                    @if (Model.GrantSections.isaddressCompleted == 1)
+                                                    {
+                                                        <i class="checkmark">✓</i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="crossmark">x</i>
+                                                    }
+                                                    Site Address Details
+                                                </a>
+                                            }
+                                            @* <a class="nav-item nav-link" id="nav-area-tab" data-toggle="tab" href="#nav-area" role="tab" aria-controls="nav-area" aria-selected="false">Site Area Details</a> *@
+                                            @if (Model.GrantSections.kml == 1)
+                                            {
+                                                <a class="nav-item nav-link @Model.GrantSections.isKMLActive" id="nav-kml-tab" data-toggle="tab" href="#nav-kml" role="tab" aria-controls="nav-kml" aria-selected="false">
+                                                    @if (Model.GrantSections.iskmlCompleted == 1)
+                                                    {
+                                                        <i class="checkmark">✓</i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="crossmark">x</i>
+                                                    }
+                                                    Site KML File Details
+                                                </a>
+                                            }
+                                            @if (Model.GrantSections.permission == 1)
+                                            {
+                                                <a class="nav-item nav-link @Model.GrantSections.isPrActive" id="nav-permission-tab" data-toggle="tab" href="#nav-permission" role="tab" aria-controls="nav-permission" aria-selected="false">
+                                                    @if (Model.GrantSections.ispermissionCompleted == 1)
+                                                    {
+                                                        <i class="checkmark">✓</i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="crossmark">x</i>
+                                                    }
+                                                    Types of Permissions
+                                                </a>
+                                            }
+                                            @if (Model.GrantSections.applicant == 1)
+                                            {
+                                                <a class="nav-item nav-link @Model.GrantSections.isAPActive" id="nav-applicant-tab" data-toggle="tab" href="#nav-applicant" role="tab" aria-controls="nav-applicant" aria-selected="false">
+                                                    @if (Model.GrantSections.isapplicantCompleted == 1)
+                                                    {
+                                                        <i class="checkmark">✓</i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="crossmark">x</i>
+                                                    }
+                                                    Applicant Details
+                                                </a>
+                                            }
+                                            @if (Model.GrantSections.owner == 1)
+                                            {
+                                                <a class="nav-item nav-link @Model.GrantSections.isOActive" id="nav-owner-tab" data-toggle="tab" href="#nav-owner" role="tab" aria-controls="nav-owner" aria-selected="false">
+                                                    @if (Model.GrantSections.isownerCompleted == 1)
+                                                    {
+                                                        <i class="checkmark">✓</i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="crossmark">x</i>
+                                                    }
+                                                    Details of Owners/Partners/Chief Executive/Full Time Directors
+                                                </a>
+                                            }
+                                        </div>
+                                    </nav>
+                                    <div class="tab-content pl-3 pt-2" id="nav-tabContent">
+                                        <div asp-validation-summary="All" class="text-danger"></div>
+                                        @if (Model.GrantSections.project == 1)
+                                        {
+                                            <div class="tab-pane fade @showproject @Model.GrantSections.isPActive" id="nav-project" role="tabpanel" aria-labelledby="nav-project-tab">
+                                                <div class="card-body">
+                                                    <form class="user" method="post" id="projectForm">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <input type="hidden" asp-for="GrantSections.projectid" id="projectid" />
+                                                                    <input type="hidden" asp-for="PId" id="PId" />
+                                                                    <input type="hidden" asp-for="ApplicationID" id="ProjectApplicationId" name="ProjectApplicationId" />
+                                                                    <label asp-for="Name" class="control-label"></label>
+                                                                    <input asp-for="Name" id="Name" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <input hidden asp-for="IsOtherTypeSelected" value="0" id="IsOtherType" />
+                                                                    <label asp-for="SelectedProjectTypeId" class="control-label">Project Type</label>
+                                                                    <select asp-for="SelectedProjectTypeId" id="SelectedProjectTypeId" asp-items="@Model.ProjectType" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedProjectTypeId" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group other" style="display:none">
+                                                                    @* <button type="submit" class="btn btn-primary btn-user btn-block">Update</button> *@  <label asp-for="OtherProjectTypeDetail" class="control-label"></label>
+                                                                    <input asp-for="OtherProjectTypeDetail" id="OtherProjectTypeDetail" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="OtherProjectTypeDetail" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div><br />
+                                                        <div class="row">
+                                                            <div class="col-sm-6 offset-sm-6">
+                                                                <button type="button" id="btnprojectSubmit" class="btn btn-success btn-user btn-block">Update</button>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div id="resultProjectMessage" class="mt-3 error-message" style="display:none;">
+                                                                <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue()">&times;</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (Model.GrantSections.address == 1)
+                                        {
+                                            <div class="tab-pane fade @showaddress @Model.GrantSections.isADActive" id="nav-address" role="tabpanel" aria-labelledby="nav-address-tab">
+                                                <div class="card-body">
+                                                    <form enctype="multipart/form-data" class="user" method="post" id="addressForm">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <input type="hidden" asp-for="GrantSections.addressid" id="addressid" />
+                                                                    <input type="hidden" asp-for="AdId" id="AdId" name="AdId" />
+                                                                    <input type="hidden" asp-for="ApplicationID" id="AddressApplicationId" name="AddressApplicationId" />
+                                                                    <label asp-for="Hadbast" class="control-label"></label>
+                                                                    <input asp-for="Hadbast" id="Hadbast" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="Hadbast" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="PlotNo" class="control-label"></label>
+                                                                    <input asp-for="PlotNo" id="PlotNo" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="PlotNo" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="SelectedDivisionId" class="control-label"></label>
+                                                                    <select asp-for="SelectedDivisionId" id="=SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="SelectedSubDivisionId" class="control-label"></label>
+                                                                    <select asp-for="SelectedSubDivisionId" id="SelectedSubDivisionId" asp-items="@Model.SubDivision" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
+                                                                    <select asp-for="SelectedTehsilBlockId" id="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="SelectedVillageID" class="control-label">Village/Town/City</label>
+                                                                    <select asp-for="SelectedVillageID" id="SelectedVillageID" asp-items="@Model.Village" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedVillageID" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Pin Code</label>
+                                                                    <label asp-for="Pincode" id="Pincode" class="form-control form-control-user">@Model.Pincode</label>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="AddressProofPhoto" class="control-label">Address Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
+                                                                    <div class="custom-file1">
+                                                                        <input type="file" id="AddressProofPhoto" class="form-control custom-file-input1" name="file">
+                                                                        @* <input asp-for="AddressProofPhoto" id="AddressProofPhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" /> *@
+                                                                        <a href="@Url.Action("Download", "Grant", new { fileName = Model.AddressProofPhotoPath })" id="AddressProofPhotoPath">Download File</a>
+                                                                        <span asp-validation-for="AddressProofPhoto" id="AddressProofPhoto-error" class="text-danger"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div><br />
+                                                        <div class="row">
+                                                            <div class="col-sm-6 offset-sm-6">
+                                                                <button type="submit" id="btnaddressSubmit" class="btn btn-success btn-user btn-block">Update</button>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div id="resultaddressMessage" class="mt-3 error-message" style="display:none;">
+                                                                <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue()">&times;</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        }
+                                        @*  <div class="tab-pane fade" id="nav-area" role="tabpanel" aria-labelledby="nav-area-tab">
+                                        <div class="card-body">
+                                        <form enctype="multipart/form-data" class="user" asp-action="ModifyAreaDetail" asp-controller="Grant" method="post" id="areaForm">
+
+                                        <div class="row">
+                                        <div class="col-lg-4">
+                                        <div class="form-group">
+                                        <input type="hidden" asp-for="KId" id="KId" name="KId" />
+                                        <input type="hidden" asp-for="ApplicationID" id="AreaApplicationId" name="AreaApplicationId" />
+                                        <input type="hidden" asp-for="KUnitValue" id="KUnitValue" />
+                                        <input type="hidden" asp-for="KTimesof" id="KTimesof"/>
+                                        <input type="hidden" asp-for="KDivideBy" id="KDivideBy" />
+                                        <input type="hidden" asp-for="MUnitValue" id="MUnitValue" />
+                                        <input type="hidden" asp-for="MTimesof" id="MTimesof" />
+                                        <input type="hidden" asp-for="MDivideBy" id="MDivideBy" />
+                                        <input type="hidden" asp-for="SUnitValue" id="SUnitValue" />
+                                        <input type="hidden" asp-for="STimesof" id="STimesof" />
+                                        <input type="hidden" asp-for="SDivideBy" id="SDivideBy" />
+                                        <label asp-for="SelectedSiteAreaUnitId" class="control-label ">Unit of Site Area</label>
+                                        <select asp-for="SelectedSiteAreaUnitId" id="SelectedSiteAreaUnitId" disabled asp-items="@Model.SiteAreaUnit" class="form-control">
+                                        <option value="">Select</option>
+                                        </select>
+                                        <span asp-validation-for="SelectedSiteAreaUnitId" class="text-danger"></span>
+                                        </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                        <div class="form-group">
+                                        <input type="hidden" asp-for=KhasraId id="KhasraId" />
+                                        <label asp-for="KhasraNo" class="control-label"></label>
+                                        <input asp-for="KhasraNo" id="KhasraNo" class="form-control form-control-user" />
+                                        <span asp-validation-for="KhasraNo" class="text-danger"></span>
+                                        </div>
+                                        </div>
+                                        </div>
+                                        <div class="row">
+                                        <div class="col-lg-4">
+                                        <div class="form-group">
+                                        <label asp-for="KanalOrBigha" class="control-label">Kanal/Bigha</label>
+                                        <input asp-for="KanalOrBigha" id="KanalOrBigha" class="form-control form-control-user" />
+                                        <span asp-validation-for="KanalOrBigha" class="text-danger"></span>
+                                        </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                        <div class="form-group">
+                                        <label asp-for="MarlaOrBiswa" class="control-label">Marla/Biswa</label>
+                                        <input asp-for="MarlaOrBiswa" id="MarlaOrBiswa" class="form-control form-control-user" />
+                                        <span asp-validation-for="MarlaOrBiswa" class="text-danger"></span>
+                                        </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                        <div class="form-group">
+                                        <label asp-for="SarsaiOrBiswansi" class="control-label">Sarsai/Biswansi</label>
+                                        <input asp-for="SarsaiOrBiswansi" id="SarsaiOrBiswansi" class="form-control form-control-user" />
+                                        <span asp-validation-for="SarsaiOrBiswansi" class="text-danger"></span>
+                                        </div>
+                                        </div>
+
+                                        </div><br />
+                                        <div class="row">
+                                        <div class="col-sm-6 offset-sm-5">
+                                        <button type="submit" id="btnareaSubmit" class="btn btn-success btn-user btn-block">Update</button>
+
+                                        </div>
+                                        </div>
+                                        <div class="row">
+                                        <div id="resultareaMessage" class="mt-3 error-message" style="display:none;">
+                                        <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue()">&times;</span></div>
+                                        </div>
+                                        </div>
+                                        <div class="row">
+                                        <div class="col-lg-12">
+                                        <table id="khasraTable" class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                        <th>#</th>
+                                        <th>Khasra No.</th>
+                                        <th>Kanal/Bigha</th>
+                                        <th>Marla/Biswa</th>
+                                        <th>Sarsai/Biswansi</th>
+                                        <th></th>
+                                        <!-- Add more columns as needed -->
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @for(int i=0;i< Model.GrantKhasras.Count;i++)
+                                        {
+                                        <tr class="khasra-entry">
+                                        <td><span class="srKhasra">@Model.GrantKhasras[i].RowId</span></td>
+                                        <td>
+                                        <div class="col-sm-12">
+                                        <input type="hidden" asp-for=GrantKhasras[i].KId />
+                                        <label asp-for="GrantKhasras[i].KhasraNo" id="KhasraNo+@Model.GrantKhasras[i].KId" class="form-control form-control-user">@Model.GrantKhasras[i].KhasraNo</label>
+
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="col-sm-12">
+                                        <label asp-for="GrantKhasras[i].KanalOrBigha" id="KanalOrBigha+@Model.GrantKhasras[i].KId" class="form-control form-control-user">@Model.GrantKhasras[i].KanalOrBigha</label>
+
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="col-sm-12">
+                                        <label asp-for="GrantKhasras[i].MarlaOrBiswa" id="MarlaOrBiswa+@Model.GrantKhasras[i].KId" class="form-control form-control-user">@Model.GrantKhasras[i].MarlaOrBiswa</label>
+
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="col-sm-12">
+                                        <label asp-for="GrantKhasras[i].SarsaiOrBiswansi" id="SarsaiOrBiswansi+@Model.GrantKhasras[i].KId" class="form-control form-control-user">@Model.GrantKhasras[i].SarsaiOrBiswansi</label>
+
+                                        </div>
+                                        </td>
+                                        <td class="delKhasra"></td>
+                                        <!-- Render more columns as needed -->
+                                        </tr>
+                                        }
+                                        </tbody>
+                                        </table>
+                                        </div>
+                                        </div>
+                                        <div class="row">
+                                        <div class="col-lg-12">
+                                        <table class="table">
+                                        <tbody>
+                                        <tr>
+                                        <td></td>
+                                        <td class="col-sm-3">
+                                        <label class="control-label">Total Area in Acres: </label>
+                                        <input hidden asp-for="TotalArea" value="0" id="TotalSiteArea" />
+                                        <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
+
+                                        </td class="col-sm-3">
+                                        <td>
+                                        <label class="control-label">Total Area in Sq Feet: </label>
+                                        <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
+
+                                        </td>
+                                        <td class="col-sm-3">
+                                        <label class="control-label">Total Area in Sq Metre(s): </label>
+                                        <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
+                                        </td>
+                                        <td class="col-sm-3">
+                                        </td>
+                                        </tr>
+                                        </tbody>
+                                        </table>
+                                        </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                        <div class="col-sm-6 offset-sm-5">
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">Update</button>
+                                        </div>
+                                        </div>
+                                        </form>
+                                        </div>
+                                        </div> *@
+                                        @if (Model.GrantSections.kml == 1)
+                                        {
+                                            <div class="tab-pane fade @showkml @Model.GrantSections.isKMLActive" id="nav-kml" role="tabpanel" aria-labelledby="nav-kml-tab">
+                                                <div class="card-body">
+                                                    <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="kmlForm">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <input type="hidden" asp-for="GrantSections.kmlid" id="kmlid" />
+                                                                    <input type="hidden" asp-for="KmlGrantId" id="KmlGrantId" name="KmlGrantId" />
+                                                                    <input type="hidden" asp-for="ApplicationID" id="kmlApplicationId" name="kmlApplicationId" />
+                                                                    <label asp-for="KMLFile" class="control-label">KML File</label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                                                    <div class="custom-file1">
+                                                                        <input asp-for="KMLFile" id="KMLFile" class="form-control custom-file-input1" accept=".pdf" />
+                                                                        <a id="KMLFilePath" href="@Url.Action("Download", "Grant", new { fileName = Model.KMLFilePath })">Download File</a>
+                                                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                                                        <span asp-validation-for="KMLFile" id="KMLFile-error" class="text-danger"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label asp-for="KmlLinkName" class="control-label"></label>
+                                                                    <input asp-for="KmlLinkName" id="KmlLinkName" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="KmlLinkName" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <div class="col-sm-6 offset-sm-6">
+                                                                <button type="submit" id="btnkmlSubmit" class="btn btn-success btn-user btn-block">Update</button>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div id="resultkmlMessage" class="mt-3 error-message" style="display:none;">
+                                                                <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue()">&times;</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (Model.GrantSections.permission == 1)
+                                        {
+                                            <div class="tab-pane fade @showpermission @Model.GrantSections.isPrActive" id="nav-permission" role="tabpanel" aria-labelledby="nav-permission-tab">
+                                                <div class="card-body">
+                                                    <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="permissionForm">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <input type="hidden" asp-for="GrantSections.permissionid" id="permissionid" />
+                                                                    <input type="hidden" asp-for="PermisionGrantId" id="PermisionGrantId" />
+                                                                    <input type="hidden" asp-for="ApplicationID" id="permissionApplicationId" name="permissionApplicationId" />
+                                                                    <label asp-for="SelectedNocPermissionTypeID" class="control-label">NOC Permission Type</label>
+                                                                    <select asp-for="SelectedNocPermissionTypeID" id="SelectedNocPermissionTypeID" asp-items="@Model.NocPermissionType" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedNocPermissionTypeID" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group existing" style="display:none;">
+                                                                    <label asp-for="NocNumber" class="control-label"></label>
+                                                                    <input asp-for="NocNumber" id="NocNumber" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="NocNumber" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <input hidden asp-for="IsExtension" value="0" id="IsExtension" />
+                                                                    <label asp-for="SelectedNocTypeId" class="control-label">NOC Type</label>
+                                                                    <select asp-for="SelectedNocTypeId" id="SelectedNocTypeId" asp-items="@Model.NocType" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedNocTypeId" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group existing" style="display:none;">
+                                                                    <label asp-for="PreviousDate" class="control-label">Date</label>
+                                                                    <input asp-for="PreviousDate" id="PreviousDate" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="PreviousDate" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <div class="col-sm-6 offset-sm-6">
+                                                                <button type="submit" id="btnpermissionSubmit" class="btn btn-success btn-user btn-block">Update</button>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div id="resultpermissionMessage" class="mt-3 error-message" style="display:none;">
+                                                                <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue()">&times;</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (Model.GrantSections.applicant == 1)
+                                        {
+                                            <div enctype="multipart/form-data" class="tab-pane fade @showapplicant @Model.GrantSections.isAPActive" id="nav-applicant" role="tabpanel" aria-labelledby="nav-applicant-tab">
+                                                <div class="card-body">
+                                                    <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="applicantForm">
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <input type="hidden" asp-for="GrantSections.applicantid" id="applicantid" />
+                                                                    <input type="hidden" asp-for="ApplicantGrantId" id="ApplicantGrantId" name="ApplicantGrantId" />
+                                                                    <input type="hidden" asp-for="ApplicationID" id="applicantApplicationId" name="applicantApplicationId" />
+                                                                    <label asp-for="ApplicantName" class="control-label"></label>
+                                                                    <input asp-for="ApplicantName" id="ApplicantName" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="ApplicantName" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="IDProofPhoto" class="control-label">ID Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
+                                                                    <div class="custom-file3">
+                                                                        <input asp-for="IDProofPhoto" id="IDProofPhoto" class="form-control custom-file-input3" accept=".jpg, .jpeg, .png, .pdf" />
+                                                                        <a id="IDProofPhotoPath" href="@Url.Action("Download", "Grant", new { idfileName = Model.IDProofPhotoPath })">Download File</a>
+                                                                        @* <label class="custom-file-label">Choose File...</label> *@
+                                                                        <span asp-validation-for="IDProofPhoto" id="IDProofPhoto-error" class="text-danger"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label asp-for="ApplicantEmailID" class="control-label"></label>
+                                                                    <input asp-for="ApplicantEmailID" id="ApplicantEmailID" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="ApplicantEmailID" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="AuthorizationLetterPhoto" class="control-label">
+                                                                        Authorization Letter (Attach in case
+                                                                        application is to be filled
+                                                                        by person other than
+                                                                        owner)-
+                                                                    </label><span style="color:red">Max File (jpg,png,pdf) Size 4MB</span>
+                                                                    <div class="custom-file2">
+                                                                        <input asp-for="AuthorizationLetterPhoto" id="AuthorizationLetterPhoto" class="form-control custom-file-input2" accept=".jpg, .jpeg, .png, .pdf" />
+                                                                        <a id="AuthorizationLetterPhotoPath" href="@Url.Action("Download", "Grant", new { authfileName = Model.AuthorizationLetterPhotoPath })">Download File</a>
+                                                                        @* <label class="custom-file-label2">Choose File...</label> *@
+                                                                        <span asp-validation-for="AuthorizationLetterPhoto" id="AuthorizationLetterPhoto-error" class="text-danger"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <div class="col-sm-6 offset-sm-6">
+                                                                <button type="submit" id="btnapplicantSubmit" class="btn btn-success btn-user btn-block">Update</button>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div id="resultapplicantMessage" class="mt-3 error-message" style="display:none;">
+                                                                <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue()">&times;</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (Model.GrantSections.owner == 1)
+                                        {
+                                            <div class="tab-pane fade @showowner @Model.GrantSections.isOActive" id="nav-owner" role="tabpanel" aria-labelledby="nav-owner-tab">
+                                                <div class="card-body">
+                                                    <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="ownerForm">
+
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <input type="hidden" asp-for="GrantSections.ownerid" id="ownersecid" />
+                                                                    <input type="hidden" asp-for="OwnerGrantId" id="OwnerGrantId" name="OwnerGrantId" />
+                                                                    <input type="hidden" asp-for="ApplicationID" id="ownerApplicationId" name="ownerApplicationId" />
+                                                                    <input type="hidden" asp-for=OwnerId />
+                                                                    <label asp-for="SelectedOwnerTypeID" class="control-label">Owner Type</label>
+                                                                    <select asp-for="SelectedOwnerTypeID" asp-items="@Model.OwnerType" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedOwnerTypeID" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="OwnerName" class="control-label"></label>
+                                                                    <input asp-for="OwnerName" class="form-control form-control-user" placeholder="Owner/Partner/Chief Executive/Full Time Director Name" />
+                                                                    <span asp-validation-for="OwnerName" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="OwnerAddress" class="control-label"></label>
+                                                                    <input asp-for="OwnerAddress" placeholder="Address" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="OwnerAddress" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label asp-for="OwnerMobileNo" class="control-label"></label>
+                                                                    <input asp-for="OwnerMobileNo" placeholder="Mobile No." class="form-control form-control-user mobno" maxlength="10" />
+                                                                    <span asp-validation-for="OwnerMobileNo" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="OwnerEmail" class="control-label"></label>
+                                                                    <input asp-for="OwnerEmail" placeholder="Email" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="OwnerEmail" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <div class="col-sm-6 offset-sm-5">
+                                                                <button type="submit" id="btnownerSubmit" class="btn btn-success btn-user btn-block">Add More</button>
+                                                                <button type="button" id="btnownerCancel" class="btn btn-secondary btn-user btn-block" onclick="ResetControls()" style="visibility:hidden">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div id="resultownerMessage" class="mt-3 error-message" style="display:none;">
+                                                                <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue()">&times;</span></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <table id="ownerTable" class="table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>#</th>
+                                                                        <th>OwnerType</th>
+                                                                        <th>Name</th>
+                                                                        <th>Address</th>
+                                                                        <th>Mobile Number</th>
+                                                                        <th>Email</th>
+                                                                        <th></th>
+                                                                        <!-- Add more columns as needed -->
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="ownerBody">
+                                                                    @for (int i = 0; i < Model.Owners.Count; i++)
+                                                                    {
+                                                                        <tr class="owner-entry">
+
+                                                                            <td><span class="srOwner">@Model.Owners[i].RowId</span></td>
+                                                                            <td>
+                                                                                <input type="hidden" asp-for=Owners[i].OId id="Owner@Model.Owners[i].OId" />
+                                                                                <label asp-for="Owners[i].OwnerTypeName" id="OwnerTypeName@Model.Owners[i].OId" class="form-control form-control-user">@Model.Owners[i].OwnerTypeName</label>
+                                                                                <input hidden asp-for="Owners[i].SelectedOwnerTypeID" id="OwnerTypeID@Model.Owners[i].OId" />
+                                                                            </td>
+                                                                            <td>
+                                                                                <label asp-for="Owners[i].Name" id="Name@Model.Owners[i].OId" class="form-control form-control-user">@Model.Owners[i].Name</label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <label asp-for="Owners[i].Address" id="Address@Model.Owners[i].OId" class="form-control form-control-user">@Model.Owners[i].Address</label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <label asp-for="Owners[i].MobileNo" id="MobileNo@Model.Owners[i].OId" class="form-control form-control-user">@Model.Owners[i].MobileNo</label>
+                                                                            </td>
+                                                                            <td>
+                                                                                <label asp-for="Owners[i].Email" id="Email@Model.Owners[i].OId" class="form-control form-control-user">@Model.Owners[i].Email</label>
+                                                                            </td>
+                                                                            <td class="delOwner">
+                                                                                <a href="#" onclick="SetEdit(@Model.Owners[i].OId,'@Model.Owners[i].Name','@Model.Owners[i].Address','@Model.Owners[i].MobileNo','@Model.Owners[i].Email',@Model.Owners[i].SelectedOwnerTypeID)" class="btn btn-warning">Edit</a>
+                                                                            </td>
+                                                                            <!-- Render more columns as needed -->
+                                                                        </tr>
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="finalSubmit">
+                                    @if (AreAllSectionCompleted == 0)
+                                    {
+                                        <hr />
+                                        <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="finalForm">
+                                        <div class="row float-start">
+                                                <input type="checkbox" style="margin-left:8px;" id="IsConfirmed" asp-for="IsConfirmed" />
+                                                <span asp-validation-for="IsConfirmed" class="text-danger"></span>
+                                        </div>
+                                        <div class="row mt-4 mb-4">
+                                            <input type="hidden" asp-for="FGrantId" id="FGrantId" name="FGrantId" />
+                                            <input type="hidden" asp-for="ApplicationID" id="FApplicationId" name="FApplicationId" />
+                                            <label asp-for="IsConfirmed">
+                                                I / We confirm that the information furnished
+                                                herewith is correct to the best of my/our
+                                                knowledge and nothing has been concealed
+                                                therein. The Government would be at liberty
+                                                to take suitable action against the
+                                                unit/project and the person(s) responsible
+                                                who failed to comply with the provisions of
+                                                the Law. Rules, Regulations & Directions in
+                                                case the information /Documents are found
+                                                to be incorrect /false/misleading the
+                                                government may withdraw the NOC issued
+                                                for the project
+                                            </label>
+                                        </div>
+                                        <div class="row isFinal">
+                                            <div class="col-sm-6 offset-sm-6">
+                                                <button type="submit" id="btnFinalSubmit" class="btn btn-primary btn-user btn-block">Final Submit</button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div id="resultfinalMessage" class="mt-3 error-message" style="display:none;">
+                                                <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue()">&times;</span></div>
+                                            </div>
+                                        </div>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/modulejs/modulemodify.js"></script>
+}

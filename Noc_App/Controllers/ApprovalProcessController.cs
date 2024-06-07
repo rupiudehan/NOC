@@ -13,6 +13,9 @@ using Noc_App.Helpers;
 using System.Threading.Tasks.Dataflow;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Noc_App.Controllers
 {
@@ -23,12 +26,10 @@ namespace Noc_App.Controllers
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
-        private readonly IRepository<UserDivision> _userDivisionRepository;
-        private readonly IRepository<UserSubdivision> _userSubDivisionRepository;
-        private readonly IRepository<UserVillage> _userVillageRepository;
-        private readonly UserManager<ApplicationUser> _userManager;
+        //private readonly IRepository<UserDivision> _userDivisionRepository;
+        //private readonly IRepository<UserSubdivision> _userSubDivisionRepository;
+        //private readonly IRepository<UserVillage> _userVillageRepository;
         private readonly IRepository<GrantPaymentDetails> _repoPayment;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IRepository<GrantApprovalDetail> _repoApprovalDetail;
         private readonly IRepository<GrantApprovalMaster> _repoApprovalMaster;
         private readonly IRepository<GrantApprovalProcessDocumentsDetails> _repoApprovalDocument;
@@ -46,29 +47,28 @@ namespace Noc_App.Controllers
         private readonly ICalculations _calculations;
         private readonly IRepository<SiteUnitMaster> _repoSiteUnitMaster;
         private readonly IRepository<RecommendationDetail> _repoRecommendation;
+        private readonly IRepository<UserRoleDetails> _userRolesRepository;
+        private readonly IRepository<GrantSectionsDetails> _grantsectionRepository;
+        private readonly IRepository<GrantRejectionShortfallSection> _grantrejectionRepository;
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
-            IRepository<DivisionDetails> divisionRepo, IRepository<UserDivision> userDivisionRepository, UserManager<ApplicationUser> userManager, IRepository<GrantPaymentDetails> repoPayment, RoleManager<IdentityRole> roleManager
-            , IRepository<UserVillage> userVillageRepository, IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster, IRepository<UserSubdivision> userSubDivisionRepository
+            IRepository<DivisionDetails> divisionRepo, IRepository<GrantPaymentDetails> repoPayment,IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster
             , IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo,
             IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IWebHostEnvironment hostingEnvironment, IEmailService emailService
             , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
-            , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation)
+            , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation
+            , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository
+            , IRepository<GrantRejectionShortfallSection> grantrejectionRepository)
         {
             _repo = repo;
             _villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
             _subDivisionRepo = subDivisionRepo;
             _divisionRepo = divisionRepo;
-            _userDivisionRepository = userDivisionRepository;
-            _userManager = userManager;
             _repoPayment = repoPayment;
-            _roleManager = roleManager;
-            _userVillageRepository = userVillageRepository;
             _repoApprovalDetail = repoApprovalDetail;
             _repoApprovalMaster = repoApprovalMaster;
-            _userSubDivisionRepository = userSubDivisionRepository;
             _hostingEnvironment = hostingEnvironment;
             _projectTypeRepo = projectTypeRepo;
             _nocPermissionTypeRepo = nocPermissionTypeRepo;
@@ -84,42 +84,150 @@ namespace Noc_App.Controllers
             _calculations = calculations;
             _repoSiteUnitMaster = repoSiteUnitMaster;
             _repoRecommendation = repoRecommendation;
+            _userRolesRepository = userRolesRepository;
+            _grantsectionRepository = grantsectionRepository;
+            _grantrejectionRepository = grantrejectionRepository;
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
         public async Task<ViewResult> Index()
         {
             try
             {
-                var user = await _userManager.GetUserAsync(User);
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                // Retrieve the user object
-                var userDetail = await _userManager.FindByIdAsync(userId);
-
+                string userId=LoggedInUserID();
+                
                 // Retrieve roles associated with the user
-                var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
-                List<UserDivision> userDiv = (await _userDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-                List<UserSubdivision> userSubdiv = (await _userSubDivisionRepository.FindAsync(x => x.UserId == user.Id)).ToList();
-                List<UserVillage> userVillage = (await _userVillageRepository.FindAsync(x => x.UserId == user.Id)).ToList();
+                var roleName = LoggedInRoleName();
+                string role = roleName;
                 List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
                 List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
                 model=await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", "0", "'" +role+"'", "'" + userId + "'");
                 var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
                 var modelRejected = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsrejected", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
-                
+                //var modelShortfall = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsexpiredshortfall", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
+
                 modelView.Add(model);
                 modelView.Add(modelForwarded);
                 modelView.Add(modelRejected);
+                //modelView.Add(modelShortfall);
 
                 return View(modelView);
             }
            catch(Exception ex){
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View();
-            } 
+            }
         }
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
         [HttpGet]
-        public async Task<IActionResult> Transfer(string id)
+        public IActionResult ShortFall(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+                return View("NotFound");
+            }
+            List<GrantSectionsDetails> sections = _grantsectionRepository.GetAll().Where(x=>x.SectionCode!="KH").OrderBy(x=>x.SectionName).ToList();
+            GrantApprovalDetailShortfall model = new GrantApprovalDetailShortfall
+            {
+                id = id,
+                GrantSectionsDetailsList=sections
+                
+            };
+            return View(model);
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ShortFall(GrantApprovalDetailShortfall model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (string.IsNullOrEmpty(model.id))
+                {
+                    ViewBag.ErrorMessage = $"Grant with Application Id = {model.id} cannot be found";
+                    return View("NotFound");
+                }
+
+                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == model.id)).FirstOrDefault();
+
+                if (grant == null)
+                {
+                    ViewBag.ErrorMessage = $"Grant with Application Id = {model.id} cannot be found";
+
+                    return View("NotFound");
+                }
+
+                string userId = LoggedInUserID();
+
+                string divisionId = LoggedInDivisionID();
+
+                string subdivisionId = LoggedInSubDivisionID();
+
+                string username = LoggedInUserName();
+
+                string designation = LoggedInDesignationName();
+
+                // Retrieve roles associated with the user
+                var roleName = LoggedInRoleName();
+
+                string role = roleName;
+                GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "SF")).FirstOrDefault();
+                int shortfallLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
+                var selectedSectionIds = model.SelectedGrantSectionIDs;
+                List<GrantRejectionShortfallSection> grantSections = new List<GrantRejectionShortfallSection>();
+                
+
+                GrantApprovalDetail approvalDetail = new GrantApprovalDetail
+                {
+                    GrantID = grant.Id,
+                    ApprovalID = master.Id,
+                    ProcessedBy = userId,
+                    ProcessedOn = DateTime.Now,
+                    ProcessedByRole = role,
+                    ProcessedByName = username + "(" + designation + ")",
+                    ProcessLevel = shortfallLevel + 1,
+                    ProcessedToRole = "Applicant",
+                    ProcessedToUser = "0",
+                    ProcessedToName = "Applicant",
+                    Remarks = model.Remarks,
+                    RecommendationID = 3
+                };
+
+                await _repoApprovalDetail.CreateAsync(approvalDetail);
+                foreach (var item in selectedSectionIds)
+                {
+                    grantSections.Add(new GrantRejectionShortfallSection { SectionId = item, GrantApprovalId = approvalDetail.Id,IsCompleted=0,CreatedOn=DateTime.Now });
+                }
+
+                approvalDetail.GrantRejectionShortfallSection=grantSections;
+                await _repoApprovalDetail.UpdateAsync(approvalDetail);
+
+                grant.IsForwarded = false;
+                grant.IsShortFall = true;
+                grant.ShortFallLevel = approvalDetail.ProcessLevel;
+                grant.IsShortFallCompleted = false;
+                grant.ShortFallReportedOn = DateTime.Now;
+                grant.ShortFallReportedByRole = role;
+                grant.ShortFallReportedById = userId;
+                grant.ShortFallReportedByName = username + "(" + designation + ")";
+                await _repo.UpdateAsync(grant);
+
+                string domain = HttpContext.Request.Host.Value;
+                string scheme = HttpContext.Request.Scheme;
+                string link = scheme + "://" + domain + Url.Action("Modify", "Grant", new { id = grant.ApplicationID });
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForShortfall(grant.ApplicantName, grant.ApplicationID, model.Remarks,link));
+                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
+                return RedirectToAction("Index");
+            }
+            return View(model);
+        }
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [HttpGet]
+        public IActionResult Transfer(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -152,18 +260,23 @@ namespace Noc_App.Controllers
 
                 return View("NotFound");
             }
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Retrieve the user object
-            var userDetail = await _userManager.FindByIdAsync(userId);
+            //// Retrieve the user object
+            //var userDetail = await _userManager.FindByIdAsync(userId);
+
+            string userId = LoggedInUserID();
+
+            string divisionId = LoggedInDivisionID();
+
+            string subdivisionId = LoggedInSubDivisionID();
 
             // Retrieve roles associated with the user
-            var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
+            var role = LoggedInRoleName();
 
             List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
-            subdivisions = (from u in _userDivisionRepository.GetAll()
-                            join sub in _subDivisionRepo.GetAll() on u.DivisionId equals (sub.DivisionId)
-                            where u.UserId == userId
+            subdivisions = (from sub in _subDivisionRepo.GetAll()
+                            where sub.DivisionId == Convert.ToInt32(divisionId)
                             select new SubDivisionDetails
                             {
                                 Id = sub.Id,
@@ -183,12 +296,14 @@ namespace Noc_App.Controllers
                 ApplicationID = grantdetail.Grant.ApplicationID,
                 CurrentOfficer=grantdetail.Approval.ProcessedToUser,
                 ApprovalId=grantdetail.Approval.Id,
+                ForwardToRole="JUNIOR ENGINEER",
                 Officers = officerDetail != null ? new SelectList(officerDetail, "UserId", "UserName") : null,
                 LocationDetails = "Division: " + grantdetail.division.Name + ", Sub-Division: " + grantdetail.subdiv.Name + ", Tehsil/Block: " + grantdetail.tehsil.Name + ", Village: " + grantdetail.village.Name + ", Pincode: " + grantdetail.village.PinCode,
             };
             return View(model);
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -210,51 +325,71 @@ namespace Noc_App.Controllers
 
                     return View("NotFound");
                 }
-                
-                // Get the current user's ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                // Retrieve the user object
-                var user = await _userManager.FindByIdAsync(userId);
+                // Get the current user's ID
+                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                //string userId = HttpContext.Session.GetString("Userid");
+                string userId = LoggedInUserID();
+
+                string divisionId = LoggedInDivisionID();
+
+                string subdivisionId = LoggedInSubDivisionID();
 
                 // Retrieve roles associated with the user
-                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                var role = LoggedInRoleName();
                 GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "F")).FirstOrDefault();
-                var forwardedUser = await _userManager.FindByIdAsync(model.SelectedOfficerId);
-                var forwardedRole = (await _userManager.GetRolesAsync(forwardedUser)).FirstOrDefault();
-                int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
+                List<OfficerResponseViewModel> officers = (await LoadOfficersAsync("Junior Engineer",model.SelectedSubDivisionId, "0")).FindAll(x=>x.user_info.EmployeeId==model.SelectedOfficerId);
+                OfficerDetail userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
+                                join officer in officers on u.Id equals officer.user_info.RoleID
+                                select new OfficerDetail
+                                {
+                                    EmployeeId= officer.user_info.EmployeeId,
+                                    RoleName=u.AppRoleName,
+                                    RoleId=u.Id.ToString(),
+                                    UserName = officer.user_info.EmployeeName+"("+ officer.user_info.DeesignationName + ")"
+                                }).FirstOrDefault();
+                //var forwardedUser = await _userManager.FindByIdAsync(model.SelectedOfficerId);
+                //var forwardedRole = (await _userManager.GetRolesAsync(forwardedUser)).FirstOrDefault();
+                //int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
 
-                GrantApprovalProcessDocumentsDetails doc = (from d in _repoApprovalDocument.GetAll()
-                                                            join a in _repoApprovalDetail.GetAll() on d.GrantApprovalID equals a.Id
-                                                            join m in _repoApprovalMaster.GetAll() on a.ApprovalID equals m.Id
-                                                            where a.GrantID== grant.Id && m.Code=="F" && model.ApprovalId==a.Id
-                                                            select new GrantApprovalProcessDocumentsDetails
-                                                            {
-                                                                CatchmentAreaAndFlowPath=d.CatchmentAreaAndFlowPath,
-                                                                CrossSectionOrCalculationSheetReportPath=d.CrossSectionOrCalculationSheetReportPath,
-                                                                DistanceFromCreekPath=d.DistanceFromCreekPath,
-                                                                DrainLSectionPath=d.DrainLSectionPath,
-                                                                GISOrDWSReportPath=d.GISOrDWSReportPath,
-                                                                GrantApproval=d.GrantApproval,
-                                                                GrantApprovalID=d.GrantApprovalID,
-                                                                Id=d.Id,
-                                                                KmlFileVerificationReportPath=d.KmlFileVerificationReportPath,
-                                                                ProcessedBy= forwardedUser.Email,
-                                                                ProcessedByRole=forwardedRole,
-                                                                SiteConditionReportPath=d.SiteConditionReportPath,
-                                                                ProcessedOn=d.ProcessedOn
-                                                            }
-                                                            ).FirstOrDefault();
+                //List<GrantApprovalProcessDocumentsDetails> docDetail = (from d in _repoApprovalDocument.GetAll()
+                //                                            join a in _repoApprovalDetail.GetAll() on d.GrantApprovalID equals a.Id
+                //                                            join m in _repoApprovalMaster.GetAll() on a.ApprovalID equals m.Id
+                //                                            where a.GrantID== grant.Id && m.Code=="F" && model.ApprovalId==a.Id
+                //                                            select new GrantApprovalProcessDocumentsDetails
+                //                                            {
+                //                                                CatchmentAreaAndFlowPath=d.CatchmentAreaAndFlowPath,
+                //                                                CrossSectionOrCalculationSheetReportPath=d.CrossSectionOrCalculationSheetReportPath,
+                //                                                DistanceFromCreekPath=d.DistanceFromCreekPath,
+                //                                                DrainLSectionPath=d.DrainLSectionPath,
+                //                                                GISOrDWSReportPath=d.GISOrDWSReportPath,
+                //                                                GrantApproval=d.GrantApproval,
+                //                                                GrantApprovalID=d.GrantApprovalID,
+                //                                                Id=d.Id,
+                //                                                KmlFileVerificationReportPath=d.KmlFileVerificationReportPath,
+                //                                                ProcessedBy= userRole.EmployeeId,
+                //                                                ProcessedByRole= userRole.RoleName,
+                //                                                SiteConditionReportPath=d.SiteConditionReportPath,
+                //                                                ProcessedOn=d.ProcessedOn
+                //                                            }
+                //                                            ).ToList();
+                //GrantApprovalProcessDocumentsDetails doc = new GrantApprovalProcessDocumentsDetails();
+                //if (docDetail.Count > 0)
+                //{
+                //    doc = docDetail.FirstOrDefault();
+                //    if (doc != null)
+                //        await _repoApprovalDocument.UpdateAsync(doc);
+                //}
                 GrantApprovalDetail approvalDetail=(await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.Id == model.ApprovalId)).FirstOrDefault();
 
-
-                approvalDetail.ProcessedBy = User.Identity.Name;
+                approvalDetail.ProcessedBy = userId;
                 approvalDetail.ProcessedByRole = role;
-                approvalDetail.ProcessedToRole = forwardedRole;
-                approvalDetail.ProcessedToUser = forwardedUser.Email;
+                approvalDetail.ProcessedToRole = userRole.RoleName;
+                approvalDetail.ProcessedToUser = userRole.EmployeeId;
+                approvalDetail.ProcessedByName = userRole.UserName;
                 approvalDetail.UpdatedOn = DateTime.Now;
-                if(doc!=null)
-                    await _repoApprovalDocument.UpdateAsync(doc);
+                
                 await _repoApprovalDetail.UpdateAsync(approvalDetail);
                 return RedirectToAction("Index");
             }
@@ -265,6 +400,8 @@ namespace Noc_App.Controllers
             }
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Obsolete]
         [HttpGet]
         public async Task<ViewResult> Forward(string Id)
         {
@@ -280,40 +417,39 @@ namespace Noc_App.Controllers
                 
                 double total = 0;
                 var divisionDetail = (from g in (await _repo.FindAsync(x => x.ApplicationID == Id))
-                                   join v in _villageRpo.GetAll() on g.VillageID equals (v.Id)
-                                   join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
-                                join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals (sub.Id)
-                                select new
-                                   {
-                                       DivisionId = sub.DivisionId,
-                                       SubDivisionId = t.SubDivisionId
-                                }
+                                        join v in _villageRpo.GetAll() on g.VillageID equals (v.Id)
+                                        join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
+                                        join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals (sub.Id)
+                                        select new
+                                        {
+                                            DivisionId = sub.DivisionId,
+                                            SubDivisionId = t.SubDivisionId
+                                        }
                          ).ToList().FirstOrDefault();
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 // Retrieve the user object
-                var userDetail = await _userManager.FindByIdAsync(userId);
+                // var userDetail = await _userManager.FindByIdAsync(userId);
+
+                string userId = LoggedInUserID();
+
+                string divisionId = LoggedInDivisionID();
+
+                string subdivisionId = LoggedInSubDivisionID();
 
                 // Retrieve roles associated with the user
-                var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault();
-                
+                var roleName = LoggedInRoleName();
+
+                string role = (await GetAppRoleName(roleName)).RoleName;
                 // Get the users in the role
-                List<UserLocationDetails> users = new List<UserLocationDetails>();
-                //List<UserLocationDetails> users = (role == "JUNIOR ENGINEER"
-                //    ? (await _userSubDivisionRepository.FindAsync(x => x.SubdivisionId == divisionDetail.SubDivisionId)).Select(x=>new UserLocationDetails { UserId=x.UserId,SubDivisionId=x.SubdivisionId,DivisionId=0,TehsilBlockId=0,VillageId=0}).ToList()
-                //    : role == "SUB DIVISIONAL OFFICER" ? 
-                //    (await _userDivisionRepository.FindAsync(x => x.DivisionId == divisionDetail.DivisionId)).Select(x => new UserLocationDetails { UserId = x.UserId, SubDivisionId = 0, DivisionId = x.DivisionId, TehsilBlockId = 0, VillageId = 0 }).ToList()
-                //    : (await _userVillageRepository.FindAsync(x => x.VillageId == grant.VillageID)).Select(x => new UserLocationDetails { UserId = x.UserId, SubDivisionId = 0, DivisionId = 0, TehsilBlockId = 0, VillageId = x.VillageId }).ToList());
                 List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
                 
                 
                 string forwardToRole = "JUNIOR ENGINEER";
                 
-                //string forwardToRole = role == "JUNIOR ENGINEER" ? "SUB DIVISIONAL OFFICER" : role == "SUB DIVISIONAL OFFICER" ? "EXECUTIVE ENGINEER" : "JUNIOR ENGINEER".ToUpper();
-                
                 List<OfficerDetails> officerDetail = new List<OfficerDetails>();
                 
-                if (role == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
+                if (roleName == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
                 {
                     var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
                     SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
@@ -326,9 +462,8 @@ namespace Noc_App.Controllers
                                              TotalArea = ((kh.KanalOrBigha*k.UnitValue*k.Timesof)/k.DivideBy)+ ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy)+ ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
                                             
                                          }).Sum(d => d.TotalArea)), 4);
-                    subdivisions = (from u in _userDivisionRepository.GetAll()
-                                    join sub in _subDivisionRepo.GetAll() on u.DivisionId equals (sub.DivisionId)
-                                    where u.UserId == userId
+                    subdivisions = (from sub in _subDivisionRepo.GetAll()  
+                                    where sub.DivisionId== Convert.ToInt32(divisionId)
                                     select new SubDivisionDetails
                                     {
                                         Id = sub.Id,
@@ -338,24 +473,7 @@ namespace Noc_App.Controllers
                 }
                 else
                 {
-                    switch (role)
-                    {
-                        case "JUNIOR ENGINEER":
-                            users = (await _userSubDivisionRepository.FindAsync(x => x.SubdivisionId == divisionDetail.SubDivisionId)).Select(x => new UserLocationDetails { UserId = x.UserId, SubDivisionId = x.SubdivisionId, DivisionId = 0, TehsilBlockId = 0, VillageId = 0 }).ToList();
-                            break;
-                        case "SUB DIVISIONAL OFFICER":
-                            users = (await _userDivisionRepository.FindAsync(x => x.DivisionId == divisionDetail.DivisionId)).Select(x => new UserLocationDetails { UserId = x.UserId, SubDivisionId = 0, DivisionId = x.DivisionId, TehsilBlockId = 0, VillageId = 0 }).ToList();
-                            break;
-                        case "EXECUTIVE ENGINEER":
-                            users = grant.IsForwarded == false
-                                ? (await _userVillageRepository.FindAsync(x => x.VillageId == grant.VillageID)).Select(x => new UserLocationDetails { UserId = x.UserId, SubDivisionId = 0, DivisionId = 0, TehsilBlockId = 0, VillageId = x.VillageId }).ToList()
-                                : (await _userDivisionRepository.FindAsync(x => x.DivisionId == divisionDetail.DivisionId)).Select(x => new UserLocationDetails { UserId = x.UserId, SubDivisionId = 0, DivisionId = x.DivisionId, TehsilBlockId = 0, VillageId = 0 }).ToList();
-                            break;
-                        default:
-                            users = (await _userDivisionRepository.FindAsync(x => x.DivisionId == divisionDetail.DivisionId)).Select(x => new UserLocationDetails { UserId = x.UserId, SubDivisionId = 0, DivisionId = x.DivisionId, TehsilBlockId = 0, VillageId = 0 }).ToList();
-                            break;
-                    }
-                    switch (role)
+                    switch (roleName)
                     {
                         case "JUNIOR ENGINEER":
                             forwardToRole = "SUB DIVISIONAL OFFICER";
@@ -381,15 +499,10 @@ namespace Noc_App.Controllers
                         default:
                             forwardToRole = "JUNIOR ENGINEER"; break;
                     }
-                    var usersInRole = (await _userManager.GetUsersInRoleAsync(forwardToRole));
-                    officerDetail = (from u in users
-                                     join ur in usersInRole on u.UserId equals ur.Id
-                                     select new OfficerDetails
-                                     {
-                                         UserId = u.UserId,
-                                         UserName = ur.UserName
-                                     }
-                                  ).ToList();
+
+                    UserRoleDetails userRoleDetails = (await GetAppRoleName(forwardToRole));
+                    
+                    officerDetail = await GetOfficer(divisionId, userRoleDetails.RoleName,"0"); 
                 }
                 List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
                 recommendations = _repoRecommendation.GetAll().Where(x=>x.Code!="NA").ToList();
@@ -410,7 +523,7 @@ namespace Noc_App.Controllers
                                                           ApplicantName = g.ApplicantName,
                                                           ApplicationID = g.ApplicationID,
                                                           ForwardToRole= forwardToRole,
-                                                          LoggedInRole = role,
+                                                          LoggedInRole = roleName,
                                                           Remarks="",
                                                           Recommendations= recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
                                                           SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
@@ -427,6 +540,7 @@ namespace Noc_App.Controllers
             }
 
         }
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -460,13 +574,25 @@ namespace Noc_App.Controllers
 
                                          }).Sum(d => d.TotalArea)), 4);
                 // Get the current user's ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 // Retrieve the user object
-                var user = await _userManager.FindByIdAsync(userId);
+                //var user = await _userManager.FindByIdAsync(userId);
+
+                string userId = LoggedInUserID();
+
+                string username = LoggedInUserName();
+
+                string designation = LoggedInDesignationName();
+
+                string divisionId = LoggedInDivisionID();
+
+                string subdivisionId = LoggedInSubDivisionID();
 
                 // Retrieve roles associated with the user
-                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                var roleName = LoggedInRoleName();
+
+                string role = roleName;
 
 
                 if (role != "EXECUTIVE ENGINEER" && model.SelectedRecommendationId == 0)
@@ -476,20 +602,62 @@ namespace Noc_App.Controllers
                 }
 
                 GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "F")).FirstOrDefault();
-                var forwardedUser = await _userManager.FindByIdAsync(model.SelectedOfficerId);
-                var forwardedRole = (await _userManager.GetRolesAsync(forwardedUser)).FirstOrDefault();
+
+                //UserRoleDetails userRoleDetails = (await GetAppRoleName(forwardToRole));
+                string forwardToRole = "";
+                string subdiv = "0";
+                OfficerDetails officerDetail = new OfficerDetails();
+                switch (role)
+                {
+                    case "JUNIOR ENGINEER":
+                        forwardToRole = "SUB DIVISIONAL OFFICER";
+                        break;
+                    case "SUB DIVISIONAL OFFICER":
+                        forwardToRole = "EXECUTIVE ENGINEER";
+                        break;
+                    case "EXECUTIVE ENGINEER":
+                        forwardToRole = grant.IsForwarded == false ? "JUNIOR ENGINEER" : "CIRCLE OFFICER";
+                        break;
+                    case "CIRCLE OFFICER":
+                        forwardToRole = "DWS";
+                        break;
+                    case "DWS":
+                        forwardToRole = "EXECUTIVE ENGINEER HQ";
+                        break;
+                    case "EXECUTIVE ENGINEER HQ":
+                        forwardToRole = "CHIEF ENGINEER HQ";
+                        break;
+                    case "CHIEF ENGINEER HQ":
+                        forwardToRole = "PRINCIPAL SECRETARY";
+                        break;
+                    default:
+                        forwardToRole = "JUNIOR ENGINEER"; break;
+                }
+                if(forwardToRole=="JUNIOR ENGINEER")
+                {
+                    subdiv = model.SelectedSubDivisionId;
+                    officerDetail = (await GetOfficer(divisionId, forwardToRole, subdiv)).FindAll(x => x.UserId == model.SelectedOfficerId).FirstOrDefault();
+                }
+                else
+                {
+                    officerDetail = (await GetOfficer(divisionId, forwardToRole, subdiv)).FindAll(x => x.UserId == model.SelectedOfficerId).FirstOrDefault();
+                }
+                string forwardedUser = officerDetail.UserId;
+                string forwardedRole = officerDetail.RoleName;
                 int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
                 GrantApprovalDetail approvalDetail = new GrantApprovalDetail
                 {
                     GrantID = grant.Id,
                     ApprovalID = master.Id,
-                    ProcessedBy = User.Identity.Name,
+                    ProcessedBy =userId,
                     ProcessedOn = DateTime.Now,
                     ProcessedByRole = role,
                     ProcessLevel = approvalLevel + 1,
+                    ProcessedByName=username+"("+designation+")",
                     ProcessedToRole = forwardedRole,
-                    ProcessedToUser = forwardedUser.Email,
-                    RecommendationID= role == "EXECUTIVE ENGINEER" && model.SelectedRecommendationId==0?3: model.SelectedRecommendationId,
+                    ProcessedToUser = forwardedUser,
+                    ProcessedToName=officerDetail.UserName,                    
+                    RecommendationID = role == "EXECUTIVE ENGINEER" && model.SelectedRecommendationId==0?3: model.SelectedRecommendationId,
                     Remarks=model.Remarks
                 };
 
@@ -669,10 +837,11 @@ namespace Noc_App.Controllers
                             DrainLSectionPath = uniqueLSectionOfDrainFileName,
                             GISOrDWSReportPath= uniqueGisOrDwsFileName,
                             KmlFileVerificationReportPath = uniqueKmlFileName,
-                            ProcessedBy = User.Identity.Name,
+                            ProcessedBy = userId,
                             ProcessedOn = DateTime.Now,
-                            ProcessedByRole = role
-                        };
+                            ProcessedByRole = role,
+                            ProcessedByName = LoggedInUserName() + "(" + LoggedInDesignationName() + ")"
+                    };
 
                         approvalDetail.GrantApprovalProcessDocuments=approvalObj;
                         await _repoApprovalDetail.UpdateAsync(approvalDetail);
@@ -703,6 +872,7 @@ namespace Noc_App.Controllers
             }
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER")]
         [HttpGet]
         public ViewResult EditApprovalDocuments(string grantId,long docId)
         {
@@ -730,6 +900,7 @@ namespace Noc_App.Controllers
 
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -749,13 +920,21 @@ namespace Noc_App.Controllers
                     {
                         //if (model.SiteConditionReportFile != null && model.CatchmentAreaFile != null && model.DistanceFromCreekFile != null && model.GisOrDwsFile != null && model.KmlFile != null && model.CrossSectionOrCalculationFile != null && model.LSectionOfDrainFile != null)
                         //{
-                        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                         // Retrieve the user object
-                        var user = await _userManager.FindByIdAsync(userId);
+                        //var user = await _userManager.FindByIdAsync(userId);
+
+                        string userId = LoggedInUserID();
+
+                        string divisionId = LoggedInDivisionID();
+
+                        string subdivisionId = LoggedInSubDivisionID();
 
                         // Retrieve roles associated with the user
-                        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                        var roleName = LoggedInRoleName();
+
+                        string role = roleName;
                         string ErrorMessage = string.Empty;
                             int siteConditionValidation = AllowedCheckExtensions(model.SiteConditionReportFile);
                             int CatchmentAreaValidation = AllowedCheckExtensions(model.CatchmentAreaFile);
@@ -932,8 +1111,9 @@ namespace Noc_App.Controllers
                         //    return View(model);
                         //}
                         obj.UpdatedOn = DateTime.Now;
-                        obj.UpdatedBy = user.UserName;
+                        obj.UpdatedBy = userId;
                         obj.UpdatedByRole = role;
+                        obj.UpdatedByName = LoggedInUserName()+"("+LoggedInDesignationName()+")";
                         await _repoApprovalDocument.UpdateAsync(obj);
                         return RedirectToAction("Index");
                     }
@@ -946,6 +1126,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ")]
         [HttpGet]
         public IActionResult Reject(string id)
         {
@@ -961,6 +1142,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(GrantApprovalDetailReject model)
@@ -982,26 +1164,41 @@ namespace Noc_App.Controllers
                     return View("NotFound");
                 }
                 // Get the current user's ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 // Retrieve the user object
-                var user = await _userManager.FindByIdAsync(userId);
+                //var user = await _userManager.FindByIdAsync(userId);
+
+                string userId = LoggedInUserID();
+
+                string divisionId = LoggedInDivisionID();
+
+                string subdivisionId = LoggedInSubDivisionID();
+
+                string username = LoggedInUserName();
+
+                string designation = LoggedInDesignationName();
 
                 // Retrieve roles associated with the user
-                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                var roleName = LoggedInRoleName();
+
+                string role = roleName;
                 GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "R")).FirstOrDefault();
                 int rejectionLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
                 GrantApprovalDetail approvalDetail = new GrantApprovalDetail
                 {
                     GrantID = grant.Id,
                     ApprovalID = master.Id,
-                    ProcessedBy = User.Identity.Name,
+                    ProcessedBy = userId,
                     ProcessedOn = DateTime.Now,
                     ProcessedByRole = role,
+                    ProcessedByName = username + "(" + designation + ")",
                     ProcessLevel = rejectionLevel + 1,
                     ProcessedToRole = "",
                     ProcessedToUser = "",
-                    Remarks = model.Remarks
+                    ProcessedToName = "",
+                    Remarks = model.Remarks,
+                    RecommendationID=3
                 };
 
                 await _repoApprovalDetail.CreateAsync(approvalDetail);
@@ -1020,6 +1217,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CHIEF ENGINEER HQ")]
         [HttpGet]
         public async Task<IActionResult> IssueNOC(string id)
         {
@@ -1054,6 +1252,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CHIEF ENGINEER HQ")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -1099,37 +1298,36 @@ namespace Noc_App.Controllers
                 }
                 string uniqueCertificateFileName = ProcessUploadedFile(model.CertificateFile, "noc");
 
-
-                //GrantApprovalProcessDocumentsDetails approvalObj = new GrantApprovalProcessDocumentsDetails
-                //{
-                //    SiteConditionReportPath = uniqueSiteConditionFileName,
-                //    CatchmentAreaAndFlowPath = uniqueCatchmentAreaFileName,
-                //    CrossSectionOrCalculationSheetReportPath = uniqueCrossSectionOrCalculationFileName,
-                //    DistanceFromCreekPath = uniqueDistanceFromCreekFileName,
-                //    DrainLSectionPath = uniqueLSectionOfDrainFileName,
-                //    GISOrDWSReportPath = uniqueGisOrDwsFileName,
-                //    KmlFileVerificationReportPath = uniqueKmlFileName,
-                //    ProcessedBy = User.Identity.Name,
-                //    ProcessedOn = DateTime.Now,
-                //    ProcessedByRole = role
-                //};
-                // Get the current user's ID
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // Get the current user's ID
+            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Retrieve the user object
-            var user = await _userManager.FindByIdAsync(userId);
+            // var user = await _userManager.FindByIdAsync(userId);
+
+            string userId = LoggedInUserID();
+
+            string divisionId = LoggedInDivisionID();
+
+            string subdivisionId = LoggedInSubDivisionID();
+
+            string username = LoggedInUserName();
+
+            string designation = LoggedInDesignationName();
 
             // Retrieve roles associated with the user
-            var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+            var roleName = LoggedInRoleName();
+
+            string role = roleName;
             GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "A")).FirstOrDefault();
             int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
             GrantApprovalDetail approvalDetail = new GrantApprovalDetail
             {
                 GrantID = grant.Id,
                 ApprovalID = master.Id,
-                ProcessedBy = User.Identity.Name,
+                ProcessedBy = userId,
                 ProcessedOn = DateTime.Now,
                 ProcessedByRole = role,
+                ProcessedByName = username + "(" + designation + ")",
                 ProcessLevel = approvalLevel + 1,
                 ProcessedToRole = "",
                 ProcessedToUser = ""
@@ -1143,7 +1341,7 @@ namespace Noc_App.Controllers
             grant.IsPending = false;
             grant.CertificateFilePath = uniqueCertificateFileName;
             grant.UploadedByRole=role;
-            grant.UploadedBy = User.Identity.Name;
+            grant.UploadedBy = userId;
             grant.UploadedOn = DateTime.Now;
             await _repo.UpdateAsync(grant);
 
@@ -1183,6 +1381,7 @@ namespace Noc_App.Controllers
             return PhysicalFile(filePath, mimeType, fileName);
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
         public async Task<IActionResult> ViewApplication(string Id)
         {
             try
@@ -1347,37 +1546,18 @@ namespace Noc_App.Controllers
             return uniqueFileName;
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Obsolete]
         [HttpPost]
-        public async Task<IActionResult> GetOfficers(int subdivisionId)
+        public async Task<IActionResult> GetOfficers(int subdivisionId,string roleName)
         {
-            List<UserLocationDetails> users = new List<UserLocationDetails>();
-            users = (from te in _tehsilBlockRepo.GetAll() 
-                                   join v in _villageRpo.GetAll() on te.Id equals(v.TehsilBlockId)
-                                   join uv in _userVillageRepository.GetAll() on v.Id equals(uv.VillageId)
-                                   where te.SubDivisionId==subdivisionId
-                                   select new UserLocationDetails
-                                   {
-                                       UserId = uv.UserId,
-                                       SubDivisionId = 0,
-                                       DivisionId = 0,
-                                       TehsilBlockId = 0,
-                                       //VillageId = uv.VillageId
-                                   }
-                                   ).Distinct().ToList();
-
-            string forwardToRole = "JUNIOR ENGINEER";
-            var usersInRole = (await _userManager.GetUsersInRoleAsync(forwardToRole));
-            List<OfficerDetails> officerDetail = (from u in users
-                             join ur in usersInRole on u.UserId equals ur.Id
-                             select new OfficerDetails
-                             {
-                                 UserId = u.UserId,
-                                 UserName = ur.UserName
-                             }
-                          ).ToList();
+            string divisionId = "0";
+            string role = (await GetAppRoleName(roleName)).RoleName;
+            List<OfficerDetails> officerDetail = await GetOfficer(divisionId, role, subdivisionId.ToString());
             return Json(new SelectList(officerDetail, "UserId", "UserName"));
         }
 
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
         [HttpPost]
         public IActionResult GetRecommendationDetail(string id)
         {
@@ -1413,6 +1593,208 @@ namespace Noc_App.Controllers
                 //ModelState.AddModelError(string.Empty, ex.Message);
                 return View();
             }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Obsolete]
+        private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole,string subdivisionId,string divisionId)
+        {
+            try
+            {
+                string baseUrl = "";
+                string salt = "";
+                string checksum = "";
+                string combinedPassword = "";
+                officerRole = "Employee";
+                if (subdivisionId != "0")
+                {
+                    subdivisionId = "114";
+                    baseUrl = "https://wrdpbind.com/api/login5.php";
+                    salt = "4RCHhk3cJ6OMGdEf";
+                    checksum = "eUOwFCGMqKvJARC1tU6l4s34";
+                    combinedPassword = officerRole + "|" + subdivisionId + "|" + checksum;
+                }
+                else
+                {
+                    divisionId = "114";
+                    baseUrl = "https://wrdpbind.com/api/login6.php";
+                    salt = "6WCHhk3cJ6OMGdRg";
+                    checksum = "dTOwFCGMqKvJARC1tU6l4sv6";
+                    combinedPassword = officerRole + "|" + divisionId + "|" + checksum;
+                }
+
+
+                string plainText = combinedPassword;
+
+                var keyBytes = new byte[16];
+                var ivBytes = new byte[16];
+
+                string key = salt;
+                var keySalt = Encoding.UTF8.GetBytes(key);
+                var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
+
+                Array.Copy(pdb.GetBytes(16), keyBytes, 16);
+                Array.Copy(pdb.GetBytes(16), ivBytes, 16);
+                string encryptedString = NCC_encryptHelper(plainText, key, key);
+
+                HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+                HttpClient client = new HttpClient(handler);
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("details", encryptedString);
+                var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
+                string resultContent = "["+tokenResponse1.Content.ReadAsStringAsync().Result.Replace("}{", "},{")+"]";
+                List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
+                if (list.FirstOrDefault().Status == "200")
+                {
+                    //    //OfficerResponseViewModel list3 = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel>(resultContent);
+                    //    //List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
+                    //    //list.Add(list3);
+
+                    return list;
+
+                }
+                return null;
+            }
+            
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        private async Task<UserRoleDetails> GetAppRoleName(string rolename)
+        {
+            try
+            {
+                return (await _userRolesRepository.FindAsync(x => x.AppRoleName == rolename)).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        private async Task<UserRoleDetails> GetRoleName(string rolename)
+        {
+            try
+            {
+                return (await _userRolesRepository.FindAsync(x => x.RoleName == rolename)).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Obsolete]
+        private async Task<List<OfficerDetails>> GetOfficer(string divisionId,string roleName,string subDivision)
+        {
+            try
+            {
+                List<OfficerResponseViewModel> officers = (await LoadOfficersAsync(roleName, subDivision, divisionId)).ToList();
+                if (officers!=null && officers.Count > 0)
+                {
+                    OfficerDetail userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
+                                              join officer in officers on u.Id equals officer.user_info.RoleID
+                                              select new OfficerDetail
+                                              {
+                                                  EmployeeId = officer.user_info.EmployeeId,
+                                                  RoleName = u.AppRoleName,
+                                                  RoleId = u.Id.ToString()
+                                              }).FirstOrDefault();
+                    //var usersInRole = (await _userManager.GetUsersInRoleAsync(forwardToRole));
+                    List<OfficerDetails> officerDetails = ((from u in officers
+                                                            select new OfficerDetails
+                                                            {
+                                                                UserId = u.user_info.EmployeeId,
+                                                                UserName = u.user_info.EmployeeName+"("+u.user_info.DeesignationName+")",
+                                                                RoleId = u.user_info.RoleID.ToString(),
+                                                                RoleName = userRole.RoleName
+                                                            }
+                                                          ).ToList());
+                    return officerDetails;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        private string NCC_encryptHelper(string plainText, string key, string iv)
+        {
+            // Pad text and encrypt
+            string paddedString = _NCC_addpadding(plainText);
+
+            using (Aes aes = Aes.Create())
+            {
+                aes.KeySize = 128;
+                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.IV = Encoding.UTF8.GetBytes(iv);
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+
+                // Encrypt the data
+                using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+                {
+                    byte[] dataBytes = Encoding.UTF8.GetBytes(plainText);
+                    byte[] encryptedData = encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
+                    return Convert.ToBase64String(encryptedData);
+                }
+            }
+        }
+
+        private string _NCC_addpadding(string inputString)
+        {
+            // Implement your padding logic here, if required
+            // In this example, we're just using PKCS7 padding
+            int paddingSize = 16 - (inputString.Length % 16);
+            string paddedString = inputString + new string((char)paddingSize, paddingSize);
+            return paddedString;
+        }
+
+        private string LoggedInUserID()
+        {
+            string userId = HttpContext.Session.GetString("Userid");
+            return userId;
+        }
+        private string LoggedInDivisionID()
+        {
+            string userId = HttpContext.Session.GetString("Divisionid");
+            return userId;
+        }
+        private string LoggedInSubDivisionID()
+        {
+            string userId = HttpContext.Session.GetString("SubDivisionid");
+            return userId;
+        }
+        private string LoggedInRoleID()
+        {
+            string userId = HttpContext.Session.GetString("RoleId");
+            return userId;
+        }
+        private string LoggedInUserName()
+        {
+            string userId = HttpContext.Session.GetString("Username");
+            return userId;
+        }
+        private string LoggedInDesignationName()
+        {
+            string userId = HttpContext.Session.GetString("Designation");
+            return userId;
+        }
+        private string LoggedInDistrict()
+        {
+            string userId = HttpContext.Session.GetString("Districtid");
+            return userId;
+        }
+        private string LoggedInRoleName()
+        {
+            string userId = HttpContext.Session.GetString("Rolename");
+            return userId;
         }
     }
 

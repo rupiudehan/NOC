@@ -5,6 +5,7 @@
     ViewBag.Title = "Department Login";
     // Layout = "~/Views/Account/_AccountLayout.cshtml";
     Layout = "~/Views/HomeLanding/_HomeLayout.cshtml";
+    string returnedUrl = ViewData["returnedUrl"] as string;
 }
 <main id="main">
     <section id="contact" class="contact">
@@ -18,7 +19,7 @@
             <div class="row">
 
                 <div class="col-lg-12 mt-5 mt-lg-0 d-flex align-items-stretch">
-                    <form asp-controller="Account" asp-action="Login" method="post" role="form" class="php-email-form">
+                    <form action="Login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnedUrl)" method="post" role="form" class="php-email-form">
                         <div class="row">
                             <div class="form-group mt-3">
                                 <label asp-for="Email"></label>

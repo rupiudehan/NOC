@@ -3,6 +3,7 @@
     public class TehsilBlockViewModel
     {
         public int Id { get; set; }
+        public int LGD_ID { get; set; }
         public string Name { get; set; }
 
         public int DivisionId { get; set; }

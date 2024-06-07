@@ -69,6 +69,26 @@ namespace Noc_App.Helpers
             </html>";
         }
 
+        public static string EmailStringBodyForGrantUpdateMessage(string applicantName, string applicationID)
+        {
+            return $@"<htm>
+            <head></head>
+            <body style=""margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;"">
+            <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
+                <div>
+                    <div>
+                        <p>Dear {applicantName},</p>
+                        
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been updated successfully.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
+                        <p>Best Regards,<br><br>
+                        Department of Water Resources, Punjab</p>
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>";
+        }
+
         public static string EmailStringBodyForGrantMessageWithPayment(string applicantName, string applicationID,string transactionID)
         {
             return $@"<htm>
@@ -100,6 +120,30 @@ namespace Noc_App.Helpers
                         <p>Dear {applicantName},</p>
                         
                         <p>Your application for the NOC Certificate with ID <b>{applicationID}</b> has been rejected due to {reason}.</p><p>Please apply again to get NOC certificate</p><br>
+                        <p>Best Regards,<br><br>
+                        Department of Water Resources, Punjab</p>
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>";
+        }
+
+        public static string EmailStringBodyForShortfall(string applicantName, string applicationID, string reason,string link)
+        {
+            return $@"<htm>
+            <head></head>
+            <body style=""margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;"">
+            <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
+                <div>
+                    <div>
+                        <p>Dear {applicantName},</p>
+                        
+                        <p>Your application ID <b>{applicationID}</b> has been put on hold due to \'{reason}\'.</p><p>Please click on the link below to make changes as per mentioned requirements</p>
+                        <p>
+                            <a href=""{link}"">Click here to make changes</a>
+                        </p>
+                        <br>
                         <p>Best Regards,<br><br>
                         Department of Water Resources, Punjab</p>
                     </div>

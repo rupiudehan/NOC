@@ -1,5 +1,6 @@
 ﻿
-@inject SignInManager<ApplicationUser> signInManager;
+@* @inject SignInManager<ApplicationUser> signInManager; *@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,7 +26,9 @@
     <!-- Custom styles for this template-->
     <link href="~/template/css/sb-admin-2.css" rel="stylesheet">
     <!-- CSS -->
-    <link href="~/landingpage/assets/css/select2.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    @* <link href="~/landingpage/assets/css/select2.css" rel="stylesheet" /> *@
     <style>
         .boldText{
             font-weight:bolder;
@@ -54,7 +57,7 @@
         <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-action="Create" asp-controller="Grant">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="javascript();">
                 <div class="sidebar-brand-icon">
                     @* <i class="fas fa-laugh-wink"></i> *@
                     <img src="~/landingpage/assets/img/favicon.png" alt="NOC" height="32" width="32" />
@@ -64,9 +67,9 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
             <!-- Nav Item - Dashboard -->
-            @if (signInManager.IsSignedIn(User) && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER")))
+            
+            @if (User.Identity.IsAuthenticated && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER")))
             {
                 <li class="nav-item @(IsLinkActive("Home","Index") ? "active" : "")">
                     <a class="nav-link" asp-action="Index" asp-controller="Home">
@@ -76,7 +79,7 @@
                 </li>
                 <hr class="sidebar-divider">
             }
-            @if (signInManager.IsSignedIn(User) && User.IsInRole("Administrator"))
+            @if (User.Identity.IsAuthenticated && (User.IsInRole("Administrator") || User.IsInRole("EXECUTIVE ENGINEER")))
             {
                 <li class="nav-item active">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
@@ -90,11 +93,11 @@
                         @* <h6 class="collapse-header">Custom Components:</h6> *@
                        @*  <a class="collapse-item" asp-action="ListRoles" asp-controller="Administration">Roles</a> *@
                         
-                            <a class="collapse-item" asp-action="List" asp-controller="Division">Division</a>
-                            <a class="collapse-item" asp-action="List" asp-controller="SubDivision">SubDivision</a>
+                            @* <a class="collapse-item" asp-action="List" asp-controller="Division">Division</a>
+                            <a class="collapse-item" asp-action="List" asp-controller="SubDivision">SubDivision</a> *@
                             <a class="collapse-item" asp-action="List" asp-controller="TehsilBlock">Tehsil/Block</a>
                             <a class="collapse-item" asp-action="List" asp-controller="Village">Village</a>
-                            <a class="collapse-item" asp-action="List" asp-controller="Account">User</a>
+                            @* <a class="collapse-item" asp-action="List" asp-controller="Account">User</a> *@
                         
                     </div>
                 </div>
@@ -103,7 +106,7 @@
                 </li>
                 <hr class="sidebar-divider">
             }
-            else if (signInManager.IsSignedIn(User))
+            @if (User.Identity.IsAuthenticated && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER") && (!User.IsInRole("Administrator"))))
             {
                 <li class="nav-item @(IsLinkActive("ApprovalProcess","Index") ? "active" : "")">
                     <a class="nav-link" asp-action="Index" asp-controller="ApprovalProcess">
@@ -113,93 +116,6 @@
                 </li>
                 <hr class="sidebar-divider">
             }
-            <!-- Divider -->
-           @*  <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Interface
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                   aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Components</span>
-                </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Custom Components:</h6>
-                        <a class="collapse-item" href="buttons.html">Buttons</a>
-                        <a class="collapse-item" href="cards.html">Cards</a>
-                    </div>
-                </div>
-            </li>
-
-            <!-- Nav Item - Utilities Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                   aria-expanded="true" aria-controls="collapseUtilities">
-                    <i class="fas fa-fw fa-wrench"></i>
-                    <span>Utilities</span>
-                </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                     data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Custom Utilities:</h6>
-                        <a class="collapse-item" href="utilities-color.html">Colors</a>
-                        <a class="collapse-item" href="utilities-border.html">Borders</a>
-                        <a class="collapse-item" href="utilities-animation.html">Animations</a>
-                        <a class="collapse-item" href="utilities-other.html">Other</a>
-                    </div>
-                </div>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Addons
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-                   aria-expanded="true" aria-controls="collapsePages">
-                    <i class="fas fa-fw fa-folder"></i>
-                    <span>Pages</span>
-                </a>
-                <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Login Screens:</h6>
-                        <a class="collapse-item" href="login.html">Login</a>
-                        <a class="collapse-item" href="register.html">Register</a>
-                        <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
-                        <div class="collapse-divider"></div>
-                        <h6 class="collapse-header">Other Pages:</h6>
-                        <a class="collapse-item" href="404.html">404 Page</a>
-                        <a class="collapse-item" href="blank.html">Blank Page</a>
-                    </div>
-                </div>
-            </li>
-
-            <!-- Nav Item - Charts -->
-            <li class="nav-item">
-                <a class="nav-link" href="charts.html">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Charts</span>
-                </a>
-            </li>
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span>
-                </a>
-            </li> *@
                        
 
         </ul>
@@ -223,7 +139,7 @@
 
                        @*  <div class="topbar-divider d-none d-sm-block"></div> *@
                        
-                        @if (signInManager.IsSignedIn(User))
+                        @if (User.Identity.IsAuthenticated)
                         {
                             <!-- Nav Item - User Information -->
                             <li class="nav-item dropdown no-arrow">

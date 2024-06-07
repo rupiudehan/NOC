@@ -17,9 +17,11 @@ namespace Noc_App.Models
         public string DrainLSectionPath { get; set; }
         public string ProcessedBy { get; set; }
         public string ProcessedByRole { get; set; }
+        public string ProcessedByName { get; set; }
         public DateTime ProcessedOn { get; set; } = DateTime.Now;
         public string UpdatedBy { get; set; }
         public string UpdatedByRole { get; set; }
+        public string UpdatedByName { get; set; }
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
     }
 }

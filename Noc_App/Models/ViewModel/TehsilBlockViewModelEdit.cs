@@ -8,6 +8,8 @@ namespace Noc_App.Models.ViewModel
     {
         public int Id { get; set; }
         [Required]
+        public int LGD_ID { get; set; }
+        [Required]
         [MaxLength(150, ErrorMessage = "Name cannot exceed 150 characters")]
         public string Name { get; set; }
         [Required]

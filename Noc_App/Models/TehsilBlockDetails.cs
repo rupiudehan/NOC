@@ -6,26 +6,24 @@ namespace Noc_App.Models
 {
     public class TehsilBlockDetails
     {
+        [Key]
         public int Id { get; set; }
+        public int LGD_ID { get; set; }
         [Required]
         [MaxLength(150, ErrorMessage = "Name cannot exceed 150 characters")]
         public string Name { get; set; }
         public int SubDivisionId { get; set; }
+        [ForeignKey(nameof(SubDivisionId))]
         public SubDivisionDetails SubDivision { get; set; }
         public List<VillageDetails> Village { get; set; }
         public bool IsActive { get; set; }
 
         public string CreatedBy { get; set; } // Assuming it's a user ID
-        public ApplicationUser User { get; set; }
+        //public ApplicationUser User { get; set; }
         public DateTime CreatedOn { get; set; }
         public string UpdatedBy { get; set; }
-        public ApplicationUser User2 { get; set; }
-        //public ApplicationUser UpdatedBy { get; set; }
+        //public ApplicationUser User2 { get; set; }
         public DateTime UpdatedOn { get; set; }
-        //public ICollection<ApplicationUser> ApplicationUsers { get; set; }
-
-        //public List<LocationUserMapping> LocatioinUserMapping { get; set; }
-        public ICollection<UserTehsil> UserTehsils { get; set; }
 
     }
 }

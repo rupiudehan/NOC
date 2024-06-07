@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -16,20 +17,33 @@ using Noc_App.UtilityService;
 using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(option =>
+    {
+        option.ExpireTimeSpan = TimeSpan.FromMinutes(60 * 1);
+        //option.LoginPath = "/Account/Login";
+        option.LoginPath = "/Account/Verify";
+        option.AccessDeniedPath = "/Account/Verify";
+        //option.AccessDeniedPath = "/Account/Login";
+    });
+builder.Services.AddAuthorization();
 
 //Register
 builder.Services.AddDbContextPool<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("DBCS"))
     );
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddMvc(options => { 
-    var policy=new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
-});
+//builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddMvc(
+//    options => { 
+    
+//    var policy=new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+//    options.Filters.Add(new AuthorizeFilter(policy));
+//}
+);
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
@@ -48,6 +62,7 @@ builder.Services.Configure<IFMS_PaymentConfig>(builder.Configuration.GetSection(
 builder.Services.AddTransient<GoogleCaptchaService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICalculations, Calculations>();
+builder.Services.AddScoped<IRepository<DistrictDetails>, Repository<DistrictDetails>>();
 builder.Services.AddScoped<IRepository<DivisionDetails>, Repository<DivisionDetails>>();
 builder.Services.AddScoped<IRepository<SubDivisionDetails>, Repository<SubDivisionDetails>>();
 builder.Services.AddScoped<IRepository<TehsilBlockDetails>, Repository<TehsilBlockDetails>>();
@@ -59,10 +74,6 @@ builder.Services.AddScoped<IRepository<NocTypeDetails>, Repository<NocTypeDetail
 builder.Services.AddScoped<IRepository<ProjectTypeDetails>, Repository<ProjectTypeDetails>>();
 builder.Services.AddScoped<IRepository<SiteAreaUnitDetails>, Repository<SiteAreaUnitDetails>>();
 builder.Services.AddScoped<IRepository<GrantKhasraDetails>, Repository<GrantKhasraDetails>>();
-builder.Services.AddScoped<IRepository<UserDivision>, Repository<UserDivision>>();
-builder.Services.AddScoped<IRepository<UserSubdivision>, Repository<UserSubdivision>>();
-builder.Services.AddScoped<IRepository<UserTehsil>, Repository<UserTehsil>>();
-builder.Services.AddScoped<IRepository<UserVillage>, Repository<UserVillage>>();
 builder.Services.AddScoped<IRepository<GrantDetails>, Repository<GrantDetails>>();
 builder.Services.AddScoped<IRepository<GrantPaymentDetails>, Repository<GrantPaymentDetails>>();
 builder.Services.AddScoped<IRepository<GrantApprovalDetail>, Repository<GrantApprovalDetail>>();
@@ -76,33 +87,17 @@ builder.Services.AddScoped<IRepository<DashboardPendencyViewModel>, Repository<D
 builder.Services.AddScoped<IRepository<DaysCheckMaster>, Repository<DaysCheckMaster>>();
 builder.Services.AddScoped<IRepository<UserRoleDetails>, Repository<UserRoleDetails>>();
 builder.Services.AddScoped<IRepository<RecommendationDetail>, Repository<RecommendationDetail>>();
+builder.Services.AddScoped<IRepository<GrantSectionsDetails>, Repository<GrantSectionsDetails>>();
+builder.Services.AddScoped<IRepository<GrantRejectionShortfallSection>, Repository<GrantRejectionShortfallSection>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(60);
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-builder.Services.AddTransient<IPaymentService, PaymentService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-builder.Services.Configure<PaymentConfig>(builder.Configuration.GetSection("RazorPayOptions"));
-
-//builder.Services.AddSingleton(x =>
-//    new PaypalClient(
-//        builder.Configuration["PayPalOptions:ClientId"],
-//        builder.Configuration["PayPalOptions:ClientSecret"],
-//        builder.Configuration["PayPalOptions:Mode"]
-//    )
-//);
-builder.Services.AddSingleton(x =>
-    new PaymentConfig(
-        builder.Configuration["RazorPayOptions:ClientId"],
-        builder.Configuration["RazorPayOptions:ClientSecret"]
-    )
-);
-//builder.Services.AddScoped<IOrderDetail, OrderDetail>();
 
 var app = builder.Build();
 
@@ -119,14 +114,18 @@ else
     app.UseStatusCodePagesWithRedirects("/Error/{0}");
 }
 
-app.UseSession();
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseCookiePolicy();
 
 app.MapControllerRoute(
     name: "default",

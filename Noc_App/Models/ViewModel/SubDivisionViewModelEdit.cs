@@ -13,7 +13,7 @@ namespace Noc_App.Models.ViewModel
         [Required]
         public int SelectedDivisionId { get; set; }
         public IEnumerable<SelectListItem> Divisions { get; set; }
-        public ApplicationUser UpdatedBy { get; set; }
+        public string UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
     }
 }

@@ -12,12 +12,15 @@ namespace Noc_App.Models
         [ForeignKey(nameof(ApprovalID))]
         public GrantApprovalMaster GrantApproval { get; set; }
         public GrantApprovalProcessDocumentsDetails GrantApprovalProcessDocuments { get; set; }
+        public List<GrantRejectionShortfallSection> GrantRejectionShortfallSection { get; set; }
         public string Remarks { get; set; }
         public int ProcessLevel { get; set; }
         public string ProcessedToUser { get; set; }
         public string ProcessedToRole { get; set; }
+        public string ProcessedToName { get; set; }
         public string ProcessedBy { get; set; }
         public string ProcessedByRole { get; set; }
+        public string ProcessedByName { get; set; }
         public DateTime ProcessedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
         public int RecommendationID { get; set; }

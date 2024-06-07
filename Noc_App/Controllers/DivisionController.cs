@@ -10,18 +10,16 @@ using System.Xml.Linq;
 
 namespace Noc_App.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     public class DivisionController : Controller
     {
         private readonly IRepository<DivisionDetails> _repo;
         private readonly IRepository<SubDivisionDetails> _repoSubdivision;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DivisionController(IRepository<DivisionDetails> repo, IRepository<SubDivisionDetails> repoSubdivision, UserManager<ApplicationUser> userManager)
+        public DivisionController(IRepository<DivisionDetails> repo, IRepository<SubDivisionDetails> repoSubdivision)
         {
             _repo = repo;
             _repoSubdivision = repoSubdivision;
-            _userManager = userManager;
         }
         [HttpGet]
         public IActionResult Create()
@@ -35,7 +33,7 @@ namespace Noc_App.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    string userid = await LoggedInUserID();
+                    string userid = LoggedInUserID();
 
                     bool IsDuplicate = _repo.IsDuplicateName(model.Name);
                     if (IsDuplicate)
@@ -63,19 +61,10 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        private async Task<string> LoggedInUserID()
+        private string LoggedInUserID()
         {
-            string userid = "0";
-            var user = await _userManager.GetUserAsync(User);
-            var user2 = await _userManager.FindByNameAsync(user.UserName);
-
-            if (user != null)
-            {
-                userid = user2.Id;
-            }
-            
-
-            return userid;
+            string userId = HttpContext.Session.GetString("Userid");
+            return userId;
         }
 
         [HttpGet]
@@ -146,7 +135,7 @@ namespace Noc_App.Controllers
                         ModelState.AddModelError("e",$"Name {model.Name} is already in use");
                         return View(model);
                     }
-                    string userid = await LoggedInUserID();
+                    string userid = LoggedInUserID();
                     obj.Name = model.Name;
                     obj.UpdatedOn = DateTime.Now;
                     obj.UpdatedBy = userid;

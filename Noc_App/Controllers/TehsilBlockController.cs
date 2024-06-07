@@ -9,21 +9,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Noc_App.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator,EXECUTIVE ENGINEER")]
     public class TehsilBlockController : Controller
     {
         private readonly IRepository<TehsilBlockDetails> _repo;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
         private readonly IRepository<VillageDetails> _villageRepo;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public TehsilBlockController(IRepository<TehsilBlockDetails> repo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo, IRepository<VillageDetails> villageRepo, UserManager<ApplicationUser> userManager)
+        public TehsilBlockController(IRepository<TehsilBlockDetails> repo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo, IRepository<VillageDetails> villageRepo)
         {
             _repo = repo;
             _subDivisionRepo = subDivisionRepo;
             _divisionRepo = divisionRepo;
-            _userManager = userManager;
             _villageRepo = villageRepo;
         }
         [HttpGet]
@@ -54,12 +51,13 @@ namespace Noc_App.Controllers
                         ModelState.AddModelError("e", $"Name {model.Name} is already in use");
                         return View(model);
                     }
-                    string userid = await LoggedInUserID();
+                    string userid = LoggedInUserID();
                     TehsilBlockDetails SaveModel = new TehsilBlockDetails
                     {
                         Name = model.Name,
                         SubDivisionId = model.SelectedSubDivisionId,
                         IsActive = true,
+                        LGD_ID=model.LGD_ID,
                         CreatedOn = DateTime.Now,
                         CreatedBy = userid
                     };
@@ -86,6 +84,7 @@ namespace Noc_App.Controllers
                 {
                     Id = v.Id,
                     Name = v.Name,
+                    LGD_ID=v.LGD_ID,
                     SubDivisionId = v.SubDivisionId,
                     SubDivisionName = v.SubDivision.Name,
                     DivisionId = v.SubDivision.DivisionId,
@@ -127,6 +126,7 @@ namespace Noc_App.Controllers
                 {
                     Id = obj.Id,
                     Name = obj.Name,
+                    LGD_ID=obj.LGD_ID,
                     SelectedDivisionId = obj.SubDivision.DivisionId,
                     Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name", obj.SubDivision.DivisionId),
                     SelectedSubDivisionId= obj.SubDivisionId,
@@ -165,8 +165,9 @@ namespace Noc_App.Controllers
                         ModelState.AddModelError("e", $"Name {model.Name} is already in use");
                         return View(model);
                     }
-                    string userid = await LoggedInUserID();
+                    string userid = LoggedInUserID();
                     obj.Name = model.Name;
+                    obj.LGD_ID= model.LGD_ID;
                     obj.SubDivisionId = model.SelectedSubDivisionId;
                     obj.UpdatedOn = DateTime.Now;
                     obj.UpdatedBy = userid;
@@ -233,19 +234,10 @@ namespace Noc_App.Controllers
 
             return RedirectToAction("List", "TehsilBlock");
         }
-        private async Task<string> LoggedInUserID()
+        private string LoggedInUserID()
         {
-            string userid = "0";
-            var user = await _userManager.GetUserAsync(User);
-            var user2 = await _userManager.FindByNameAsync(user.UserName);
-
-            if (user != null)
-            {
-                userid = user2.Id;
-            }
-
-
-            return userid;
+            string userId = HttpContext.Session.GetString("Userid");
+            return userId;
         }
 
         [HttpPost]

@@ -1,0 +1,1013 @@
+﻿@model GrantViewModelEdit
+@{
+    ViewBag.Title = "Update Application for Issue of NOC-Drainage";
+    Layout = "~/Views/HomeLanding/_HomeLayout.cshtml";
+}
+<main id="main">
+    <section id="contact" class="contact">
+        <div class="container">
+
+            <div class="section-title">
+                <h2>Update Application for Issuance of NOC-Drainage</h2>
+                @* <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p> *@
+            </div>
+
+            <div class="row">
+
+                <div class="col-lg-12 mt-5 mt-lg-0 d-flex align-items-stretch">
+
+
+                    <!-- Circle Buttons -->
+                    <form enctype="multipart/form-data" class="user" asp-action="Edit" asp-controller="Grant" method="post" id="grantForm">
+                        <div class="card shadow mb-4">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Project Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <input type="hidden" asp-for="Id" />
+                                                    <input type="hidden" asp-for="ApplicationID" id="ApplicationID" />
+                                                    <label asp-for="Name" class="control-label"></label>
+                                                    <input asp-for="Name" class="form-control form-control-user" />
+                                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                                </div>
+
+                                                @* <div class="form-group">
+                                                <label asp-for="SiteAreaOrSizeInInches" class="control-label "></label>
+                                                <input asp-for="SiteAreaOrSizeInInches" class="form-control form-control-user numericField" />
+                                                <span asp-validation-for="SiteAreaOrSizeInInches" class="text-danger"></span>
+                                                </div> *@
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <input hidden asp-for="IsOtherTypeSelected" value="0" id="IsOtherType" />
+                                                    <label asp-for="SelectedProjectTypeId" class="control-label">Project Type</label>
+                                                    <select asp-for="SelectedProjectTypeId" asp-items="@Model.ProjectType" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <span asp-validation-for="SelectedProjectTypeId" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <div class="form-group other" style="display:none">
+                                                    <label asp-for="OtherProjectTypeDetail" class="control-label"></label>
+                                                    <input asp-for="OtherProjectTypeDetail" class="form-control form-control-user" />
+                                                    <span asp-validation-for="OtherProjectTypeDetail" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Site Address Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                @* <div class="form-group">
+                                                <label asp-for="Khasra" class="control-label"></label>
+                                                <input asp-for="Khasra" class="form-control form-control-user" />
+                                                <span asp-validation-for="Khasra" class="text-danger"></span>
+                                                </div> *@
+                                                <div class="form-group">
+                                                    <label asp-for="Hadbast" class="control-label"></label>
+                                                    <input asp-for="Hadbast" class="form-control form-control-user" />
+                                                    <span asp-validation-for="Hadbast" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="PlotNo" class="control-label"></label>
+                                                    <input asp-for="PlotNo" class="form-control form-control-user" />
+                                                    <span asp-validation-for="PlotNo" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="SelectedDivisionId" class="control-label"></label>
+                                                    <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="SelectedSubDivisionId" class="control-label"></label>
+                                                    <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivision" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
+                                                    <select asp-for="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="SelectedVillageID" class="control-label">Village/Town/City</label>
+                                                    <select asp-for="SelectedVillageID" asp-items="@Model.Village" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <span asp-validation-for="SelectedVillageID" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label">Pin Code</label>
+                                                    <label asp-for="Pincode" id="Pincode" class="form-control form-control-user">@Model.Pincode</label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="AddressProofPhoto" class="control-label">Address Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
+                                                    <div class="custom-file1">
+                                                        <input asp-for="AddressProofPhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
+                                                        <a href="@Url.Action("Download", "Grant", new { fileName = Model.AddressProofPhotoPath })">Download File</a>
+                                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                                        <span asp-validation-for="AddressProofPhoto" id="AddressProofPhoto-error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <input type="hidden" id="KUnitValue" value="0" />
+                                                    <input type="hidden" id="KTimesof" value="1" />
+                                                    <input type="hidden" id="KDivideBy" value="1" />
+                                                    <input type="hidden" id="MUnitValue" value="0" />
+                                                    <input type="hidden" id="MTimesof" value="1" />
+                                                    <input type="hidden" id="MDivideBy" value="1" />
+                                                    <input type="hidden" id="SUnitValue" value="0" />
+                                                    <input type="hidden" id="STimesof" value="1" />
+                                                    <input type="hidden" id="SDivideBy" value="1" />
+                                                    <input type="hidden" asp-for="Khasras.UnitName" id="khasraUnit" />
+                                                    <label asp-for="SelectedSiteAreaUnitId" class="control-label ">Unit of Site Area</label>
+                                                    <select asp-for="SelectedSiteAreaUnitId" asp-items="@Model.SiteAreaUnit" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <span asp-validation-for="SelectedSiteAreaUnitId" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <table id="khasraTable" class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Khasra No.</th>
+                                                        <th>Kanal/Bigha</th>
+                                                        <th>Marla/Biswa</th>
+                                                        <th>Sarsai/Biswansi</th>
+                                                        <th></th>
+                                                        <!-- Add more columns as needed -->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @for(int i=0;i< Model.GrantKhasras.Count;i++)
+                                                    {
+                                                    <tr class="khasra-entry">
+                                                        <td><span class="srKhasra">@Model.GrantKhasras[i].RowId</span></td>
+                                                        <td>
+                                                            <div class="col-sm-12">
+                                                                <input type="hidden" asp-for=GrantKhasras[i].KId />
+                                                            <input type="text" asp-for=GrantKhasras[i].KhasraNo class="form-control" placeholder="Khasra No." />
+                                                            <span asp-validation-for="GrantKhasras[i].KhasraNo" class="text-danger"></span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="col-sm-12">
+                                                            <input type="text" asp-for=GrantKhasras[i].KanalOrBigha class="form-control numericField K2" placeholder="Kanal/Bigha" />
+                                                            <span asp-validation-for="GrantKhasras[i].KanalOrBigha" class="text-danger"></span>
+                                                        </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="col-sm-12">
+                                                            <input type="text" asp-for=GrantKhasras[i].MarlaOrBiswa class="form-control numericField M1" placeholder="Marla/Biswa" />
+                                                            <span asp-validation-for="GrantKhasras[i].MarlaOrBiswa" class="text-danger"></span>
+                                                        </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="col-sm-12">
+                                                            <input type="text" asp-for=GrantKhasras[i].SarsaiOrBiswansi class="form-control numericField B3" placeholder="Sarsai/Biswansi" />
+                                                            <span asp-validation-for="GrantKhasras[i].SarsaiOrBiswansi" class="text-danger"></span>
+                                                        </div>
+                                                        </td>
+                                                        <td class="delKhasra"></td>
+                                                        <!-- Render more columns as needed -->
+                                                    </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                        <div class="row">
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td class="col-sm-3">
+                                                        <label class="control-label">Total Area in Acres: </label>
+                                                        <input hidden asp-for="TotalArea" value="0" id="TotalSiteArea" />
+                                                        <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
+                                                        
+                                                        </td class="col-sm-3">
+                                                        <td>
+                                                        <label class="control-label">Total Area in Sq Feet: </label>
+                                                        <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
+                                                       
+                                                        </td>
+                                                        <td class="col-sm-3">
+                                                        <label class="control-label">Total Area in Sq Metre(s): </label>
+                                                                <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
+                                                       </td>
+                                                        <td class="col-sm-3">
+                                                    <div style="margin-top:23px;float:right;">
+                                                        <a href="#" data-toggle="modal" data-target="#myModal" onclick="SetValue('@Model.ApplicationID')" class="btn btn-success">Add More</a>
+                                                        @* <button type="button" class="btn btn-success" id="addMoreKhasraBtn">Add More</button> *@
+                                                    </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Site KML File Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label asp-for="KMLFile" class="control-label">KML File</label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                            <div class="custom-file1">
+                                                <input asp-for="KMLFile" class="form-control custom-file-input1" accept=".pdf" />
+                                                <a href="@Url.Action("Download", "Grant", new { fileName = Model.KMLFilePath })">Download File</a>
+                                                @* <label class="custom-file-label1">Choose File...</label> *@
+                                                <span asp-validation-for="KMLFile" id="KMLFile-error" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="KmlLinkName" class="control-label"></label>
+                                            <input asp-for="KmlLinkName" class="form-control form-control-user" />
+                                            <span asp-validation-for="KmlLinkName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Types of Permissions</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label asp-for="SelectedNocPermissionTypeID" class="control-label">NOC Permission Type</label>
+                                            <select asp-for="SelectedNocPermissionTypeID" asp-items="@Model.NocPermissionType" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <span asp-validation-for="SelectedNocPermissionTypeID" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <input hidden asp-for="IsExtension" value="0" id="IsExtension" />
+                                            <label asp-for="SelectedNocTypeId" class="control-label">NOC Type</label>
+                                            <select asp-for="SelectedNocTypeId" asp-items="@Model.NocType" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <span asp-validation-for="SelectedNocTypeId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group existing" style="display:none;">
+                                            <label asp-for="NocNumber" class="control-label"></label>
+                                            <input asp-for="NocNumber" class="form-control form-control-user" />
+                                            <span asp-validation-for="NocNumber" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group existing" style="display:none;">
+                                            <label asp-for="PreviousDate" class="control-label">Date</label>
+                                            <input asp-for="PreviousDate" class="form-control form-control-user" />
+                                            <span asp-validation-for="PreviousDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label asp-for="ApplicantName" class="control-label"></label>
+                                                    <input asp-for="ApplicantName" class="form-control form-control-user" />
+                                                    <span asp-validation-for="ApplicantName" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="IDProofPhoto" class="control-label">ID Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
+                                                    <div class="custom-file3">
+                                                        <input asp-for="IDProofPhoto" class="form-control custom-file-input3" accept=".jpg, .jpeg, .png, .pdf" />
+                                                <a href="@Url.Action("Download", "Grant", new { fileName = Model.IDProofPhotoPath })">Download File</a>
+                                                        @* <label class="custom-file-label">Choose File...</label> *@
+                                                        <span asp-validation-for="IDProofPhoto" id="IDProofPhoto-error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <label asp-for="ApplicantEmailID" class="control-label"></label>
+                                                    <input asp-for="ApplicantEmailID" class="form-control form-control-user" />
+                                                    <span asp-validation-for="ApplicantEmailID" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="AuthorizationLetterPhoto" class="control-label">
+                                                        Authorization Letter (Attach in case
+                                                        application is to be filled
+                                                        by person other than
+                                                        owner)-
+                                                    </label><span style="color:red">Max File (jpg,png,pdf) Size 4MB</span>
+                                                    <div class="custom-file2">
+                                                        <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" accept=".jpg, .jpeg, .png, .pdf" />
+                                                <a href="@Url.Action("Download", "Grant", new { fileName = Model.AuthorizationLetterPhotoPath })">Download File</a>
+                                                        @* <label class="custom-file-label2">Choose File...</label> *@
+                                                        <span asp-validation-for="AuthorizationLetterPhoto" id="AuthorizationLetterPhoto-error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Details of Owners/Partners/Chief Executive/Full Time Directors</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <table id="ownerTable" class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>OwnerType</th>
+                                                        <th>Name</th>
+                                                        <th>Address</th>
+                                                        <th>Mobile Number</th>
+                                                        <th>Email</th>
+                                                        <th></th>
+                                                        <!-- Add more columns as needed -->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @for(int i=0;i< Model.Owners.Count;i++){
+                                                    <tr class="owner-entry">
+
+                                                        <td><span class="srOwner">@Model.Owners[i].RowId</span></td>
+                                                        <td>
+                                                            <input type="hidden" asp-for=Owners[i].OId />
+                                                            <select asp-for="Owners[i].SelectedOwnerTypeID" asp-items="@Model.Owners[i].OwnerType" class="form-control">
+                                                                <option value="">Select</option>
+                                                            </select>
+                                                            <input hidden asp-for="Owners[i].SelectedOwnerTypeID" />
+                                                            <span asp-validation-for="Owners[i].SelectedOwnerTypeID" class="text-danger"></span>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" asp-for=Owners[i].Name class="form-control" placeholder="Owner/Partner/Chief Executive/Full Time Director Name" />
+                                                            <span asp-validation-for="Owners[i].Name" class="text-danger"></span>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" asp-for=Owners[i].Address class="form-control" placeholder="Address" />
+                                                            <span asp-validation-for="Owners[i].Address" class="text-danger"></span>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" asp-for=Owners[i].MobileNo class="form-control mobno" maxlength="10" placeholder="Mobile No." />
+                                                            <span asp-validation-for="Owners[i].MobileNo" class="text-danger"></span>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" asp-for=Owners[i].Email class="form-control" placeholder="Email" />
+                                                            <span asp-validation-for="Owners[i].Email" class="text-danger"></span>
+                                                        </td>
+                                                        <td class="delOwner"></td>
+                                                        <!-- Render more columns as needed -->
+                                                    </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                        <div class="row col-sm-2 offset-sm-10">
+                                            <button type="button" class="btn btn-success" id="addMoreBtn">Add More</button>
+                                        </div>
+                                        <div class="row float-start">
+                                            <input type="checkbox" style="margin-left:8px;" asp-for="IsConfirmed" />
+                                        </div>
+                                        <div class="row mt-4">
+                                            <span asp-validation-for="IsConfirmed" class="text-danger"></span>
+                                            <label asp-for="IsConfirmed">
+                                                I / We confirm that the information furnished
+                                                herewith is correct to the best of my/our
+                                                knowledge and nothing has been concealed
+                                                therein. The Government would be at liberty
+                                                to take suitable action against the
+                                                unit/project and the person(s) responsible
+                                                who failed to comply with the provisions of
+                                                the Law. Rules, Regulations & Directions in
+                                                case the information /Documents are found
+                                                to be incorrect /false/misleading the
+                                                government may withdraw the NOC issued
+                                                for the project
+                                            </label>
+                                        </div>
+                                        <div asp-validation-summary="All" class="text-danger validateAll"></div>
+                                        <div class="row">
+                                            <div class="col-sm-6 offset-sm-5">
+                                                <button type="submit" class="btn btn-primary btn-user btn-block">Update</button>
+                                            </div>
+                                            @* <div class="col-lg-6">
+                                            <a class="btn btn-secondary btn-user btn-block" asp-controller="Grant" asp-action="List">Back to List</a>
+                                            </div> *@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form method="post" asp-action="KhasraSave" asp-controller="Grant">
+            <div class="modal-header">
+                <input type="hidden" id="id" name="id" />
+                <input type="hidden" id="KId" name="KId" />
+                <input type="hidden" id="UnitId" name="UnitId" />
+                <h5 class="modal-title" id="exampleModalLabel"><label id="dvBranch">Add Khasra Details</label></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height: 500px;overflow-y:scroll;">
+                @* <form class="user" enctype="multipart/form-data" asp-action="KhasraSave" method="post">                     *@
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="UnitName" class="control-label">Unit of Site Area</label>
+                                <input id="UnitName" readonly name="UnitName" class="form-control form-control-user" />
+                            </div>
+                            <div class="form-group">
+                                <label for="KhasraNo" class="control-label">Khasra No.</label>
+                                <input id="KhasraNo" name="KhasraNo" class="form-control form-control-user"  placeholder="Khasra No."/>
+                                <span id="KhasraNo-validation" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="KanalOrBigha" class="control-label">Kanal/Bigha</label>
+                                <input id="KanalOrBigha" name="KanalOrBigha" class="form-control form-control-user" placeholder="Kanal/Bigha"/>
+                                <span id="KanalOrBigha-validation" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="MarlaOrBiswa" class="control-label">Marla/Biswa</label>
+                                <input id="MarlaOrBiswa" name="MarlaOrBiswa" class="form-control form-control-user" placeholder="Marla/Biswa" />
+                                <span id="MarlaOrBiswa-validation" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="SarsaiOrBiswansi" class="control-label">Sarsai/Biswansi</label>
+                                <input id="SarsaiOrBiswansi" name="SarsaiOrBiswansi" class="form-control form-control-user" placeholder="Sarsai/Biswansi" />
+                                <span id="SarsaiOrBiswansi-validation" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    @* <div class="row">
+                        <div class="col-lg-6">
+
+                            <button type="submit" class="btn btn-success btn-user btn-block">Save</button>
+                        </div>
+                    </div> *@
+                @* </form> *@
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+                <button class="btn btn-success" type="submit">Save</button>
+                @* <a class="btn btn-primary" asp-action="Logout" asp-controller="Account">Logout</a> *@
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* <div id="partialContainer"></div> *@
+@section Scripts {
+    <script>
+        function SetValue(id) {
+            $('#id').val(id);
+            $('#UnitName').val($('#khasraUnit').val());
+            //$("#myModal").modal(); $("#myModal").addClass('show');
+            // var body = $('#tbRecommendation');
+            // var table = $("#tblRecommendation");
+            // $('.barcontainer').hide();
+            // $("#myModal").hide();
+            // body.empty();
+            // $("#divLoader").show(); $('.barcontainer').hide();
+            // $.ajax({
+            //     url: "/ApprovalProcess/GetRecommendationDetail",
+            //     type: "POST",
+            //     data: { id: id },
+            //     complete: function (r) {
+            //         $("#myModal").modal(); $("#myModal").addClass('show');
+            //         $("#divLoader").hide();
+            //         $('.barcontainer').show();
+
+            //     },
+            //     success: function (r) {
+            //         if (r != null) {
+            //             var count = 1; var len = r.length;
+
+            //             $.each(r, function (key, value) {
+            //                 var tr = '<tr>';
+            //                 tr += '<td>' + count + '</td>';
+            //                 tr += '<td>' + value.applicationId + '</td>';
+            //                 tr += '<td>' + value.recommended + '</td>';
+            //                 tr += '<td>' + value.remarks + '</td>';
+            //                 tr += '<td>' + value.recommendedBy + '</td>';
+            //                 tr += '<td>' + value.recommendedTo + '</td>';
+            //                 tr += '</tr>';
+            //                 body.append(tr);
+            //                 count++;
+            //             });
+            //             table.DataTable();
+            //         }
+            //     },
+            //     failure: function (r) {
+            //         alert(r.d);
+            //     },
+            //     error: function (r) {
+            //         alert(r.d);
+            //     }
+            // });
+            
+        }
+    </script>
+    <script>
+        document.getElementById("SelectedProjectTypeId").addEventListener("change", function () {
+            var selectedText = this.options[this.selectedIndex].text;
+            if (selectedText != 'Any Other') {
+                $('.other').css('display', 'none');
+                $('#IsOtherType').val(0);
+            } else {
+                $('.other').css('display', '');
+                $('#IsOtherType').val(1);
+            }
+
+        });
+        document.getElementById("SelectedNocTypeId").addEventListener("change", function () {
+            var selectedText = this.options[this.selectedIndex].text;
+            $('#PreviousDate').val('');
+            if (selectedText == 'Extension of Existing Project') {
+                $('#IsExtension').val(1);
+                $('.existing').css('display', '');
+            } else {
+                $('.existing').css('display', 'none');
+                $('#IsExtension').val(0);
+            }
+
+        });
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('PreviousDate').setAttribute('max', today);
+        $(function () {
+            document.getElementById("grantForm").addEventListener("submit", function (event) {
+                var fileInputIDProofPhoto = document.getElementById("IDProofPhoto");
+                var fileSizeIDProofPhoto = fileInputIDProofPhoto.files[0].size;
+                var fileInputAuthorizationLetterPhoto = document.getElementById("AuthorizationLetterPhoto");
+                var fileSizeAuthorizationLetterPhoto = fileInputAuthorizationLetterPhoto.files[0].size;
+                var fileInputAddressProofPhoto = document.getElementById("AddressProofPhoto");
+                var fileSizeAddressProofPhoto = fileInputAddressProofPhoto.files[0].size;
+                var fileInputKMLFile = document.getElementById("KMLFile");
+                var fileSizeKMLFile = fileInputKMLFile.files[0].size;
+                var maxSize = 4 * 1024 * 1024; // 10MB in bytes
+
+                var summary = $('.validateAll');
+                summary.find('ul li').each(function () {
+                    $(this).remove();
+                });
+                if (fileSizeIDProofPhoto > maxSize) {
+                    event.preventDefault(); // Prevent form submission
+                    document.getElementById("IDProofPhoto-error").textContent = "ID Proof File size cannot be greater than 4MB";
+                    summary.find('ul').append('<li id="IDProofPhotoSum">ID Proof File size cannot be greater than 4MB</li>');
+                    document.getElementById("IDProofPhoto-error").style.display = "block";
+                } else {
+                    document.getElementById("IDProofPhoto-error").textContent = "";
+                    document.getElementById("IDProofPhoto-error").style.display = "none";
+                    summary.find('ul #IDProofPhotoSum').remove();
+                }
+                if (fileSizeAuthorizationLetterPhoto > maxSize) {
+                    event.preventDefault(); // Prevent form submission
+                    document.getElementById("AuthorizationLetterPhoto-error").textContent = "Authorization Letter File size cannot be greater than 4MB";
+                    summary.find('ul').append('<li id="AuthorizationLetterPhotoSum">Authorization Letter File size cannot be greater than 4MB</li>');
+                    document.getElementById("AuthorizationLetterPhoto-error").style.display = "block";
+                } else {
+                    document.getElementById("AuthorizationLetterPhoto-error").textContent = "";
+                    document.getElementById("AuthorizationLetterPhoto-error").style.display = "none";
+                    summary.find('ul #AuthorizationLetterPhotoSum').remove();
+                }
+                if (fileSizeAddressProofPhoto > maxSize) {
+                    event.preventDefault(); // Prevent form submission
+                    document.getElementById("AddressProofPhoto-error").textContent = "Address Proof File size cannot be greater than 4MB";
+                    summary.find('ul').append('<li id="AddressProofPhotoSum">Address Proof File size cannot be greater than 4MB</li>');
+                    document.getElementById("AddressProofPhoto-error").style.display = "block";
+                } else {
+                    document.getElementById("AddressProofPhoto-error").textContent = "";
+                    document.getElementById("AddressProofPhoto-error").style.display = "none";
+                    summary.find('ul #AddressProofPhotoSum').remove();
+                }
+                if (fileSizeKMLFile > maxSize) {
+                    event.preventDefault(); // Prevent form submission
+                    document.getElementById("KMLFile-error").textContent = "KML File size cannot be greater than 4MB";
+                    summary.find('ul').append('<li id="KMLFileSum">KML File size cannot be greater than 4MB</li>');
+                    document.getElementById("KMLFile-error").style.display = "block";
+                } else {
+                    document.getElementById("KMLFile-error").textContent = "";
+                    document.getElementById("KMLFile-error").style.display = "none";
+                    summary.find('ul #KMLFileSum').remove();
+                }
+            });
+            $('#IDProofPhoto').on('change', function () {
+                if ((this.files[0].size) > (4 * 1024 * 1024)) {
+                    $('#IDProofPhoto-error').text('File size cannot be greater than 4MB');
+                }
+            });
+            $('#AuthorizationLetterPhoto').on('change', function () {
+                if ((this.files[0].size) > (4 * 1024 * 1024)) {
+                    $('#AuthorizationLetterPhoto-error').text('File size cannot be greater than 4MB');
+                }
+            });
+            $('#AddressProofPhoto').on('change', function () {
+                if ((this.files[0].size) > (4 * 1024 * 1024)) {
+                    $('#AddressProofPhoto-error').text('File size cannot be greater than 4MB');
+                }
+            });
+            $('#KMLFile').on('change', function () {
+                if ((this.files[0].size) > (4 * 1024 * 1024)) {
+                    $('#KMLFile-error').text('File size cannot be greater than 4MB');
+                }
+            });
+            var total = $('#TotalArea').text();
+            var totalSqFeet = $('#TotalSiteAreaSqFeet').text();
+                    
+            var totalSqMetre = $('#TotalSiteAreaSqMetre').text();
+            // if ($('#Latitude').val() == '0') $('#Latitude').val('');
+            // if ($('#Longitute').val() == '0') $('#Longitute').val('');
+            // if($('#SiteAreaOrSizeInFeet').val()=='0') $('#SiteAreaOrSizeInFeet').val('');
+            // if ($('#SiteAreaOrSizeInInches').val() == '0') $('#SiteAreaOrSizeInInches').val('');
+
+            $(".mobno").on("keypress", function (event) {
+                // Allow only numeric characters (0-9) in the input field
+                var charCode = event.which;
+                if (charCode < 48 || charCode > 57) {
+                    event.preventDefault();
+                }
+            });
+            function SetKhasraValues(khasra){
+                    var Bigha = 'K';
+                    var Biswa = 'M';
+                    var Biswansi = 'S';
+                $('#khasraTable .M1').each(function () {
+                        $(this).removeAttr('class');
+                        $(this).attr('class', 'form-control numericField M1 ' + Biswa);
+                    });
+                    $('#khasraTable .K2').each(function () {
+                        $(this).removeAttr('class');
+                        $(this).attr('class', 'form-control numericField K2 ' + Bigha);
+                    });
+                    $('#khasraTable .B3').each(function () {
+                        $(this).removeAttr('class');
+                        $(this).attr('class', 'form-control numericField B3 ' + Biswansi);
+                    });
+                    var khasraIndex = 0;
+                    var newEntry = $(".khasra-entry:first").clone();
+                    newEntry.find("input").each(function () {
+                        var name = $(this).attr("name").replace("[0]", "[" + khasraIndex + "]");
+                        var id = $(this).attr("id").replace("0", khasraIndex);
+                        $(this).attr("name", name);
+                        $(this).attr("id", id);
+                        $(this).val("");
+                    });
+                if (khasra.val() == '') {
+                    var list = (khasra.find("option:selected").text()).split('/');
+                    var unitId = khasra.val();
+                    $.ajax({
+                        url: "/Grant/GetUnitsDetail",
+                        type: "POST",
+                        data: { unitId: unitId },
+                        async: false,
+                        success: function (data) {
+                            $.each(data, function (key, value) {
+                                $('#' + value.unitCode + 'UnitValue').val(value.unitValue);
+                                $('#' + value.unitCode + 'Timesof').val(value.timesof);
+                                $('#' + value.unitCode + 'DivideBy').val(value.divideBy);
+                            });
+
+                        },
+                        failure: function (f) {
+                            alert(f);
+                        },
+                        error: function (e) {
+                            alert('Error ' + e);
+                        }
+                    });
+
+                    
+                    khasraIndex++;
+                    $("#khasraTable tbody").empty();
+                    $("#khasraTable tbody").append(newEntry);
+                    $('#TotalArea').text(total);
+                    $('#TotalSiteAreaSqFeet').text(totalSqFeet);
+                    $('#TotalSiteAreaSqMetre').text(totalSqMetre);
+                }
+            }
+            $('body').on('change', '#SelectedSiteAreaUnitId', function () {
+                SetKhasraValues($(this));
+            });
+            SetKhasraValues($('#SelectedSiteAreaUnitId'));
+            $('#khasraTable tbody').on('change', '.numericField', function () {
+                var grandTotal = total;
+                var _this = $(this);
+                if ($('#SelectedSiteAreaUnitId').find("option:selected").text() != 'Select') {
+
+                    $('#khasraTable tbody .khasra-entry').each(function () {
+                        var _thisInner = $(this);
+                        var Marla = 0;
+                        var Biswansi = 0;
+                        var Kanal = 0;
+                        var Biswa = 0;
+                        var Sarsai = 0;
+                        var Bigha = 0;
+                           
+                        var k = 'K';var m = 'M';var s = 'S';
+                        if (_thisInner.find('.'+m).length > 0) {
+                            Marla = _thisInner.find('.'+m).val() != '' ? (parseFloat(_thisInner.find('.'+m).val())*parseFloat($('#'+m+'UnitValue').val())*parseFloat($('#'+m+'Timesof').val()))/parseFloat($('#'+m+'DivideBy').val()) : 0.0;
+                        }
+                        if (_thisInner.find('.'+s).length > 0) {
+
+                            Biswansi = _thisInner.find('.'+s).val() != '' ? (parseFloat(_thisInner.find('.'+s).val())*parseFloat($('#'+s+'UnitValue').val())*parseFloat($('#'+s+'Timesof').val()))/parseFloat($('#'+s+'DivideBy').val()) : 0.0;
+                        }
+                        if (_thisInner.find('.'+k).length > 0) {
+                            Kanal = _thisInner.find('.'+k).val() != '' ? (parseFloat(_thisInner.find('.'+k).val())*parseFloat($('#'+k+'UnitValue').val())*parseFloat($('#'+k+'Timesof').val()))/parseFloat($('#'+k+'DivideBy').val()) : 0.0;
+                        }
+                        //console.log(_thisInner.find('.'+m).val()+"-"+Marla + "-" + Biswansi + "-" + Kanal);
+                        grandTotal = parseFloat(grandTotal) + Marla + Biswansi + Kanal + Biswa + Sarsai + Bigha;
+                        total = parseFloat(grandTotal).toFixed(4);
+                        totalSqFeet = parseFloat(total * 43560).toFixed(4);
+                        totalSqMetre = parseFloat(total * 4046.86).toFixed(4);
+                    });
+                }
+                else {
+                    _this.val(0);
+                    alert('Please select Unit of Site Area!');
+                }
+                $('#TotalArea').text(total.toString());
+                $('#TotalSiteArea').val(total.toString());
+                $('#TotalSiteAreaSqFeet').text(totalSqFeet.toString());
+                $('#TotalSiteAreaSqMetre').text(totalSqMetre.toString());
+            });
+            // $('#TotalArea').text(total.toString());
+            // $('#TotalSiteAreaSqFeet').text(totalSqFeet.toString());
+            // $('#TotalSiteAreaSqMetre').text(totalSqMetre.toString());
+            $(".mobno").on("blur", function () {
+                validateMob($(this).val(), $(this));
+            });
+            function validateMob(mobno, field) {
+                var fieldRegex = /^\d{10}$/;
+
+                if (parseInt(mobno) < 0) {
+                    field.val('');
+                    field.next(".text-danger").text("Please enter a valid mobile number.");
+                }
+                else if (!fieldRegex.test(mobno)) {
+                    // PinCode.addClass("is-invalid");
+                    field.next(".text-danger").text("Please enter a valid mobile number.");
+                } else {
+                    // PinCode.removeClass("is-invalid");
+                    field.next(".text-danger").text("");
+                }
+            }
+            $("body").on("input", ".numericField", function () {
+                // Remove non-numeric characters using a regular expression
+                $(this).val($(this).val().replace(/[^0-9.]/g, ''));
+
+                // Remove multiple dots, leaving only one
+                if ($(this).val().split('.').length > 2) {
+                    $(this).val($(this).val().replace(/\.+$/, ''));
+                }
+            });
+            $('.custom-file-input3').on('change', function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label3').html(fileName);
+            });
+            $('.custom-file-input1').on('change', function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label1').html(fileName);
+            });
+            $('.custom-file-input2').on('change', function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label2').html(fileName);
+            });
+        });
+    </script>
+    <script>
+        var ownerIndex = 1;
+
+        $("#addMoreBtn").on("click", function () {
+            var newEntry = $(".owner-entry:first").clone();
+
+            // newEntry.find("span").each(function () {
+            //     var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
+            //     $(this).attr("name", name);
+            //     $(this).text("");
+            // });
+            newEntry.find("select").each(function () {
+                var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
+                $(this).attr("name", name);
+                $(this).val("");
+            });
+            newEntry.find("hidden").each(function () {
+                var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
+                $(this).attr("name", name);
+                $(this).val("");
+            });
+            newEntry.find("input").each(function () {
+                var name = $(this).attr("name").replace("[0]", "[" + ownerIndex + "]");
+                $(this).attr("name", name);
+                $(this).val("");
+            });
+            newEntry.find('.delOwner').append('<button type="button" id="owner' + ownerIndex + '" onclick="deleteRow(this,\'owner\',\'Owner\')" class="btn btn-danger btn-user btn-block">Delete</button>');
+            ownerIndex++;
+            $("#ownerTable tbody").append(newEntry);
+            SetSerialNo('owner', 'Owner');
+        });
+
+        var khasraIndex = 1;
+
+        $("#addMoreKhasraBtn").on("click", function () {
+            var newEntry = $(".khasra-entry:first").clone();
+            newEntry.find("input").each(function () {
+                var name = $(this).attr("name").replace("[0]", "[" + khasraIndex + "]");
+                var id = $(this).attr("id").replace("0", khasraIndex);
+                $(this).attr("name", name);
+                $(this).attr("id", id);
+                $(this).val("");
+            });
+            newEntry.find('.delKhasra').append('<button type="button" id="khasra' + khasraIndex + '" onclick="deleteRow(this,\'khasra\',\'Khasra\')" class="btn btn-danger btn-user btn-block">Delete</button>');
+            khasraIndex++;
+            $("#khasraTable tbody").append(newEntry);
+            SetSerialNo('khasra', 'Khasra');
+        });
+        function SetSerialNo(classname, className2) {
+            var sr = 1;
+            $("." + classname + "-entry").parent().find('tr').each(function () {
+                $(this).find('.sr' + className2 + ':first').text(sr++);
+            });
+        }
+
+        function deleteRow(button, classname, className2) {
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            SetSerialNo(classname, className2);
+        }
+    </script>
+    <script>
+        function populateDropdown(data, dropdownId) {
+            var dropdown = $("#Selected" + dropdownId);
+            dropdown.html('<option value="">Select</option>');
+            $.each(data, function (key, value) {
+                dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
+            });
+        }
+        $(document).ready(function () {
+            var selectedText = document.getElementById("SelectedProjectTypeId").options[document.getElementById("SelectedProjectTypeId").selectedIndex].text;
+            if (selectedText != 'Any Other') {
+                $('.other').css('display', 'none');
+                $('#IsOtherType').val(0);
+            } else {
+                $('.other').css('display', '');
+                $('#IsOtherType').val(1);
+            }
+            var selectedText = document.getElementById("SelectedNocTypeId").options[document.getElementById("SelectedNocTypeId").selectedIndex].text;
+            if (selectedText == 'Extension of Existing Project') {
+                $('#IsExtension').val(1);
+                $('.existing').css('display', '');
+            } else {
+                $('.existing').css('display', 'none');
+                $('#IsExtension').val(0);
+            }
+            $("#SelectedVillageID").change(function () {
+                var villageId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetVillageDetail",
+                    type: "POST",
+                    data: { villageId: villageId },
+                    async: false,
+                    success: function (data) {
+                        $.each(data, function (key, value) {
+                            if (key == 'pinCode') {
+                                $('#Pincode').text(value);
+                            }
+                        });
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+            $("#SelectedDivisionId").change(function () {
+                var divisionId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetSubDivisions",
+                    type: "POST",
+                    data: { divisionId: divisionId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "SubDivisionId");
+                        var dropdownlistTehsil = $("#SelectedTehsilBlockId");
+                        dropdownlistTehsil.empty();
+                        var dropdownlistVillage = $("#SelectedVillageId");
+                        dropdownlistVillage.empty();
+                        dropdownlistTehsil.html('<option value="">Select</option>');
+                        dropdownlistVillage.html('<option value="">Select</option>');
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+
+            $("#SelectedSubDivisionId").change(function () {
+                var subDivisionId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetTehsilBlocks",
+                    type: "POST",
+                    data: { subDivisionId: subDivisionId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "TehsilBlockId");
+                        var dropdownlistVillage = $("#SelectedVillageId");
+                        dropdownlistVillage.empty();
+                        dropdownlistVillage.html('<option value="">Select</option>');
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+
+
+            $("#SelectedTehsilBlockId").change(function () {
+                var tehsilBlockId = $(this).val();
+                $.ajax({
+                    url: "/Grant/GetVillagess",
+                    type: "POST",
+                    data: { tehsilBlockId: tehsilBlockId },
+                    async: false,
+                    success: function (data) {
+                        populateDropdown(data, "VillageID");
+                    },
+                    failure: function (f) {
+                        alert(f);
+                    },
+                    error: function (e) {
+                        alert('Error ' + e);
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -10,7 +10,7 @@ namespace Noc_App.Models.ViewModel
         [MaxLength(150, ErrorMessage = "Name cannot exceed 150 characters")]
         public string Name { get; set; }
         public bool IsActive { get; set; }
-        public ApplicationUser CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
     }
 }

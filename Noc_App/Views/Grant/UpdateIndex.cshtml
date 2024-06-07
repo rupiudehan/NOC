@@ -1,0 +1,33 @@
+﻿@model GrantViewModel
+@{
+    // ViewBag.Title = "Application of Grant for NOC Detail";
+    // Layout = "~/Views/HomeLanding/_HomeLayout.cshtml";
+    ViewBag.Title = "Success";
+    Layout = "~/Views/Shared/_LayoutSuccess.cshtml";
+}
+<h1> Congratulations!</h1>
+@if (Model != null)
+{
+    <input hidden asp-for="Id" />
+    <p>
+
+            Your application has been updated successfully.
+            
+        
+        <br /> Track its status with the following tracking number:<br />
+        <b style="color:#76ac23">
+            @Model.ApplicationID
+        </b>
+    </p>
+    <p>
+        <a asp-controller="Grant" asp-action="GeneratePdf" asp-route-Id="@Model.ApplicationID">Click here to download application</a>
+    </p>
+    <br />
+    <p>
+        <a class="btn btn-secondary btn-user btn-block" asp-controller="Grant" asp-action="Create">Back</a>
+    </p>
+}
+else
+{
+    <p>Invalid request!</p>
+}

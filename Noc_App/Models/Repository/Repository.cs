@@ -90,6 +90,19 @@ namespace Noc_App.Models.Repository
             //return null;
         }
 
+        public T GetById(int id)
+        {
+            try
+            {
+                return _dbSet.Find(id);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally { _context.Dispose(); }
+        }
+
         public async Task<T> GetByIdAsync(int id)
         {
             try
@@ -111,6 +124,34 @@ namespace Noc_App.Models.Repository
             catch (Exception ex)
             {
                 throw;
+            }
+            finally { _context.Dispose(); }
+        }
+
+        public void Update(T entity)
+        {
+            try
+            {
+                _context.Entry(entity).State = EntityState.Modified;
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                // Log the error or notify the user
+                Console.WriteLine("Concurrency exception: " + ex.Message);
+
+                // Reload the entity from the database
+                foreach (var entry in ex.Entries)
+                {
+                    if (entry.State == EntityState.Modified || entry.State == EntityState.Deleted)
+                    {
+                        // Reload the original values to overwrite the current values
+                        entry.Reload();
+                    }
+                }
+
+                // Retry the operation
+                _context.SaveChanges();
             }
             finally { _context.Dispose(); }
         }
