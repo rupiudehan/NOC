@@ -114,12 +114,12 @@ namespace Noc_App.Context
                 );
 
             modelBuilder.Entity<SiteUnitMaster>().HasData(
-                new SiteUnitMaster { Id = 1,SiteAreaUnitId=1, UnitName = "Biswa",UnitCode="M",UnitValue= 0.0125,Timesof=1, DivideBy=1 },
-                new SiteUnitMaster { Id = 2, SiteAreaUnitId = 1, UnitName = "Bigha", UnitCode = "K", UnitValue = 0.25, Timesof = 1, DivideBy = 1 },
-                new SiteUnitMaster { Id = 3, SiteAreaUnitId = 1, UnitName = "Biswansi", UnitCode = "S", UnitValue = 0.000625, Timesof = 1, DivideBy = 1 },
-                new SiteUnitMaster { Id = 4, SiteAreaUnitId = 3, UnitName = "Biswa", UnitCode = "M", UnitValue = 0.0125, Timesof = 3, DivideBy = 1 },
-                new SiteUnitMaster { Id = 5, SiteAreaUnitId = 3, UnitName = "Bigha", UnitCode = "K", UnitValue = 0.25, Timesof = 3, DivideBy = 1 },
-                new SiteUnitMaster { Id = 6, SiteAreaUnitId = 3, UnitName = "Biswansi", UnitCode = "S", UnitValue = 0.000625, Timesof = 3, DivideBy = 1 },
+                new SiteUnitMaster { Id = 1,SiteAreaUnitId=1, UnitName = "Biswa",UnitCode="M",UnitValue= 1, Timesof=1, DivideBy= 32.27 },
+                new SiteUnitMaster { Id = 2, SiteAreaUnitId = 1, UnitName = "Bigha", UnitCode = "K", UnitValue = 1, Timesof = 1, DivideBy = 1.673 },
+                new SiteUnitMaster { Id = 3, SiteAreaUnitId = 1, UnitName = "Biswansi", UnitCode = "S", UnitValue = 1, Timesof = 1, DivideBy = 32.31 },
+                new SiteUnitMaster { Id = 4, SiteAreaUnitId = 3, UnitName = "Biswa", UnitCode = "M", UnitValue = 1, Timesof = 3, DivideBy = 32.27 },
+                new SiteUnitMaster { Id = 5, SiteAreaUnitId = 3, UnitName = "Bigha", UnitCode = "K", UnitValue = 1, Timesof = 3, DivideBy = 1.673 },
+                new SiteUnitMaster { Id = 6, SiteAreaUnitId = 3, UnitName = "Biswansi", UnitCode = "S", UnitValue = 1, Timesof = 3, DivideBy = 32.31 },
                 new SiteUnitMaster { Id = 7, SiteAreaUnitId = 2, UnitName = "Kanal", UnitCode = "K", UnitValue = 1, Timesof = 1, DivideBy = 8 },
                 new SiteUnitMaster { Id = 8, SiteAreaUnitId = 2, UnitName = "Marla", UnitCode = "M", UnitValue = 1, Timesof = 1, DivideBy = 160 },
                 new SiteUnitMaster { Id = 9, SiteAreaUnitId = 2, UnitName = "Sarsai", UnitCode = "S", UnitValue = 1, Timesof = 1, DivideBy = 1440 }

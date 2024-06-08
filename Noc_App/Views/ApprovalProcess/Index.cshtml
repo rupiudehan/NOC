@@ -54,6 +54,7 @@
                                             <tr>
                                                 <td>#</td>
                                                 <th>Application Id</th>
+                                                <th>Date of Application</th>
                                                 <th>Project Name</th>
                                                 <th>Location Details</th>
                                                 <th>Processed By</th>
@@ -93,6 +94,7 @@
                                                 <tr>
                                                     <td>@count</td>
                                                     <td>@data.ApplicationID</td>
+                                                    <td>@string.Format("{0:dd/MM/yyyy}", data.CreatedOn)</td>
                                                     <td>@data.Name</td>
                                                     <td>@data.LocationDetails </td>
                                                     @if (data.LastForwardedByRole != "")
@@ -283,12 +285,16 @@
                                             <tr>
                                                 <td>#</td>
                                                 <th>Application Id</th>
+                                                <th>Date of Application</th>
                                                 <th>Project Name</th>
                                                 <th>Location Details</th>
                                                 <th>Forwarded To Role</th>
                                                 @* <th>Forwarded To User</th> *@
                                                 <th>View</th>
-                                                <th>Action</th>
+                                                @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER"))))
+                                                {
+                                                    <th>Action</th>
+                                                }
 
                                             </tr>
                                         </thead>
@@ -298,6 +304,7 @@
                                                 <tr>
                                                     <td>@count</td>
                                                     <td>@data.ApplicationID</td>
+                                                    <td>@string.Format("{0:dd/MM/yyyy}", data.CreatedOn)</td>
                                                     <td>@data.Name</td>
                                                     <td>@data.LocationDetails </td>
                                                     @if (data.LastForwardedByRole != "")
@@ -337,9 +344,12 @@
                                                     <td>
                                                         <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                     </td>
-                                                    <td>
-                                                        <a asp-action="Transfer" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Transfer</a>
-                                                    </td>
+                                                    @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER"))))
+                                                    {
+                                                        <td>
+                                                            <a asp-action="Transfer" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Transfer</a>
+                                                        </td>
+                                                    }
 
                                                 </tr>
                                                 count = count + 1;
@@ -372,6 +382,7 @@
                                                 <tr>
                                                     <td>#</td>
                                                     <th>Application Id</th>
+                                                    <th>Date of Application</th>
                                                     <th>Project Name</th>
                                                     <th>Location Details</th>
                                                     <th>Rejected By</th>
@@ -385,6 +396,7 @@
                                                     <tr>
                                                         <td>@count</td>
                                                         <td>@data.ApplicationID</td>
+                                                        <td>@string.Format("{0:dd/MM/yyyy}", data.CreatedOn)</td>
                                                         <td>@data.Name</td>
                                                         <td>@data.LocationDetails </td>
                                                         @if (data.LastForwardedByRole != "")

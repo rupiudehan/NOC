@@ -100,6 +100,7 @@ namespace Noc_App.Controllers
                 // Retrieve roles associated with the user
                 var roleName = LoggedInRoleName();
                 string role = roleName;
+                role = (await GetAppRoleName(role)).AppRoleName;
                 List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
                 List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
                 model=await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", "0", "'" +role+"'", "'" + userId + "'");

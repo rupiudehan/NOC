@@ -29,8 +29,12 @@
                             </div>
                             <div class="form-group mt-3">
                                 <label asp-for="Password"></label>
-                                <input asp-for="Password" class="form-control form-control-user" placeholder="Password">
-                                <span asp-validation-for="Password" class="text-danger"></span>
+                                    <input asp-for="Password" id="Password" class="form-control form-control-user" placeholder="Password">
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="form-group mt-3">
+                                <input id="showhide" type="checkbox" onclick="myFunction()">
+                                <label for="showhide">Show Password</label>
                             </div>
                         </div>
                         <div class="my-3">
@@ -63,5 +67,14 @@
                 $('button[type=submit]').css("visibility", "unset");
             });
         });
+
+        function myFunction() {
+            var x = document.getElementById("Password");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
     </script>
 }

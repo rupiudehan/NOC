@@ -40,6 +40,7 @@ namespace Noc_App.Models.ViewModel
         public string LastForwardedByRole { get; set; }
         public int PreviousProcessLevel { get; set; }
         public int ProcessedLevel { get; set; }
+        public DateTime CreatedOn { get; set; }
         //[Display(Name = "Sub-Division")]
         //public string SelectedSubDivisionId { get; set; }
         //public IEnumerable<SelectListItem> SubDivisions { get; set; }

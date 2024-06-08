@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using Noc_App.Clients;
 using System.Globalization;
+using Newtonsoft.Json;
 
 namespace Noc_App.Controllers
 {
@@ -538,6 +539,7 @@ namespace Noc_App.Controllers
                             Owners = model.Owners,
                             Pincode = selectedvillage.PinCode.ToString()
                         };
+                        model.OwnerType = viewModel.OwnerType;
                         if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.KmlLinkName != null && model.KmlLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
                             && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.ApplicantName != null
                             && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.IsConfirmed
@@ -679,6 +681,69 @@ namespace Noc_App.Controllers
                                 else inputString = "GNTNOC1";
 
                                 model.ApplicationID = inputString;
+                                List<OwnerDetails> ownerList = new List<OwnerDetails>();
+                                foreach (OwnerViewModelCreate item in viewModel.Owners)
+                                {
+                                    OwnerDetails owner = new OwnerDetails
+                                    {
+                                        Address = item.Address,
+                                        Email = item.Email,
+                                        MobileNo = item.MobileNo,
+                                        Name = item.Name,
+                                        OwnerTypeId = item.SelectedOwnerTypeID
+                                    };
+                                    ownerList.Add(owner);
+                                }
+                                List<GrantKhasraDetails> khasraList = new List<GrantKhasraDetails>();
+                                foreach (GrantKhasraViewModelCreate item in viewModel.GrantKhasras)
+                                {
+                                    GrantKhasraDetails khasra = new GrantKhasraDetails
+                                    {
+                                        KanalOrBigha = item.KanalOrBigha,
+                                        KhasraNo = item.KhasraNo,
+                                        MarlaOrBiswa = item.MarlaOrBiswa,
+                                        SarsaiOrBiswansi = item.SarsaiOrBiswansi,
+                                        UnitId = model.SelectedSiteAreaUnitId,
+                                        //GrantID = obj.Id
+                                    };
+                                    khasraList.Add(khasra);
+                                }
+                                //string khasraString = JsonConvert.SerializeObject(khasraList);
+                                //string ownerString = JsonConvert.SerializeObject(ownerList);
+                                //string[] jsonb = new string[2];
+                                //jsonb[0] = khasraString;
+                                //jsonb[1] = ownerString;
+                                //object[] parameters = new object[26];
+                                //parameters[0] = model.Name;
+                                //parameters[1] = model.SelectedSiteAreaUnitId;
+                                //parameters[2] = model.SelectedProjectTypeId ?? 0;
+                                //parameters[3] = model.OtherProjectTypeDetail;
+                                //parameters[4] = model.Hadbast;
+                                //parameters[5] = model.PlotNo;
+                                //parameters[6] = model.SelectedVillageID;
+                                //parameters[7] = uniqueAddressProofFileName;
+                                //parameters[8] = uniqueKmlFileName;
+                                //parameters[9] = model.KmlLinkName;
+                                //parameters[10] = model.ApplicantName;
+                                //parameters[11] = model.ApplicantEmailID;
+                                //parameters[12] = uniqueIDProofFileName;
+                                //parameters[13] = uniqueAuthLetterFileName;
+                                //parameters[14] = model.SelectedNocPermissionTypeID ?? 0;
+                                //parameters[15] = model.SelectedNocTypeId ?? 0;
+                                //parameters[16] = Convert.ToBoolean(model.IsExtension);
+                                //parameters[17] = model.NocNumber;
+                                //parameters[18] = model.PreviousDate ?? DateTime.Now;
+                                //parameters[19] = model.IsConfirmed;
+                                //parameters[20] = model.ApplicationID;
+                                //parameters[21] = 0;
+                                //parameters[22] = true;
+                                //parameters[23] = DateTime.Now;
+
+                                //string msg=await  _repo.ExecuteSaveOrderFunction("GrantApplicationCreate", model.Name,model.SelectedSiteAreaUnitId,model.SelectedProjectTypeId??0,model.OtherProjectTypeDetail!=""? model.OtherProjectTypeDetail:null
+                                //    , model.Hadbast,model.PlotNo,model.SelectedVillageID, uniqueAddressProofFileName,uniqueKmlFileName,model.KmlLinkName,model.ApplicantName,model.ApplicantEmailID
+                                //    ,uniqueIDProofFileName,uniqueAuthLetterFileName,model.SelectedNocPermissionTypeID??0,model.SelectedNocPermissionTypeID??0, Convert.ToBoolean(model.IsExtension), model.NocNumber!=""? model.NocNumber:null,
+                                //    model.PreviousDate??DateTime.Now,model.IsConfirmed,model.ApplicationID,0,true,DateTime.Now, khasraString,ownerString);
+
                                 GrantDetails obj = new GrantDetails
                                 {
                                     Name = model.Name,
@@ -707,120 +772,98 @@ namespace Noc_App.Controllers
                                 };
                                 await _repo.CreateAsync(obj);
                                 //model.SelectedOwnerTypeID
-                                List<OwnerDetails> ownerList = new List<OwnerDetails>();
-                                foreach (OwnerViewModelCreate item in viewModel.Owners)
-                                {
-                                    OwnerDetails owner = new OwnerDetails
-                                    {
-                                        Address = item.Address,
-                                        Email = item.Email,
-                                        GrantId = obj.Id,
-                                        MobileNo = item.MobileNo,
-                                        Name = item.Name,
-                                        OwnerTypeId = item.SelectedOwnerTypeID
-                                    };
-                                    ownerList.Add(owner);
-                                }
-                                List<GrantKhasraDetails> khasraList = new List<GrantKhasraDetails>();
-                                foreach (GrantKhasraViewModelCreate item in viewModel.GrantKhasras)
-                                {
-                                    GrantKhasraDetails khasra = new GrantKhasraDetails
-                                    {
-                                        KanalOrBigha = item.KanalOrBigha,
-                                        KhasraNo = item.KhasraNo,
-                                        MarlaOrBiswa = item.MarlaOrBiswa,
-                                        SarsaiOrBiswansi = item.SarsaiOrBiswansi,
-                                        UnitId = obj.SiteAreaUnitId,
-                                        GrantID = obj.Id
-                                    };
-                                    khasraList.Add(khasra);
-                                }
+
                                 obj.Owners = ownerList;
                                 obj.Khasras = khasraList;
                                 await _repo.UpdateAsync(obj);
-                                var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
-                                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
-                                double TotalPayment = 0;
-                                //if (Convert.ToDouble(model.TotalArea) <= 0.25)
+                                //if (msg == "success")
                                 //{
-                                //    TotalPayment = 250;
+                                    var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
+                                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+                                    double TotalPayment = 0;
+                                    //if (Convert.ToDouble(model.TotalArea) <= 0.25)
+                                    //{
+                                    //    TotalPayment = 250;
+                                    //}
+                                    //else 
+                                    string calculation = "";
+                                    if (Convert.ToDouble(model.TotalArea) <= 0.50)
+                                    {
+                                        TotalPayment = 500;
+                                        calculation = "For " + model.TotalArea.ToString() + " Acre, Amount is " + TotalPayment.ToString();
+                                    }
+                                    else if (Convert.ToDouble(model.TotalArea) > 0.50 && Convert.ToDouble(model.TotalArea) <= 1)
+                                    {
+                                        TotalPayment = 1000;
+                                        calculation = "For " + model.TotalArea.ToString() + " Acre, Amount is " + TotalPayment.ToString();
+                                    }
+                                    else if (Convert.ToDouble(model.TotalArea) > 1)
+                                    {
+                                        double area = Convert.ToDouble(model.TotalArea) - 1;
+                                        string area2 = area.ToString("#.####");
+                                        TotalPayment = 1000;
+                                        calculation = "For 1 Acre, Amount is " + TotalPayment.ToString();
+                                        int count = 0;
+                                        do
+                                        {
+                                            count++;
+                                            area = area - 1;
+                                        } while (area > 0);
+                                        calculation += ". On Additional " + area2 + " Acres, Amount is " + 250.ToString() + " per/Acre";
+                                        TotalPayment = TotalPayment + (count * 250);
+                                        calculation += ". For Total " + model.TotalArea.ToString() + " Acres, Amount is " + TotalPayment.ToString();
+                                    }
+                                    if (TotalPayment > 0)
+                                    {
+                                        var detail = (from v in _villageRpo.GetAll()
+                                                      join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                                                      join s in _subDivisionRepo.GetAll() on t.SubDivisionId equals s.Id
+                                                      join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
+                                                      join dist in _districtRepo.GetAll() on d.DistrictId equals dist.Id
+                                                      where v.Id == model.SelectedVillageID
+                                                      select new
+                                                      {
+                                                          Village = v,
+                                                          Tehsil = t,
+                                                          SubDivision = s,
+                                                          Division = d,
+                                                          District = dist
+                                                      }).FirstOrDefault();
+                                        int grantid =  _repo.Find(x => x.ApplicationID == model.ApplicationID).FirstOrDefault().Id;
+                                        PaymentRequest paymentRequestDetail = new PaymentRequest
+                                        {
+                                            Name = model.Name,
+                                            PayerName = model.Owners.FirstOrDefault().Name,
+                                            MobileNo = viewModel.Owners.FirstOrDefault().MobileNo,
+                                            Email = model.ApplicantEmailID,
+                                            Address = "Division:" + detail.Division.Name + ",Sub-Division:" + detail.SubDivision.Name + ",Tehsil/Block:" + detail.Tehsil.Name + ",Village:" + detail.Village.Name + ",Pincode:" + detail.Village.PinCode,
+                                            Amount = TotalPayment,
+                                            GrantId = grantid,
+                                            ApplicationId = model.ApplicationID,
+                                            DistrictId = detail.District.LGD_ID.ToString(),
+                                            Hadbast = model.Hadbast,
+                                            PhoneNumber = viewModel.Owners.FirstOrDefault().MobileNo,
+                                            Pincode = detail.Village.PinCode.ToString(),
+                                            PlotNo = model.PlotNo != null && model.PlotNo != "" ? model.PlotNo : "0",
+                                            TehsilId = detail.Tehsil.LGD_ID.ToString(),
+                                            Division = detail.Division.Name,
+                                            SubDivision = detail.SubDivision.Name,
+                                            Tehsil = detail.Tehsil.Name,
+                                            Village = detail.Village.Name,
+                                            AreaCalculation = calculation
+                                        };
+                                        return RedirectToAction("Index", "Payment", paymentRequestDetail);
+                                    }
+                                    else
+                                    {
+                                        return RedirectToAction("Index", "Grant", new { Id = model.ApplicationID });
+                                    }
                                 //}
-                                //else 
-                                string calculation = "";
-                                if (Convert.ToDouble(model.TotalArea) <= 0.50)
-                                {
-                                    TotalPayment = 500;
-                                    calculation = "For " + model.TotalArea.ToString() + " Acre, Amount is " + TotalPayment.ToString();
-                                }
-                                else if (Convert.ToDouble(model.TotalArea) > 0.50 && Convert.ToDouble(model.TotalArea) <= 1)
-                                {
-                                    TotalPayment = 1000;
-                                    calculation = "For " + model.TotalArea.ToString() + " Acre, Amount is " + TotalPayment.ToString();
-                                }
-                                else if (Convert.ToDouble(model.TotalArea) > 1)
-                                {
-                                    double area = Convert.ToDouble(model.TotalArea) - 1;
-                                    string area2 = area.ToString("#.####");
-                                    TotalPayment = 1000;
-                                    calculation = "For 1 Acre, Amount is " + TotalPayment.ToString();
-                                    int count = 0;
-                                    do
-                                    {
-                                        count++;
-                                        area = area - 1;
-                                    } while (area > 0);
-                                    calculation += ". On Additional " + area2 + " Acres, Amount is " + 250.ToString() + " per/Acre";
-                                    TotalPayment = TotalPayment + (count * 250);
-                                    calculation += ". For Total " + model.TotalArea.ToString() + " Acres, Amount is " + TotalPayment.ToString();
-                                }
-                                if (TotalPayment > 0)
-                                {
-                                    var detail = (from v in _villageRpo.GetAll()
-                                                  join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
-                                                  join s in _subDivisionRepo.GetAll() on t.SubDivisionId equals s.Id
-                                                  join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
-                                                  join dist in _districtRepo.GetAll() on d.DistrictId equals dist.Id
-                                                  where v.Id == model.SelectedVillageID
-                                                  select new
-                                                  {
-                                                      Village = v,
-                                                      Tehsil = t,
-                                                      SubDivision = s,
-                                                      Division = d,
-                                                      District = dist
-                                                  }).FirstOrDefault();
-                                    //VillageDetails applicantVillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID);
-                                    //TehsilBlockDetails applicantteh = await _tehsilBlockRepo.GetByIdAsync(model.SelectedTehsilBlockId);
-                                    //SubDivisionDetails applicantsubdiv = await _subDivisionRepo.GetByIdAsync(model.SelectedSubDivisionId);
-                                    //DivisionDetails applicantdiv = await _divisionRepo.GetByIdAsync(model.SelectedDivisionId);
-                                    PaymentRequest paymentRequestDetail = new PaymentRequest
-                                    {
-                                        Name = model.Name,
-                                        PayerName = model.Owners.FirstOrDefault().Name,
-                                        MobileNo = viewModel.Owners.FirstOrDefault().MobileNo,
-                                        Email = model.ApplicantEmailID,
-                                        Address = "Division:" + detail.Division.Name + ",Sub-Division:" + detail.SubDivision.Name + ",Tehsil/Block:" + detail.Tehsil.Name + ",Village:" + detail.Village.Name + ",Pincode:" + detail.Village.PinCode,
-                                        Amount = TotalPayment,
-                                        GrantId = obj.Id,
-                                        ApplicationId = obj.ApplicationID,
-                                        DistrictId = detail.District.LGD_ID.ToString(),
-                                        Hadbast = model.Hadbast,
-                                        PhoneNumber = viewModel.Owners.FirstOrDefault().MobileNo,
-                                        Pincode = detail.Village.PinCode.ToString(),
-                                        PlotNo = model.PlotNo != null && model.PlotNo != "" ? model.PlotNo : "0",
-                                        TehsilId = detail.Tehsil.LGD_ID.ToString(),
-                                        Division = detail.Division.Name,
-                                        SubDivision = detail.SubDivision.Name,
-                                        Tehsil = detail.Tehsil.Name,
-                                        Village = detail.Village.Name,
-                                        AreaCalculation = calculation
-                                    };
-                                    return RedirectToAction("Index", "Payment", paymentRequestDetail);
-                                }
-                                else
-                                {
-                                    return RedirectToAction("Index", "Grant", new { Id = obj.ApplicationID });
-                                }
+
+                                //else
+                                //{
+                                //    ModelState.AddModelError("", "Something went wrong while saving details");
+                                //}
 
                             }
                             else
@@ -846,7 +889,7 @@ namespace Noc_App.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", $"Please check file size");
+                    ModelState.AddModelError("", $"All fields are required");
                     return View(model);
                 }
             }

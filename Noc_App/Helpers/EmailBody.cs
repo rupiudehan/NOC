@@ -59,7 +59,10 @@ namespace Noc_App.Helpers
                     <div>
                         <p>Dear {applicantName},</p>
                         
-                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully, but payment is pending
+                        <br />
+                        Your application will be processed only after successful payment. 
+                        </p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
                         <p>Best Regards,<br><br>
                         Department of Water Resources, Punjab</p>
                     </div>

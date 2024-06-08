@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Noc_App.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240608131655_unitchange")]
+    partial class unitchange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1299,62 +1302,62 @@ namespace NocApp.Migrations
                         new
                         {
                             Id = 1,
-                            DivideBy = 32.270000000000003,
+                            DivideBy = 1.0,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
                             UnitCode = "M",
                             UnitName = "Biswa",
-                            UnitValue = 1.0
+                            UnitValue = 32.270000000000003
                         },
                         new
                         {
                             Id = 2,
-                            DivideBy = 1.673,
+                            DivideBy = 1.0,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
                             UnitCode = "K",
                             UnitName = "Bigha",
-                            UnitValue = 1.0
+                            UnitValue = 1.673
                         },
                         new
                         {
                             Id = 3,
-                            DivideBy = 32.310000000000002,
+                            DivideBy = 1.0,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
                             UnitCode = "S",
                             UnitName = "Biswansi",
-                            UnitValue = 1.0
+                            UnitValue = 32.310000000000002
                         },
                         new
                         {
                             Id = 4,
-                            DivideBy = 32.270000000000003,
+                            DivideBy = 1.0,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
                             UnitCode = "M",
                             UnitName = "Biswa",
-                            UnitValue = 1.0
+                            UnitValue = 32.270000000000003
                         },
                         new
                         {
                             Id = 5,
-                            DivideBy = 1.673,
+                            DivideBy = 1.0,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
                             UnitCode = "K",
                             UnitName = "Bigha",
-                            UnitValue = 1.0
+                            UnitValue = 1.673
                         },
                         new
                         {
                             Id = 6,
-                            DivideBy = 32.310000000000002,
+                            DivideBy = 1.0,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
                             UnitCode = "S",
                             UnitName = "Biswansi",
-                            UnitValue = 1.0
+                            UnitValue = 32.310000000000002
                         },
                         new
                         {

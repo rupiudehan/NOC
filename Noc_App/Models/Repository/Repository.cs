@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Noc_App.Context;
 using Noc_App.Models.interfaces;
+using Noc_App.UtilityService;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq.Expressions;
 
 namespace Noc_App.Models.Repository
@@ -198,6 +200,82 @@ namespace Noc_App.Models.Repository
                 query = query.Include(navigationProperty);
             }
             return query;
+        }
+
+        public async Task<string> SaveRecords(string name,int unitid,int projecttypeid,string otherprojecttypedetail,string hadbast,string plotno, int villageid
+            ,string addressproofphotopath,string kmlfilepath,string kmllinkname,string applicantname,string applicantemailid,string idproofphotopath
+            ,string authorizationletterphotopath,int nocpermissiontypeid,int noctypeid,bool isextension,string nocnumber,DateTime previousdate,bool isconfirmed
+            ,string applicationid,int processedlevel,bool ispending,DateTime createdon, string khasraItemsJson, string ownerItemsJson)
+        {
+            try
+            {
+                string query = $"CALL GrantApplicationCreate('{name}',{unitid},{projecttypeid},'{otherprojecttypedetail ?? ""}','{hadbast}','{plotno}'" +
+                    $",{villageid},'{addressproofphotopath}','{kmlfilepath}','{kmllinkname}','{applicantname}','{applicantemailid}','{idproofphotopath}'" +
+                    $",'{authorizationletterphotopath}',{nocpermissiontypeid},{noctypeid},{isextension},'{nocnumber ?? ""}','{previousdate}',{isconfirmed}" +
+                    $",'{applicationid}',{processedlevel},{ispending},'{createdon}', '{khasraItemsJson}', '{ownerItemsJson}')";
+                
+                await _context.Database.ExecuteSqlRawAsync(query);
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+
+        }
+
+        public async Task<string> ExecuteSaveOrderFunction(string storedProcedureName,/*string[] json, params object[] parameters,*/
+            string name, int unitid, int projecttypeid, string otherprojecttypedetail, string hadbast, string plotno, int villageid
+            , string addressproofphotopath, string kmlfilepath, string kmllinkname, string applicantname, string applicantemailid, string idproofphotopath
+            , string authorizationletterphotopath, int nocpermissiontypeid, int noctypeid, bool isextension, string nocnumber, DateTime previousdate, bool isconfirmed
+            , string applicationid, int processedlevel, bool ispending, DateTime createdon, string khasraItemsJson, string ownerItemsJson)
+        {
+            try
+            {
+                string query = $"SELECT * FROM {storedProcedureName}('{name}'::text, {unitid}, {projecttypeid}, '{otherprojecttypedetail}'::text, '{hadbast}'::text, '{plotno}'::text, {villageid}, '{addressproofphotopath}'::text, '{ kmlfilepath}'::text,'{kmllinkname}'::text,'{applicantname}'::text,'{applicantemailid}'::text,'{idproofphotopath}'::text,'{authorizationletterphotopath}'::text,{nocpermissiontypeid},{noctypeid},{isextension},'{nocnumber}'::text,'{previousdate}'::timestamp with time zone,{isconfirmed},'{applicationid}'::text,{processedlevel},{ispending},'{createdon}'::timestamp with time zone,'{khasraItemsJson}'::jsonb,'{ownerItemsJson}'::jsonb);";
+                //string param = "";
+                //for (int i = 1; i <= parameters.Length- json.Length; i++)
+                //{
+                //    if (i < parameters.Length)
+                //    {
+                //        if (parameters[i] is string)
+                //            param = param == "" ? "@p" + i + " ::text," : param + "@p" + i + " ::text,";
+                //        else if (parameters[i] is int)
+                //            param = param == "" ? "@p" + i + " ::integer," : param + "@p" + i + " ::integer,";
+                //        else if (parameters[i] is bool)
+                //            param = param == "" ? "@p" + i + " ::boolean," : param + "@p" + i + " ::boolean,";
+                //    }
+                //    else {
+                //        if (parameters[i] is string)
+                //            param = param + "@p" + i+ " ::text"; 
+                //        else if (parameters[i] is int)
+                //            param = param + "@p" + i + " ::integer";
+                //        else if (parameters[i] is bool)
+                //            param = param + "@p" + i + " ::boolean";
+                //    }
+                //}
+                //for (int i = 1; i <= json.Length; i++)
+                //{
+                    
+                //    if (i < json.Length)
+                //    {
+                //        param = param == "" ? ",@p" + Convert.ToInt32(i + parameters.Length - json.Length) + "::jsonb," : param + ",@p" + Convert.ToInt32(i + parameters.Length - json.Length) + "::jsonb,";
+                //    }
+                //    else param = param + "@p" + Convert.ToInt32(i + parameters.Length - json.Length) + "::jsonb";
+                //    parameters[Convert.ToInt32(parameters.Length-json.Length+i-1)] = json[i - 1];
+                //}
+                
+                ////$"@p1, @p1::jsonb";
+                //var sql = $"SELECT {storedProcedureName}(" + param + ")";
+                ////var parameters = new object[] { customerId, orderItemsJson };
+
+                await _context.Database.ExecuteSqlRawAsync(query);
+                return "success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
 
         public async Task<List<T>> ExecuteStoredProcedureAsync<T2>(string storedProcedureName, params object[] parameters)
