@@ -16,7 +16,7 @@ namespace Noc_App.Models
         public GrantApprovalDetail GrantApprovalDetail { get; set; }
         public int SectionId { get; set; }
         [ForeignKey(nameof(SectionId))]
-        public GrantSectionsDetails GrantSectionsDetails { get; set; }
+        public List<GrantSectionsDetails> GrantSectionsDetails { get; set; }
         public int IsCompleted { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }

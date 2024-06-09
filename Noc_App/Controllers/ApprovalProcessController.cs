@@ -144,85 +144,92 @@ namespace Noc_App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ShortFall(GrantApprovalDetailShortfall model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (string.IsNullOrEmpty(model.id))
+                if (ModelState.IsValid)
                 {
-                    ViewBag.ErrorMessage = $"Grant with Application Id = {model.id} cannot be found";
-                    return View("NotFound");
+                    if (string.IsNullOrEmpty(model.id))
+                    {
+                        ViewBag.ErrorMessage = $"Grant with Application Id = {model.id} cannot be found";
+                        return View("NotFound");
+                    }
+
+                    GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == model.id)).FirstOrDefault();
+
+                    if (grant == null)
+                    {
+                        ViewBag.ErrorMessage = $"Grant with Application Id = {model.id} cannot be found";
+
+                        return View("NotFound");
+                    }
+
+                    string userId = LoggedInUserID();
+
+                    string divisionId = LoggedInDivisionID();
+
+                    string subdivisionId = LoggedInSubDivisionID();
+
+                    string username = LoggedInUserName();
+
+                    string designation = LoggedInDesignationName();
+
+                    // Retrieve roles associated with the user
+                    var roleName = LoggedInRoleName();
+
+                    string role = roleName;
+                    GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "SF")).FirstOrDefault();
+                    int shortfallLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
+                    var selectedSectionIds = model.SelectedGrantSectionIDs;
+                    List<GrantRejectionShortfallSection> grantSections = new List<GrantRejectionShortfallSection>();
+
+
+                    GrantApprovalDetail approvalDetail = new GrantApprovalDetail
+                    {
+                        GrantID = grant.Id,
+                        ApprovalID = master.Id,
+                        ProcessedBy = userId,
+                        ProcessedOn = DateTime.Now,
+                        ProcessedByRole = role,
+                        ProcessedByName = username + "(" + designation + ")",
+                        ProcessLevel = shortfallLevel + 1,
+                        ProcessedToRole = "Applicant",
+                        ProcessedToUser = "0",
+                        ProcessedToName = "Applicant",
+                        Remarks = model.Remarks,
+                        RecommendationID = 3
+                    };
+
+                    await _repoApprovalDetail.CreateAsync(approvalDetail);
+                    foreach (var item in selectedSectionIds)
+                    {
+                        grantSections.Add(new GrantRejectionShortfallSection { SectionId = item, GrantApprovalId = approvalDetail.Id, IsCompleted = 0, CreatedOn = DateTime.Now });
+                    }
+
+                    approvalDetail.GrantRejectionShortfallSection = grantSections;
+                    await _repoApprovalDetail.UpdateAsync(approvalDetail);
+
+                    grant.IsForwarded = false;
+                    grant.IsShortFall = true;
+                    grant.ShortFallLevel = approvalDetail.ProcessLevel;
+                    grant.IsShortFallCompleted = false;
+                    grant.ShortFallReportedOn = DateTime.Now;
+                    grant.ShortFallReportedByRole = role;
+                    grant.ShortFallReportedById = userId;
+                    grant.ShortFallReportedByName = username + "(" + designation + ")";
+                    await _repo.UpdateAsync(grant);
+
+                    string domain = HttpContext.Request.Host.Value;
+                    string scheme = HttpContext.Request.Scheme;
+                    string link = scheme + "://" + domain + Url.Action("Modify", "Grant", new { id = grant.ApplicationID });
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForShortfall(grant.ApplicantName, grant.ApplicationID, model.Remarks, link));
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
+                    return RedirectToAction("Index");
                 }
-
-                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == model.id)).FirstOrDefault();
-
-                if (grant == null)
-                {
-                    ViewBag.ErrorMessage = $"Grant with Application Id = {model.id} cannot be found";
-
-                    return View("NotFound");
-                }
-
-                string userId = LoggedInUserID();
-
-                string divisionId = LoggedInDivisionID();
-
-                string subdivisionId = LoggedInSubDivisionID();
-
-                string username = LoggedInUserName();
-
-                string designation = LoggedInDesignationName();
-
-                // Retrieve roles associated with the user
-                var roleName = LoggedInRoleName();
-
-                string role = roleName;
-                GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "SF")).FirstOrDefault();
-                int shortfallLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
-                var selectedSectionIds = model.SelectedGrantSectionIDs;
-                List<GrantRejectionShortfallSection> grantSections = new List<GrantRejectionShortfallSection>();
-                
-
-                GrantApprovalDetail approvalDetail = new GrantApprovalDetail
-                {
-                    GrantID = grant.Id,
-                    ApprovalID = master.Id,
-                    ProcessedBy = userId,
-                    ProcessedOn = DateTime.Now,
-                    ProcessedByRole = role,
-                    ProcessedByName = username + "(" + designation + ")",
-                    ProcessLevel = shortfallLevel + 1,
-                    ProcessedToRole = "Applicant",
-                    ProcessedToUser = "0",
-                    ProcessedToName = "Applicant",
-                    Remarks = model.Remarks,
-                    RecommendationID = 3
-                };
-
-                await _repoApprovalDetail.CreateAsync(approvalDetail);
-                foreach (var item in selectedSectionIds)
-                {
-                    grantSections.Add(new GrantRejectionShortfallSection { SectionId = item, GrantApprovalId = approvalDetail.Id,IsCompleted=0,CreatedOn=DateTime.Now });
-                }
-
-                approvalDetail.GrantRejectionShortfallSection=grantSections;
-                await _repoApprovalDetail.UpdateAsync(approvalDetail);
-
-                grant.IsForwarded = false;
-                grant.IsShortFall = true;
-                grant.ShortFallLevel = approvalDetail.ProcessLevel;
-                grant.IsShortFallCompleted = false;
-                grant.ShortFallReportedOn = DateTime.Now;
-                grant.ShortFallReportedByRole = role;
-                grant.ShortFallReportedById = userId;
-                grant.ShortFallReportedByName = username + "(" + designation + ")";
-                await _repo.UpdateAsync(grant);
-
-                string domain = HttpContext.Request.Host.Value;
-                string scheme = HttpContext.Request.Scheme;
-                string link = scheme + "://" + domain + Url.Action("Modify", "Grant", new { id = grant.ApplicationID });
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForShortfall(grant.ApplicantName, grant.ApplicationID, model.Remarks,link));
-                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
-
-                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Something went wrong");
             }
             return View(model);
         }
@@ -1612,6 +1619,7 @@ namespace Noc_App.Controllers
             user_info user_info5 = new user_info();
             user_info user_info6 = new user_info();
             user_info user_info7 = new user_info();
+            user_info user_info8 = new user_info();
             user_info1 =new user_info { Name = "Junior Engineer", Designation = "xyz", DesignationID = 1, Role = "Junior Engineer", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "test", SubDivisionID = 114 };
             user_info2 = new user_info { Name = "Sub Divisional Officer", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info3 = new user_info { Name = "Superintending Engineer", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "se", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
@@ -1619,6 +1627,7 @@ namespace Noc_App.Controllers
             user_info5 = new user_info { Name = "XEN HO Drainage", Designation = "xyz", DesignationID = 1, Role = "XEN HO Drainage", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "eehq", EmpID = "127", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info6 = new user_info { Name = "Chief Engineer", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info7 = new user_info { Name = "Principal Secretary", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info8 = new user_info { Name = "ExecutiveEngineer", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "ExecutiveEngineer", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
             LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
             LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
@@ -1627,6 +1636,7 @@ namespace Noc_App.Controllers
             LoginResponseViewModel o5= new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info5 };
             LoginResponseViewModel o6=new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info6 };
             LoginResponseViewModel o7= new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info7 };
+            LoginResponseViewModel o8 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info8 };
             users.Add(o1);
             users.Add(o2);
             users.Add(o3);
@@ -1634,6 +1644,7 @@ namespace Noc_App.Controllers
             users.Add(o5);
             users.Add(o6);
             users.Add(o7);
+            users.Add(o8);
             return users;
 
         }
