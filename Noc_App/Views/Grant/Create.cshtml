@@ -141,6 +141,8 @@
                                         <div class="row">
                                             <div class="col-lg-6">
                                                 <div class="form-group">
+                                                    <input type="hidden" id="ValidKhasra" value="1" />
+                                                    <input type="hidden" id="ValidKhasraName" value="" />
                                                     <input type="hidden" id="KUnitValue" value="0" />
                                                     <input type="hidden" id="KTimesof" value="1" />
                                                     <input type="hidden" id="KDivideBy" value="1" />
@@ -174,8 +176,8 @@
                                                         <td><span class="srKhasra">1</span></td>
                                                         <td>
                                                             <div class="col-sm-12">
-                                                            <input type="text" asp-for=GrantKhasras[0].KhasraNo class="form-control" placeholder="Khasra No." />
-                                                            <span asp-validation-for="GrantKhasras[0].KhasraNo" class="text-danger"></span>
+                                                            <input type="text" asp-for=GrantKhasras[0].KhasraNo class="form-control khasra" placeholder="Khasra No." onblur="CheckDuplicate(this)"/>
+                                                            <span asp-validation-for="GrantKhasras[0].KhasraNo" class="text-danger " id="khasraVal0"></span>
                                                             </div>
                                                         </td>
                                                         <td>
@@ -417,7 +419,7 @@
                                         <div asp-validation-summary="All" class="text-danger validateAll"></div>
                                         <div class="row">
                                             <div class="col-sm-6 offset-sm-5">
-                                                <button type="submit" class="btn btn-primary btn-user btn-block">Submit</button>
+                                                <button type="submit" class="btn btn-primary btn-user btn-block" id="btnSave">Submit</button>
                                             </div>
                                             @* <div class="col-lg-6">
                                             <a class="btn btn-secondary btn-user btn-block" asp-controller="Grant" asp-action="List">Back to List</a>
@@ -442,6 +444,23 @@
 @* <div id="partialContainer"></div> *@
 @section Scripts {
     <script>
+        function CheckDuplicate(control){
+            // alert($(control).val())
+            $('#khasraTable').find('tbody>tr').each(function () {
+                if($(control).prop('name')!=$(this).find('.khasra').prop('name')){
+                    if($(this).find('.khasra').val()==$(control).val()){
+                        $('#ValidKhasra').val(0);
+                        $('#ValidKhasraName').val($(control).prop('name'));
+                        $(control).closest('div').find('span').html('<span>Khasra No. already exists</span>');
+                    }else{
+                        $('#ValidKhasra').val(1);  
+                        $('#ValidKhasraName').val('');                      
+                        $(control).closest('div').find('span').html('');
+                    }
+                }
+            })
+            $(control).val();
+        }
         document.getElementById("SelectedProjectTypeId").addEventListener("change", function () {
             var selectedText = this.options[this.selectedIndex].text;
             if (selectedText != 'Any Other') {
@@ -475,15 +494,23 @@
         //     }
         // }
         $(function () {
+            $('#grantForm').on('submit', function (e) { 
+                if($('#ValidKhasra').val()=='0'){
+                    var name=$('#ValidKhasraName').val();
+                    $('input[name="' + name + '"]').closest('div').find('span').html('<span>Khasra No. already exists</span>'); 
+                    e.preventDefault();
+                    return false;
+                }
+            });
             document.getElementById("grantForm").addEventListener("submit", function (event) {
                 var fileInputIDProofPhoto = document.getElementById("IDProofPhoto");
-                var fileSizeIDProofPhoto = fileInputIDProofPhoto.files[0].size;
+                var fileSizeIDProofPhoto = fileInputIDProofPhoto.files[0]!=undefined?fileInputIDProofPhoto.files[0].size:'';
                 var fileInputAuthorizationLetterPhoto = document.getElementById("AuthorizationLetterPhoto");
-                var fileSizeAuthorizationLetterPhoto = fileInputAuthorizationLetterPhoto.files[0].size;
+                var fileSizeAuthorizationLetterPhoto = fileInputAuthorizationLetterPhoto.files[0]!=undefined?fileInputAuthorizationLetterPhoto.files[0].size:'';
                 var fileInputAddressProofPhoto = document.getElementById("AddressProofPhoto");
-                var fileSizeAddressProofPhoto = fileInputAddressProofPhoto.files[0].size;
+                var fileSizeAddressProofPhoto = fileInputAddressProofPhoto.files[0]!=undefined?fileInputAddressProofPhoto.files[0].size:'';
                 var fileInputKMLFile = document.getElementById("KMLFile");
-                var fileSizeKMLFile = fileInputKMLFile.files[0].size;
+                var fileSizeKMLFile = fileInputKMLFile.files[0]!=undefined?fileInputKMLFile.files[0].size:'';
                 var maxSize = 4 * 1024 * 1024; // 10MB in bytes
 
                 var summary = $('.validateAll');

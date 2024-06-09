@@ -695,18 +695,29 @@ namespace Noc_App.Controllers
                                     ownerList.Add(owner);
                                 }
                                 List<GrantKhasraDetails> khasraList = new List<GrantKhasraDetails>();
-                                foreach (GrantKhasraViewModelCreate item in viewModel.GrantKhasras)
+                                int duplicates = viewModel.GrantKhasras.GroupBy(x => x.KhasraNo).Where(g => g.Count() > 1).Count();
+                                if (duplicates <= 0)
                                 {
-                                    GrantKhasraDetails khasra = new GrantKhasraDetails
+                                    foreach (GrantKhasraViewModelCreate item in viewModel.GrantKhasras)
                                     {
-                                        KanalOrBigha = item.KanalOrBigha,
-                                        KhasraNo = item.KhasraNo,
-                                        MarlaOrBiswa = item.MarlaOrBiswa,
-                                        SarsaiOrBiswansi = item.SarsaiOrBiswansi,
-                                        UnitId = model.SelectedSiteAreaUnitId,
-                                        //GrantID = obj.Id
-                                    };
-                                    khasraList.Add(khasra);
+                                        var khasraDeplicate = viewModel.GrantKhasras.Any(x => x.KhasraNo == item.KhasraNo);
+                                        GrantKhasraDetails khasra = new GrantKhasraDetails
+                                        {
+                                            KanalOrBigha = item.KanalOrBigha,
+                                            KhasraNo = item.KhasraNo,
+                                            MarlaOrBiswa = item.MarlaOrBiswa,
+                                            SarsaiOrBiswansi = item.SarsaiOrBiswansi,
+                                            UnitId = model.SelectedSiteAreaUnitId,
+                                            //GrantID = obj.Id
+                                        };
+                                        khasraList.Add(khasra);
+                                    }
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError("", $"Please check duplicate khasra numbers");
+
+                                    return View(viewModel);
                                 }
                                 //string khasraString = JsonConvert.SerializeObject(khasraList);
                                 //string ownerString = JsonConvert.SerializeObject(ownerList);
