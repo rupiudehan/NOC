@@ -457,8 +457,7 @@ namespace Noc_App.Controllers
                 
                 List<OfficerDetails> officerDetail = new List<OfficerDetails>();
                 
-                if (roleName == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
-                {
+                
                     var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
                     SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
                     SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
@@ -470,6 +469,8 @@ namespace Noc_App.Controllers
                                              TotalArea = ((kh.KanalOrBigha*k.UnitValue*k.Timesof)/k.DivideBy)+ ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy)+ ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
                                             
                                          }).Sum(d => d.TotalArea)), 4);
+                if (roleName == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
+                {
                     subdivisions = (from sub in _subDivisionRepo.GetAll()  
                                     where sub.DivisionId== Convert.ToInt32(divisionId)
                                     select new SubDivisionDetails
@@ -479,7 +480,7 @@ namespace Noc_App.Controllers
                                     }
                                     ).ToList();
                 }
-                else
+                //else
                 {
                     switch (roleName)
                     {
