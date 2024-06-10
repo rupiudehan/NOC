@@ -429,7 +429,7 @@ namespace Noc_App.Controllers
             {
                 if (id != null)
                 {
-                    var challanDetail = (await _repoChallanDetails.FindAsync(x => x.ApplicationId == id && x.RequestStatus == "Fresh Request")).FirstOrDefault();
+                    var challanDetail = (await _repoChallanDetails.FindAsync(x => x.ApplicationId == id && (x.RequestStatus == "Fresh Request" || x.RequestStatus=="Failed"))).FirstOrDefault();
 
                     GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == id.ToLower())).FirstOrDefault();
                     if (obj != null)
@@ -444,8 +444,14 @@ namespace Noc_App.Controllers
                                 OrderId = "0",
                                 Message = "Payment is unsuccessful"
                             };
-                            challanDetail.RequestStatus = "Failed";
-                            await _repoChallanDetails.UpdateAsync(challanDetail);
+                            if (challanDetail != null)
+                            {
+                                if (challanDetail.RequestStatus != "Failed")
+                                {
+                                    challanDetail.RequestStatus = "Failed";
+                                    await _repoChallanDetails.UpdateAsync(challanDetail);
+                                }
+                            }
                             return View(model);
                         }
                         else
