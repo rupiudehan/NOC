@@ -41,8 +41,8 @@
                             </div>
                         </div>
                     </div>
-                  @*   @if (Model.LoggedInRole == "JUNIOR ENGINEER" && Model.TotalArea <= 2.00)
-                    { *@
+                    @if (Model.IsForwarded == true)
+                    {
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -117,7 +117,7 @@
                                 </div>
                             </div>
                         </div>
-                    @* } *@
+                    }
                     <div class="row">
                         @if (Model.LoggedInRole == "EXECUTIVE ENGINEER" && Model.IsForwarded==false)
                         {
