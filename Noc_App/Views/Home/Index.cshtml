@@ -280,6 +280,13 @@
                 LoadBarPendancyChart();
             });
             LoadBarPendancyChart();
+            
+        });
+        // Notice that e is not used or needed.
+
+    </script>
+    <script>
+        function BindTable(){
             $("#tblPendancy").DataTable({
                 dom: 'Blfrtip',
                 buttons: [
@@ -320,11 +327,7 @@
                 "pageLength": 10,
 
             });
-        });
-        // Notice that e is not used or needed.
-
-    </script>
-    <script>
+        }
         function LoadBarPendancyChart() {
             // var rolename = $('#RoleName').val();
             // var DivisionId = $('#hdnDivisionId').val();
@@ -391,7 +394,7 @@
             body.empty();
             //table.DataTable().clear().destroy();
             $("#divLoader").show(); $('.barcontainer,.drpd').hide();
-            console.log(roleName)
+            
             $.ajax({
                 url: "/Home/GetRoleLevelPendencyReport",
                 type: "POST",
@@ -408,6 +411,10 @@
                 },
                 success: function (r) {
                     if (r != null) {
+                        if ($.fn.DataTable.isDataTable('#tblPendancy')) {
+                            table.DataTable().destroy();
+                            body.empty();
+                        }
                         var count = 1; var len = r.length;
                         $.each(r, function (key, value) {
                             var tr = '<tr>';
@@ -422,6 +429,10 @@
                             body.append(tr);
                             count++;
                         });
+                        BindTable();
+                        // table.DataTable().clear().draw();
+                        // table.DataTable().destroy();
+                        // BindTable();
                     }
                 },
                 failure: function (r) {
