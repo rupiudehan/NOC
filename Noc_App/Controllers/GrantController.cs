@@ -2505,6 +2505,22 @@ namespace Noc_App.Controllers
             }
         }
 
+        [AcceptVerbs("Get", "Post")]
+        [AllowAnonymous]
+        public async Task<IActionResult> IsEmailExistsToModify(string applicantEmailID)
+        {
+            var user = await _repo.GetAll().AnyAsync(x => x.ApplicantEmailID != applicantEmailID && x.IsRejected != true);
+
+            if (!user)
+            {
+                return Json(true);
+            }
+            else
+            {
+                return Json($"Email {applicantEmailID} is already in use");
+            }
+        }
+
         private string ExtractNumber(string inputString)
         {
             // Use LINQ to filter out non-numeric characters and create a new string.
