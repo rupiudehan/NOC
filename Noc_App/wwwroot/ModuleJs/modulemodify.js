@@ -25,18 +25,19 @@ if (document.getElementById("SelectedNocTypeId") != null) {
 
     });
 }
-function LoadFinalBlock() {
+function LoadFinalBlock(grantId,applicationid) {
     $('.finalSubmit').empty();
     var divs = `
                 <hr />
                                         <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="finalForm">
                                         <div class="row float-start">
-                                                <input type="checkbox" style="margin-left:8px;" id="IsConfirmed" asp-for="IsConfirmed" />
-                                                <span asp-validation-for="IsConfirmed" class="text-danger"></span>
-                                        </div><br />
+                                                <input type="checkbox" style="margin-left:8px;" id="IsConfirmed" data-val="true" data-val-required="The Confirm field is required." name="IsConfirmed" value="true">
+                                                <span class="text-danger field-validation-valid" data-valmsg-for="IsConfirmed" data-valmsg-replace="true"></span>
+                                                
+                                        </div>
                                         <div class="row mt-4 mb-4">
-                                            <input type="hidden" asp-for="FGrantId" id="FGrantId" name="FGrantId" />
-                                            <input type="hidden" asp-for="ApplicationID" id="FApplicationId" name="FApplicationId" />
+                                            <input type="hidden" asp-for="FGrantId" id="FGrantId" value="`+ grantId +`" name="FGrantId" />
+                                            <input type="hidden" asp-for="ApplicationID" id="FApplicationId" name="FApplicationId" value="`+ applicationid +`"/>
                                             <label asp-for="IsConfirmed">
                                                 I / We confirm that the information furnished
                                                 herewith is correct to the best of my/our
@@ -65,8 +66,9 @@ function LoadFinalBlock() {
                                         </form>`;
     $('.finalSubmit').html(divs);
 }
-        var today = new Date().toISOString().split('T')[0];
-document.getElementById('PreviousDate').setAttribute('max', today);
+var today = new Date().toISOString().split('T')[0];
+if (document.getElementById('PreviousDate') != null && document.getElementById('PreviousDate') != undefined)
+    document.getElementById('PreviousDate').setAttribute('max', today);
 function toggleValue(module) {
     var resultProjectMessage = $('#result' + module + 'Message');
     resultProjectMessage.css('display', 'none');
@@ -590,6 +592,7 @@ $(function () {
             event.preventDefault();
             var module = 'applicant';
             var formData = new FormData();
+            var applicantid = $('#applicantid').val();
             var ApplicantGrantId = $('#ApplicantGrantId').val();
             var applicantApplicationId = $('#applicantApplicationId').val();
             var ApplicantName = $('#ApplicantName').val();
@@ -597,11 +600,13 @@ $(function () {
             var fileInputId = $('#IDProofPhoto')[0];
             var fileInputAuth = $('#AuthorizationLetterPhoto')[0];
             var ownersecid = $('#ownersecid').val();
-
-            var allFileValid = true;
+            
+            var allFileValid = true; 
             allFileValid = ValidFileField(fileInputId, module);
             if (allFileValid) {
+                
                 allFileValid = ValidFileField(fileInputAuth, module);
+
                 if (allFileValid) {
                     var allValid = true;
                     allValid = ValidateFields(module, module);
@@ -616,6 +621,7 @@ $(function () {
                             formData.append('applicantName', ApplicantName);
                             formData.append('applicantEmailID', ApplicantEmailID);
                             formData.append('ownersecid', ownersecid);
+                            formData.append('applicantid', applicantid);
 
                             ToggleLoadder(true);
                             var navtab = $('#nav-applicant-tab');
@@ -640,7 +646,7 @@ $(function () {
                                         $('#' + module + 'Form')[0].reset();
                                         $('#AreAllSectionCompleted').val(response.completed);
                                         if ($('#AreAllSectionCompleted').val() == '0') {
-                                            LoadFinalBlock();
+                                            LoadFinalBlock(ApplicantGrantId, applicantApplicationId);
                                         }
                                     } else {
                                         var errors = response.errors.join('<br/>');
@@ -911,11 +917,12 @@ $(function () {
 });
 
 function ValidFileField(fileInput, modulename) {
-    const errorMessage = document.getElementById('result' + modulename + 'Message');
+    
     var resultProjectMessage = $('#result' + modulename + 'Message');
     if (fileInput.files.length == 0) {
+
         resultProjectMessage.css('display', 'block');
-        resultProjectMessage.html('<div class="alert alert-danger">Please upload file<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
+        resultProjectMessage.html('<div class="alert alert-danger">Please upload file<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
 
         return false;
     }
@@ -923,7 +930,7 @@ function ValidFileField(fileInput, modulename) {
     if (!file) {
 
         resultProjectMessage.css('display', 'block');
-        resultProjectMessage.html('<div class="alert alert-danger">Please upload address proof<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
+        resultProjectMessage.html('<div class="alert alert-danger">Please upload address proof<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
 
         return false;
     }
@@ -935,16 +942,16 @@ function ValidFileField(fileInput, modulename) {
     if ($.inArray(file.type, validTypes) === -1) {
         resultProjectMessage.css('display', 'block');
         if (fileInput == "kml")
-            resultProjectMessage.html('<div class="alert alert-danger">Invalid file type. Only PDF files are allowed.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
+            resultProjectMessage.html('<div class="alert alert-danger">Invalid file type. Only PDF files are allowed.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
         else
-            resultProjectMessage.html('<div class="alert alert-danger">Invalid file type. Only JPG, PNG, and PDF files are allowed.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
+            resultProjectMessage.html('<div class="alert alert-danger">Invalid file type. Only JPG, PNG, and PDF files are allowed.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
 
         return false;
     }
 
     if (file.size > maxSize) {
         resultProjectMessage.css('display', 'block');
-        resultProjectMessage.html('<div class="alert alert-danger">File size exceeds 4 MB.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
+        resultProjectMessage.html('<div class="alert alert-danger">File size exceeds 4 MB.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
 
         return false;
     }

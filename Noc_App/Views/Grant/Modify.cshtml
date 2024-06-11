@@ -432,7 +432,7 @@
                                         {
                                             <div class="tab-pane fade @showkml @Model.GrantSections.isKMLActive" id="nav-kml" role="tabpanel" aria-labelledby="nav-kml-tab">
                                                 <div class="card-body">
-                                                    <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="kmlForm">
+                                                    <form enctype="multipart/form-data" class="user" method="post" id="kmlForm">
                                                         <div class="row">
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
@@ -476,7 +476,7 @@
                                         {
                                             <div class="tab-pane fade @showpermission @Model.GrantSections.isPrActive" id="nav-permission" role="tabpanel" aria-labelledby="nav-permission-tab">
                                                 <div class="card-body">
-                                                    <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="permissionForm">
+                                                    <form class="user" method="post" id="permissionForm">
                                                         <div class="row">
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
@@ -531,7 +531,7 @@
                                         {
                                             <div enctype="multipart/form-data" class="tab-pane fade @showapplicant @Model.GrantSections.isAPActive" id="nav-applicant" role="tabpanel" aria-labelledby="nav-applicant-tab">
                                                 <div class="card-body">
-                                                    <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="applicantForm">
+                                                    <form class="user" enctype="multipart/form-data" method="post" id="applicantForm">
                                                         <div class="row">
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
@@ -595,7 +595,7 @@
                                         {
                                             <div class="tab-pane fade @showowner @Model.GrantSections.isOActive" id="nav-owner" role="tabpanel" aria-labelledby="nav-owner-tab">
                                                 <div class="card-body">
-                                                    <form class="user" asp-action="Modify" asp-controller="Grant" method="post" id="ownerForm">
+                                                    <form class="user" method="post" id="ownerForm">
 
                                                         <div class="row">
                                                             <div class="col-lg-6">

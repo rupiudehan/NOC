@@ -13,7 +13,6 @@ namespace Noc_App.Models.ViewModel
         [Required]
         [RegularExpression(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", ErrorMessage = "Invalid Email Format")]
         [Display(Name = "Applicant Email")]
-        [Remote(action: "IsEmailExistsToModify", controller: "Grant")]
         public string ApplicantEmailID { get; set; }
         [Required]
         [Display(Name = "Identity Proof")]

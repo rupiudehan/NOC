@@ -1166,6 +1166,256 @@ namespace Noc_App.Controllers
             }
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<GrantViewModelEdit> ModifyResult(string id)
+        {
+            try
+            {
+                var grant = (from g in _repo.GetAll()
+                             join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID
+                             join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                             join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                             join s in _subDivisionRepo.GetAll() on t.SubDivisionId equals s.Id
+                             join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
+                             join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
+                             join m in _repoApprovalMaster.GetAll() on a.ApprovalID equals m.Id
+                             join r in _grantrejectionRepository.GetAll() on a.Id equals r.GrantApprovalId
+                             join pr in _grantsectionRepository.GetAll() on r.SectionId equals pr.Id
+                             where g.ApplicationID.ToLower() == id.Trim().ToLower()
+                             && m.Code.ToUpper() == "SF"
+                             && g.ShortFallLevel == a.ProcessLevel && g.IsShortFallCompleted == false
+                             select new
+                             {
+                                 Grant = g,
+                                 Payment = p,
+                                 Village = v,
+                                 Tehsil = t,
+                                 SubDivision = s,
+                                 Division = d
+                             }
+                         ).FirstOrDefault();
+                if (grant != null)
+                {
+                    string startDateStr = string.Format("{0:dd/MM/yyyy}", grant.Grant.ShortFallReportedOn);
+                    string endDateStr = string.Format("{0:dd/MM/yyyy}", DateTime.Now);
+                    DateTime startDate = ParseDate(startDateStr);
+                    DateTime endDate = ParseDate(endDateStr);
+                    int businessDays = CalculateBusinessDays(startDate, endDate);
+                    int totalDays = (await _repoDaysCheckMaster.FindAsync(x => x.Code == "SF")).FirstOrDefault().NoOfDays;
+                    if (businessDays <= totalDays)
+                    {
+                        if (grant.Grant.IsShortFallCompleted == false)
+                        {
+                            var projectType = _projectTypeRepo.GetAll();
+                            var nocPermission = _nocPermissionTypeRepo.GetAll();
+                            var nocType = _nocTypeRepo.GetAll();
+                            var ownerType = _ownerTypeRepo.GetAll();
+                            var siteUnits = _siteUnitsRepo.GetAll();
+                            var villages = _villageRpo.Find(x => x.TehsilBlockId == grant.Village.TehsilBlockId);
+                            var tehsils = _tehsilBlockRepo.Find(x => x.SubDivisionId == grant.Tehsil.SubDivisionId);
+                            var subdivisions = _subDivisionRepo.Find(x => x.DivisionId == grant.SubDivision.DivisionId);
+                            var divisions = _divisionRepo.GetAll();
+                            var khasras = _khasraRepo.Find(x => x.GrantID == grant.Grant.Id);
+                            var owners = (from o in _grantOwnersRepo.GetAll()
+                                          join types in _ownerTypeRepo.GetAll() on o.OwnerTypeId equals types.Id
+                                          where o.GrantId == grant.Grant.Id
+                                          select new
+                                          {
+                                              Owner = o,
+                                              OwnerType = types
+                                          }
+                                          ).ToList();
+
+
+                            List<GrantKhasraViewModelCreate> khasralist = new List<GrantKhasraViewModelCreate>();
+                            List<OwnerViewModelCreate> ownerlist = new List<OwnerViewModelCreate>();
+                            List<OwnerTypeDetails> ownertype = _ownerTypeRepo.GetAll().ToList();
+                            int count = 0;
+                            foreach (var item in owners)
+                            {
+                                ownerlist.Add(new OwnerViewModelCreate
+                                {
+                                    OId = item.Owner.Id,
+                                    SelectedOwnerTypeID = item.Owner.OwnerTypeId,
+                                    RowId = ++count,
+                                    OwnerType = new SelectList(ownertype, "Id", "Name", item.Owner.OwnerTypeId),
+                                    Address = item.Owner.Address,
+                                    Email = item.Owner.Email,
+                                    MobileNo = item.Owner.MobileNo,
+                                    Name = item.Owner.Name,
+                                    OwnerTypeName = item.OwnerType.Name
+                                });
+                            }
+                            double totalArea = 0;
+                            count = 0;
+                            foreach (GrantKhasraDetails item in khasras)
+                            {
+                                SiteUnitsViewModel unitDetails = new SiteUnitsViewModel
+                                {
+                                    KanalOrBigha = item.KanalOrBigha,
+                                    MarlaOrBiswa = item.MarlaOrBiswa,
+                                    SarsaiOrBiswansi = item.SarsaiOrBiswansi,
+                                    SiteUnitId = grant.Grant.SiteAreaUnitId
+                                };
+                                var units = await _calculations.CalculateUnits(unitDetails);
+                                totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
+                                khasralist.Add(new GrantKhasraViewModelCreate { RowId = ++count, KId = item.Id, KanalOrBigha = item.KanalOrBigha, KhasraNo = item.KhasraNo, MarlaOrBiswa = item.MarlaOrBiswa, SarsaiOrBiswansi = item.SarsaiOrBiswansi });
+                            }
+                            List<SiteUnitMaster> unitMaster = (await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.Grant.SiteAreaUnitId)).ToList();
+                            var KanalOrBigha = unitMaster.Find(x => x.UnitCode.ToUpper() == "K");
+                            var MarlaOrBiswa = unitMaster.Find(x => x.UnitCode.ToUpper() == "M");
+                            var SarsaiOrBiswansi = unitMaster.Find(x => x.UnitCode.ToUpper() == "S");
+                            GrantSections sections = new GrantSections();
+                            var sectiondetail = (from p in _grantsectionRepository.GetAll()
+                                                 join r in _grantrejectionRepository.GetAll() on p.Id equals r.SectionId
+                                                 join a in _repoApprovalDetail.GetAll() on r.GrantApprovalId equals a.Id
+                                                 join m in _repoApprovalMaster.GetAll() on a.ApprovalID equals m.Id
+                                                 where r.GrantApprovalId == a.Id && m.Code.ToUpper() == "SF" && a.GrantID == grant.Grant.Id && grant.Grant.ShortFallLevel == a.ProcessLevel
+                                                 select new
+                                                 {
+                                                     project = p,
+                                                     rejectedSection = r
+                                                 }).ToList();
+                            sections.project = 0;
+                            sections.address = 0;
+                            sections.kml = 0;
+                            sections.applicant = 0;
+                            sections.owner = 0;
+                            sections.permission = 0;
+                            foreach (var item in sectiondetail)
+                            {
+                                if (item.project.SectionCode.ToUpper() == "P")
+                                {
+                                    sections.project = 1;
+                                    sections.isprojectCompleted = item.rejectedSection.IsCompleted;
+                                    sections.projectid = item.rejectedSection.Id;
+                                    sections.isPActive = "active"; sections.isADActive = "";
+                                }
+                                else if (item.project.SectionCode.ToUpper() == "AD")
+                                {
+                                    sections.address = 1;
+                                    sections.isaddressCompleted = item.rejectedSection.IsCompleted;
+                                    sections.addressid = item.rejectedSection.Id;
+                                    sections.isADActive = sections.isPActive == "active" ? "" : "active";
+                                }
+                                else if (item.project.SectionCode.ToUpper() == "K")
+                                {
+                                    sections.kml = 1;
+                                    sections.iskmlCompleted = item.rejectedSection.IsCompleted;
+                                    sections.kmlid = item.rejectedSection.Id;
+                                    sections.isKMLActive = sections.isPActive == "active" || sections.isADActive == "active" ? "" : "active";
+                                }
+                                else if (item.project.SectionCode.ToUpper() == "AP")
+                                {
+                                    sections.applicant = 1;
+                                    sections.isapplicantCompleted = item.rejectedSection.IsCompleted;
+                                    sections.applicantid = item.rejectedSection.Id;
+                                    sections.isAPActive = sections.isPActive == "active" || sections.isADActive == "active" || sections.isKMLActive == "active" || sections.isPrActive == "active" ? "" : "active";
+                                }
+                                else if (item.project.SectionCode.ToUpper() == "OW")
+                                {
+                                    sections.owner = 1;
+                                    sections.isownerCompleted = item.rejectedSection.IsCompleted;
+                                    sections.ownerid = item.rejectedSection.Id;
+                                    sections.isOActive = sections.isPActive == "active" || sections.isADActive == "active" || sections.isKMLActive == "active" || sections.isAPActive == "active" || sections.isPrActive == "active" ? "" : "active";
+                                }
+                                else if (item.project.SectionCode.ToUpper() == "PM")
+                                {
+                                    sections.permission = 1;
+                                    sections.ispermissionCompleted = item.rejectedSection.IsCompleted;
+                                    sections.permissionid = item.rejectedSection.Id;
+                                    sections.isPrActive = sections.isPActive == "active" || sections.isADActive == "active" || sections.isKMLActive == "active" ? "" : "active";
+                                }
+                            }
+                            int totalCompleted = (from g in _repo.GetAll()
+                                                  join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
+                                                  join m in _repoApprovalMaster.GetAll() on a.ApprovalID equals m.Id
+                                                  join r in _grantrejectionRepository.GetAll() on a.Id equals r.GrantApprovalId
+                                                  where g.ShortFallLevel == a.ProcessLevel && m.Code == "SF" && r.IsCompleted == 0 && g.Id == grant.Grant.Id
+                                                  select new { rjectionid = r.Id }).Count();
+                            var viewModel = new GrantViewModelEdit
+                            {
+                                Divisions = new SelectList(divisions, "Id", "Name", grant.Division.Id),
+                                ProjectType = new SelectList(projectType, "Id", "Name", grant.Grant.ProjectTypeId),
+                                NocPermissionType = new SelectList(nocPermission, "Id", "Name", grant.Grant.NocPermissionTypeID),
+                                NocType = new SelectList(nocType, "Id", "Name", grant.Grant.NocTypeId),
+                                Village = new SelectList(villages, "Id", "Name", grant.Village.Id),
+                                TehsilBlock = new SelectList(tehsils, "Id", "Name", grant.Tehsil.Id),
+                                SubDivision = new SelectList(subdivisions, "Id", "Name", grant.SubDivision.Id),
+                                SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
+                                GrantKhasras = khasralist,
+                                Owners = ownerlist,
+                                SelectedSiteAreaUnitId = grant.Grant.SiteAreaUnitId,
+                                IsOtherTypeSelected = 0,
+                                IsConfirmed = false,
+                                IsExtension = 0,
+                                TotalArea = totalArea.ToString("#.####"),
+                                TotalAreaSqFeet = (totalArea * 43560).ToString("#.####"),
+                                TotalAreaSqMetre = (totalArea * 4046.86).ToString("#.####"),
+                                Name = grant.Grant.Name,
+                                ApplicantEmailID = grant.Grant.ApplicantEmailID,
+                                ApplicantName = grant.Grant.ApplicantName,
+                                ApplicationID = grant.Grant.ApplicationID,
+                                Hadbast = grant.Grant.Hadbast,
+                                Id = grant.Grant.Id,
+                                PId = grant.Grant.Id,
+                                AdId = grant.Grant.Id,
+                                KId = grant.Grant.Id,
+                                FGrantId = grant.Grant.Id,
+                                KmlGrantId = grant.Grant.Id,
+                                PermisionGrantId = grant.Grant.Id,
+                                OwnerGrantId = grant.Grant.Id,
+                                ApplicantGrantId = grant.Grant.Id,
+                                KmlLinkName = grant.Grant.KMLLinkName,
+                                NocNumber = grant.Grant.NocNumber,
+                                OtherProjectTypeDetail = grant.Grant.OtherProjectTypeDetail,
+                                Pincode = grant.Village.PinCode.ToString(),
+                                PlotNo = grant.Grant.PlotNo,
+                                PreviousDate = grant.Grant.PreviousDate,
+                                OwnerType = new SelectList(ownertype, "Id", "Name"),
+                                SelectedDivisionId = grant.Division.Id,
+                                SelectedNocPermissionTypeID = grant.Grant.NocPermissionTypeID,
+                                SelectedNocTypeId = grant.Grant.NocTypeId,
+                                SelectedProjectTypeId = grant.Grant.ProjectTypeId,
+                                SelectedSubDivisionId = grant.SubDivision.Id,
+                                SelectedTehsilBlockId = grant.Tehsil.Id,
+                                SelectedVillageID = grant.Village.Id,
+                                AddressProofPhotoPath = grant.Grant.AddressProofPhotoPath,
+                                AuthorizationLetterPhotoPath = grant.Grant.AuthorizationLetterPhotoPath,
+                                IDProofPhotoPath = grant.Grant.IDProofPhotoPath,
+                                KMLFilePath = grant.Grant.KMLFilePath,
+                                KUnitValue = KanalOrBigha.UnitValue,
+                                KTimesof = KanalOrBigha.Timesof,
+                                KDivideBy = KanalOrBigha.DivideBy,
+                                MUnitValue = MarlaOrBiswa.UnitValue,
+                                MTimesof = MarlaOrBiswa.Timesof,
+                                MDivideBy = MarlaOrBiswa.DivideBy,
+                                SUnitValue = SarsaiOrBiswansi.UnitValue,
+                                STimesof = SarsaiOrBiswansi.Timesof,
+                                SDivideBy = SarsaiOrBiswansi.DivideBy,
+                                GrantSections = sections,
+                                AreAllSectionCompleted = totalCompleted
+                            };
+                            if (viewModel != null && sectiondetail.Count > 0)
+                                return (viewModel);
+                            
+                        }
+                        
+                    }
+                    
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                
+            }
+            return null;
+        }
+
+
+
         public IActionResult UnAuthorized()
         {
             return View();
@@ -1201,7 +1451,7 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Modify(GrantFinalSubmitViewModelEdit model)
         {
-            var ViewMode = Modify(model.FApplicationId);
+            var ViewMode = (await ModifyResult(model.FApplicationId));
             try
             {
                 if (model != null)
@@ -1225,7 +1475,7 @@ namespace Noc_App.Controllers
                     }
                     if (isValid)
                     {
-                        grantDetail.IsForwarded = grantDetail.ProcessLevel==0?false:true;
+                        grantDetail.IsForwarded = grantDetail.ProcessLevel == 0 ? false : true;
                         grantDetail.IsShortFallCompleted = true;
                         grantDetail.IsShortFall = false;
                         grantDetail.ShortFallCompletedOn = DateTime.Now;
@@ -1713,6 +1963,15 @@ namespace Noc_App.Controllers
                             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
                         }
+
+                        var user = await _repo.GetAll().AnyAsync(x => x.ApplicantEmailID == model.ApplicantEmailID && x.Id != model.applicantGrantId && x.IsRejected != true);
+                        if (user)
+                        {
+                            ModelState.AddModelError("", $"Email {model.ApplicantEmailID} is already in use");
+
+                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        }
+                        
                         GrantRejectionShortfallSection grantrejctionSectionDetail = await _grantrejectionRepository.GetByIdAsync(model.applicantid);
 
                         bool isValid = true;
@@ -2494,22 +2753,6 @@ namespace Noc_App.Controllers
         public async Task<IActionResult> IsEmailExists(string applicantEmailID)
         {
             var user = await _repo.GetAll().AnyAsync(x => x.ApplicantEmailID == applicantEmailID && x.IsRejected != true);
-
-            if (!user)
-            {
-                return Json(true);
-            }
-            else
-            {
-                return Json($"Email {applicantEmailID} is already in use");
-            }
-        }
-
-        [AcceptVerbs("Get", "Post")]
-        [AllowAnonymous]
-        public async Task<IActionResult> IsEmailExistsToModify(string applicantEmailID)
-        {
-            var user = await _repo.GetAll().AnyAsync(x => x.ApplicantEmailID != applicantEmailID && x.IsRejected != true);
 
             if (!user)
             {
