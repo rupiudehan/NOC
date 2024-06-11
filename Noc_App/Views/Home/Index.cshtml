@@ -391,6 +391,7 @@
             body.empty();
             //table.DataTable().clear().destroy();
             $("#divLoader").show(); $('.barcontainer,.drpd').hide();
+            console.log(roleName)
             $.ajax({
                 url: "/Home/GetRoleLevelPendencyReport",
                 type: "POST",

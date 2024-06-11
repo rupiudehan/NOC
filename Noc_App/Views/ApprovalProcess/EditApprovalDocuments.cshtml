@@ -46,7 +46,7 @@
                                     <label asp-for="SiteConditionReportFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
                                         <input asp-for="SiteConditionReportFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.SiteConditionReportFilePath })">Download File</a>
                                         <span asp-validation-for="SiteConditionReportFile" id="SiteConditionReportFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -55,8 +55,8 @@
                                 <div class="form-group">
                                     <label asp-for="CatchmentAreaFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
-                                        <input asp-for="CatchmentAreaFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                    <input asp-for="CatchmentAreaFile" class="form-control custom-file-input1" accept=".pdf" />
+                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.CatchmentAreaFilePath })">Download File</a>
                                         <span asp-validation-for="CatchmentAreaFile" id="CatchmentAreaFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -65,8 +65,8 @@
                                 <div class="form-group">
                                     <label asp-for="DistanceFromCreekFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
-                                        <input asp-for="DistanceFromCreekFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                    <input asp-for="DistanceFromCreekFile" class="form-control custom-file-input1" accept=".pdf" />
+                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.DistanceFromCreekFilePath })">Download File</a>
                                         <span asp-validation-for="DistanceFromCreekFile" id="DistanceFromCreekFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -75,8 +75,8 @@
                                 <div class="form-group">
                                     <label asp-for="GisOrDwsFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
-                                        <input asp-for="GisOrDwsFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                    <input asp-for="GisOrDwsFile" class="form-control custom-file-input1" accept=".pdf" />
+                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.GisOrDwsFilePath })">Download File</a>
                                         <span asp-validation-for="GisOrDwsFile" id="GisOrDwsFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -87,8 +87,8 @@
                                 <div class="form-group">
                                     <label asp-for="KmlFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
-                                        <input asp-for="KmlFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                    <input asp-for="KmlFile" class="form-control custom-file-input1" accept=".pdf" />
+                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.KmlFilePath })">Download File</a>
                                         <span asp-validation-for="KmlFile" id="KmlFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -97,8 +97,8 @@
                                 <div class="form-group">
                                     <label asp-for="CrossSectionOrCalculationFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
-                                        <input asp-for="CrossSectionOrCalculationFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                    <input asp-for="CrossSectionOrCalculationFile" class="form-control custom-file-input1" accept=".pdf" />
+                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.CrossSectionOrCalculationFilePath })">Download File</a>
                                         <span asp-validation-for="CrossSectionOrCalculationFile" id="CrossSectionOrCalculationFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -107,8 +107,8 @@
                                 <div class="form-group">
                                     <label asp-for="LSectionOfDrainFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
-                                        <input asp-for="LSectionOfDrainFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                    <input asp-for="LSectionOfDrainFile" class="form-control custom-file-input1" accept=".pdf" />
+                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.LSectionOfDrainFilePath })">Download File</a>
                                         <span asp-validation-for="LSectionOfDrainFile" id="LSectionOfDrainFile-error" class="text-danger"></span>
                                     </div>
                                 </div>

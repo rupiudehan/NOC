@@ -898,11 +898,22 @@ namespace Noc_App.Controllers
 
                     return View("NotFound");
                 }
-                ApprovalDocumentsViewModelEdit model = new ApprovalDocumentsViewModelEdit
-                {
-                    GrantApprovalDocId= docId
-                };
-
+                ApprovalDocumentsViewModelEdit model = (from g in _repo.GetAll()
+                              join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID
+                              join doc in _repoApprovalDocument.GetAll() on app.Id equals doc.GrantApprovalID
+                              where g.ApplicationID == grantId
+                              select new ApprovalDocumentsViewModelEdit
+                              {
+                                  CatchmentAreaFilePath=doc.CatchmentAreaAndFlowPath,
+                                  CrossSectionOrCalculationFilePath=doc.CrossSectionOrCalculationSheetReportPath,
+                                  DistanceFromCreekFilePath=doc.DistanceFromCreekPath,
+                                  GisOrDwsFilePath=doc.GISOrDWSReportPath,
+                                  KmlFilePath=doc.KmlFileVerificationReportPath,
+                                  LSectionOfDrainFilePath=doc.DrainLSectionPath,
+                                  SiteConditionReportFilePath=doc.SiteConditionReportPath,
+                                  GrantApprovalDocId=docId
+                              }
+                              ).FirstOrDefault();
                 
                 return View(model);
             }

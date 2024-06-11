@@ -41,6 +41,7 @@ namespace Noc_App.Models.ViewModel
         public int PreviousProcessLevel { get; set; }
         public int ProcessedLevel { get; set; }
         public DateTime CreatedOn { get; set; }
+        public double TotalArea { get; set; }
         //[Display(Name = "Sub-Division")]
         //public string SelectedSubDivisionId { get; set; }
         //public IEnumerable<SelectListItem> SubDivisions { get; set; }
