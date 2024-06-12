@@ -6,5 +6,6 @@
         public string ApplicationID { get; set; }
         public string OrderId { get; set; }
         public string Message { get; set; }
+        public double TotalAmount { get; set; }
     }
 }

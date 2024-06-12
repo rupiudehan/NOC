@@ -32,6 +32,7 @@ namespace Noc_App.Models.ViewModel
         public int DivisionId { get; set; }
         public int SubDivisionId { get; set; }
         public bool IsForwarded { get; set; }
+        public bool IsShortFall { get; set; }
         public string LoggedInRole { get; set; }
         public long GrantApprovalId { get; set; }
         public string ProcessedToUser { get; set; }
@@ -42,6 +43,7 @@ namespace Noc_App.Models.ViewModel
         public int ProcessedLevel { get; set; }
         public DateTime CreatedOn { get; set; }
         public double TotalArea { get; set; }
+        public string Remarks { get; set; }
         //[Display(Name = "Sub-Division")]
         //public string SelectedSubDivisionId { get; set; }
         //public IEnumerable<SelectListItem> SubDivisions { get; set; }

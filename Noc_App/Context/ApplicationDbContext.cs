@@ -83,8 +83,8 @@ namespace Noc_App.Context
                 );
 
             modelBuilder.Entity<RecommendationDetail>().HasData(
-                new RecommendationDetail{ Id = 1, Name = "Approved", Code = "A" },
-                new RecommendationDetail { Id = 2, Name = "Rejected", Code = "R" },
+                new RecommendationDetail{ Id = 1, Name = "For Approval", Code = "A" },
+                new RecommendationDetail { Id = 2, Name = "For Rejection", Code = "R" },
                 new RecommendationDetail { Id = 3, Name = "Nothing", Code = "NA" }
                 );
 

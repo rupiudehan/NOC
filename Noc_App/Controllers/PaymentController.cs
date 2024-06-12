@@ -367,7 +367,7 @@ namespace Noc_App.Controllers
                 };
                 await _repoPayment.CreateAsync(payment);
                 await _repoChallanDetails.UpdateAsync(challanDetail);
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, ResponseData.challandata.deptRefNo));
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, ResponseData.challandata.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
                 _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
                 return RedirectToAction("Index", "Grant", new { Id = id });
             }
