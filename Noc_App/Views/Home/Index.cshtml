@@ -13,6 +13,97 @@
 
 @if (Model != null)
 {
+    if (Model.LoggedInRole == "CHIEF ENGINEER HQ")
+    {
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body" style="background-color:#4e73df;color:white;">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="pe-7s-cash"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <center><h5>
+                                            <div class="stat-text"><span class="count">@Model.TotalCount</span></div>
+                                            <div class="stat-heading">Total Applications Received</div>
+                                        </h5>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body" style="background-color:#1cc88a;color:white">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-2">
+                                <i class="pe-7s-cart"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <center>
+                                        <h5>
+                                            <div class="stat-text"><span class="count">@Model.ApprovedCount</span></div>
+                                            <div class="stat-heading">Approved</div>
+                                        </h5>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body" style="background-color:#e74f40;color:white;">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-3">
+                                <i class="pe-7s-browser"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <center>
+                                        <h5>
+                                            <div class="stat-text"><span class="count">@Model.RejectedCount</span></div>
+                                            <div class="stat-heading">Rejected</div>
+                                        </h5>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body" style="background-color:#f6c23e;color:white">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-4">
+                                <i class="pe-7s-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <center>
+                                        <h5>
+                                            <div class="stat-text"><span class="count">@Model.Pending</span></div>
+                                            <div class="stat-heading">Balance</div>
+                                        </h5>
+                                    </center>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     <div class="row">
 
         <div class="col-lg-12">

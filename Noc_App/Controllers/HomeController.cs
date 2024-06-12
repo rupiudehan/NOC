@@ -24,6 +24,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<VillageDetails> _villageRpo;
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         private readonly IRepository<UserRoleDetails> _userRolesRepository;
+        private readonly IRepository<ReportApplicationCountViewModel> _grantReportAppCountDetailsRepo;
         //private readonly IEmployeeRepository _employeeRepository;
         //[Obsolete]
         //private readonly IHostingEnvironment _hostingEnvironment;
@@ -32,6 +33,7 @@ namespace Noc_App.Controllers
         public HomeController(ILogger<HomeController> logger, IRepository<DashboardPendencyAll> pendencyDetailsRepo
             , IRepository<DivisionDetails> divisionRepo, IRepository<DashboardPendencyViewModel> pendencyRepo, IRepository<SubDivisionDetails> subDivisionRepo
             , IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<UserRoleDetails> userRolesRepository
+            , IRepository<ReportApplicationCountViewModel> grantReportAppCountDetailsRepo
             )
         {            
             _pendencyDetailsRepo = pendencyDetailsRepo;
@@ -41,6 +43,7 @@ namespace Noc_App.Controllers
             _villageRpo = villageRepo;
             _tehsilBlockRepo=tehsilBlockRepo;
             _userRolesRepository=userRolesRepository;
+            _grantReportAppCountDetailsRepo = grantReportAppCountDetailsRepo;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
@@ -114,6 +117,8 @@ namespace Noc_App.Controllers
                                      }
                                                 ).Distinct().ToList();
                     }
+                    ReportApplicationCountViewModel modelreport = new ReportApplicationCountViewModel();
+                    modelreport =  _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscount", "0", "0", "0", "0").FirstOrDefault();
                     //subdivisions = divisions != null && divisions.Count()>0 ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
                     DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
                     {
@@ -121,7 +126,12 @@ namespace Noc_App.Controllers
                         SubDivisions = new SelectList(subdivisions, "Id", "Name"),
                         RoleName = role.ToUpper(),
                         hdnDivisionId = divisions.Count()>0? divisions.FirstOrDefault().Id:0,
-                        hdnSubDivisionId = subdivisions.Count() > 0 ? subdivisions.FirstOrDefault().Id : 0
+                        hdnSubDivisionId = subdivisions.Count() > 0 ? subdivisions.FirstOrDefault().Id : 0,
+                        TotalCount= modelreport.TotalCount,
+                        ApprovedCount= modelreport.ApprovedCount,
+                        RejectedCount= modelreport.RejectedCount,
+                        Pending= modelreport.TotalCount- (modelreport.ApprovedCount+ modelreport.RejectedCount),
+                        LoggedInRole= role
                     };
                     //return View(_employeeRepository.GetAllEmployees());
                     return View(model);

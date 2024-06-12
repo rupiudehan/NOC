@@ -45,6 +45,7 @@ namespace Noc_App.Context
             modelBuilder.Entity<GrantUnprocessedAppDetails>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyAll>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyViewModel>().HasNoKey();
+            modelBuilder.Entity<ReportApplicationCountViewModel>().HasNoKey();
 
             modelBuilder.Entity<DistrictDetails>().HasData(
                new DistrictDetails { Id = 1, Name = "Amritsar", LGD_ID = 27 },

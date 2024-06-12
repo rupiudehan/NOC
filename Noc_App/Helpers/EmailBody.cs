@@ -20,7 +20,7 @@ namespace Noc_App.Helpers
                         <a href=""http://localhost:4200/reset?email={email}&code={emailToken}"" target=""_blank"" style=""background:#0d6efd;padding:10px;border:none;
                         color:white;border-radius:4px;display:block;margin:0 auto; width:50%;text-align:center;text-decoration:none;"">Reset Password</a>
                         <p>
-                            <b>No Reply EMAIL. Also, display a message ""This is auto generated email, do not reply to this email id"".</b>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
                         </p><br>
                         <p>Best Regards,<br><br>
                         Department of Water Resources, Punjab</p>
@@ -43,7 +43,7 @@ namespace Noc_App.Helpers
                         <p>Username: {email}</p>
                         <p>Password: {password}</p>
                         <p>
-                            <b>No Reply EMAIL. Also, display a message ""This is auto generated email, do not reply to this email id"".</b>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
                         </p>
                         <br>
                         <p>Best Regards,<br><br>
@@ -65,13 +65,13 @@ namespace Noc_App.Helpers
                     <div>
                         <p>Dear {applicantName},</p>
                         
-                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully, but payment is pending
-                        <p>
-                            <b>No Reply EMAIL. Also, display a message ""This is auto generated email, do not reply to this email id"".</b>
-                        </p>
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully, but payment is pending.
                         <br />
                         Your application will be processed only after successful payment. 
-                        </p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
+                        </p><p>Keep track of its progress easily by using this Application ID on our portal.</p>
+                        <p>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
+                        </p><br>
                         <p>Best Regards,<br><br>
                         Department of Water Resources, Punjab</p>
                     </div>
@@ -91,10 +91,10 @@ namespace Noc_App.Helpers
                     <div>
                         <p>Dear {applicantName},</p>
                         
-                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been updated successfully.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been updated successfully.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p>
                         <p>
-                            <b>No Reply EMAIL. Also, display a message ""This is auto generated email, do not reply to this email id"".</b>
-                        </p>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
+                        </p><br>
                         <p>Best Regards,<br><br>
                         Department of Water Resources, Punjab</p>
                     </div>
@@ -114,10 +114,10 @@ namespace Noc_App.Helpers
                     <div>
                         <p>Dear {applicantName},</p>
                         
-                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully. <br/>Payment of {totalamount} Rs./- has been received with transaction number {transactionID}.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p><br>
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully. <br/>Payment of ₹{totalamount} has been received with transaction number {transactionID}.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p>
                         <p>
-                            <b>No Reply EMAIL. Also, display a message ""This is auto generated email, do not reply to this email id"".</b>
-                        </p>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
+                        </p><br>
                         <p>Best Regards,<br><br>
                         Department of Water Resources, Punjab</p>
                     </div>
@@ -137,11 +137,11 @@ namespace Noc_App.Helpers
                     <div>
                         <p>Dear {applicantName},</p>
                         
-                        <p>Your application for the NOC Certificate with ID <b>{applicationID}</b> has been rejected due to {reason}.</p><p>Please apply again to get NOC certificate</p><br>
+                        <p>Your application for the NOC Certificate with ID <b>{applicationID}</b> has been rejected due to {reason}.</p><p>Please apply again to get NOC certificate</p>
                         
                         <p>
-                            <b>No Reply EMAIL. Also, display a message ""This is auto generated email, do not reply to this email id"".</b>
-                        </p>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
+                        </p><br>
                         <p>Best Regards,<br><br>
                         Department of Water Resources, Punjab</p>
                     </div>
@@ -169,7 +169,7 @@ namespace Noc_App.Helpers
                             The above link shall expire after 7 days, failing to which you have to reapply for the concerned NOC.
                         </p>
                         <p>
-                            <b>No Reply EMAIL. Also, display a message ""This is auto generated email, do not reply to this email id"".</b>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
                         </p>
                         <br>
                         <p>Best Regards,<br><br>

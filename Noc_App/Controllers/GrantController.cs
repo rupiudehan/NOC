@@ -857,16 +857,16 @@ namespace Noc_App.Controllers
                                         double area = Convert.ToDouble(model.TotalArea) - 1;
                                         string area2 = area.ToString("#.####");
                                         TotalPayment = 1000;
-                                        calculation = "For 1 Acre, Amount is " + TotalPayment.ToString();
+                                        calculation = "For 1 Acre, Amount is ₹" + TotalPayment.ToString();
                                         int count = 0;
                                         do
                                         {
                                             count++;
                                             area = area - 1;
                                         } while (area > 0);
-                                    additionalcalculation = "On Additional " + area2 + " Acres, Amount is ₹" + 250.ToString() + " per/Acre";
+                                    additionalcalculation = "Additional Area Calculation With Amount ₹" + 250.ToString() + "per/Acre : On Additional " + area + " Acres, Amount is ₹" + (TotalPayment + (count * 250) - 1000).ToString();
                                         TotalPayment = TotalPayment + (count * 250);
-                                    totalareacalculation = ". For Total " + model.TotalArea.ToString() + " Acres, Amount is ₹" + TotalPayment.ToString()+" (NON-REFUNDABLE)";
+                                    totalareacalculation = "Amount Calculation for Total " + model.TotalArea.ToString() + " Acres : ₹" + TotalPayment.ToString()+" (NON-REFUNDABLE)";
                                     }
                                     if (TotalPayment > 0)
                                     {

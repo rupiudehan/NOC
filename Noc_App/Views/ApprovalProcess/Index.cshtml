@@ -72,7 +72,7 @@
                                                             <th>Edit Documents</th>
                                                         }
                                                     }
-                                                    @if (arry[0].Any(x => x.IsForwarded == true && x.rejectionmust != 1 && x.IsShortFall == false))
+                                                    @if (arry[0].Any(x => x.IsForwarded == true && x.rejectionmust != 1))
                                                     {
                                                         <th>Recommendations</th>
                                                     }
@@ -153,6 +153,8 @@
                                                     {
                                                         @if (arry[0].Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.rejectionmust != 1))
                                                         {
+                                                            @if (arry[0].Any(x => x.GrantApprovalDocId != 0 && x.rejectionmust != 1 && x.IsShortFall == false))
+                                                            {
                                                             @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == false)
                                                             {
                                                                 @if (data.GrantApprovalDocId != 0)
@@ -236,8 +238,14 @@
                                                                         <td></td>
                                                                     }
                                                                 }
+                                                                }
                                                             }
+                                                            @* else
+                                                            {
+                                                                <td></td>
+                                                            } *@
                                                         }
+                                                        
                                                         @if (arry[0].Any(x => x.IsForwarded == true && x.rejectionmust != 1))
                                                         {
                                                             @if (data.IsForwarded == true)
@@ -265,14 +273,20 @@
                                                                 <td></td>
                                                             }
                                                         }
-                                                        @if (arry[0].Any(x => x.rejectionmust != 1))
+                                                        @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
                                                         {
                                                             @if (data.rejectionmust != 1)
                                                             {
 
                                                                 if (data.IsShortFall)
                                                                 {
-                                                                    <td>Reverted Due to Discrepancy</td>
+                                                                    @if (data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                                                    {
+                                                                        <td>Reverted Due to Discrepancy</td>
+                                                                    }else{
+                                                                        <td>Reverted Due to Discrepancy</td>
+                                                                        <td>Reverted Due to Discrepancy</td>
+                                                                    }
                                                                 }
                                                                 else
                                                                 {
@@ -301,9 +315,17 @@
                                                             }
                                                             else
                                                             {
+                                                                @if (data.LoggedInRole == "CHIEF ENGINEER HQ"){
+                                                                    <td></td>
+                                                                }else{
                                                                 <td></td>
                                                                 <td></td>
+                                                                }
                                                             }
+                                                        }
+                                                        else
+                                                        {
+                                                            <td></td>
                                                         }
                                                         @if (arry[0].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || x.LoggedInRole == "CHIEF ENGINEER HQ") && x.rejectionmust != 1))
                                                         {

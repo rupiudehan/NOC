@@ -80,6 +80,7 @@ builder.Services.AddScoped<IRepository<GrantApprovalDetail>, Repository<GrantApp
 builder.Services.AddScoped<IRepository<GrantApprovalProcessDocumentsDetails>, Repository<GrantApprovalProcessDocumentsDetails>>();
 builder.Services.AddScoped<IRepository<GrantApprovalMaster>, Repository<GrantApprovalMaster>>();
 builder.Services.AddScoped<IRepository<GrantUnprocessedAppDetails>, Repository<GrantUnprocessedAppDetails>>();
+builder.Services.AddScoped<IRepository<ReportApplicationCountViewModel>, Repository<ReportApplicationCountViewModel>>();
 builder.Services.AddScoped<IRepository<SiteUnitMaster>, Repository<SiteUnitMaster>>();
 builder.Services.AddScoped<IRepository<ChallanDetails>, Repository<ChallanDetails>>();
 builder.Services.AddScoped<IRepository<DashboardPendencyAll>, Repository<DashboardPendencyAll>>();
