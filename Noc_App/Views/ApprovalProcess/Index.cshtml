@@ -32,7 +32,7 @@
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                             <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Pending</a>
                             
-                            @if (arry[0].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY") || arry[1].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY") || arry[2].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY"))
+                            @if ((arry[0].Any() && arry[0].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")) || (arry[1].Any() && arry[1].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")) || (arry[2].Any() && arry[2].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")))
                             {
                                 <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Forwarded</a>
                                 @if (arry[2] != null && arry[2].Any() && !arry[2].Any(x => x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER"))

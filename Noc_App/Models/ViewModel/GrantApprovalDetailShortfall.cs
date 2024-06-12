@@ -9,6 +9,7 @@ namespace Noc_App.Models.ViewModel
         [Display(Name ="Section Name")]
         public List<int> SelectedGrantSectionIDs { get; set; }
         public IEnumerable<GrantSectionsDetails> GrantSectionsDetailsList { get; set; }
+        [Required]
         public string Remarks { get; set; }
     }
 }

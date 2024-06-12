@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Update Application for Issue of NOC-Drainage";
     Layout = "~/Views/Shared/_LayoutWithoutLinks.cshtml";
+    var dd = Model.GrantSections;
     string showproject = Model.GrantSections.isPActive == "active" ? "show" : "";
     string showaddress = Model.GrantSections.isADActive == "active" ? "show" : "";
     string showkml = Model.GrantSections.isKMLActive == "active" ? "show" : "";

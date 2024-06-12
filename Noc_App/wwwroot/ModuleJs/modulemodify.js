@@ -25,7 +25,8 @@ if (document.getElementById("SelectedNocTypeId") != null) {
 
     });
 }
-function LoadFinalBlock(grantId,applicationid) {
+function LoadFinalBlock(grantId, applicationid) {
+    console.log(grantId)
     $('.finalSubmit').empty();
     var divs = `
                 <hr />
@@ -356,7 +357,7 @@ $(function () {
                                 $('#projectForm')[0].reset();
                                 $('#AreAllSectionCompleted').val(response.completed);
                                 if ($('#AreAllSectionCompleted').val() == '0') {
-                                    LoadFinalBlock();                                
+                                    LoadFinalBlock(projectid, projectApplicationId);                               
                                 }
                             } else {
                                 var errors = response.errors.join('<br/>');
@@ -440,7 +441,7 @@ $(function () {
                                     $('#' + module + 'Form')[0].reset();
                                     $('#AreAllSectionCompleted').val(response.completed);
                                     if ($('#AreAllSectionCompleted').val() == '0') {
-                                        LoadFinalBlock();
+                                        LoadFinalBlock(addressid, AddressApplicationId);
                                     }
                                 } else {
                                     var errors = response.errors.join('<br/>');
@@ -459,9 +460,10 @@ $(function () {
             }
         });
     }
-
+ 
     if (document.getElementById("kmlForm") != null) {
         $('#kmlForm').on('submit', function (event) {
+            alert('d');
             event.preventDefault();
             var module = 'kml';
             var formData = new FormData();
@@ -508,8 +510,9 @@ $(function () {
                                     resultProjectMessage.html('<div class="alert alert-success">Detail saved successfully!<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
                                     //$('#' + module + 'Form')[0].reset();
                                     $('#AreAllSectionCompleted').val(response.completed);
+                                    
                                     if ($('#AreAllSectionCompleted').val() == '0') {
-                                        LoadFinalBlock();
+                                        LoadFinalBlock(KmlGrantId, kmlApplicationId);
                                     }
                                 } else {
                                     var errors = response.errors.join('<br/>');
@@ -569,7 +572,7 @@ $(function () {
                                 //$('#projectForm')[0].reset();
                                 $('#AreAllSectionCompleted').val(response.completed);
                                 if ($('#AreAllSectionCompleted').val() == '0') {
-                                    LoadFinalBlock();
+                                    LoadFinalBlock(permissionGrantId, permissionApplicationId);
                                 }
                             } else {
                                 var errors = response.errors.join('<br/>');
@@ -730,7 +733,7 @@ $(function () {
                             // $('#projectForm')[0].reset();
                             $('#AreAllSectionCompleted').val(response.completed);
                             if ($('#AreAllSectionCompleted').val() == '0') {
-                                LoadFinalBlock();
+                                LoadFinalBlock(OwnerGrantId, OwnerApplicationId);
                             }
                         } else {
                             var errors = response.errors.join('<br/>');
