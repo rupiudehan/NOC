@@ -868,7 +868,7 @@ namespace Noc_App.Controllers
                                     {
                                         area2 = (Convert.ToDouble(area2) * -1).ToString();
                                     }
-                                    additionalcalculation = "Additional Area Calculation With Amount ₹" + 250.ToString() + "per/Acre : On Additional " + area2 + " Acres, Amount is ₹" + (TotalPayment + (count * 250) - 1000).ToString();
+                                    additionalcalculation = "Additional Area Calculation With Amount ₹" + 250.ToString() + " per/Acre : On Additional " + area2 + " Acres, Amount is ₹" + (TotalPayment + (count * 250) - 1000).ToString();
                                         TotalPayment = TotalPayment + (count * 250);
                                     totalareacalculation = "Amount Calculation for Total " + model.TotalArea.ToString() + " Acres : ₹" + TotalPayment.ToString()+" (NON-REFUNDABLE)";
                                     }
