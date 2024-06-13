@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Noc_App.Helpers;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Noc_App.Models.ViewModel
 {
@@ -33,9 +34,9 @@ namespace Noc_App.Models.ViewModel
         [MaxLength(50, ErrorMessage = "Plot No. cannot exceed 50 characters")]
         [Display(Name ="Plot No.")]
         public string? PlotNo { get; set; }
-        [Required]
-        [Display(Name = "Owner Type")]
-        public IEnumerable<SelectListItem> OwnerType { get; set; }
+        //[Required]
+        //[Display(Name = "Owner Type")]
+        //public IEnumerable<SelectListItem> OwnerType { get; set; }
         [Display(Name="Pin Code")]
         public string Pincode { get; set; }
         [Required]
@@ -57,6 +58,16 @@ namespace Noc_App.Models.ViewModel
         [Required]
         [Display(Name = "Address Proof")]
         public IFormFile AddressProofPhoto { get; set; }
+        [Required]
+        [Display(Name = "Plan Sanction Authority")]
+        public int SelectedPlanSanctionAuthorityId { get; set; }       
+        public IEnumerable<SelectListItem> PlanSanctionAuthorityMaster { get; set; }
+        [Required]
+        [Display(Name = "Layout Plan")]
+        public IFormFile LayoutPlanFilePhoto { get; set; }
+        [Required]
+        [Display(Name = "Farad")]
+        public IFormFile FaradFilePoto { get; set; }
         [Required]
         public IFormFile KMLFile { get; set; }
         [Required]

@@ -15,6 +15,7 @@ using System.Security.Cryptography;
 using Noc_App.Clients;
 using System.Globalization;
 using Newtonsoft.Json;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Noc_App.Controllers
 {
@@ -43,6 +44,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<GrantSectionsDetails> _grantsectionRepository;
         private readonly IRepository<GrantApprovalMaster> _repoApprovalMaster;
         private readonly IRepository<DaysCheckMaster> _repoDaysCheckMaster;
+        private readonly IRepository<PlanSanctionAuthorityMaster> _repoPlanSanctionAuthtoryMaster;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
@@ -54,7 +56,7 @@ namespace Noc_App.Controllers
             IRepository<GrantApprovalDetail> repoApprovalDetail, IWebHostEnvironment hostEnvironment, IRepository<SiteUnitMaster> repoSiteUnitMaster
             , ICalculations calculations, IRepository<GrantRejectionShortfallSection> grantrejectionRepository
             , IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<GrantApprovalMaster> repoApprovalMaster
-            , IRepository<DaysCheckMaster> repoDaysCheckMaster)
+            , IRepository<DaysCheckMaster> repoDaysCheckMaster, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
         {
             _villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
@@ -80,6 +82,7 @@ namespace Noc_App.Controllers
             _grantsectionRepository = grantsectionRepository;
             _repoApprovalMaster = repoApprovalMaster;
             _repoDaysCheckMaster=repoDaysCheckMaster;
+            _repoPlanSanctionAuthtoryMaster=repoPlanSanctionAuthtoryMaster;
         }
 
         [AllowAnonymous]
@@ -522,10 +525,12 @@ namespace Noc_App.Controllers
             var nocType = _nocTypeRepo.GetAll();
             var ownerType = _ownerTypeRepo.GetAll();
             var siteUnits = _siteUnitsRepo.GetAll();
+            var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll();
             var viewModel = new GrantViewModelCreate
             {
                 Divisions = new SelectList(divisions, "Id", "Name"),
                 ProjectType = new SelectList(projectType, "Id", "Name"),
+                PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name"),
                 NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
                 NocType = new SelectList(nocType, "Id", "Name"),
                 Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
@@ -561,6 +566,7 @@ namespace Noc_App.Controllers
                     var nocType = _nocTypeRepo.GetAll();
                     var ownerType = _ownerTypeRepo.GetAll();
                     var siteUnits = _siteUnitsRepo.GetAll();
+                    var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll();
                     var filteredSubdivisions = await _subDivisionRepo.FindAsync(c => c.DivisionId == model.SelectedDivisionId);
                     var filteredtehsilBlock = await _tehsilBlockRepo.FindAsync(c => c.SubDivisionId == model.SelectedSubDivisionId);
                     var fileteedvillage = await _villageRpo.FindAsync(c => c.TehsilBlockId == model.SelectedTehsilBlockId);
@@ -570,28 +576,31 @@ namespace Noc_App.Controllers
                     {
                         var viewModel = new GrantViewModelCreate
                         {
-                            Village = new SelectList(fileteedvillage, "Id", "Name"),
-                            TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name"),
-                            SubDivision = new SelectList(filteredSubdivisions, "Id", "Name"),
-                            Divisions = new SelectList(divisions, "Id", "Name"),
-                            ProjectType = new SelectList(projectType, "Id", "Name"),
-                            NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
-                            NocType = new SelectList(nocType, "Id", "Name"),
-                            OwnerType = new SelectList(ownerType, "Id", "Name"),
+                            Village = new SelectList(fileteedvillage, "Id", "Name",model.SelectedVillageID),
+                            TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name", model.SelectedTehsilBlockId),
+                            SubDivision = new SelectList(filteredSubdivisions, "Id", "Name", model.SelectedSubDivisionId),
+                            Divisions = new SelectList(divisions, "Id", "Name", model.SelectedDivisionId),
+                            PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name",model.SelectedPlanSanctionAuthorityId),
+                            ProjectType = new SelectList(projectType, "Id", "Name",model.SelectedProjectTypeId),
+                            NocPermissionType = new SelectList(nocPermission, "Id", "Name",model.SelectedNocPermissionTypeID),
+                            NocType = new SelectList(nocType, "Id", "Name",model.SelectedNocTypeId),
+                            //OwnerType = new SelectList(ownerType, "Id", "Name"),
                             SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
                             GrantKhasras = model.GrantKhasras,
                             Owners = model.Owners,
                             Pincode = selectedvillage.PinCode.ToString()
                         };
-                        model.OwnerType = viewModel.OwnerType;
-                        if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.KmlLinkName != null && model.KmlLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
+                        //model.OwnerType = viewModel.OwnerType;
+                        if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.LayoutPlanFilePhoto != null && model.FaradFilePoto != null && model.KmlLinkName != null && model.KmlLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
                             && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.ApplicantName != null
-                            && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.IsConfirmed
+                            && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.SelectedPlanSanctionAuthorityId > 0 && model.IsConfirmed
                             )
                         {
                             int IdProofValidation = AllowedCheckExtensions(model.IDProofPhoto, "proof");
                             int AddressProofValidation = AllowedCheckExtensions(model.AddressProofPhoto, "proof");
                             int AuthorizationValidation = AllowedCheckExtensions(model.AuthorizationLetterPhoto, "proof");
+                            int LayoutPlanValidation = AllowedCheckExtensions(model.LayoutPlanFilePhoto, "proof");
+                            int FaradValidation = AllowedCheckExtensions(model.FaradFilePoto, "proof");
                             int kmlFileValidation = AllowedCheckExtensions(model.KMLFile, "kml");
                             if (IdProofValidation == 0)
                             {
@@ -604,6 +613,34 @@ namespace Noc_App.Controllers
                             else if (IdProofValidation == 2)
                             {
                                 ErrorMessage = "ID proof field is required";
+                                ModelState.AddModelError("", ErrorMessage);
+                                return View(viewModel);
+                            }
+                            if (LayoutPlanValidation == 0)
+                            {
+                                ErrorMessage = $"Invalid layout plan file type. Please upload a JPG, PNG, or PDF file";
+                                ModelState.AddModelError("", ErrorMessage);
+
+                                return View(viewModel);
+
+                            }
+                            else if (LayoutPlanValidation == 2)
+                            {
+                                ErrorMessage = "Layout plan field is required";
+                                ModelState.AddModelError("", ErrorMessage);
+                                return View(viewModel);
+                            }
+                            if (FaradValidation == 0)
+                            {
+                                ErrorMessage = $"Invalid farad file type. Please upload a JPG, PNG, or PDF file";
+                                ModelState.AddModelError("", ErrorMessage);
+
+                                return View(viewModel);
+
+                            }
+                            else if (FaradValidation == 2)
+                            {
+                                ErrorMessage = "Farad field is required";
                                 ModelState.AddModelError("", ErrorMessage);
                                 return View(viewModel);
                             }
@@ -655,6 +692,18 @@ namespace Noc_App.Controllers
                                 ModelState.AddModelError("", ErrorMessage);
                                 return View(viewModel);
                             }
+                            if (!AllowedFileSize(model.LayoutPlanFilePhoto))
+                            {
+                                ErrorMessage = "Layout plan file size exceeds the allowed limit of 4MB";
+                                ModelState.AddModelError("", ErrorMessage);
+                                return View(viewModel);
+                            }
+                            if (!AllowedFileSize(model.FaradFilePoto))
+                            {
+                                ErrorMessage = "Farad file size exceeds the allowed limit of 4MB";
+                                ModelState.AddModelError("", ErrorMessage);
+                                return View(viewModel);
+                            }
                             if (!AllowedFileSize(model.AddressProofPhoto))
                             {
                                 ErrorMessage = "Address proof file size exceeds the allowed limit of 4MB";
@@ -678,6 +727,8 @@ namespace Noc_App.Controllers
                             string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto, "IDProof");
                             string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
                             string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
+                            string uniqueLayoutPlanFileName = ProcessUploadedFile(model.LayoutPlanFilePhoto, "LayoutPlan");
+                            string uniqueFaradFileName = ProcessUploadedFile(model.FaradFilePoto, "Farad");
                             string uniqueKmlFileName = ProcessUploadedFile(model.KMLFile, "kml");
                             if (model.IsExtension == 1)
                             {
@@ -763,42 +814,6 @@ namespace Noc_App.Controllers
 
                                     return View(viewModel);
                                 }
-                                //string khasraString = JsonConvert.SerializeObject(khasraList);
-                                //string ownerString = JsonConvert.SerializeObject(ownerList);
-                                //string[] jsonb = new string[2];
-                                //jsonb[0] = khasraString;
-                                //jsonb[1] = ownerString;
-                                //object[] parameters = new object[26];
-                                //parameters[0] = model.Name;
-                                //parameters[1] = model.SelectedSiteAreaUnitId;
-                                //parameters[2] = model.SelectedProjectTypeId ?? 0;
-                                //parameters[3] = model.OtherProjectTypeDetail;
-                                //parameters[4] = model.Hadbast;
-                                //parameters[5] = model.PlotNo;
-                                //parameters[6] = model.SelectedVillageID;
-                                //parameters[7] = uniqueAddressProofFileName;
-                                //parameters[8] = uniqueKmlFileName;
-                                //parameters[9] = model.KmlLinkName;
-                                //parameters[10] = model.ApplicantName;
-                                //parameters[11] = model.ApplicantEmailID;
-                                //parameters[12] = uniqueIDProofFileName;
-                                //parameters[13] = uniqueAuthLetterFileName;
-                                //parameters[14] = model.SelectedNocPermissionTypeID ?? 0;
-                                //parameters[15] = model.SelectedNocTypeId ?? 0;
-                                //parameters[16] = Convert.ToBoolean(model.IsExtension);
-                                //parameters[17] = model.NocNumber;
-                                //parameters[18] = model.PreviousDate ?? DateTime.Now;
-                                //parameters[19] = model.IsConfirmed;
-                                //parameters[20] = model.ApplicationID;
-                                //parameters[21] = 0;
-                                //parameters[22] = true;
-                                //parameters[23] = DateTime.Now;
-
-                                //string msg=await  _repo.ExecuteSaveOrderFunction("GrantApplicationCreate", model.Name,model.SelectedSiteAreaUnitId,model.SelectedProjectTypeId??0,model.OtherProjectTypeDetail!=""? model.OtherProjectTypeDetail:null
-                                //    , model.Hadbast,model.PlotNo,model.SelectedVillageID, uniqueAddressProofFileName,uniqueKmlFileName,model.KmlLinkName,model.ApplicantName,model.ApplicantEmailID
-                                //    ,uniqueIDProofFileName,uniqueAuthLetterFileName,model.SelectedNocPermissionTypeID??0,model.SelectedNocPermissionTypeID??0, Convert.ToBoolean(model.IsExtension), model.NocNumber!=""? model.NocNumber:null,
-                                //    model.PreviousDate??DateTime.Now,model.IsConfirmed,model.ApplicationID,0,true,DateTime.Now, khasraString,ownerString);
-
                                 GrantDetails obj = new GrantDetails
                                 {
                                     Name = model.Name,
@@ -817,6 +832,9 @@ namespace Noc_App.Controllers
                                     IsExtension = Convert.ToBoolean(model.IsExtension),
                                     KMLFilePath = uniqueKmlFileName,
                                     KMLLinkName = model.KmlLinkName,
+                                    LayoutPlanFilePath=uniqueLayoutPlanFileName,
+                                    FaradFilePath=uniqueFaradFileName,
+                                    PlanSanctionAuthorityId=model.SelectedPlanSanctionAuthorityId,
                                     NocNumber = model.NocNumber,
                                     PreviousDate = model.PreviousDate,
                                     IsConfirmed = model.IsConfirmed,
@@ -827,7 +845,10 @@ namespace Noc_App.Controllers
                                 };
                                 await _repo.CreateAsync(obj);
                                 //model.SelectedOwnerTypeID
-
+                                var idproof = fileUploadeSave(model.IDProofPhoto, uniqueIDProofFileName);
+                                var addressproof = fileUploadeSave(model.AddressProofPhoto, uniqueAddressProofFileName);
+                                var authletter = fileUploadeSave(model.AuthorizationLetterPhoto, uniqueAuthLetterFileName);
+                                var kml = fileUploadeSave(model.KMLFile, uniqueKmlFileName);
                                 obj.Owners = ownerList;
                                 obj.Khasras = khasraList;
                                 await _repo.UpdateAsync(obj);
@@ -836,11 +857,7 @@ namespace Noc_App.Controllers
                                     var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
                                     _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
                                     double TotalPayment = 0;
-                                    //if (Convert.ToDouble(model.TotalArea) <= 0.25)
-                                    //{
-                                    //    TotalPayment = 250;
-                                    //}
-                                    //else 
+                                
                                     string calculation = "", additionalcalculation = "", totalareacalculation="";
                                     if (Convert.ToDouble(model.TotalArea) <= 0.50)
                                     {
@@ -1003,6 +1020,7 @@ namespace Noc_App.Controllers
                         if (grant.Grant.IsShortFallCompleted == false)
                         {
                             var projectType = _projectTypeRepo.GetAll();
+                            var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll();
                             var nocPermission = _nocPermissionTypeRepo.GetAll();
                             var nocType = _nocTypeRepo.GetAll();
                             var ownerType = _ownerTypeRepo.GetAll();
@@ -1133,6 +1151,7 @@ namespace Noc_App.Controllers
                             {
                                 Divisions = new SelectList(divisions, "Id", "Name", grant.Division.Id),
                                 ProjectType = new SelectList(projectType, "Id", "Name", grant.Grant.ProjectTypeId),
+                                PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name", grant.Grant.PlanSanctionAuthorityId),
                                 NocPermissionType = new SelectList(nocPermission, "Id", "Name", grant.Grant.NocPermissionTypeID),
                                 NocType = new SelectList(nocType, "Id", "Name", grant.Grant.NocTypeId),
                                 Village = new SelectList(villages, "Id", "Name", grant.Village.Id),
@@ -1179,6 +1198,8 @@ namespace Noc_App.Controllers
                                 AddressProofPhotoPath = grant.Grant.AddressProofPhotoPath,
                                 AuthorizationLetterPhotoPath = grant.Grant.AuthorizationLetterPhotoPath,
                                 IDProofPhotoPath = grant.Grant.IDProofPhotoPath,
+                                LayoutPlanFilePath = grant.Grant.LayoutPlanFilePath,
+                                FaradFilePath = grant.Grant.FaradFilePath,
                                 KMLFilePath = grant.Grant.KMLFilePath,
                                 KUnitValue = KanalOrBigha.UnitValue,
                                 KTimesof = KanalOrBigha.Timesof,
@@ -1663,11 +1684,34 @@ namespace Noc_App.Controllers
                         return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
                     }
 
+                    if (model.selectedPlanSanctionAuthorityId <= 0)
+                    {
+                        isValid = false;
+
+                        ModelState.AddModelError("", $"Plan Sanction Authority field is required to fill");
+
+                        return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                    }
+
                     if (model.file == null)
                     {
                             isValid = false;
                             ModelState.AddModelError("", $"Please upload address proof");
                             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                    }
+
+                    if (model.layoutPlanFilePhoto == null)
+                    {
+                        isValid = false;
+                        ModelState.AddModelError("", $"Please upload layout plan");
+                        return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                    }
+
+                    if (model.faradFilePoto == null)
+                    {
+                        isValid = false;
+                        ModelState.AddModelError("", $"Please upload farad");
+                        return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
                     }
                     if (isValid)
                     {
@@ -1686,15 +1730,55 @@ namespace Noc_App.Controllers
                             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
                         }
                         string uniqueAddressProofFileName = ProcessUploadedFile(model.file, "Address");
-                        
+
+                        int LayoutPlanValidation = AllowedCheckExtensions(model.layoutPlanFilePhoto, "proof");
+                        if (LayoutPlanValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid layout plan file type. Please upload a JPG, PNG, or PDF file";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+
+                        }
+                        else if (LayoutPlanValidation == 2)
+                        {
+                            ErrorMessage = "Layout plan field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        }
+
+                        string uniqueLayoutPlanFileName = ProcessUploadedFile(model.layoutPlanFilePhoto, "LayoutPlan");
+
+                        int FaradValidation = AllowedCheckExtensions(model.faradFilePoto, "proof");
+                        if (FaradValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid farad file type. Please upload a JPG, PNG, or PDF file";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+
+                        }
+                        else if (FaradValidation == 2)
+                        {
+                            ErrorMessage = "Farad field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        }
+                        string uniqueFaradFileName = ProcessUploadedFile(model.faradFilePoto, "Farad");
+
                         grantDetail.Hadbast = model.hadbast;
                         grantDetail.PlotNo = model.plotNo;
                         grantDetail.VillageID = model.selectedVillageID;
                         grantDetail.AddressProofPhotoPath = uniqueAddressProofFileName;
+                        grantDetail.PlanSanctionAuthorityId = model.selectedPlanSanctionAuthorityId;
+                        grantDetail.LayoutPlanFilePath = uniqueLayoutPlanFileName;
+                        grantDetail.FaradFilePath = uniqueFaradFileName;
                         await _repo.UpdateAsync(grantDetail);
                         grantrejctionSectionDetail.IsCompleted = 1;
                         grantrejctionSectionDetail.UpdatedOn = DateTime.Now;
                         await _grantrejectionRepository.UpdateAsync(grantrejctionSectionDetail);
+
+                        var addressproof = fileUploadeSave(model.file, uniqueAddressProofFileName);
 
                         int totalCompleted = (from g in _repo.GetAll()
                                               join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
@@ -1877,8 +1961,8 @@ namespace Noc_App.Controllers
                             grantrejctionSectionDetail.IsCompleted = 1;
                             grantrejctionSectionDetail.UpdatedOn = DateTime.Now;
                             await _grantrejectionRepository.UpdateAsync(grantrejctionSectionDetail);
-                            string uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, "Documents");
-                            //string filePath = Path.Combine(uploadFolder, uniqueKmlFileName);
+
+                            var kml = fileUploadeSave(model.kmlFile, uniqueKmlFileName);
                             string download = $"/Grant/Download?fileName={uniqueKmlFileName}";
                             int totalCompleted = (from g in _repo.GetAll()
                                                   join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
@@ -2096,9 +2180,11 @@ namespace Noc_App.Controllers
                             grantrejctionSectionDetail.IsCompleted = 1;
                             grantrejctionSectionDetail.UpdatedOn = DateTime.Now;
                             await _grantrejectionRepository.UpdateAsync(grantrejctionSectionDetail);
-                            string uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, "Documents");
-                            //string idfilePath = Path.Combine(uploadFolder, uniqueIDProofFileName);
-                            //string authfilePath = Path.Combine(uploadFolder, uniqueAuthLetterFileName);
+
+                            var idproof = fileUploadeSave(model.idProofPhotoFile, uniqueIDProofFileName);
+
+                            var authletter = fileUploadeSave(model.authorizationLetterPhotofile, uniqueAuthLetterFileName);
+
                             string downloadid = $"/Grant/Download?fileName={uniqueIDProofFileName}";
                             string downloadauth = $"/Grant/Download?fileName={uniqueAuthLetterFileName}";
                             int totalCompleted = (from g in _repo.GetAll()
@@ -2308,14 +2394,33 @@ namespace Noc_App.Controllers
 
                 string uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, "Documents");
                 uniqueFileName = prefixName + "_" + Guid.NewGuid().ToString() + "_" + file.FileName;
-                string filePath = Path.Combine(uploadFolder, uniqueFileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    file.CopyTo(fileStream);
-                }
             }
 
             return uniqueFileName;
+        }
+
+        [Obsolete]
+        private bool fileUploadeSave(IFormFile file, string uniqueFileName)
+        {
+            try
+            {
+                if (file != null && file.Length > 0)
+                {
+
+                    string uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, "Documents");                    
+                    string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                }
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         [AcceptVerbs("Get", "Post")]

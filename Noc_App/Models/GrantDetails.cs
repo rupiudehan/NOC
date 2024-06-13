@@ -11,7 +11,7 @@ namespace Noc_App.Models
         public int SiteAreaUnitId { get; set; }
         [ForeignKey(nameof(SiteAreaUnitId))]
         public SiteAreaUnitDetails SiteAreaUnits { get; set; }
-        [Required]
+
         public int ProjectTypeId { get; set; }
         [ForeignKey(nameof(ProjectTypeId))]
         public ProjectTypeDetails ProjectType { get; set; }
@@ -24,6 +24,11 @@ namespace Noc_App.Models
         public VillageDetails Village { get; set; }
         //[Required]
         public string AddressProofPhotoPath { get; set; }
+        public int PlanSanctionAuthorityId { get; set; }
+        [ForeignKey(nameof(PlanSanctionAuthorityId))]
+        public PlanSanctionAuthorityMaster PlanSanctionAuthorityMaster { get; set; }
+        public string LayoutPlanFilePath { get; set; }
+        public string FaradFilePath { get; set; }
         public string KMLFilePath { get; set; }
         public string KMLLinkName { get; set; }
         //[Required]

@@ -58,6 +58,20 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Address Proof")]
         public IFormFile AddressProofPhoto { get; set; }
         public string AddressProofPhotoPath { get; set; }
+        [Required]
+        [Display(Name = "Plan Sanction Authority")]
+        public int SelectedPlanSanctionAuthorityId { get; set; }
+        public IEnumerable<SelectListItem> PlanSanctionAuthorityMaster { get; set; }
+        [Required]
+        [Display(Name = "Layout Plan")]
+        public IFormFile LayoutPlanFilePhoto { get; set; }
+        [Required]
+        [Display(Name = "Farad")]
+        public IFormFile FaradFilePoto { get; set; }
+        
+        public string LayoutPlanFilePath { get; set; }
+        
+        public string FaradFilePath { get; set; }
         public IFormFile KMLFile { get; set; }
         public string KMLFilePath { get; set; }
         [RegularExpression(@"https:\/\/earth\.google\.com\/web\/\S+", ErrorMessage = "Invalid link")]

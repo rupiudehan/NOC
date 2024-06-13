@@ -39,6 +39,7 @@ namespace Noc_App.Context
         public DbSet<RecommendationDetail> RecommendationDetail { get; set; }
         public DbSet<GrantSectionsDetails> GrantSectionsDetails { get; set; }
         public DbSet<GrantRejectionShortfallSection> GrantRejectionShortfallSection { get; set; }
+        public DbSet<PlanSanctionAuthorityMaster> PlanSanctionAuthorityMaster { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,6 +47,12 @@ namespace Noc_App.Context
             modelBuilder.Entity<DashboardPendencyAll>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyViewModel>().HasNoKey();
             modelBuilder.Entity<ReportApplicationCountViewModel>().HasNoKey();
+
+
+            modelBuilder.Entity<PlanSanctionAuthorityMaster>().HasData(
+                new PlanSanctionAuthorityMaster { Id = 1, Name = "Country", Code = "C" },
+                new PlanSanctionAuthorityMaster { Id = 2, Name = "Local", Code = "L" }
+                );
 
             modelBuilder.Entity<DistrictDetails>().HasData(
                new DistrictDetails { Id = 1, Name = "Amritsar", LGD_ID = 27 },

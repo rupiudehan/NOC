@@ -662,8 +662,8 @@ namespace NocApp.Migrations
                     b.Property<long>("GrantApprovalID")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("KmlFileVerificationReportPath")
-                        .HasColumnType("text");
+                    b.Property<bool>("IsKMLByApplicantValid")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ProcessedBy")
                         .HasColumnType("text");
@@ -729,6 +729,9 @@ namespace NocApp.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("FaradFilePath")
+                        .HasColumnType("text");
+
                     b.Property<string>("Hadbast")
                         .HasColumnType("text");
 
@@ -771,6 +774,9 @@ namespace NocApp.Migrations
                     b.Property<string>("KMLLinkName")
                         .HasColumnType("text");
 
+                    b.Property<string>("LayoutPlanFilePath")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -785,6 +791,9 @@ namespace NocApp.Migrations
 
                     b.Property<string>("OtherProjectTypeDetail")
                         .HasColumnType("text");
+
+                    b.Property<int>("PlanSanctionAuthorityId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("PlotNo")
                         .HasColumnType("text");
@@ -842,6 +851,8 @@ namespace NocApp.Migrations
                     b.HasIndex("NocPermissionTypeID");
 
                     b.HasIndex("NocTypeId");
+
+                    b.HasIndex("PlanSanctionAuthorityId");
 
                     b.HasIndex("ProjectTypeId");
 
@@ -1152,6 +1163,39 @@ namespace NocApp.Migrations
                         {
                             Id = 4,
                             Name = "Full Time Directors"
+                        });
+                });
+
+            modelBuilder.Entity("Noc_App.Models.PlanSanctionAuthorityMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlanSanctionAuthorityMaster");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "C",
+                            Name = "Country"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "L",
+                            Name = "Local"
                         });
                 });
 
@@ -1617,6 +1661,9 @@ namespace NocApp.Migrations
                     b.Property<bool>("IsForwarded")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsShortFall")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LastForwardedByRole")
                         .HasColumnType("text");
 
@@ -1662,6 +1709,9 @@ namespace NocApp.Migrations
                     b.Property<int>("ProjectTypeId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Remarks")
+                        .HasColumnType("text");
+
                     b.Property<int>("SiteAreaUnitId")
                         .HasColumnType("integer");
 
@@ -1687,6 +1737,20 @@ namespace NocApp.Migrations
                         .HasColumnType("integer");
 
                     b.ToTable("GrantUnprocessedAppDetails");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.ViewModel.ReportApplicationCountViewModel", b =>
+                {
+                    b.Property<long>("ApprovedCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RejectedCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalCount")
+                        .HasColumnType("bigint");
+
+                    b.ToTable("ReportApplicationCountViewModel");
                 });
 
             modelBuilder.Entity("Noc_App.Models.VillageDetails", b =>
@@ -1804,6 +1868,12 @@ namespace NocApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Noc_App.Models.PlanSanctionAuthorityMaster", "PlanSanctionAuthorityMaster")
+                        .WithMany()
+                        .HasForeignKey("PlanSanctionAuthorityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Noc_App.Models.ProjectTypeDetails", "ProjectType")
                         .WithMany("Grants")
                         .HasForeignKey("ProjectTypeId")
@@ -1825,6 +1895,8 @@ namespace NocApp.Migrations
                     b.Navigation("NocPermissionType");
 
                     b.Navigation("NocType");
+
+                    b.Navigation("PlanSanctionAuthorityMaster");
 
                     b.Navigation("ProjectType");
 
