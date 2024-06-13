@@ -12,7 +12,8 @@ namespace Noc_App.Models
         public string CatchmentAreaAndFlowPath { get; set; }
         public string DistanceFromCreekPath { get; set; }
         public string GISOrDWSReportPath { get; set; }
-        public string KmlFileVerificationReportPath { get; set; }
+        public bool IsKMLByApplicantValid { get; set; }
+        //public string KmlFileVerificationReportPath { get; set; }
         public string CrossSectionOrCalculationSheetReportPath { get; set; }
         public string DrainLSectionPath { get; set; }
         public string ProcessedBy { get; set; }

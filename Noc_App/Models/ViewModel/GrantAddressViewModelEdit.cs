@@ -17,5 +17,11 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Address Proof")]
         public IFormFile file { get; set; }
         public int addressid { get; set; }
+        [Display(Name = "Plan Sanction Authority")]
+        public int selectedPlanSanctionAuthorityId { get; set; }
+        [Display(Name = "Layout Plan")]
+        public IFormFile layoutPlanFilePhoto { get; set; }
+        [Display(Name = "Farad")]
+        public IFormFile faradFilePoto { get; set; }
     }
 }

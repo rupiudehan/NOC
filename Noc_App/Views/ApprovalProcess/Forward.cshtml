@@ -88,12 +88,8 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label asp-for="KmlFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
-                                    <div class="custom-file1">
-                                        <input asp-for="KmlFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
-                                        <span asp-validation-for="KmlFile" id="KmlFile-error" class="text-danger"></span>
-                                    </div>
+                                    <label asp-for="IsKMLByApplicantValid" class="control-label"></label>
+                                    <input type="checkbox" asp-for="IsKMLByApplicantValid" />
                                 </div>
                             </div>
                             <div class="col-lg-3">

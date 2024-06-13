@@ -26,7 +26,7 @@ if (document.getElementById("SelectedNocTypeId") != null) {
     });
 }
 function LoadFinalBlock(grantId, applicationid) {
-    console.log(grantId)
+   
     $('.finalSubmit').empty();
     var divs = `
                 <hr />
@@ -332,7 +332,10 @@ $(function () {
             event.preventDefault(); // Prevent the form from submitting normally
             allValid = ValidateFields('Project', 'project');
             if (allValid) {
-                inputValidate = ValidateInputFields('Project', 'project');
+                var inputValidate = true;
+                if (isOtherType == '1') {
+                    inputValidate = ValidateInputFields('Project', 'project');
+                }
                 var module = 'Project';
                 if (allValid && inputValidate) {
                     var resultProjectMessage = $('#resultProjectMessage');
@@ -357,7 +360,7 @@ $(function () {
                                 $('#projectForm')[0].reset();
                                 $('#AreAllSectionCompleted').val(response.completed);
                                 if ($('#AreAllSectionCompleted').val() == '0') {
-                                    LoadFinalBlock(projectid, projectApplicationId);                               
+                                    LoadFinalBlock(pid, projectApplicationId);                               
                                 }
                             } else {
                                 var errors = response.errors.join('<br/>');
@@ -441,7 +444,7 @@ $(function () {
                                     $('#' + module + 'Form')[0].reset();
                                     $('#AreAllSectionCompleted').val(response.completed);
                                     if ($('#AreAllSectionCompleted').val() == '0') {
-                                        LoadFinalBlock(addressid, AddressApplicationId);
+                                        LoadFinalBlock(AdId, AddressApplicationId);
                                     }
                                 } else {
                                     var errors = response.errors.join('<br/>');
@@ -463,7 +466,6 @@ $(function () {
  
     if (document.getElementById("kmlForm") != null) {
         $('#kmlForm').on('submit', function (event) {
-            alert('d');
             event.preventDefault();
             var module = 'kml';
             var formData = new FormData();
@@ -572,7 +574,7 @@ $(function () {
                                 //$('#projectForm')[0].reset();
                                 $('#AreAllSectionCompleted').val(response.completed);
                                 if ($('#AreAllSectionCompleted').val() == '0') {
-                                    LoadFinalBlock(permissionGrantId, permissionApplicationId);
+                                    LoadFinalBlock(PermisionGrantId, permissionApplicationId);
                                 }
                             } else {
                                 var errors = response.errors.join('<br/>');
@@ -979,7 +981,7 @@ function ValidateInputFields(modulename, formName) {
     if (!allValid) {
         var resultProjectMessage = $('#result' + modulename + 'Message');
         resultProjectMessage.css('display', 'block');
-        resultProjectMessage.html('<div class="alert alert-danger">' + errorMessage.textContent + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
+        resultProjectMessage.html('<div class="alert alert-danger">' + errorMessage.textContent + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
     }
     return allValid;
 }
@@ -1003,7 +1005,7 @@ function ValidateFields(modulename, formName) {
     if (!allValid) {
         var resultProjectMessage = $('#result' + modulename + 'Message');
         resultProjectMessage.css('display', 'block');
-        resultProjectMessage.html('<div class="alert alert-danger">' + errorMessage.textContent + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
+        resultProjectMessage.html('<div class="alert alert-danger">' + errorMessage.textContent + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
     }
     return allValid;
 }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240508112144_addedUnitId")]
-    partial class addedUnitId
+    [Migration("20240613072746_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,33 +25,136 @@ namespace NocApp.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("Noc_App.Models.ChallanDetails", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ApplicationId")
                         .HasColumnType("text");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
+                    b.Property<string>("RequestStatus")
                         .HasColumnType("text");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<string>("add1")
+                        .HasColumnType("text");
 
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<string>("add2")
+                        .HasColumnType("text");
+
+                    b.Property<string>("add3")
+                        .HasColumnType("text");
+
+                    b.Property<string>("add4")
+                        .HasColumnType("text");
+
+                    b.Property<string>("add5")
+                        .HasColumnType("text");
+
+                    b.Property<string>("addLine1")
+                        .HasColumnType("text");
+
+                    b.Property<string>("addLine2")
+                        .HasColumnType("text");
+
+                    b.Property<string>("addPincode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("challanDate")
+                        .HasColumnType("text");
+
+                    b.Property<string>("companyName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ddoCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("deptCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("deptRefNo")
+                        .HasColumnType("text");
+
+                    b.Property<string>("district")
+                        .HasColumnType("text");
+
+                    b.Property<string>("emailId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("expiryDate")
+                        .HasColumnType("text");
+
+                    b.Property<string>("fURL")
+                        .HasColumnType("text");
+
+                    b.Property<string>("mobNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("noOfTrans")
+                        .HasColumnType("text");
+
+                    b.Property<string>("nonTrsyAmt")
+                        .HasColumnType("text");
+
+                    b.Property<string>("payLocCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("payerName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("sURL")
+                        .HasColumnType("text");
+
+                    b.Property<string>("tehsil")
+                        .HasColumnType("text");
+
+                    b.Property<string>("teleNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("totalAmt")
+                        .HasColumnType("text");
+
+                    b.Property<string>("trsyAmt")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("ChallanDetails");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Noc_App.Models.DashboardPendencyAll", b =>
+                {
+                    b.Property<string>("CHIEF_ENGINEER_HQ")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CIRCLE_OFFICER")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Division")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EXECUTIVE_ENGINEER")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EXECUTIVE_ENGINEER_HQ")
+                        .HasColumnType("text");
+
+                    b.Property<string>("JUNIOR_ENGINEER")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SUB_DIVISIONAL_OFFICER")
+                        .HasColumnType("text");
+
+                    b.Property<string>("dws")
+                        .HasColumnType("text");
+
+                    b.ToTable("DashboardPendencyAll");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.DaysCheckMaster", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,24 +162,124 @@ namespace NocApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ClaimType")
+                    b.Property<string>("CheckFor")
                         .HasColumnType("text");
 
-                    b.Property<string>("ClaimValue")
+                    b.Property<string>("Code")
                         .HasColumnType("text");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("IsRelatedToForward")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IsRelatedToIssue")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NoOfDays")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserRoleID")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("UserRoleID");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("DaysCheckMaster");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CheckFor = "Executive Engineer",
+                            Code = "EEF",
+                            IsRelatedToForward = 1,
+                            IsRelatedToIssue = 0,
+                            NoOfDays = 1,
+                            UserRoleID = 7
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CheckFor = "Executive Engineer",
+                            Code = "EES",
+                            IsRelatedToForward = 0,
+                            IsRelatedToIssue = 1,
+                            NoOfDays = 2,
+                            UserRoleID = 7
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CheckFor = "Chief Engineer",
+                            Code = "CEHQF",
+                            IsRelatedToForward = 1,
+                            IsRelatedToIssue = 0,
+                            NoOfDays = 3,
+                            UserRoleID = 10
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CheckFor = "Junior Engineer",
+                            Code = "JE",
+                            IsRelatedToForward = 1,
+                            IsRelatedToIssue = 0,
+                            NoOfDays = 2,
+                            UserRoleID = 60
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CheckFor = "Sub Divisional Officer",
+                            Code = "SDO",
+                            IsRelatedToForward = 1,
+                            IsRelatedToIssue = 0,
+                            NoOfDays = 2,
+                            UserRoleID = 67
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CheckFor = "XEN HO Drainage",
+                            Code = "EEHQ",
+                            IsRelatedToForward = 1,
+                            IsRelatedToIssue = 0,
+                            NoOfDays = 3,
+                            UserRoleID = 128
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CheckFor = "XEN/DWS",
+                            Code = "D",
+                            IsRelatedToForward = 1,
+                            IsRelatedToIssue = 0,
+                            NoOfDays = 1,
+                            UserRoleID = 83
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CheckFor = "Principal Secretary",
+                            Code = "PS",
+                            IsRelatedToForward = 1,
+                            IsRelatedToIssue = 0,
+                            NoOfDays = 1,
+                            UserRoleID = 6
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CheckFor = "Superintending Engineer",
+                            Code = "CO",
+                            IsRelatedToForward = 1,
+                            IsRelatedToIssue = 0,
+                            NoOfDays = 2,
+                            UserRoleID = 8
+                        });
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Noc_App.Models.DistrictDetails", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -84,141 +287,209 @@ namespace NocApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Noc_App.Models.ApplicationUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<int>("LGD_ID")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
+                    b.ToTable("DistrictDetails");
 
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 27,
+                            Name = "Amritsar",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 605,
+                            Name = "Barnala",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 28,
+                            Name = "Bathinda",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 29,
+                            Name = "Faridkot",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 30,
+                            Name = "Fatehgarh Sahib",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 651,
+                            Name = "Fazilka",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 31,
+                            Name = "Ferozepur",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 32,
+                            Name = "Gurdaspur",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 33,
+                            Name = "Hoshiarpur",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 34,
+                            Name = "Jalandhar",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 11,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 35,
+                            Name = "Kapurthala",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 12,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 36,
+                            Name = "Ludhiana",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 13,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 737,
+                            Name = "Malerkotla",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 14,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 37,
+                            Name = "Mansa",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 15,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 38,
+                            Name = "Moga",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 16,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 662,
+                            Name = "Pathankot",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 17,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 41,
+                            Name = "Patiala",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 18,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 42,
+                            Name = "Rupnagar",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 19,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 608,
+                            Name = "S.A.S Nagar Mohali",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 20,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 43,
+                            Name = "Sangrur",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 21,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 40,
+                            Name = "ShahidBhagat Singh Nagar",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 22,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 39,
+                            Name = "Sri Muktsar Sahib",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 23,
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LGDID = 609,
+                            Name = "Tarn Taran",
+                            UpdatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>
@@ -234,6 +505,9 @@ namespace NocApp.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DistrictId")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -251,9 +525,7 @@ namespace NocApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("UpdatedBy");
+                    b.HasIndex("DistrictId");
 
                     b.ToTable("DivisionDetails");
                 });
@@ -278,11 +550,17 @@ namespace NocApp.Migrations
                     b.Property<string>("ProcessedBy")
                         .HasColumnType("text");
 
+                    b.Property<string>("ProcessedByName")
+                        .HasColumnType("text");
+
                     b.Property<string>("ProcessedByRole")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ProcessedOn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ProcessedToName")
+                        .HasColumnType("text");
 
                     b.Property<string>("ProcessedToRole")
                         .HasColumnType("text");
@@ -290,14 +568,22 @@ namespace NocApp.Migrations
                     b.Property<string>("ProcessedToUser")
                         .HasColumnType("text");
 
+                    b.Property<int>("RecommendationID")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApprovalID");
 
                     b.HasIndex("GrantID");
+
+                    b.HasIndex("RecommendationID");
 
                     b.ToTable("GrantApprovalDetails");
                 });
@@ -319,6 +605,38 @@ namespace NocApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("GrantApprovalMaster");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "P",
+                            Name = "Pending"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "R",
+                            Name = "Reject"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "F",
+                            Name = "Forward"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "A",
+                            Name = "Approved"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Code = "SF",
+                            Name = "ShortFall"
+                        });
                 });
 
             modelBuilder.Entity("Noc_App.Models.GrantApprovalProcessDocumentsDetails", b =>
@@ -347,10 +665,13 @@ namespace NocApp.Migrations
                     b.Property<long>("GrantApprovalID")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("KmlFileVerificationReportPath")
-                        .HasColumnType("text");
+                    b.Property<bool>("IsKMLByApplicantValid")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ProcessedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProcessedByName")
                         .HasColumnType("text");
 
                     b.Property<string>("ProcessedByRole")
@@ -363,6 +684,9 @@ namespace NocApp.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UpdatedByName")
                         .HasColumnType("text");
 
                     b.Property<string>("UpdatedByRole")
@@ -408,6 +732,9 @@ namespace NocApp.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("FaradFilePath")
+                        .HasColumnType("text");
+
                     b.Property<string>("Hadbast")
                         .HasColumnType("text");
 
@@ -438,10 +765,19 @@ namespace NocApp.Migrations
                     b.Property<bool>("IsSentBack")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsShortFall")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsShortFallCompleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("KMLFilePath")
                         .HasColumnType("text");
 
                     b.Property<string>("KMLLinkName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LayoutPlanFilePath")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
@@ -459,6 +795,9 @@ namespace NocApp.Migrations
                     b.Property<string>("OtherProjectTypeDetail")
                         .HasColumnType("text");
 
+                    b.Property<int>("PlanSanctionAuthorityId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PlotNo")
                         .HasColumnType("text");
 
@@ -473,6 +812,24 @@ namespace NocApp.Migrations
 
                     b.Property<int>("SentBackLevel")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("ShortFallCompletedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ShortFallLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ShortFallReportedById")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ShortFallReportedByName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ShortFallReportedByRole")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ShortFallReportedOn")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("SiteAreaUnitId")
                         .HasColumnType("integer");
@@ -497,6 +854,8 @@ namespace NocApp.Migrations
                     b.HasIndex("NocPermissionTypeID");
 
                     b.HasIndex("NocTypeId");
+
+                    b.HasIndex("PlanSanctionAuthorityId");
 
                     b.HasIndex("ProjectTypeId");
 
@@ -556,16 +915,19 @@ namespace NocApp.Migrations
                     b.Property<int>("GrantID")
                         .HasColumnType("integer");
 
-                    b.Property<string>("PaymentOrderId")
+                    b.Property<string>("PayerEmail")
                         .HasColumnType("text");
 
-                    b.Property<string>("Paymentstatus")
+                    b.Property<string>("PayerName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentOrderId")
                         .HasColumnType("text");
 
                     b.Property<decimal?>("TotalAmount")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("paymentid")
+                    b.Property<string>("deptRefNo")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -573,6 +935,104 @@ namespace NocApp.Migrations
                     b.HasIndex("GrantID");
 
                     b.ToTable("GrantPaymentDetails");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantRejectionShortfallSection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("GrantApprovalId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("IsCompleted")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrantApprovalId");
+
+                    b.ToTable("GrantRejectionShortfallSection");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantSectionsDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("SectionCode")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("SectionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SectionName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SectionId");
+
+                    b.ToTable("GrantSectionsDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            SectionCode = "P",
+                            SectionName = "Project"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            SectionCode = "AD",
+                            SectionName = "Address"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            SectionCode = "KH",
+                            SectionName = "Khasra"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            SectionCode = "K",
+                            SectionName = "KML"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            SectionCode = "AP",
+                            SectionName = "Applicant"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            SectionCode = "OW",
+                            SectionName = "Owner"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            SectionCode = "PM",
+                            SectionName = "Permission"
+                        });
                 });
 
             modelBuilder.Entity("Noc_App.Models.NocPermissionTypeDetails", b =>
@@ -709,6 +1169,39 @@ namespace NocApp.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Noc_App.Models.PlanSanctionAuthorityMaster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlanSanctionAuthorityMaster");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "C",
+                            Name = "Country"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "L",
+                            Name = "Local"
+                        });
+                });
+
             modelBuilder.Entity("Noc_App.Models.ProjectTypeDetails", b =>
                 {
                     b.Property<int>("Id")
@@ -744,6 +1237,45 @@ namespace NocApp.Migrations
                         {
                             Id = 4,
                             Name = "Any Other"
+                        });
+                });
+
+            modelBuilder.Entity("Noc_App.Models.RecommendationDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RecommendationDetail");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "A",
+                            Name = "For Approval"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "R",
+                            Name = "For Rejection"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "NA",
+                            Name = "Nothing"
                         });
                 });
 
@@ -816,67 +1348,67 @@ namespace NocApp.Migrations
                         new
                         {
                             Id = 1,
-                            DivideBy = 1.0,
+                            DivideBy = 32.270000000000003,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "BSI",
-                            UnitName = "Biswa-I",
-                            UnitValue = 0.012500000000000001
+                            UnitCode = "M",
+                            UnitName = "Biswa",
+                            UnitValue = 1.0
                         },
                         new
                         {
                             Id = 2,
-                            DivideBy = 1.0,
+                            DivideBy = 1.673,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "BGI",
-                            UnitName = "Bigha-I",
-                            UnitValue = 0.25
+                            UnitCode = "K",
+                            UnitName = "Bigha",
+                            UnitValue = 1.0
                         },
                         new
                         {
                             Id = 3,
-                            DivideBy = 1.0,
+                            DivideBy = 32.310000000000002,
                             SiteAreaUnitId = 1,
                             Timesof = 1.0,
-                            UnitCode = "BWI",
-                            UnitName = "Biswansi-I",
-                            UnitValue = 0.00062500000000000001
+                            UnitCode = "S",
+                            UnitName = "Biswansi",
+                            UnitValue = 1.0
                         },
                         new
                         {
                             Id = 4,
-                            DivideBy = 1.0,
+                            DivideBy = 32.270000000000003,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "BSI",
-                            UnitName = "Biswa-II",
-                            UnitValue = 0.012500000000000001
+                            UnitCode = "M",
+                            UnitName = "Biswa",
+                            UnitValue = 1.0
                         },
                         new
                         {
                             Id = 5,
-                            DivideBy = 1.0,
+                            DivideBy = 1.673,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "BGI",
-                            UnitName = "Bigha-II",
-                            UnitValue = 0.25
+                            UnitCode = "K",
+                            UnitName = "Bigha",
+                            UnitValue = 1.0
                         },
                         new
                         {
                             Id = 6,
-                            DivideBy = 1.0,
+                            DivideBy = 32.310000000000002,
                             SiteAreaUnitId = 3,
                             Timesof = 3.0,
-                            UnitCode = "BWI",
-                            UnitName = "Biswansi-II",
-                            UnitValue = 0.00062500000000000001
+                            UnitCode = "S",
+                            UnitName = "Biswansi",
+                            UnitValue = 1.0
                         },
                         new
                         {
                             Id = 7,
-                            DivideBy = 160.0,
+                            DivideBy = 8.0,
                             SiteAreaUnitId = 2,
                             Timesof = 1.0,
                             UnitCode = "K",
@@ -886,10 +1418,10 @@ namespace NocApp.Migrations
                         new
                         {
                             Id = 8,
-                            DivideBy = 8.0,
+                            DivideBy = 160.0,
                             SiteAreaUnitId = 2,
                             Timesof = 1.0,
-                            UnitCode = "K",
+                            UnitCode = "M",
                             UnitName = "Marla",
                             UnitValue = 1.0
                         },
@@ -899,7 +1431,7 @@ namespace NocApp.Migrations
                             DivideBy = 1440.0,
                             SiteAreaUnitId = 2,
                             Timesof = 1.0,
-                            UnitCode = "K",
+                            UnitCode = "S",
                             UnitName = "Sarsai",
                             UnitValue = 1.0
                         });
@@ -938,11 +1470,7 @@ namespace NocApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("DivisionId");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("SubDivisionDetails");
                 });
@@ -964,6 +1492,9 @@ namespace NocApp.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("LGD_ID")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -980,73 +1511,122 @@ namespace NocApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("SubDivisionId");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("TehsilBlockDetails");
                 });
 
-            modelBuilder.Entity("Noc_App.Models.UserDivision", b =>
+            modelBuilder.Entity("Noc_App.Models.UserRoleDetails", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("DivisionId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    b.HasKey("UserId", "DivisionId");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.HasIndex("DivisionId");
+                    b.Property<string>("AppRoleName")
+                        .HasColumnType("text");
 
-                    b.ToTable("UserDivision");
+                    b.Property<int>("RoleLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserRoleDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 7,
+                            AppRoleName = "EXECUTIVE ENGINEER",
+                            RoleLevel = 7,
+                            RoleName = "Executive Engineer"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            AppRoleName = "CHIEF ENGINEER HQ",
+                            RoleLevel = 3,
+                            RoleName = "Chief Engineer"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            AppRoleName = "JUNIOR ENGINEER",
+                            RoleLevel = 9,
+                            RoleName = "Junior Engineer"
+                        },
+                        new
+                        {
+                            Id = 67,
+                            AppRoleName = "SUB DIVISIONAL OFFICER",
+                            RoleLevel = 8,
+                            RoleName = "Sub Divisional Officer"
+                        },
+                        new
+                        {
+                            Id = 128,
+                            AppRoleName = "EXECUTIVE ENGINEER HQ",
+                            RoleLevel = 4,
+                            RoleName = "XEN HO Drainage"
+                        },
+                        new
+                        {
+                            Id = 83,
+                            AppRoleName = "DWS",
+                            RoleLevel = 5,
+                            RoleName = "XEN/DWS"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            AppRoleName = "PRINCIPAL SECRETARY",
+                            RoleLevel = 2,
+                            RoleName = "Principal Secretary"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            AppRoleName = "CIRCLE OFFICER",
+                            RoleLevel = 6,
+                            RoleName = "Superintending Engineer"
+                        },
+                        new
+                        {
+                            Id = 1,
+                            AppRoleName = "Administrator",
+                            RoleLevel = 1,
+                            RoleName = "Administrator"
+                        });
                 });
 
-            modelBuilder.Entity("Noc_App.Models.UserSubdivision", b =>
+            modelBuilder.Entity("Noc_App.Models.ViewModel.DashboardPendencyViewModel", b =>
                 {
-                    b.Property<string>("UserId")
+                    b.Property<string>("ApplicationID")
                         .HasColumnType("text");
 
-                    b.Property<int>("SubdivisionId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "SubdivisionId");
-
-                    b.HasIndex("SubdivisionId");
-
-                    b.ToTable("UserSubdivision");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.UserTehsil", b =>
-                {
-                    b.Property<string>("UserId")
+                    b.Property<string>("ApplyDate")
                         .HasColumnType("text");
 
-                    b.Property<int>("TehsilId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "TehsilId");
-
-                    b.HasIndex("TehsilId");
-
-                    b.ToTable("UserTehsil");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.UserVillage", b =>
-                {
-                    b.Property<string>("UserId")
+                    b.Property<string>("Division")
                         .HasColumnType("text");
 
-                    b.Property<int>("VillageId")
+                    b.Property<int>("Id")
                         .HasColumnType("integer");
 
-                    b.HasKey("UserId", "VillageId");
+                    b.Property<int>("Pendency")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("VillageId");
+                    b.Property<string>("ProcessedToRole")
+                        .HasColumnType("text");
 
-                    b.ToTable("UserVillage");
+                    b.Property<string>("ProjectName")
+                        .HasColumnType("text");
+
+                    b.ToTable("DashboardPendencyViewModel");
                 });
 
             modelBuilder.Entity("Noc_App.Models.ViewModel.GrantUnprocessedAppDetails", b =>
@@ -1059,6 +1639,9 @@ namespace NocApp.Migrations
 
                     b.Property<string>("ApplicationID")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DivisionId")
                         .HasColumnType("integer");
@@ -1079,6 +1662,9 @@ namespace NocApp.Migrations
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsForwarded")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsShortFall")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastForwardedByRole")
@@ -1120,8 +1706,14 @@ namespace NocApp.Migrations
                     b.Property<string>("ProcessedToRole")
                         .HasColumnType("text");
 
+                    b.Property<string>("ProcessedToUser")
+                        .HasColumnType("text");
+
                     b.Property<int>("ProjectTypeId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("text");
 
                     b.Property<int>("SiteAreaUnitId")
                         .HasColumnType("integer");
@@ -1135,13 +1727,33 @@ namespace NocApp.Migrations
                     b.Property<string>("TehsilBlockName")
                         .HasColumnType("text");
 
+                    b.Property<double>("TotalArea")
+                        .HasColumnType("double precision");
+
                     b.Property<int>("VillageID")
                         .HasColumnType("integer");
 
                     b.Property<string>("VillageName")
                         .HasColumnType("text");
 
+                    b.Property<int>("rejectionmust")
+                        .HasColumnType("integer");
+
                     b.ToTable("GrantUnprocessedAppDetails");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.ViewModel.ReportApplicationCountViewModel", b =>
+                {
+                    b.Property<long>("ApprovedCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RejectedCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TotalCount")
+                        .HasColumnType("bigint");
+
+                    b.ToTable("ReportApplicationCountViewModel");
                 });
 
             modelBuilder.Entity("Noc_App.Models.VillageDetails", b =>
@@ -1180,79 +1792,31 @@ namespace NocApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("TehsilBlockId");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.ToTable("VillageDetails");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Noc_App.Models.DaysCheckMaster", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Noc_App.Models.UserRoleDetails", "UserRole")
                         .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("Noc_App.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.HasOne("Noc_App.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
+                        .HasForeignKey("UserRoleID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Noc_App.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.HasOne("Noc_App.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("UserRole");
                 });
 
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>
                 {
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("Divisions")
-                        .HasForeignKey("CreatedBy");
+                    b.HasOne("Noc_App.Models.DistrictDetails", "District")
+                        .WithMany("Division")
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User2")
-                        .WithMany("Divisions2")
-                        .HasForeignKey("UpdatedBy");
-
-                    b.Navigation("User");
-
-                    b.Navigation("User2");
+                    b.Navigation("District");
                 });
 
             modelBuilder.Entity("Noc_App.Models.GrantApprovalDetail", b =>
@@ -1269,9 +1833,17 @@ namespace NocApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Noc_App.Models.RecommendationDetail", "RecommendationDetail")
+                        .WithMany()
+                        .HasForeignKey("RecommendationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Grant");
 
                     b.Navigation("GrantApproval");
+
+                    b.Navigation("RecommendationDetail");
                 });
 
             modelBuilder.Entity("Noc_App.Models.GrantApprovalProcessDocumentsDetails", b =>
@@ -1299,6 +1871,12 @@ namespace NocApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Noc_App.Models.PlanSanctionAuthorityMaster", "PlanSanctionAuthorityMaster")
+                        .WithMany()
+                        .HasForeignKey("PlanSanctionAuthorityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Noc_App.Models.ProjectTypeDetails", "ProjectType")
                         .WithMany("Grants")
                         .HasForeignKey("ProjectTypeId")
@@ -1320,6 +1898,8 @@ namespace NocApp.Migrations
                     b.Navigation("NocPermissionType");
 
                     b.Navigation("NocType");
+
+                    b.Navigation("PlanSanctionAuthorityMaster");
 
                     b.Navigation("ProjectType");
 
@@ -1358,6 +1938,26 @@ namespace NocApp.Migrations
                     b.Navigation("Grant");
                 });
 
+            modelBuilder.Entity("Noc_App.Models.GrantRejectionShortfallSection", b =>
+                {
+                    b.HasOne("Noc_App.Models.GrantApprovalDetail", "GrantApprovalDetail")
+                        .WithMany("GrantRejectionShortfallSection")
+                        .HasForeignKey("GrantApprovalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GrantApprovalDetail");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantSectionsDetails", b =>
+                {
+                    b.HasOne("Noc_App.Models.GrantRejectionShortfallSection", "GrantRejectionShortfallSection")
+                        .WithMany("GrantSectionsDetails")
+                        .HasForeignKey("SectionId");
+
+                    b.Navigation("GrantRejectionShortfallSection");
+                });
+
             modelBuilder.Entity("Noc_App.Models.OwnerDetails", b =>
                 {
                     b.HasOne("Noc_App.Models.GrantDetails", "Grant")
@@ -1390,186 +1990,52 @@ namespace NocApp.Migrations
 
             modelBuilder.Entity("Noc_App.Models.SubDivisionDetails", b =>
                 {
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("SubDivisions")
-                        .HasForeignKey("CreatedBy");
-
                     b.HasOne("Noc_App.Models.DivisionDetails", "Division")
                         .WithMany("SubDivision")
                         .HasForeignKey("DivisionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User2")
-                        .WithMany("SubDivisions2")
-                        .HasForeignKey("UpdatedBy");
-
                     b.Navigation("Division");
-
-                    b.Navigation("User");
-
-                    b.Navigation("User2");
                 });
 
             modelBuilder.Entity("Noc_App.Models.TehsilBlockDetails", b =>
                 {
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("TehsilBlocks")
-                        .HasForeignKey("CreatedBy");
-
                     b.HasOne("Noc_App.Models.SubDivisionDetails", "SubDivision")
                         .WithMany("TehsilBlock")
                         .HasForeignKey("SubDivisionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User2")
-                        .WithMany("TehsilBlocks2")
-                        .HasForeignKey("UpdatedBy");
-
                     b.Navigation("SubDivision");
-
-                    b.Navigation("User");
-
-                    b.Navigation("User2");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.UserDivision", b =>
-                {
-                    b.HasOne("Noc_App.Models.DivisionDetails", "Division")
-                        .WithMany("UserDivisions")
-                        .HasForeignKey("DivisionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("UserDivisions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Division");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.UserSubdivision", b =>
-                {
-                    b.HasOne("Noc_App.Models.SubDivisionDetails", "Subdivision")
-                        .WithMany("UserSubdivisions")
-                        .HasForeignKey("SubdivisionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("UserSubdivisions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Subdivision");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.UserTehsil", b =>
-                {
-                    b.HasOne("Noc_App.Models.TehsilBlockDetails", "Tehsil")
-                        .WithMany("UserTehsils")
-                        .HasForeignKey("TehsilId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("UserTehsils")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tehsil");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.UserVillage", b =>
-                {
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("UserVillages")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Noc_App.Models.VillageDetails", "Village")
-                        .WithMany("UserVillages")
-                        .HasForeignKey("VillageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("Village");
                 });
 
             modelBuilder.Entity("Noc_App.Models.VillageDetails", b =>
                 {
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User")
-                        .WithMany("Villages")
-                        .HasForeignKey("CreatedBy");
-
                     b.HasOne("Noc_App.Models.TehsilBlockDetails", "TehsilBlock")
                         .WithMany("Village")
                         .HasForeignKey("TehsilBlockId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Noc_App.Models.ApplicationUser", "User2")
-                        .WithMany("Villages2")
-                        .HasForeignKey("UpdatedBy");
-
                     b.Navigation("TehsilBlock");
-
-                    b.Navigation("User");
-
-                    b.Navigation("User2");
                 });
 
-            modelBuilder.Entity("Noc_App.Models.ApplicationUser", b =>
+            modelBuilder.Entity("Noc_App.Models.DistrictDetails", b =>
                 {
-                    b.Navigation("Divisions");
-
-                    b.Navigation("Divisions2");
-
-                    b.Navigation("SubDivisions");
-
-                    b.Navigation("SubDivisions2");
-
-                    b.Navigation("TehsilBlocks");
-
-                    b.Navigation("TehsilBlocks2");
-
-                    b.Navigation("UserDivisions");
-
-                    b.Navigation("UserSubdivisions");
-
-                    b.Navigation("UserTehsils");
-
-                    b.Navigation("UserVillages");
-
-                    b.Navigation("Villages");
-
-                    b.Navigation("Villages2");
+                    b.Navigation("Division");
                 });
 
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>
                 {
                     b.Navigation("SubDivision");
-
-                    b.Navigation("UserDivisions");
                 });
 
             modelBuilder.Entity("Noc_App.Models.GrantApprovalDetail", b =>
                 {
                     b.Navigation("GrantApprovalProcessDocuments");
+
+                    b.Navigation("GrantRejectionShortfallSection");
                 });
 
             modelBuilder.Entity("Noc_App.Models.GrantDetails", b =>
@@ -1577,6 +2043,11 @@ namespace NocApp.Migrations
                     b.Navigation("Khasras");
 
                     b.Navigation("Owners");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.GrantRejectionShortfallSection", b =>
+                {
+                    b.Navigation("GrantSectionsDetails");
                 });
 
             modelBuilder.Entity("Noc_App.Models.NocPermissionTypeDetails", b =>
@@ -1602,22 +2073,16 @@ namespace NocApp.Migrations
             modelBuilder.Entity("Noc_App.Models.SubDivisionDetails", b =>
                 {
                     b.Navigation("TehsilBlock");
-
-                    b.Navigation("UserSubdivisions");
                 });
 
             modelBuilder.Entity("Noc_App.Models.TehsilBlockDetails", b =>
                 {
-                    b.Navigation("UserTehsils");
-
                     b.Navigation("Village");
                 });
 
             modelBuilder.Entity("Noc_App.Models.VillageDetails", b =>
                 {
                     b.Navigation("Grants");
-
-                    b.Navigation("UserVillages");
                 });
 #pragma warning restore 612, 618
         }

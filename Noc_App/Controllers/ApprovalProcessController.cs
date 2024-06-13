@@ -577,13 +577,13 @@ namespace Noc_App.Controllers
                 SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
                 SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
                 
-                var total = Math.Round(((from kh in _khasraRepo.GetAll()
-                                         where kh.GrantID == grant.Id
-                                         select new
-                                         {
-                                             TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
+                //var total = Math.Round(((from kh in _khasraRepo.GetAll()
+                //                         where kh.GrantID == grant.Id
+                //                         select new
+                //                         {
+                //                             TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
 
-                                         }).Sum(d => d.TotalArea)), 4);
+                //                         }).Sum(d => d.TotalArea)), 4);
                 // Get the current user's ID
                 //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -675,16 +675,16 @@ namespace Noc_App.Controllers
                     Remarks=model.Remarks
                 };
 
-                if (total<=2 && role=="JUNIOR ENGINEER")
+                if (role=="JUNIOR ENGINEER")
                 {
-                    if(model.SiteConditionReportFile!=null && model.CatchmentAreaFile!=null && model.DistanceFromCreekFile!=null && model.GisOrDwsFile!=null && model.KmlFile!=null && model.CrossSectionOrCalculationFile!=null && model.LSectionOfDrainFile != null)
+                    if(model.SiteConditionReportFile!=null && model.CatchmentAreaFile!=null && model.DistanceFromCreekFile!=null && model.GisOrDwsFile!=null && model.CrossSectionOrCalculationFile!=null && model.LSectionOfDrainFile != null)
                     {
                         string ErrorMessage = string.Empty;
                         int siteConditionValidation = AllowedCheckExtensions(model.SiteConditionReportFile);
                         int CatchmentAreaValidation = AllowedCheckExtensions(model.CatchmentAreaFile);
                         int DistanceFromCreekFileValidation = AllowedCheckExtensions(model.DistanceFromCreekFile);
                         int GisOrDwsFileValidation = AllowedCheckExtensions(model.GisOrDwsFile);
-                        int KmlFileValidation = AllowedCheckExtensions(model.KmlFile);
+                        //int KmlFileValidation = AllowedCheckExtensions(model.KmlFile);
                         int CrossSectionOrCalculationFileValidation = AllowedCheckExtensions(model.CrossSectionOrCalculationFile);
                         int LSectionOfDrainFileValidation = AllowedCheckExtensions(model.LSectionOfDrainFile);
                         if (siteConditionValidation == 0)
@@ -743,20 +743,20 @@ namespace Noc_App.Controllers
                             return View(model);
                         }
 
-                        if (KmlFileValidation == 0)
-                        {
-                            ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
-                            ModelState.AddModelError("", ErrorMessage);
+                        //if (KmlFileValidation == 0)
+                        //{
+                        //    ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
+                        //    ModelState.AddModelError("", ErrorMessage);
 
-                            return View(model);
+                        //    return View(model);
 
-                        }
-                        else if (KmlFileValidation == 2)
-                        {
-                            ErrorMessage = "KML File field is required";
-                            ModelState.AddModelError("", ErrorMessage);
-                            return View(model);
-                        }
+                        //}
+                        //else if (KmlFileValidation == 2)
+                        //{
+                        //    ErrorMessage = "KML File field is required";
+                        //    ModelState.AddModelError("", ErrorMessage);
+                        //    return View(model);
+                        //}
                         if (CrossSectionOrCalculationFileValidation == 0)
                         {
                             ErrorMessage = $"Invalid Cross-Section/Calculation file type. Please upload a PDF file only";
@@ -812,12 +812,12 @@ namespace Noc_App.Controllers
                             return View(model);
                         }
 
-                        if (!AllowedFileSize(model.KmlFile))
-                        {
-                            ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
-                            ModelState.AddModelError("", ErrorMessage);
-                            return View(model);
-                        }
+                        //if (!AllowedFileSize(model.KmlFile))
+                        //{
+                        //    ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
+                        //    ModelState.AddModelError("", ErrorMessage);
+                        //    return View(model);
+                        //}
 
                         if (!AllowedFileSize(model.CrossSectionOrCalculationFile))
                         {
@@ -838,7 +838,7 @@ namespace Noc_App.Controllers
                         string uniqueGisOrDwsFileName = ProcessUploadedFile(model.GisOrDwsFile, "GisOrDws");
                         string uniqueCrossSectionOrCalculationFileName = ProcessUploadedFile(model.CrossSectionOrCalculationFile, "CrossSectionOrCalculation");
                         string uniqueLSectionOfDrainFileName = ProcessUploadedFile(model.LSectionOfDrainFile, "LSectionOfDrain");
-                        string uniqueKmlFileName = ProcessUploadedFile(model.KmlFile, "kmlReport");
+                        //string uniqueKmlFileName = ProcessUploadedFile(model.KmlFile, "kmlReport");
 
                         await _repoApprovalDetail.CreateAsync(approvalDetail);
 
@@ -850,7 +850,7 @@ namespace Noc_App.Controllers
                             DistanceFromCreekPath = uniqueDistanceFromCreekFileName,
                             DrainLSectionPath = uniqueLSectionOfDrainFileName,
                             GISOrDWSReportPath= uniqueGisOrDwsFileName,
-                            KmlFileVerificationReportPath = uniqueKmlFileName,
+                            IsKMLByApplicantValid = model.IsKMLByApplicantValid,
                             ProcessedBy = userId,
                             ProcessedOn = DateTime.Now,
                             ProcessedByRole = role,
@@ -908,7 +908,7 @@ namespace Noc_App.Controllers
                                   CrossSectionOrCalculationFilePath=doc.CrossSectionOrCalculationSheetReportPath,
                                   DistanceFromCreekFilePath=doc.DistanceFromCreekPath,
                                   GisOrDwsFilePath=doc.GISOrDWSReportPath,
-                                  KmlFilePath=doc.KmlFileVerificationReportPath,
+                                  IsKMLByApplicantValid=doc.IsKMLByApplicantValid,
                                   LSectionOfDrainFilePath=doc.DrainLSectionPath,
                                   SiteConditionReportFilePath=doc.SiteConditionReportPath,
                                   GrantApprovalDocId=docId
@@ -965,7 +965,7 @@ namespace Noc_App.Controllers
                             int CatchmentAreaValidation = AllowedCheckExtensions(model.CatchmentAreaFile);
                             int DistanceFromCreekFileValidation = AllowedCheckExtensions(model.DistanceFromCreekFile);
                             int GisOrDwsFileValidation = AllowedCheckExtensions(model.GisOrDwsFile);
-                            int KmlFileValidation = AllowedCheckExtensions(model.KmlFile);
+                            //int KmlFileValidation = AllowedCheckExtensions(model.KmlFile);
                             int CrossSectionOrCalculationFileValidation = AllowedCheckExtensions(model.CrossSectionOrCalculationFile);
                             int LSectionOfDrainFileValidation = AllowedCheckExtensions(model.LSectionOfDrainFile);
                             if (siteConditionValidation == 0)
@@ -1024,20 +1024,20 @@ namespace Noc_App.Controllers
                                 return View(model);
                             }
 
-                            if (KmlFileValidation == 0)
-                            {
-                                ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
-                                ModelState.AddModelError("", ErrorMessage);
+                            //if (KmlFileValidation == 0)
+                            //{
+                            //    ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
+                            //    ModelState.AddModelError("", ErrorMessage);
 
-                                return View(model);
+                            //    return View(model);
 
-                            }
-                            else if (KmlFileValidation == 2)
-                            {
-                                ErrorMessage = "KML File field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
+                            //}
+                            //else if (KmlFileValidation == 2)
+                            //{
+                            //    ErrorMessage = "KML File field is required";
+                            //    ModelState.AddModelError("", ErrorMessage);
+                            //    return View(model);
+                            //}
                             if (CrossSectionOrCalculationFileValidation == 0)
                             {
                                 ErrorMessage = $"Invalid Cross-Section/Calculation file type. Please upload a PDF file only";
@@ -1093,12 +1093,12 @@ namespace Noc_App.Controllers
                                 return View(model);
                             }
 
-                            if (!AllowedFileSize(model.KmlFile))
-                            {
-                                ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
+                            //if (!AllowedFileSize(model.KmlFile))
+                            //{
+                            //    ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
+                            //    ModelState.AddModelError("", ErrorMessage);
+                            //    return View(model);
+                            //}
 
                             if (!AllowedFileSize(model.CrossSectionOrCalculationFile))
                             {
@@ -1119,7 +1119,7 @@ namespace Noc_App.Controllers
                             string uniqueGisOrDwsFileName = ProcessUploadedFile(model.GisOrDwsFile, "GisOrDws");
                             string uniqueCrossSectionOrCalculationFileName = ProcessUploadedFile(model.CrossSectionOrCalculationFile, "CrossSectionOrCalculation");
                             string uniqueLSectionOfDrainFileName = ProcessUploadedFile(model.LSectionOfDrainFile, "LSectionOfDrain");
-                            string uniqueKmlFileName = ProcessUploadedFile(model.KmlFile, "kmlReport");
+                            //string uniqueKmlFileName = ProcessUploadedFile(model.KmlFile, "kmlReport");
 
 
                         obj.SiteConditionReportPath = uniqueSiteConditionFileName;
@@ -1128,7 +1128,7 @@ namespace Noc_App.Controllers
                         obj.DistanceFromCreekPath = uniqueDistanceFromCreekFileName;
                         obj.DrainLSectionPath = uniqueLSectionOfDrainFileName;
                         obj.GISOrDWSReportPath = uniqueGisOrDwsFileName;
-                        obj.KmlFileVerificationReportPath = uniqueKmlFileName;
+                        obj.IsKMLByApplicantValid = model.IsKMLByApplicantValid;
                         //}
                         //else
                         //{

@@ -90,6 +90,7 @@ builder.Services.AddScoped<IRepository<UserRoleDetails>, Repository<UserRoleDeta
 builder.Services.AddScoped<IRepository<RecommendationDetail>, Repository<RecommendationDetail>>();
 builder.Services.AddScoped<IRepository<GrantSectionsDetails>, Repository<GrantSectionsDetails>>();
 builder.Services.AddScoped<IRepository<GrantRejectionShortfallSection>, Repository<GrantRejectionShortfallSection>>();
+builder.Services.AddScoped<IRepository<PlanSanctionAuthorityMaster>, Repository<PlanSanctionAuthorityMaster>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
