@@ -34,8 +34,9 @@
                                             @if (Model.AreaAdditionalCalculation != null && Model.TotalAreaCalculation != "")
                                             {
                                                 <center><h5>@Model.TotalAreaCalculation</h5></center>
-                                            }
+                                            }else{
                                             <center><h5>Total Amount : ₹@Model.Amount</h5></center>
+                                            }
                                             <input hidden asp-for="Amount" />
                                             <input hidden asp-for="GrantId" />
                                             <input hidden asp-for="Name" />

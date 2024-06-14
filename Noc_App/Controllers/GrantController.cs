@@ -1013,8 +1013,8 @@ namespace Noc_App.Controllers
                     string endDateStr = string.Format("{0:dd/MM/yyyy}", DateTime.Now);
                     DateTime startDate = ParseDate(startDateStr);
                     DateTime endDate = ParseDate(endDateStr);
-                    int businessDays = CalculateBusinessDays(startDate, endDate);
-                    int totalDays = (await _repoDaysCheckMaster.FindAsync(x => x.Code == "SF")).FirstOrDefault().NoOfDays;
+                    double businessDays = CalculateBusinessDays(startDate, endDate);
+                    double totalDays = (await _repoDaysCheckMaster.FindAsync(x => x.Code == "SF")).FirstOrDefault().NoOfDays;
                     if (businessDays <= totalDays)
                     {
                         if (grant.Grant.IsShortFallCompleted == false)
@@ -1272,8 +1272,8 @@ namespace Noc_App.Controllers
                     string endDateStr = string.Format("{0:dd/MM/yyyy}", DateTime.Now);
                     DateTime startDate = ParseDate(startDateStr);
                     DateTime endDate = ParseDate(endDateStr);
-                    int businessDays = CalculateBusinessDays(startDate, endDate);
-                    int totalDays = (await _repoDaysCheckMaster.FindAsync(x => x.Code == "SF")).FirstOrDefault().NoOfDays;
+                    double businessDays = CalculateBusinessDays(startDate, endDate);
+                    double totalDays = (await _repoDaysCheckMaster.FindAsync(x => x.Code == "SF")).FirstOrDefault().NoOfDays;
                     if (businessDays <= totalDays)
                     {
                         if (grant.Grant.IsShortFallCompleted == false)
@@ -1498,7 +1498,7 @@ namespace Noc_App.Controllers
             // Parse date in dd/MM/yyyy format
             return DateTime.ParseExact(dateStr, "dd/MM/yyyy", CultureInfo.InvariantCulture);
         }
-        private int CalculateBusinessDays(DateTime start, DateTime end)
+        private double CalculateBusinessDays(DateTime start, DateTime end)
         {
             if (start > end)
                 throw new ArgumentException("Start date must be before end date");

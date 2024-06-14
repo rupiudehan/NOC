@@ -621,6 +621,7 @@
                                         {
                                             <div class="tab-pane fade @showowner @Model.GrantSections.isOActive" id="nav-owner" role="tabpanel" aria-labelledby="nav-owner-tab">
                                                 <div class="card-body">
+
                                                     <form class="user" method="post" id="ownerForm">
 
                                                         <div class="row">
@@ -628,7 +629,7 @@
                                                                 <div class="form-group">
                                                                     <input type="hidden" asp-for="GrantSections.ownerid" id="ownersecid" />
                                                                     <input type="hidden" asp-for="OwnerGrantId" id="OwnerGrantId" name="OwnerGrantId" />
-                                                                    <input type="hidden" asp-for="ApplicationID" id="ownerApplicationId" name="ownerApplicationId" />
+                                                                    <input type="hidden" asp-for="ApplicationID" id="OwnerApplicationId" name="OwnerApplicationId" />
                                                                     <input type="hidden" asp-for=OwnerId />
                                                                     <label asp-for="SelectedOwnerTypeID" class="control-label">Owner Type</label>
                                                                     <select asp-for="SelectedOwnerTypeID" asp-items="@Model.OwnerType" class="form-control">
@@ -673,6 +674,7 @@
                                                                 <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue('owner')">&times;</span></div>
                                                             </div>
                                                         </div>
+                                                    </form>
                                                         <div class="row">
                                                             <table id="ownerTable" class="table">
                                                                 <thead>
@@ -720,7 +722,6 @@
                                                             </table>
 
                                                         </div>
-                                                    </form>
                                                 </div>
                                             </div>
                                         }

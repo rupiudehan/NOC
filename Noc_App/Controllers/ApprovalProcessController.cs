@@ -89,7 +89,7 @@ namespace Noc_App.Controllers
             _grantrejectionRepository = grantrejectionRepository;
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<ViewResult> Index()
         {
             try
@@ -120,7 +120,7 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public IActionResult ShortFall(string id)
         {
@@ -139,7 +139,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ShortFall(GrantApprovalDetailShortfall model)
@@ -233,7 +233,7 @@ namespace Noc_App.Controllers
             }
             return View(model);
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public IActionResult Transfer(string id)
         {
@@ -311,7 +311,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -408,7 +408,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         [HttpGet]
         public async Task<ViewResult> Forward(string Id)
@@ -422,6 +422,8 @@ namespace Noc_App.Controllers
 
                     return View("NotFound");
                 }
+
+                GrantApprovalDetail approval=(from a in _repoApprovalDetail.GetAll() where a.GrantID==grant.Id orderby a.Id descending select a).FirstOrDefault();
                 
                 double total = 0;
                 var divisionDetail = (from g in (await _repo.FindAsync(x => x.ApplicationID == Id))
@@ -480,7 +482,7 @@ namespace Noc_App.Controllers
                                     }
                                     ).ToList();
                 }
-                //else
+                else
                 {
                     switch (roleName)
                     {
@@ -491,13 +493,25 @@ namespace Noc_App.Controllers
                             forwardToRole = "EXECUTIVE ENGINEER";
                             break;
                         case "EXECUTIVE ENGINEER":
-                            forwardToRole = grant.IsForwarded == false ? "JUNIOR ENGINEER" : "CIRCLE OFFICER";
+                            if (grant.IsForwarded == false)
+                                forwardToRole = "JUNIOR ENGINEER";
+                            else if (approval.ProcessedByRole== "SUB DIVISIONAL OFFICER")
+                                forwardToRole = "DWS,CIRCLE OFFICER";
+                            else forwardToRole = "CIRCLE OFFICER";
                             break;
                         case "CIRCLE OFFICER":
-                            forwardToRole = "DWS";
+                            forwardToRole = "EXECUTIVE ENGINEER HQ";
                             break;
                         case "DWS":
-                            forwardToRole = "EXECUTIVE ENGINEER HQ";
+                            if (approval.ProcessedByRole == "EXECUTIVE ENGINEER")
+                                forwardToRole = "ADE";
+                            else forwardToRole = "DIRECTOR DRAINAGE";
+                            break;
+                        case "ADE":
+                            forwardToRole = "DIRECTOR DRAINAGE";
+                            break;
+                        case "DIRECTOR DRAINAGE":
+                            forwardToRole = "EXECUTIVE ENGINEER";
                             break;
                         case "EXECUTIVE ENGINEER HQ":
                             forwardToRole = "CHIEF ENGINEER HQ";
@@ -509,11 +523,12 @@ namespace Noc_App.Controllers
                             forwardToRole = "JUNIOR ENGINEER"; break;
                     }
 
-                    UserRoleDetails userRoleDetails =  (await GetAppRoleName(forwardToRole));
+                    //UserRoleDetails userRoleDetails =  (await GetAppRoleName(forwardToRole));
 
                     //officerDetail = await GetOfficer(divisionId, userRoleDetails.RoleName,"0"); 
 
-                    officerDetail = forwardToRole== "JUNIOR ENGINEER"? await GetOfficer(divisionId, forwardToRole, "0"): await GetOfficer(divisionId, userRoleDetails.RoleName, "0");
+                    //officerDetail = forwardToRole== "JUNIOR ENGINEER"? await GetOfficer(divisionId, forwardToRole, "0"): await GetOfficer(divisionId, userRoleDetails.RoleName, "0");
+                    officerDetail =  await GetOfficer(divisionId, forwardToRole, "0");
                 }
                 List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
                 recommendations = _repoRecommendation.GetAll().Where(x=>x.Code!="NA").ToList();
@@ -538,7 +553,7 @@ namespace Noc_App.Controllers
                                                           Remarks="",
                                                           Recommendations= recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
                                                           SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
-                                                          Officers = officerDetail!=null? new SelectList(officerDetail, "UserId", "UserName"):null,
+                                                          Officers = officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null,
                                                           LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + v.Name + ", Pincode: " + v.PinCode,
                                                       }).FirstOrDefault();
                 
@@ -551,7 +566,7 @@ namespace Noc_App.Controllers
             }
 
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -618,6 +633,7 @@ namespace Noc_App.Controllers
                 string forwardToRole = "";
                 string subdiv = "0";
                 OfficerDetails officerDetail = new OfficerDetails();
+                GrantApprovalDetail approval = (from a in _repoApprovalDetail.GetAll() where a.GrantID == grant.Id orderby a.Id descending select a).FirstOrDefault();
                 switch (role)
                 {
                     case "JUNIOR ENGINEER":
@@ -627,13 +643,25 @@ namespace Noc_App.Controllers
                         forwardToRole = "EXECUTIVE ENGINEER";
                         break;
                     case "EXECUTIVE ENGINEER":
-                        forwardToRole = grant.IsForwarded == false ? "JUNIOR ENGINEER" : "CIRCLE OFFICER";
+                        if (grant.IsForwarded == false)
+                            forwardToRole = "JUNIOR ENGINEER";
+                        else if (approval.ProcessedByRole == "SUB DIVISIONAL OFFICER")
+                            forwardToRole = "DWS,CIRCLE OFFICER";
+                        else forwardToRole = "CIRCLE OFFICER";
                         break;
                     case "CIRCLE OFFICER":
-                        forwardToRole = "DWS";
+                        forwardToRole = "EXECUTIVE ENGINEER HQ";
                         break;
                     case "DWS":
-                        forwardToRole = "EXECUTIVE ENGINEER HQ";
+                        if (approval.ProcessedByRole == "EXECUTIVE ENGINEER")
+                            forwardToRole = "ADE";
+                        else forwardToRole = "DIRECTOR DRAINAGE";
+                        break;
+                    case "ADE":
+                        forwardToRole = "DIRECTOR DRAINAGE";
+                        break;
+                    case "DIRECTOR DRAINAGE":
+                        forwardToRole = "EXECUTIVE ENGINEER";
                         break;
                     case "EXECUTIVE ENGINEER HQ":
                         forwardToRole = "CHIEF ENGINEER HQ";
@@ -644,7 +672,46 @@ namespace Noc_App.Controllers
                     default:
                         forwardToRole = "JUNIOR ENGINEER"; break;
                 }
-                string forwardrole = (await GetAppRoleName(forwardToRole)).RoleName;
+                //switch (role)
+                //{
+                //    case "JUNIOR ENGINEER":
+                //        forwardToRole = "SUB DIVISIONAL OFFICER";
+                //        break;
+                //    case "SUB DIVISIONAL OFFICER":
+                //        forwardToRole = "EXECUTIVE ENGINEER";
+                //        break;
+                //    case "EXECUTIVE ENGINEER":
+                //        forwardToRole = grant.IsForwarded == false ? "JUNIOR ENGINEER" : "CIRCLE OFFICER";
+                //        break;
+                //    case "CIRCLE OFFICER":
+                //        forwardToRole = "DWS";
+                //        break;
+                //    case "DWS":
+                //        forwardToRole = "EXECUTIVE ENGINEER HQ";
+                //        break;
+                //    case "EXECUTIVE ENGINEER HQ":
+                //        forwardToRole = "CHIEF ENGINEER HQ";
+                //        break;
+                //    case "CHIEF ENGINEER HQ":
+                //        forwardToRole = "PRINCIPAL SECRETARY";
+                //        break;
+                //    default:
+                //        forwardToRole = "JUNIOR ENGINEER"; break;
+                //}
+                var roles = forwardToRole.Split(',');
+                string forwardrole = "";
+                if (roles.Count() > 1)
+                {
+                    for (int i = 0; i < roles.Count(); i++)
+                    {
+                        if (forwardrole != "")
+                            forwardrole += "," + roles[i];// ((await GetAppRoleName(roles[i])).RoleName);
+                        else forwardrole += roles[i];// (await GetAppRoleName(roles[i])).RoleName;
+                    }
+
+                }
+                else forwardrole = forwardToRole;// (await GetAppRoleName(forwardToRole)).RoleName;
+
                 if (forwardToRole=="JUNIOR ENGINEER")
                 {
                     subdiv = model.SelectedSubDivisionId;
@@ -654,7 +721,8 @@ namespace Noc_App.Controllers
                 else
                 {
                     //officerDetail = (await GetOfficer(divisionId, forwardToRole, subdiv)).FindAll(x => x.UserId == model.SelectedOfficerId).FirstOrDefault();
-                    officerDetail = (await GetOfficer(divisionId, forwardrole, subdiv)).FindAll(x => x.UserId == model.SelectedOfficerId).FirstOrDefault();
+                    var offc = (await GetOfficer(divisionId, forwardrole, subdiv)).FindAll(x => x.UserId == model.SelectedOfficerId);
+                    officerDetail = offc.Find(x=>x.UserId==model.SelectedOfficerId);
                 }
                 string forwardedUser = officerDetail.UserId;
                 string forwardedRole = officerDetail.RoleName;
@@ -886,7 +954,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public ViewResult EditApprovalDocuments(string grantId,long docId)
         {
@@ -925,7 +993,7 @@ namespace Noc_App.Controllers
 
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -1151,7 +1219,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public IActionResult Reject(string id)
         {
@@ -1167,7 +1235,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(GrantApprovalDetailReject model)
@@ -1355,7 +1423,8 @@ namespace Noc_App.Controllers
                 ProcessedByName = username + "(" + designation + ")",
                 ProcessLevel = approvalLevel + 1,
                 ProcessedToRole = "",
-                ProcessedToUser = ""
+                ProcessedToUser = "",
+                RecommendationID=3
             };
 
             await _repoApprovalDetail.CreateAsync(approvalDetail);
@@ -1406,7 +1475,7 @@ namespace Noc_App.Controllers
             return PhysicalFile(filePath, mimeType, fileName);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<IActionResult> ViewApplication(string Id)
         {
             try
@@ -1571,18 +1640,18 @@ namespace Noc_App.Controllers
             return uniqueFileName;
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         [HttpPost]
         public async Task<IActionResult> GetOfficers(int subdivisionId,string roleName)
         {
             string divisionId = "0";
-            string role = (await GetAppRoleName(roleName)).RoleName;
-            List<OfficerDetails> officerDetail = await GetOfficer(divisionId, role, subdivisionId.ToString());
+            //string role = (await GetAppRoleName(roleName)).RoleName;
+            List<OfficerDetails> officerDetail = await GetOfficer(divisionId, roleName, subdivisionId.ToString());
             return Json(new SelectList(officerDetail, "UserId", "UserName"));
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public IActionResult GetRecommendationDetail(string id)
         {
@@ -1619,7 +1688,7 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private List<LoginResponseViewModel> FetchUser()
         {
@@ -1632,6 +1701,9 @@ namespace Noc_App.Controllers
             user_info user_info6 = new user_info();
             user_info user_info7 = new user_info();
             user_info user_info8 = new user_info();
+            user_info user_info11 = new user_info();
+            user_info user_info9 = new user_info();
+            user_info user_info10 = new user_info();
             user_info1 =new user_info { Name = "Junior Engineer", Designation = "xyz", DesignationID = 1, Role = "Junior Engineer", RoleID = 60, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "test", SubDivisionID = 114 };
             user_info2 = new user_info { Name = "Sub Divisional Officer", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info3 = new user_info { Name = "Superintending Engineer", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
@@ -1640,6 +1712,9 @@ namespace Noc_App.Controllers
             user_info6 = new user_info { Name = "Chief Engineer", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 10, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info7 = new user_info { Name = "Principal Secretary", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 6, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info8 = new user_info { Name = "ExecutiveEngineer", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "ExecutiveEngineer", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info11 = new user_info { Name = "ADE", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info9 = new user_info { Name = "Director Drainage", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info10 = new user_info { Name = "Administrator", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1, DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
             LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
             LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
@@ -1649,6 +1724,9 @@ namespace Noc_App.Controllers
             LoginResponseViewModel o6=new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info6 };
             LoginResponseViewModel o7= new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info7 };
             LoginResponseViewModel o8 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info8 };
+            LoginResponseViewModel o11 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info11 };
+            LoginResponseViewModel o9 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info9 };
+            LoginResponseViewModel o10 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info10 };
             users.Add(o1);
             users.Add(o2);
             users.Add(o3);
@@ -1657,10 +1735,13 @@ namespace Noc_App.Controllers
             users.Add(o6);
             users.Add(o7);
             users.Add(o8);
+            users.Add(o11);
+            users.Add(o9);
+            users.Add(o10);
             return users;
 
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole,string subdivisionId,string divisionId)
         {
@@ -1712,7 +1793,8 @@ namespace Noc_App.Controllers
                 //string resultContent = "["+tokenResponse1.Content.ReadAsStringAsync().Result.Replace("}{", "},{")+"]";
                 //List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
                 List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
-                officerRole = (await GetRoleName(officerRole)).RoleName;
+                //officerRole = (await GetRoleName(officerRole)).RoleName;
+                officerRole = (await GetAppRoleName(officerRole)).RoleName;
                 user_info user = users.Find(x => x.user_info.Role == officerRole).user_info;
                 OfficerResponseViewModel obj = new OfficerResponseViewModel
                 {
@@ -1740,7 +1822,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DD")]
         private async Task<UserRoleDetails> GetAppRoleName(string rolename)
         {
             try
@@ -1753,7 +1835,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         private async Task<UserRoleDetails> GetRoleName(string rolename)
         {
             try
@@ -1765,31 +1847,41 @@ namespace Noc_App.Controllers
                 return null;
             }
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private async Task<List<OfficerDetails>> GetOfficer(string divisionId,string roleName,string subDivision)
         {
             try
             {
-                List<OfficerResponseViewModel> officers = (await LoadOfficersAsync(roleName, subDivision, divisionId)).ToList();
+                var role = roleName.Split(',');
+                List<OfficerResponseViewModel> officers = new List<OfficerResponseViewModel>();
+                for (int i = 0;i< role.Count(); i++)
+                {
+                    List<OfficerResponseViewModel> officer = new List<OfficerResponseViewModel>();
+                    officer = (await LoadOfficersAsync(role[i], subDivision, divisionId)).ToList();
+                    officers.AddRange(officer);
+                    
+                }
+                
                 if (officers!=null && officers.Count > 0)
                 {
-                    OfficerDetail userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
+                    var userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
                                               join officer in officers on u.Id equals officer.user_info.RoleID
                                               select new OfficerDetail
                                               {
                                                   EmployeeId = officer.user_info.EmployeeId,
                                                   RoleName = u.AppRoleName,
                                                   RoleId = u.Id.ToString()
-                                              }).FirstOrDefault();
+                                              });
                     //var usersInRole = (await _userManager.GetUsersInRoleAsync(forwardToRole));
-                    List<OfficerDetails> officerDetails = ((from u in officers
+                    List<OfficerDetails> officerDetails = ((from u in officers.AsEnumerable()
+                                                            join o in userRole on u.user_info.EmployeeId equals o.EmployeeId
                                                             select new OfficerDetails
                                                             {
                                                                 UserId = u.user_info.EmployeeId,
                                                                 UserName = u.user_info.EmployeeName+"("+u.user_info.DeesignationName+")",
                                                                 RoleId = u.user_info.RoleID.ToString(),
-                                                                RoleName = userRole.RoleName
+                                                                RoleName = o.RoleName
                                                             }
                                                           ).ToList());
                     return officerDetails;

@@ -46,7 +46,7 @@ namespace Noc_App.Controllers
             _grantReportAppCountDetailsRepo = grantReportAppCountDetailsRepo;
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
         public IActionResult Index()
         {
             try
@@ -74,7 +74,7 @@ namespace Noc_App.Controllers
                 if (role.ToUpper() == "ADMINISTRATOR") return View();
                 else
                 {
-                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS")
+                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DD")
                     {
                         divisions = _divisionRepo.GetAll().ToList();
                     }
@@ -155,7 +155,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
         [HttpPost]
         public IActionResult GetSubDivisions(int divisionId)
         {
@@ -165,7 +165,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
         [HttpPost]
         public async Task<IActionResult> GetRoleLevel(string divisiondetailId, string subdivisiondetailId, string role)
         {
@@ -196,7 +196,7 @@ namespace Noc_App.Controllers
                 DivisionDetails divisions = new DivisionDetails();
                 if (divisionId == 0)
                 {
-                    if (role.ToUpper() == "PRINCIPAL SECRETARY" || role.ToUpper() == "EXECUTIVE ENGINEER HQ" || role.ToUpper() == "CHIEF ENGINEER HQ" || role.ToUpper() == "DWS")
+                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DD")
                     {
                         divisions = _divisionRepo.GetAll().FirstOrDefault();
                     }
@@ -363,7 +363,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
         private async Task<UserRoleDetails> GetAppRoleName(string rolename)
         {
             try
@@ -376,7 +376,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
         [HttpPost]
         public async Task<IActionResult> GetRoleLevelPendencyReport(string divisiondetailId, string subdivisiondetailId, string role)
         {
@@ -468,7 +468,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
         private async Task<UserRoleDetails> GetRoleName(string rolename)
         {
             try

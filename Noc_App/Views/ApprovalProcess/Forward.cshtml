@@ -88,12 +88,6 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label asp-for="IsKMLByApplicantValid" class="control-label"></label>
-                                    <input type="checkbox" asp-for="IsKMLByApplicantValid" />
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
                                     <label asp-for="CrossSectionOrCalculationFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
                                         <input asp-for="CrossSectionOrCalculationFile" class="form-control custom-file-input1" accept=".pdf" />
@@ -110,6 +104,12 @@
                                         @* <label class="custom-file-label1">Choose File...</label> *@
                                         <span asp-validation-for="LSectionOfDrainFile" id="LSectionOfDrainFile-error" class="text-danger"></span>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <b><label asp-for="IsKMLByApplicantValid" class="control-label"></label></b>
+                                    <input type="checkbox" asp-for="IsKMLByApplicantValid" checked />
                                 </div>
                             </div>
                         </div>
@@ -274,13 +274,13 @@
             $("#SelectedSubDivisionId").change(function () {
                 var subdivisionId = $(this).val();
                 var role = $('#ForwardToRole').val();
+                console.log(role);
                 $.ajax({
                     url: "/ApprovalProcess/GetOfficers",
                     type: "POST",
                     data: { subdivisionId: subdivisionId,roleName:role},
                     async:false,
                     success: function (data) {
-                        console.log(JSON.stringify(data));
                         populateDropdown(data, "OfficerId");
                     },
                     failure: function (f) {

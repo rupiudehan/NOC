@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Noc_App.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240614102653_addeddaysforadeandDD")]
+    partial class addeddaysforadeandDD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,16 +296,6 @@ namespace NocApp.Migrations
                             IsRelatedToIssue = 0,
                             NoOfDays = 0.5,
                             UserRoleID = 35
-                        },
-                        new
-                        {
-                            Id = 12,
-                            CheckFor = "Shortfall",
-                            Code = "SF",
-                            IsRelatedToForward = 0,
-                            IsRelatedToIssue = 0,
-                            NoOfDays = 7.0,
-                            UserRoleID = 0
                         });
                 });
 

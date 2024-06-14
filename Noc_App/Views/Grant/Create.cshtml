@@ -100,23 +100,6 @@
                                                     <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label asp-for="SelectedPlanSanctionAuthorityId" class="control-label"></label>
-                                                    <select asp-for="SelectedPlanSanctionAuthorityId" asp-items="@Model.PlanSanctionAuthorityMaster" class="form-control">
-                                                        <option value="">Select</option>
-                                                    </select>
-                                                    <span asp-validation-for="SelectedPlanSanctionAuthorityId" class="text-danger"></span>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="LayoutPlanFilePhoto" class="control-label">Layout Plan Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
-                                                    <div class="custom-file1">
-                                                        <input asp-for="LayoutPlanFilePhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
-                                                        @* <label class="custom-file-label1">Choose File...</label> *@
-                                                        <span asp-validation-for="LayoutPlanFilePhoto" id="LayoutPlanFilePhoto-error" class="text-danger"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-group">
                                                     <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
                                                     <select asp-for="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
                                                         <option value="">Select</option>
@@ -130,9 +113,18 @@
                                                     </select>
                                                     <span asp-validation-for="SelectedVillageID" class="text-danger"></span>
                                                 </div>
+                                            </div>
+                                            <div class="col-lg-6">
                                                 <div class="form-group">
                                                     <label class="control-label">Pin Code</label>
                                                     <label asp-for="Pincode" id="Pincode" class="form-control form-control-user">@Model.Pincode</label>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="SelectedPlanSanctionAuthorityId" class="control-label"></label>
+                                                    <select asp-for="SelectedPlanSanctionAuthorityId" asp-items="@Model.PlanSanctionAuthorityMaster" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <span asp-validation-for="SelectedPlanSanctionAuthorityId" class="text-danger"></span>
                                                 </div>
                                                 <div class="form-group">
                                                     <label asp-for="AddressProofPhoto" class="control-label">Address Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
@@ -140,6 +132,14 @@
                                                         <input asp-for="AddressProofPhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
                                                         @* <label class="custom-file-label1">Choose File...</label> *@
                                                         <span asp-validation-for="AddressProofPhoto" id="AddressProofPhoto-error" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="LayoutPlanFilePhoto" class="control-label">Layout Plan Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
+                                                    <div class="custom-file1">
+                                                        <input asp-for="LayoutPlanFilePhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
+                                                        @* <label class="custom-file-label1">Choose File...</label> *@
+                                                        <span asp-validation-for="LayoutPlanFilePhoto" id="LayoutPlanFilePhoto-error" class="text-danger"></span>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">

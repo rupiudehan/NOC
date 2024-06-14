@@ -339,10 +339,10 @@
                                                                 }
                                                             }
                                                         }
-                                                        else
+                                                        @* else
                                                         {
-                                                            <td></td>
-                                                        }
+                                                            <td>4</td>
+                                                        } *@
                                                         @if (arry[0].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || x.LoggedInRole == "CHIEF ENGINEER HQ") && x.rejectionmust != 1))
                                                         {
                                                             @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || (data.LoggedInRole == "CHIEF ENGINEER HQ" && data.TotalArea < 25))
@@ -417,7 +417,7 @@
                                                                 {
                                                                     @if (arry[0].Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || data.LoggedInRole == "CHIEF ENGINEER HQ")
                                                                     {
-                                                                        <td>3</td>
+                                                                        <td></td>
                                                                     }
                                                                     <td>
                                                                         <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>

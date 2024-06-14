@@ -104,9 +104,12 @@ namespace Noc_App.Context
                 new DaysCheckMaster { Id = 3, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Junior Engineer", Code = "JE", NoOfDays = 2,UserRoleID=60 },
                 new DaysCheckMaster { Id = 4, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Sub Divisional Officer", Code = "SDO", NoOfDays = 2,UserRoleID=67 },
                 new DaysCheckMaster { Id = 5, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "XEN HO Drainage", Code = "EEHQ", NoOfDays = 3,UserRoleID=128 },
-                new DaysCheckMaster { Id = 6, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "XEN/DWS", Code = "D", NoOfDays = 1,UserRoleID=83 },
+                new DaysCheckMaster { Id = 6, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "XEN/DWS", Code = "D", NoOfDays = 0.5,UserRoleID=83 },
                 new DaysCheckMaster { Id = 7, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Principal Secretary", Code = "PS", NoOfDays = 1,UserRoleID=6 },
-                new DaysCheckMaster { Id = 8, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Superintending Engineer", Code = "CO", NoOfDays = 2,UserRoleID=8 }
+                new DaysCheckMaster { Id = 8, IsRelatedToForward=1,IsRelatedToIssue=0,CheckFor = "Superintending Engineer", Code = "CO", NoOfDays = 2,UserRoleID=8 },
+                new DaysCheckMaster { Id = 10, IsRelatedToForward = 1, IsRelatedToIssue = 0, CheckFor = "ADE/DWS", Code = "ADE", NoOfDays = 1, UserRoleID = 90 },
+                new DaysCheckMaster { Id = 11, IsRelatedToForward = 1, IsRelatedToIssue = 0, CheckFor = "Director Drainage", Code = "DD", NoOfDays = 0.5, UserRoleID = 35 },
+                new DaysCheckMaster { Id = 12, IsRelatedToForward = 0, IsRelatedToIssue = 0, CheckFor = "Shortfall", Code = "SF", NoOfDays = 7, UserRoleID = 7 }
                 );
 
             modelBuilder.Entity<UserRoleDetails>().HasData(

@@ -11,7 +11,7 @@ namespace Noc_App.Models
         public string Code { get; set; }
         public int IsRelatedToForward { get; set; }
         public int IsRelatedToIssue { get; set; }
-        public int NoOfDays { get; set; }
+        public double NoOfDays { get; set; }
         public int UserRoleID { get; set; }
         [ForeignKey(nameof(UserRoleID))]
         public UserRoleDetails UserRole { get; set; }

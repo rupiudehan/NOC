@@ -671,8 +671,8 @@ $(function () {
             }
         });
     }
-
-    if (document.getElementById("ownerForm") != null) {
+    if (document.getElementById("ownerForm") != null)
+    {
         $('#ownerForm').on('submit', function (e) {
             e.preventDefault(); // Prevent the form from submitting normally
             var OwnerGrantId = $('#OwnerGrantId').val();
@@ -683,11 +683,11 @@ $(function () {
             var OwnerAddress = $('#OwnerAddress').val();
             var OwnerMobileNo = $('#OwnerMobileNo').val();
             var OwnerEmail = $('#OwnerEmail').val();
+            var ownersecid = $('#ownersecid').val();
             var module = 'owner';
             allValid = ValidateFields(module, module);
             inputValidate = ValidateInputFields(module, module);
             //if (allValid) {
-
 
             if (allValid && inputValidate) {
                 var resultProjectMessage = $('#result' + module + 'Message');
@@ -697,7 +697,7 @@ $(function () {
                 $.ajax({
                     url: "/Grant/ModifyOwnerDetail",
                     type: "POST",
-                    data: { OwnerApplicationId: OwnerApplicationId, OwnerGrantId: OwnerGrantId, OwnerId: OwnerId, SelectedOwnerTypeID: SelectedOwnerTypeID, OwnerName: OwnerName, OwnerAddress: OwnerAddress, OwnerMobileNo: OwnerMobileNo, OwnerEmail: OwnerEmail },
+                    data: { OwnerApplicationId: OwnerApplicationId, OwnerGrantId: OwnerGrantId, OwnerId: OwnerId, SelectedOwnerTypeID: SelectedOwnerTypeID, OwnerName: OwnerName, OwnerAddress: OwnerAddress, OwnerMobileNo: OwnerMobileNo, OwnerEmail: OwnerEmail, ownersecid: ownersecid },
                     complete: function (r) {
 
                         ToggleLoadder(false);
