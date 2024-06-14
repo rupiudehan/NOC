@@ -79,7 +79,7 @@
                 </li>
                 <hr class="sidebar-divider">
             }
-            @if (User.Identity.IsAuthenticated && (User.IsInRole("Administrator") || User.IsInRole("EXECUTIVE ENGINEER")))
+            @if (User.Identity.IsAuthenticated && (User.IsInRole("Administrator")))
             {
                 <li class="nav-item active">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
