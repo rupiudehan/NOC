@@ -508,7 +508,7 @@ namespace Noc_App.Controllers
                             else forwardToRole = "DIRECTOR DRAINAGE";
                             break;
                         case "ADE":
-                            forwardToRole = "DIRECTOR DRAINAGE";
+                            forwardToRole = "DWS";
                             break;
                         case "DIRECTOR DRAINAGE":
                             forwardToRole = "EXECUTIVE ENGINEER";
@@ -658,7 +658,7 @@ namespace Noc_App.Controllers
                         else forwardToRole = "DIRECTOR DRAINAGE";
                         break;
                     case "ADE":
-                        forwardToRole = "DIRECTOR DRAINAGE";
+                        forwardToRole = "DWS";
                         break;
                     case "DIRECTOR DRAINAGE":
                         forwardToRole = "EXECUTIVE ENGINEER";

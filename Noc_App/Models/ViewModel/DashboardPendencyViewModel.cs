@@ -7,7 +7,7 @@
         public int Id { get; set; }
         public string ApplicationID { get; set; }
         public string ProjectName { get; set; }
-        public int Pendency { get; set; }
+        public double Pendency { get; set; }
         public string ApplyDate { get; set; }
     }
 }

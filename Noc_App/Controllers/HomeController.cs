@@ -155,7 +155,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public IActionResult GetSubDivisions(int divisionId)
         {
@@ -165,7 +165,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public async Task<IActionResult> GetRoleLevel(string divisiondetailId, string subdivisiondetailId, string role)
         {
@@ -196,7 +196,7 @@ namespace Noc_App.Controllers
                 DivisionDetails divisions = new DivisionDetails();
                 if (divisionId == 0)
                 {
-                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DD")
+                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE")
                     {
                         divisions = _divisionRepo.GetAll().FirstOrDefault();
                     }
@@ -237,7 +237,7 @@ namespace Noc_App.Controllers
                     if (subdivisionId == 0)
                     {
                         var subs = (from d in _subDivisionRepo.GetAll()
-                                        where d.Id == Convert.ToInt32(subdivisionsId)
+                                        where d.DivisionId == Convert.ToInt32(divisionId)
                                         select new SubDivisionDetails
                                         {
                                             Id = d.Id,
@@ -269,34 +269,46 @@ namespace Noc_App.Controllers
                         "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER"
                         });
                         break;
-                    case "CIRCLE OFFICER":
-                        list.Add(new object[]
-                        {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER"
-                        });
-                        break;
                     case "DWS":
                         list.Add(new object[]
                         {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","CIRCLE OFFICER"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER"/*,"CIRCLE OFFICER"*/
+                        });
+                        break;
+                    case "ADE":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS"
+                        });
+                        break;
+                    case "DIRECTOR DRAINAGE":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE"
+                        });
+                        break;
+                    case "CIRCLE OFFICER":
+                        list.Add(new object[]
+                        {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE"
                         });
                         break;
                     case "EXECUTIVE ENGINEER HQ":
                         list.Add(new object[]
                         {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","CIRCLE OFFICER","DWS"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER"
                         });
                         break;
                     case "CHIEF ENGINEER HQ":
                         list.Add(new object[]
                         {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","CIRCLE OFFICER","DWS","EXECUTIVE ENGINEER HQ"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ"
                         });
                         break;
                     default:
                         list.Add(new object[]
                         {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","CIRCLE OFFICER","DWS","EXECUTIVE ENGINEER HQ","CHIEF ENGINEER HQ"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ","CHIEF ENGINEER HQ"
                         }); break;
                 }
 
@@ -323,39 +335,52 @@ namespace Noc_App.Controllers
                                 item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER)
                                });
                             break;
-                        case "CIRCLE OFFICER":
-                            list.Add(new object[]
-                                {
-                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
-
-                                });
-                            break;
                         case "DWS":
                             list.Add(new object[]
                                {
                                 item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
-                                ,Convert.ToInt32(item.CIRCLE_OFFICER)
                                });
+                            break;
+                        case "ADE":
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                                ,Convert.ToInt32(item.dws)
+                               });
+                            break;
+                        case "DIRECTOR DRAINAGE":
+                            list.Add(new object[]
+                               {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                                ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE)
+                               });
+                            break;
+                        case "CIRCLE OFFICER":
+                            list.Add(new object[]
+                                {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                                ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE)
+                                });
                             break;
                         case "EXECUTIVE ENGINEER HQ":
                             list.Add(new object[]
                                {
                                 item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
-                                ,Convert.ToInt32(item.CIRCLE_OFFICER), Convert.ToInt32(item.dws)
+                                ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER)
                                });
                             break;
                         case "CHIEF ENGINEER HQ":
                             list.Add(new object[]
                                {
                                 item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
-                                ,Convert.ToInt32(item.CIRCLE_OFFICER), Convert.ToInt32(item.dws),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ)
+                                ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ)
                                });
                             break;
                         default:
                             list.Add(new object[]
                                {
                                 item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
-                                ,Convert.ToInt32(item.CIRCLE_OFFICER), Convert.ToInt32(item.dws),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ)
+                                ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ)
                                }); break;
                     }
                 }
@@ -363,7 +388,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
         private async Task<UserRoleDetails> GetAppRoleName(string rolename)
         {
             try
@@ -376,7 +401,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public async Task<IActionResult> GetRoleLevelPendencyReport(string divisiondetailId, string subdivisiondetailId, string role)
         {
@@ -403,7 +428,7 @@ namespace Noc_App.Controllers
                     DivisionDetails divisions = new DivisionDetails();
                     if (divisionId == 0)
                     {
-                        if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER HQ" || roleName == "CHIEF ENGINEER HQ" || roleName == "DWS")
+                        if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE")
                         {
                             divisions = _divisionRepo.GetAll().FirstOrDefault();
                         }
@@ -443,7 +468,7 @@ namespace Noc_App.Controllers
                         if (subdivisionId == 0)
                         {
                             var subs = (from d in _subDivisionRepo.GetAll()
-                                        where d.Id == Convert.ToInt32(subdivisionsId)
+                                        where d.DivisionId == Convert.ToInt32(divisionId)
                                         select new SubDivisionDetails
                                         {
                                             Id = d.Id,
@@ -468,7 +493,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DD")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
         private async Task<UserRoleDetails> GetRoleName(string rolename)
         {
             try
