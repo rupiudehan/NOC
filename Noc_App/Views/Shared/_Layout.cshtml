@@ -37,12 +37,25 @@
     @functions {
         private bool IsLinkActive(string controller, string action)
         {
-            // if (controller == "Home") return true;
+            // if (action == 'Master') {
+            //     return true;
+            // }
             // else
             // {
-            var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
-            var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-            return string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) && string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+                var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+                var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+                return string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) && string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+            // }
+        }
+
+        private bool IsLink2Active(bool rtn)
+        {
+            // if (action == 'Master') {
+            //     return true;
+            // }
+            // else
+            // {
+            return rtn;
             // }
         }
     }
@@ -81,7 +94,7 @@
             }
             @if (User.Identity.IsAuthenticated && (User.IsInRole("Administrator")))
             {
-                <li class="nav-item active">
+                <li class="nav-item @(IsLink2Active(true) ? "active" : "")" id="masterid">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
                    aria-expanded="true" aria-controls="masters">
                     <i class="fas fa-fw fa-cog"></i>
@@ -103,6 +116,14 @@
                 </div>
                 
                 
+                </li>
+                <hr class="sidebar-divider">
+
+                <li class="nav-item @(IsLinkActive("Home","ApplicationStatus") ? "active" : "")">
+                    <a class="nav-link" asp-action="ApplicationStatus" asp-controller="Home">
+                        <i class="fas fa-fw fa-bookmark"></i>
+                        <span>Application Status</span>
+                    </a>
                 </li>
                 <hr class="sidebar-divider">
             }

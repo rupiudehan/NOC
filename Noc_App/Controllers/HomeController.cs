@@ -25,6 +25,9 @@ namespace Noc_App.Controllers
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         private readonly IRepository<UserRoleDetails> _userRolesRepository;
         private readonly IRepository<ReportApplicationCountViewModel> _grantReportAppCountDetailsRepo;
+
+        public IRepository<GrantUnprocessedAppDetails> _grantUnprocessedAppDetailsRepo { get; }
+
         //private readonly IEmployeeRepository _employeeRepository;
         //[Obsolete]
         //private readonly IHostingEnvironment _hostingEnvironment;
@@ -33,7 +36,7 @@ namespace Noc_App.Controllers
         public HomeController(ILogger<HomeController> logger, IRepository<DashboardPendencyAll> pendencyDetailsRepo
             , IRepository<DivisionDetails> divisionRepo, IRepository<DashboardPendencyViewModel> pendencyRepo, IRepository<SubDivisionDetails> subDivisionRepo
             , IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<UserRoleDetails> userRolesRepository
-            , IRepository<ReportApplicationCountViewModel> grantReportAppCountDetailsRepo
+            , IRepository<ReportApplicationCountViewModel> grantReportAppCountDetailsRepo, IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
             )
         {            
             _pendencyDetailsRepo = pendencyDetailsRepo;
@@ -44,6 +47,7 @@ namespace Noc_App.Controllers
             _tehsilBlockRepo=tehsilBlockRepo;
             _userRolesRepository=userRolesRepository;
             _grantReportAppCountDetailsRepo = grantReportAppCountDetailsRepo;
+            _grantUnprocessedAppDetailsRepo = grantUnprocessedAppDetailsRepo;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
@@ -142,7 +146,33 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
-        
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
+        public IActionResult ApplicationStatus()
+        {
+            try
+            {
+                List<DivisionDetails> divisions = new List<DivisionDetails>();
+                List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
+                var roleName = LoggedInRoleName();
+                divisions = _divisionRepo.GetAll().ToList();
+                ApplicationStatusReportViewModel model = new ApplicationStatusReportViewModel
+                {
+                    Divisions = new SelectList(divisions, "Id", "Name"),
+                    hdnDivisionId = divisions.Count() > 0 ? divisions.FirstOrDefault().Id : 0,
+                    SelectedDivisionId= divisions.Count() > 0 ? divisions.FirstOrDefault().Id : 0,
+                    LoggedInRole = roleName.ToUpper()
+                };
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return View();
+        }
+
+
         public IActionResult Privacy()
         {
             return View();
@@ -484,6 +514,27 @@ namespace Noc_App.Controllers
                     
                     return Json(model);
                 }
+            }
+            catch (Exception ex)
+            {
+
+                return View();
+            }
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        public IActionResult GetApplicationStatusReport(string divisiondetailId)
+        {
+            try
+            {
+                string divisionsId = LoggedInDivisionID();
+                int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+                    
+                    List<GrantUnprocessedAppDetails> model = _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedure<GrantUnprocessedAppDetails>("getapplicationsstatus", 0, 0, 0, 0, divisionId).ToList();
+
+                    return Json(model);
+               
             }
             catch (Exception ex)
             {
