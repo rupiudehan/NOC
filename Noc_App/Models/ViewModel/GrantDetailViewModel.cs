@@ -22,6 +22,9 @@ namespace Noc_App.Models.ViewModel
         public string PlotNo { get; set; }
         [Display(Name = "Pin Code")]
         public string Pincode { get; set; }
+        public string PlanSanctionAuthorityName { get; set; }
+        public string LayoutPlanFilePath { get; set; }
+        public string FaradFilePath { get; set; }
         [Display(Name = "Village/Town/City")]
         public string VillageName { get; set; }
         [Display(Name = "Drainage Division")]
@@ -56,7 +59,33 @@ namespace Noc_App.Models.ViewModel
         public string ApplicationID { get; set; }
         public List<OwnerDetails> Owners { get; set; }
         public List<GrantKhasraDetails> Khasras { get; set; }
+        public List<GrantInspectionDocuments> GrantInspectionDocumentsDetail { get; set; }
         public string LocationDetail { get; set; }
         public string Domain { get; set; }
+    }
+
+    public class GrantInspectionDocuments
+    {
+        [Display(Name = "Site Condition Report")]
+        public string SiteConditionReportFilePath { get; set; }
+
+        [Display(Name = "Catchment Area & Flow")]
+        public string CatchmentAreaFilePath { get; set; }
+
+        [Display(Name = "Distance From the Creek")]
+        public string DistanceFromCreekFilePath { get; set; }
+
+        [Display(Name = "GIS Report/DWS Report")]
+        public string GisOrDwsFilePath { get; set; }
+
+        [Display(Name = "Cross-Section/Calculation Sheets")]
+        public string CrossSectionOrCalculationFilePath { get; set; }
+
+        [Display(Name = "L-Section of the Drain if Sanctioned")]
+        public string LSectionOfDrainFilePath { get; set; }
+        [Display(Name = "Is KML Provided by Applicant Valid")]
+        public bool IsKMLByApplicantValid { get; set; }
+        public string UploadedByRole { get; set; }
+        public string UploadedByName { get; set; }
     }
 }

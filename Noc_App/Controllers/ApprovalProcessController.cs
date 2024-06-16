@@ -50,6 +50,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<UserRoleDetails> _userRolesRepository;
         private readonly IRepository<GrantSectionsDetails> _grantsectionRepository;
         private readonly IRepository<GrantRejectionShortfallSection> _grantrejectionRepository;
+        private readonly IRepository<PlanSanctionAuthorityMaster> _repoPlanSanctionAuthtoryMaster;
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<GrantPaymentDetails> repoPayment,IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster
@@ -59,7 +60,7 @@ namespace Noc_App.Controllers
             , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
             , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation
             , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository
-            , IRepository<GrantRejectionShortfallSection> grantrejectionRepository)
+            , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
         {
             _repo = repo;
             _villageRpo = villageRepo;
@@ -87,6 +88,7 @@ namespace Noc_App.Controllers
             _userRolesRepository = userRolesRepository;
             _grantsectionRepository = grantsectionRepository;
             _grantrejectionRepository = grantrejectionRepository;
+            _repoPlanSanctionAuthtoryMaster = repoPlanSanctionAuthtoryMaster;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
@@ -925,7 +927,7 @@ namespace Noc_App.Controllers
                             ProcessedByName = LoggedInUserName() + "(" + LoggedInDesignationName() + ")"
                     };
 
-                        approvalDetail.GrantApprovalProcessDocuments=approvalObj;
+                        approvalDetail.GrantApprovalProcessDocuments.Add(approvalObj);
                         await _repoApprovalDetail.UpdateAsync(approvalDetail);
 
                     }
@@ -956,7 +958,7 @@ namespace Noc_App.Controllers
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
-        public ViewResult EditApprovalDocuments(string grantId,long docId)
+        public ViewResult EditApprovalDocuments(string grantId,long docId,long app)
         {
             try
             {
@@ -967,9 +969,9 @@ namespace Noc_App.Controllers
                     return View("NotFound");
                 }
                 ApprovalDocumentsViewModelEdit model = (from g in _repo.GetAll()
-                              join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID
-                              join doc in _repoApprovalDocument.GetAll() on app.Id equals doc.GrantApprovalID
-                              where g.ApplicationID == grantId
+                              join app2 in _repoApprovalDetail.GetAll() on g.Id equals app2.GrantID
+                              join doc in _repoApprovalDocument.GetAll() on app2.Id equals doc.GrantApprovalID
+                              where g.ApplicationID == grantId && app2.Id== app && (app2.ProcessedToUser==doc.ProcessedBy)
                               select new ApprovalDocumentsViewModelEdit
                               {
                                   CatchmentAreaFilePath=doc.CatchmentAreaAndFlowPath,
@@ -979,10 +981,30 @@ namespace Noc_App.Controllers
                                   IsKMLByApplicantValid=doc.IsKMLByApplicantValid,
                                   LSectionOfDrainFilePath=doc.DrainLSectionPath,
                                   SiteConditionReportFilePath=doc.SiteConditionReportPath,
-                                  GrantApprovalDocId=docId
+                                  GrantApprovalDocId=docId,
+                                  GrantApprovalId= app
                               }
                               ).FirstOrDefault();
-                
+                if (model == null)
+                {
+                    model = (from g in _repo.GetAll()
+                             join app2 in _repoApprovalDetail.GetAll() on g.Id equals app2.GrantID
+                             join doc in _repoApprovalDocument.GetAll() on app2.Id equals doc.GrantApprovalID
+                             where g.ApplicationID == grantId && (app2.ProcessedToUser == doc.ProcessedBy)
+                             select new ApprovalDocumentsViewModelEdit
+                             {
+                                 CatchmentAreaFilePath = doc.CatchmentAreaAndFlowPath,
+                                 CrossSectionOrCalculationFilePath = doc.CrossSectionOrCalculationSheetReportPath,
+                                 DistanceFromCreekFilePath = doc.DistanceFromCreekPath,
+                                 GisOrDwsFilePath = doc.GISOrDWSReportPath,
+                                 IsKMLByApplicantValid = doc.IsKMLByApplicantValid,
+                                 LSectionOfDrainFilePath = doc.DrainLSectionPath,
+                                 SiteConditionReportFilePath = doc.SiteConditionReportPath,
+                                 GrantApprovalDocId = docId,
+                                 GrantApprovalId = app
+                             }
+                                      ).OrderByDescending(x=>x.GrantApprovalDocId).FirstOrDefault();
+                }
                 return View(model);
             }
             catch (Exception ex)
@@ -1003,213 +1025,227 @@ namespace Noc_App.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    GrantApprovalProcessDocumentsDetails obj=await _repoApprovalDocument.GetBylongIdAsync(model.GrantApprovalDocId);
-                    if (obj == null)
+                    string uniqueSiteConditionFileName = "";
+                    string uniqueCatchmentAreaFileName = "";
+                    string uniqueDistanceFromCreekFileName = "";
+                    string uniqueGisOrDwsFileName = "";
+                    string uniqueCrossSectionOrCalculationFileName = "";
+                    string uniqueLSectionOfDrainFileName = "";
+
+                    string userId = LoggedInUserID();
+
+                    string divisionId = LoggedInDivisionID();
+
+                    string subdivisionId = LoggedInSubDivisionID();
+
+                    // Retrieve roles associated with the user
+                    var roleName = LoggedInRoleName();
+
+                    string role = roleName;
+                    string ErrorMessage = string.Empty;
+                    GrantApprovalProcessDocumentsDetails obj = new GrantApprovalProcessDocumentsDetails();
+                    if (model.GrantApprovalDocId != 0)
                     {
-                        ViewBag.ErrorMessage = $"Document with Id = {obj.Id} cannot be found";
-                        return View("NotFound");
+                        obj = await _repoApprovalDocument.GetBylongIdAsync(model.GrantApprovalDocId);
+                        if (obj == null)
+                        {
+                            ViewBag.ErrorMessage = $"Document with Id = {obj.Id} cannot be found";
+                            return View("NotFound");
+                        }
+
+                        uniqueSiteConditionFileName = obj.SiteConditionReportPath;
+                        uniqueCatchmentAreaFileName = obj.CatchmentAreaAndFlowPath;
+                        uniqueDistanceFromCreekFileName = obj.DistanceFromCreekPath;
+                        uniqueGisOrDwsFileName = obj.GISOrDWSReportPath;
+                        uniqueCrossSectionOrCalculationFileName = obj.CrossSectionOrCalculationSheetReportPath;
+                        uniqueLSectionOfDrainFileName = obj.DrainLSectionPath;
                     }
-                    else
+                    if(CheckFiles(model.SiteConditionReportFile)==0 && CheckFiles(model.CatchmentAreaFile) == 0 && CheckFiles(model.DistanceFromCreekFile) == 0 &&
+                        CheckFiles(model.GisOrDwsFile) == 0 && CheckFiles(model.CrossSectionOrCalculationFile) == 0 && CheckFiles(model.LSectionOfDrainFile) == 0)                   
                     {
-                        //if (model.SiteConditionReportFile != null && model.CatchmentAreaFile != null && model.DistanceFromCreekFile != null && model.GisOrDwsFile != null && model.KmlFile != null && model.CrossSectionOrCalculationFile != null && model.LSectionOfDrainFile != null)
-                        //{
-                        //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        ErrorMessage = $"Atleast one file is required to upload";
+                        ModelState.AddModelError("", ErrorMessage);
 
-                        // Retrieve the user object
-                        //var user = await _userManager.FindByIdAsync(userId);
+                        return View(model);
+                    }
+                    if (CheckFiles(model.SiteConditionReportFile) != 0)
+                    {
+                        int siteConditionValidation = AllowedCheckExtensions(model.SiteConditionReportFile);
+                        if (siteConditionValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid site condition report file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
 
-                        string userId = LoggedInUserID();
+                            return View(model);
 
-                        string divisionId = LoggedInDivisionID();
+                        }
+                        else if (siteConditionValidation == 2)
+                        {
+                            ErrorMessage = "Site condition report field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (!AllowedFileSize(model.SiteConditionReportFile))
+                        {
+                            ErrorMessage = "Site condition report size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        uniqueSiteConditionFileName = ProcessUploadedFile(model.SiteConditionReportFile, "SiteCondition");
+                    }
+                    if (CheckFiles(model.CatchmentAreaFile) != 0)
+                    {
+                        int CatchmentAreaValidation = AllowedCheckExtensions(model.CatchmentAreaFile);
+                        if (CatchmentAreaValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid catchment area file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
 
-                        string subdivisionId = LoggedInSubDivisionID();
+                        }
+                        else if (CatchmentAreaValidation == 2)
+                        {
+                            ErrorMessage = "Catchment area field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (!AllowedFileSize(model.CatchmentAreaFile))
+                        {
+                            ErrorMessage = "Catchment area file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        uniqueCatchmentAreaFileName = ProcessUploadedFile(model.CatchmentAreaFile, "CatchmentArea");
+                    }
+                    if (CheckFiles(model.DistanceFromCreekFile) != 0)
+                    {
+                        int DistanceFromCreekFileValidation = AllowedCheckExtensions(model.DistanceFromCreekFile);
+                        if (DistanceFromCreekFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid distance from creek file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
 
-                        // Retrieve roles associated with the user
-                        var roleName = LoggedInRoleName();
+                        }
+                        else if (DistanceFromCreekFileValidation == 2)
+                        {
+                            ErrorMessage = "Distance from creek file field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (!AllowedFileSize(model.DistanceFromCreekFile))
+                        {
+                            ErrorMessage = "Distance from creek file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        uniqueDistanceFromCreekFileName = ProcessUploadedFile(model.DistanceFromCreekFile, "DistanceFromCreek");
+                    }
+                    if (CheckFiles(model.GisOrDwsFile) != 0)
+                    {
+                        int GisOrDwsFileValidation = AllowedCheckExtensions(model.GisOrDwsFile);
+                        if (GisOrDwsFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid GIS/DWS file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
 
-                        string role = roleName;
-                        string ErrorMessage = string.Empty;
-                            int siteConditionValidation = AllowedCheckExtensions(model.SiteConditionReportFile);
-                            int CatchmentAreaValidation = AllowedCheckExtensions(model.CatchmentAreaFile);
-                            int DistanceFromCreekFileValidation = AllowedCheckExtensions(model.DistanceFromCreekFile);
-                            int GisOrDwsFileValidation = AllowedCheckExtensions(model.GisOrDwsFile);
-                            //int KmlFileValidation = AllowedCheckExtensions(model.KmlFile);
-                            int CrossSectionOrCalculationFileValidation = AllowedCheckExtensions(model.CrossSectionOrCalculationFile);
-                            int LSectionOfDrainFileValidation = AllowedCheckExtensions(model.LSectionOfDrainFile);
-                            if (siteConditionValidation == 0)
-                            {
-                                ErrorMessage = $"Invalid site condition report file type. Please upload a PDF file only";
-                                ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
 
-                                return View(model);
+                        }
+                        else if (GisOrDwsFileValidation == 2)
+                        {
+                            ErrorMessage = "GIS/DWS File field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (!AllowedFileSize(model.GisOrDwsFile))
+                        {
+                            ErrorMessage = "GIS/DWS file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        uniqueGisOrDwsFileName = ProcessUploadedFile(model.GisOrDwsFile, "GisOrDws");
 
-                            }
-                            else if (siteConditionValidation == 2)
-                            {
-                                ErrorMessage = "Site condition report field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-                            if (CatchmentAreaValidation == 0)
-                            {
-                                ErrorMessage = $"Invalid catchment area file type. Please upload a PDF file only";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
+                    }
+                    if (CheckFiles(model.CrossSectionOrCalculationFile) != 0)
+                    {
+                        int CrossSectionOrCalculationFileValidation = AllowedCheckExtensions(model.CrossSectionOrCalculationFile);
+                        if (CrossSectionOrCalculationFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid Cross-Section/Calculation file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
 
-                            }
-                            else if (CatchmentAreaValidation == 2)
-                            {
-                                ErrorMessage = "Catchment area field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-                            if (DistanceFromCreekFileValidation == 0)
-                            {
-                                ErrorMessage = $"Invalid distance from creek file type. Please upload a PDF file only";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
+                            return View(model);
 
-                            }
-                            else if (DistanceFromCreekFileValidation == 2)
-                            {
-                                ErrorMessage = "Distance from creek file field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
+                        }
+                        else if (CrossSectionOrCalculationFileValidation == 2)
+                        {
+                            ErrorMessage = "Cross-Section/Calculation file field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        if (!AllowedFileSize(model.CrossSectionOrCalculationFile))
+                        {
+                            ErrorMessage = "Cross-Section/Calculation file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        uniqueCrossSectionOrCalculationFileName = ProcessUploadedFile(model.CrossSectionOrCalculationFile, "CrossSectionOrCalculation");
+                    }
+                    if (CheckFiles(model.LSectionOfDrainFile) != 0)
+                    {
+                        int LSectionOfDrainFileValidation = AllowedCheckExtensions(model.LSectionOfDrainFile);
 
-                            if (LSectionOfDrainFileValidation == 0)
-                            {
-                                ErrorMessage = $"Invalid GIS/DWS file type. Please upload a PDF file only";
-                                ModelState.AddModelError("", ErrorMessage);
+                        if (LSectionOfDrainFileValidation == 0)
+                        {
+                            ErrorMessage = $"Invalid L-Section of drain file type. Please upload a PDF file only";
+                            ModelState.AddModelError("", ErrorMessage);
 
-                                return View(model);
+                            return View(model);
 
-                            }
-                            else if (GisOrDwsFileValidation == 2)
-                            {
-                                ErrorMessage = "GIS/DWS File field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
+                        }
+                        else if (LSectionOfDrainFileValidation == 2)
+                        {
+                            ErrorMessage = "L-Section of drain file field is required";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
 
-                            //if (KmlFileValidation == 0)
-                            //{
-                            //    ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
-                            //    ModelState.AddModelError("", ErrorMessage);
+                        if (!AllowedFileSize(model.LSectionOfDrainFile))
+                        {
+                            ErrorMessage = "L-Section of drain file size exceeds the allowed limit of 4MB";
+                            ModelState.AddModelError("", ErrorMessage);
+                            return View(model);
+                        }
+                        uniqueLSectionOfDrainFileName = ProcessUploadedFile(model.LSectionOfDrainFile, "LSectionOfDrain");
+                    }
 
-                            //    return View(model);
-
-                            //}
-                            //else if (KmlFileValidation == 2)
-                            //{
-                            //    ErrorMessage = "KML File field is required";
-                            //    ModelState.AddModelError("", ErrorMessage);
-                            //    return View(model);
-                            //}
-                            if (CrossSectionOrCalculationFileValidation == 0)
-                            {
-                                ErrorMessage = $"Invalid Cross-Section/Calculation file type. Please upload a PDF file only";
-                                ModelState.AddModelError("", ErrorMessage);
-
-                                return View(model);
-
-                            }
-                            else if (CrossSectionOrCalculationFileValidation == 2)
-                            {
-                                ErrorMessage = "Cross-Section/Calculation file field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-                            if (LSectionOfDrainFileValidation == 0)
-                            {
-                                ErrorMessage = $"Invalid L-Section of drain file type. Please upload a PDF file only";
-                                ModelState.AddModelError("", ErrorMessage);
-
-                                return View(model);
-
-                            }
-                            else if (LSectionOfDrainFileValidation == 2)
-                            {
-                                ErrorMessage = "L-Section of drain file field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-
-                            if (!AllowedFileSize(model.SiteConditionReportFile))
-                            {
-                                ErrorMessage = "Site condition report size exceeds the allowed limit of 4MB";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-                            if (!AllowedFileSize(model.CatchmentAreaFile))
-                            {
-                                ErrorMessage = "Catchment area file size exceeds the allowed limit of 4MB";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-                            if (!AllowedFileSize(model.DistanceFromCreekFile))
-                            {
-                                ErrorMessage = "Distance from creek file size exceeds the allowed limit of 4MB";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-
-                            if (!AllowedFileSize(model.GisOrDwsFile))
-                            {
-                                ErrorMessage = "GIS/DWS file size exceeds the allowed limit of 4MB";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-
-                            //if (!AllowedFileSize(model.KmlFile))
-                            //{
-                            //    ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
-                            //    ModelState.AddModelError("", ErrorMessage);
-                            //    return View(model);
-                            //}
-
-                            if (!AllowedFileSize(model.CrossSectionOrCalculationFile))
-                            {
-                                ErrorMessage = "Cross-Section/Calculation file size exceeds the allowed limit of 4MB";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-
-                            if (!AllowedFileSize(model.LSectionOfDrainFile))
-                            {
-                                ErrorMessage = "L-Section of drain file size exceeds the allowed limit of 4MB";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(model);
-                            }
-                            string uniqueSiteConditionFileName = ProcessUploadedFile(model.SiteConditionReportFile, "SiteCondition");
-                            string uniqueCatchmentAreaFileName = ProcessUploadedFile(model.CatchmentAreaFile, "CatchmentArea");
-                            string uniqueDistanceFromCreekFileName = ProcessUploadedFile(model.DistanceFromCreekFile, "DistanceFromCreek");
-                            string uniqueGisOrDwsFileName = ProcessUploadedFile(model.GisOrDwsFile, "GisOrDws");
-                            string uniqueCrossSectionOrCalculationFileName = ProcessUploadedFile(model.CrossSectionOrCalculationFile, "CrossSectionOrCalculation");
-                            string uniqueLSectionOfDrainFileName = ProcessUploadedFile(model.LSectionOfDrainFile, "LSectionOfDrain");
-                            //string uniqueKmlFileName = ProcessUploadedFile(model.KmlFile, "kmlReport");
-
-
-                        obj.SiteConditionReportPath = uniqueSiteConditionFileName;
-                        obj.CatchmentAreaAndFlowPath = uniqueCatchmentAreaFileName;
-                        obj.CrossSectionOrCalculationSheetReportPath = uniqueCrossSectionOrCalculationFileName;
-                        obj.DistanceFromCreekPath = uniqueDistanceFromCreekFileName;
-                        obj.DrainLSectionPath = uniqueLSectionOfDrainFileName;
-                        obj.GISOrDWSReportPath = uniqueGisOrDwsFileName;
-                        obj.IsKMLByApplicantValid = model.IsKMLByApplicantValid;
-                        //}
-                        //else
-                        //{
-                        //    ModelState.AddModelError(string.Empty, "All documents are required to be uploaded");
-                        //    return View(model);
-                        //}
+                    obj.SiteConditionReportPath = uniqueSiteConditionFileName;
+                    obj.CatchmentAreaAndFlowPath = uniqueCatchmentAreaFileName;
+                    obj.CrossSectionOrCalculationSheetReportPath = uniqueCrossSectionOrCalculationFileName;
+                    obj.DistanceFromCreekPath = uniqueDistanceFromCreekFileName;
+                    obj.DrainLSectionPath = uniqueLSectionOfDrainFileName;
+                    obj.GISOrDWSReportPath = uniqueGisOrDwsFileName;
+                    obj.IsKMLByApplicantValid = model.IsKMLByApplicantValid;
+                    obj.GrantApprovalID = model.GrantApprovalId;
+                        
+                    if (model.GrantApprovalDocId != 0)
+                    { 
                         obj.UpdatedOn = DateTime.Now;
                         obj.UpdatedBy = userId;
                         obj.UpdatedByRole = role;
-                        obj.UpdatedByName = LoggedInUserName()+"("+LoggedInDesignationName()+")";
+                        obj.UpdatedByName = LoggedInUserName() + "(" + LoggedInDesignationName() + ")";
                         await _repoApprovalDocument.UpdateAsync(obj);
-                        return RedirectToAction("Index");
                     }
+                    else
+                    {
+                        obj.ProcessedOn = DateTime.Now;
+                        obj.ProcessedBy = userId;
+                        obj.ProcessedByRole = role;
+                        obj.ProcessedByName = LoggedInUserName() + "(" + LoggedInDesignationName() + ")";
+                        await _repoApprovalDocument.CreateAsync(obj);
+                    }
+                    return RedirectToAction("Index");
                 }
             }
             catch (Exception ex)
@@ -1481,6 +1517,7 @@ namespace Noc_App.Controllers
             try
             {
                 GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
+                PlanSanctionAuthorityMaster planAuth = await  _repoPlanSanctionAuthtoryMaster.GetByIdAsync(obj.PlanSanctionAuthorityId);
                 VillageDetails village = await _villageRpo.GetByIdAsync(obj.VillageID);
                 TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(village.TehsilBlockId);
                 SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(tehsil.SubDivisionId);
@@ -1490,6 +1527,23 @@ namespace Noc_App.Controllers
                 SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(obj.SiteAreaUnitId);
                 List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == obj.Id)).ToList();
                 List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
+                List<GrantInspectionDocuments> documents = (from d in _repoApprovalDocument.GetAll()
+                                join a in _repoApprovalDetail.GetAll() on d.GrantApprovalID equals a.Id
+                                where a.GrantID==obj.Id
+                                select new GrantInspectionDocuments
+                                { 
+                                    GisOrDwsFilePath=d.GISOrDWSReportPath,
+                                    CatchmentAreaFilePath=d.CatchmentAreaAndFlowPath,
+                                    CrossSectionOrCalculationFilePath=d.CrossSectionOrCalculationSheetReportPath,
+                                    DistanceFromCreekFilePath=d.DistanceFromCreekPath,
+                                    LSectionOfDrainFilePath=d.DrainLSectionPath,
+                                    IsKMLByApplicantValid=d.IsKMLByApplicantValid,
+                                    UploadedByRole = d.ProcessedByRole,
+                                    UploadedByName=d.ProcessedByName,
+                                    SiteConditionReportFilePath=d.SiteConditionReportPath
+                                   
+                                }).ToList();
+                    //(await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 List<OwnerTypeDetails> ownertype = new List<OwnerTypeDetails>();
                 foreach (OwnerDetails item in owners)
                 {
@@ -1541,11 +1595,15 @@ namespace Noc_App.Controllers
                         ProjectTypeName = obj.Name,
                         SiteAreaUnitName = unit.Name,
                         TotalArea = totalArea.ToString(),
-                        TotalAreaSqFeet = (totalArea * 43560).ToString(),
-                        TotalAreaSqMetre = (totalArea * 4046.86).ToString(),
+                        TotalAreaSqFeet = Math.Round((totalArea * 43560),4).ToString(),
+                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86),4).ToString(),
                         Owners = owners,
                         Khasras = khasras,
-                        LocationDetail= "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + village.Name + ", Pincode: " + village.PinCode
+                        PlanSanctionAuthorityName= planAuth.Name,
+                        FaradFilePath=obj.FaradFilePath,
+                        LayoutPlanFilePath=obj.LayoutPlanFilePath,
+                        GrantInspectionDocumentsDetail = documents,
+                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + village.Name + ", Pincode: " + village.PinCode
                     };
                     return View(model);
                 }
@@ -1584,6 +1642,10 @@ namespace Noc_App.Controllers
                         TotalAreaSqMetre = (totalArea * 4046.86).ToString(),
                         Owners = owners,
                         Khasras = khasras,
+                        PlanSanctionAuthorityName = planAuth.Name,
+                        FaradFilePath = obj.FaradFilePath,
+                        LayoutPlanFilePath = obj.LayoutPlanFilePath,
+                        GrantInspectionDocumentsDetail = documents,
                         LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + village.Name + ", Pincode: " + village.PinCode
                     };
                     return View(model);
@@ -1604,6 +1666,16 @@ namespace Noc_App.Controllers
                 return false;
             }
             return true;
+        }
+
+        private int CheckFiles(IFormFile file)
+        {
+            if (file != null && file.Length > 0)
+            {
+                
+                return 1;
+            }
+            else return 0;
         }
         private int AllowedCheckExtensions(IFormFile file)
         {

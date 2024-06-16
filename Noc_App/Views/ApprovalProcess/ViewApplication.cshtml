@@ -75,6 +75,22 @@
                                     </td>
 
                                 </tr>
+                                <tr>
+                                    <td class="boldText">Layout Plan</td>
+                                    <td>
+                                        <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.LayoutPlanFilePath })">Download File</a>
+                                    </td>
+                                    <td class="boldText">Farad</td>
+                                    <td>
+                                        <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.FaradFilePath })">Download File</a>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td class="boldText" colspan="1">Plan Sanction Authority</td>
+                                    <td colspan="3">@Model.PlanSanctionAuthorityName</td>
+
+                                </tr>
                                 <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6></td></tr>
                                 <tr>
                                     <td colspan="4">
@@ -222,6 +238,80 @@
                                         <td class="boldText">Previous Date</td>
                                         <td>@Model.PreviousDate</td>
                                     </tr>
+                                }
+                                @if (Model.GrantInspectionDocumentsDetail.Count() > 0)
+                                {
+                                    @foreach (GrantInspectionDocuments item in Model.GrantInspectionDocumentsDetail)
+                                    {
+                                        <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Inspection Documents Uploaded By @item.UploadedByRole</h6></td></tr>
+                                        @if (item.SiteConditionReportFilePath != "")
+                                        {
+                                            <tr>
+                                                <td class="boldText" colspan="1">Site Condition Report</td>
+                                                <td colspan="3">
+                                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = item.SiteConditionReportFilePath })">Download File</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (item.CatchmentAreaFilePath != "")
+                                        {
+                                            <tr>
+                                                <td class="boldText" colspan="1">Catchment Area & Flow</td>
+                                                <td colspan="3">
+                                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = item.CatchmentAreaFilePath })">Download File</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (item.DistanceFromCreekFilePath != "")
+                                        {
+                                            <tr>
+                                                <td class="boldText" colspan="1">Distance From the Creek</td>
+                                                <td colspan="3">
+                                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = item.DistanceFromCreekFilePath })">Download File</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (item.GisOrDwsFilePath != "")
+                                        {
+                                            <tr>
+                                                <td class="boldText" colspan="1">GIS Report/DWS Report</td>
+                                                <td colspan="3">
+                                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = item.GisOrDwsFilePath })">Download File</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (item.CrossSectionOrCalculationFilePath != "")
+                                        {
+                                            <tr>
+                                                <td class="boldText" colspan="1">Cross-Section/Calculation Sheets</td>
+                                                <td colspan="3">
+                                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = item.CrossSectionOrCalculationFilePath })">Download File</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                        @if (item.LSectionOfDrainFilePath != "")
+                                        {
+                                            <tr>
+                                                <td class="boldText" colspan="1">L-Section of the Drain if Sanctioned</td>
+                                                <td colspan="3">
+                                                    <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = item.LSectionOfDrainFilePath })">Download File</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td class="boldText" colspan="1">Is KML Provided by Applicant Valid</td>
+                                            <td colspan="3">
+                                                @if(item.IsKMLByApplicantValid){
+                                                    @:Yes
+                                                }
+                                                 else 
+                                                 {
+                                                     @:No
+                                                 }
+                                            </td>
+                                        </tr>
+                                    }
+                                    
                                 }
                                 <tr>
                                     <td colspan="4">

@@ -11,7 +11,7 @@ namespace Noc_App.Models
         public int ApprovalID { get; set; }
         [ForeignKey(nameof(ApprovalID))]
         public GrantApprovalMaster GrantApproval { get; set; }
-        public GrantApprovalProcessDocumentsDetails GrantApprovalProcessDocuments { get; set; }
+        public List<GrantApprovalProcessDocumentsDetails> GrantApprovalProcessDocuments { get; set; }
         public List<GrantRejectionShortfallSection> GrantRejectionShortfallSection { get; set; }
         public string Remarks { get; set; }
         public int ProcessLevel { get; set; }
