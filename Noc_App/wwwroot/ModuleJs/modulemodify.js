@@ -389,75 +389,83 @@ $(function () {
             var PlotNo = parseInt($('#PlotNo').val());
             var SelectedVillageID = $('#SelectedVillageID').val();
             var fileInput = $('#AddressProofPhoto')[0];
-
+            var SelectedPlanSanctionAuthorityId = $('#SelectedPlanSanctionAuthorityId').val();
             var allFileValid = true;
             allFileValid = ValidFileField(fileInput, module);
             if (allFileValid) {
-                var allValid = true;
-                allValid = ValidateFields(module, module);
-                if (allValid) {
-                    var hval = '1', pval = '1';
-                    var resultProjectMessage = $('#result' + module + 'Message');
-                    if (!Hadbast) {
-                        hval = '0';
-                    }
-                    if (!PlotNo) {
-                        pval = '0';
-                    }
-                    allHValid = true;
-                    if (hval == '0' && pval == '0') {
-                        allHValid = false;
-                        resultProjectMessage.css('display', 'block');
-                        resultProjectMessage.html('<div class="alert alert-danger">Atleast one field is required to fill out of Hadbast/Plot No.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
-                    }
-                    if (allValid && allHValid && allFileValid) {
-                        var file = fileInput.files[0];
-                        formData.append('file', file);
-                        formData.append('file', $('#AddressProofPhoto')[0].files[0]);
-                        formData.append('ownerName', 'test');
-                        formData.append('address', 'testing');
-                        formData.append('addressApplicationId', AddressApplicationId);
-                        formData.append('adId', AdId);
-                        formData.append('hadbast', Hadbast);
-                        formData.append('plotNo', PlotNo);
-                        formData.append('selectedVillageID', SelectedVillageID);
-                        formData.append('addressid', addressid);
-                        ToggleLoadder(true);
-                        var navtab = $('#nav-address-tab');
-                        $.ajax({
-                            url: '/uploadaddressproof',
-                            type: 'POST',
-                            data: formData,
-                            contentType: false,
-                            processData: false,
-                            complete: function (r) {
-
-                                ToggleLoadder(false);
-                            },
-                            success: function (response) {
-                                if (response.success) {
-                                    navtab.empty();
-                                    navtab.html('<i class="checkmark">✓</i>Site Address Details');
-                                    $('#AddressProofPhotoPath').attr('href', response.filepath);
-                                    resultProjectMessage.css('display', 'block');
-                                    resultProjectMessage.html('<div class="alert alert-success">Detail saved successfully!<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
-                                    $('#' + module + 'Form')[0].reset();
-                                    $('#AreAllSectionCompleted').val(response.completed);
-                                    if ($('#AreAllSectionCompleted').val() == '0') {
-                                        LoadFinalBlock(AdId, AddressApplicationId);
-                                    }
-                                } else {
-                                    var errors = response.errors.join('<br/>');
-                                    resultProjectMessage.css('display', 'block');
-                                    resultProjectMessage.html('<div class="alert alert-danger">' + errors + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
-                                }
-                                //alert('File uploaded successfully to ' + response.path);
-                            },
-                            error: function () {
-                                resultProjectMessage.css('display', 'block');
-                                resultProjectMessage.html('<div class="alert alert-danger">An error occurred while saving the address.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module +'\')">&times;</span></div>');
+                allFileValid = ValidFileField($('#LayoutPlanFilePhoto')[0], module);
+                if (allFileValid) {
+                    allFileValid = ValidFileField($('#FaradFilePoto')[0], module);
+                    if (allFileValid) {
+                        var allValid = true;
+                        allValid = ValidateFields(module, module);
+                        if (allValid) {
+                            var hval = '1', pval = '1';
+                            var resultProjectMessage = $('#result' + module + 'Message');
+                            if (!Hadbast) {
+                                hval = '0';
                             }
-                        });
+                            if (!PlotNo) {
+                                pval = '0';
+                            }
+                            allHValid = true;
+                            if (hval == '0' && pval == '0') {
+                                allHValid = false;
+                                resultProjectMessage.css('display', 'block');
+                                resultProjectMessage.html('<div class="alert alert-danger">Atleast one field is required to fill out of Hadbast/Plot No.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
+                            }
+                            if (allValid && allHValid && allFileValid) {
+                                /*var file = fileInput.files[0];*/
+                                formData.append('file', $('#AddressProofPhoto')[0].files[0]);
+                                formData.append('ownerName', 'test');
+                                formData.append('address', 'testing');
+                                formData.append('addressApplicationId', AddressApplicationId);
+                                formData.append('adId', AdId);
+                                formData.append('hadbast', Hadbast);
+                                formData.append('plotNo', PlotNo);
+                                formData.append('selectedVillageID', SelectedVillageID);
+                                formData.append('addressid', addressid);
+                                formData.append('selectedPlanSanctionAuthorityId', SelectedPlanSanctionAuthorityId);
+                                formData.append('layoutPlanFilePhoto', $('#LayoutPlanFilePhoto')[0].files[0]);
+                                formData.append('faradFilePoto', $('#FaradFilePoto')[0].files[0]);
+                                ToggleLoadder(true);
+                                var navtab = $('#nav-address-tab');
+                                $.ajax({
+                                    url: '/uploadaddressproof',
+                                    type: 'POST',
+                                    data: formData,
+                                    contentType: false,
+                                    processData: false,
+                                    complete: function (r) {
+
+                                        ToggleLoadder(false);
+                                    },
+                                    success: function (response) {
+                                        if (response.success) {
+                                            navtab.empty();
+                                            navtab.html('<i class="checkmark">✓</i>Site Address Details');
+                                            $('#AddressProofPhotoPath').attr('href', response.filepath);
+                                            resultProjectMessage.css('display', 'block');
+                                            resultProjectMessage.html('<div class="alert alert-success">Detail saved successfully!<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
+                                            $('#' + module + 'Form')[0].reset();
+                                            $('#AreAllSectionCompleted').val(response.completed);
+                                            if ($('#AreAllSectionCompleted').val() == '0') {
+                                                LoadFinalBlock(AdId, AddressApplicationId);
+                                            }
+                                        } else {
+                                            var errors = response.errors.join('<br/>');
+                                            resultProjectMessage.css('display', 'block');
+                                            resultProjectMessage.html('<div class="alert alert-danger">' + errors + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
+                                        }
+                                        //alert('File uploaded successfully to ' + response.path);
+                                    },
+                                    error: function () {
+                                        resultProjectMessage.css('display', 'block');
+                                        resultProjectMessage.html('<div class="alert alert-danger">An error occurred while saving the address.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
+                                    }
+                                });
+                            }
+                        }
                     }
                 }
             }
@@ -924,41 +932,43 @@ $(function () {
 function ValidFileField(fileInput, modulename) {
     
     var resultProjectMessage = $('#result' + modulename + 'Message');
-    if (fileInput.files.length == 0) {
+    //if (fileInput.files.length == 0) {
 
-        resultProjectMessage.css('display', 'block');
-        resultProjectMessage.html('<div class="alert alert-danger">Please upload file<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
+    //    resultProjectMessage.css('display', 'block');
+    //    resultProjectMessage.html('<div class="alert alert-danger">Please upload file<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
 
-        return false;
-    }
-    var file = fileInput.files[0];
-    if (!file) {
+    //    return false;
+    //}
+    if (fileInput.files.length > 0) {
+        var file = fileInput.files[0];
+        if (!file) {
 
-        resultProjectMessage.css('display', 'block');
-        resultProjectMessage.html('<div class="alert alert-danger">Please upload address proof<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
+            resultProjectMessage.css('display', 'block');
+            resultProjectMessage.html('<div class="alert alert-danger">Please upload address proof<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename + '\')">&times;</span></div>');
 
-        return false;
-    }
+            return false;
+        }
 
-    var validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-    if (fileInput == "kml") validTypes = ['application/pdf'];
-    var maxSize = 4 * 1024 * 1024; // 2 MB
+        var validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+        if (fileInput == "kml") validTypes = ['application/pdf'];
+        var maxSize = 4 * 1024 * 1024; // 2 MB
 
-    if ($.inArray(file.type, validTypes) === -1) {
-        resultProjectMessage.css('display', 'block');
-        if (fileInput == "kml")
-            resultProjectMessage.html('<div class="alert alert-danger">Invalid file type. Only PDF files are allowed.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
-        else
-            resultProjectMessage.html('<div class="alert alert-danger">Invalid file type. Only JPG, PNG, and PDF files are allowed.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
+        if ($.inArray(file.type, validTypes) === -1) {
+            resultProjectMessage.css('display', 'block');
+            if (fileInput == "kml")
+                resultProjectMessage.html('<div class="alert alert-danger">Invalid file type. Only PDF files are allowed.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename + '\')">&times;</span></div>');
+            else
+                resultProjectMessage.html('<div class="alert alert-danger">Invalid file type. Only JPG, PNG, and PDF files are allowed.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename + '\')">&times;</span></div>');
 
-        return false;
-    }
+            return false;
+        }
 
-    if (file.size > maxSize) {
-        resultProjectMessage.css('display', 'block');
-        resultProjectMessage.html('<div class="alert alert-danger">File size exceeds 4 MB.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename +'\')">&times;</span></div>');
+        if (file.size > maxSize) {
+            resultProjectMessage.css('display', 'block');
+            resultProjectMessage.html('<div class="alert alert-danger">File size exceeds 4 MB.<span class="close-icon" style="float:right" onclick="toggleValue(\'' + modulename + '\')">&times;</span></div>');
 
-        return false;
+            return false;
+        }
     }
     return true;
 }

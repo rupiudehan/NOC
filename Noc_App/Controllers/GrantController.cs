@@ -1195,6 +1195,7 @@ namespace Noc_App.Controllers
                                 SelectedSubDivisionId = grant.SubDivision.Id,
                                 SelectedTehsilBlockId = grant.Tehsil.Id,
                                 SelectedVillageID = grant.Village.Id,
+                                SelectedPlanSanctionAuthorityId=grant.Grant.PlanSanctionAuthorityId,
                                 AddressProofPhotoPath = grant.Grant.AddressProofPhotoPath,
                                 AuthorizationLetterPhotoPath = grant.Grant.AuthorizationLetterPhotoPath,
                                 IDProofPhotoPath = grant.Grant.IDProofPhotoPath,
@@ -1693,28 +1694,29 @@ namespace Noc_App.Controllers
                         return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
                     }
 
-                    if (model.file == null)
-                    {
-                            isValid = false;
-                            ModelState.AddModelError("", $"Please upload address proof");
-                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                    }
+                    //if (model.file == null)
+                    //{
+                    //        isValid = false;
+                    //        ModelState.AddModelError("", $"Please upload address proof");
+                    //        return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                    //}
 
-                    if (model.layoutPlanFilePhoto == null)
-                    {
-                        isValid = false;
-                        ModelState.AddModelError("", $"Please upload layout plan");
-                        return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                    }
+                    //if (model.layoutPlanFilePhoto == null)
+                    //{
+                    //    isValid = false;
+                    //    ModelState.AddModelError("", $"Please upload layout plan");
+                    //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                    //}
 
-                    if (model.faradFilePoto == null)
-                    {
-                        isValid = false;
-                        ModelState.AddModelError("", $"Please upload farad");
-                        return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                    }
+                    //if (model.faradFilePoto == null)
+                    //{
+                    //    isValid = false;
+                    //    ModelState.AddModelError("", $"Please upload farad");
+                    //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                    //}
                     if (isValid)
                     {
+                        
                         int AddressProofValidation = AllowedCheckExtensions(model.file, "proof");
                         if (AddressProofValidation == 0)
                         {
@@ -1723,13 +1725,17 @@ namespace Noc_App.Controllers
                             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
                         }
-                        else if (AddressProofValidation == 2)
+                        //else if (AddressProofValidation == 2)
+                        //{
+                        //    ErrorMessage = "Address proof field is required";
+                        //    ModelState.AddModelError("", ErrorMessage);
+                        //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        //}
+                        string uniqueAddressProofFileName = grantDetail.AddressProofPhotoPath;
+                        if (model.file != null)
                         {
-                            ErrorMessage = "Address proof field is required";
-                            ModelState.AddModelError("", ErrorMessage);
-                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                            uniqueAddressProofFileName = ProcessUploadedFile(model.file, "Address");
                         }
-                        string uniqueAddressProofFileName = ProcessUploadedFile(model.file, "Address");
 
                         int LayoutPlanValidation = AllowedCheckExtensions(model.layoutPlanFilePhoto, "proof");
                         if (LayoutPlanValidation == 0)
@@ -1740,16 +1746,20 @@ namespace Noc_App.Controllers
                             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
                         }
-                        else if (LayoutPlanValidation == 2)
+                        //else if (LayoutPlanValidation == 2)
+                        //{
+                        //    ErrorMessage = "Layout plan field is required";
+                        //    ModelState.AddModelError("", ErrorMessage);
+                        //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        //}
+
+                        string uniqueLayoutPlanFileName = grantDetail.LayoutPlanFilePath;
+                        if (model.layoutPlanFilePhoto != null)
                         {
-                            ErrorMessage = "Layout plan field is required";
-                            ModelState.AddModelError("", ErrorMessage);
-                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                            uniqueLayoutPlanFileName = ProcessUploadedFile(model.layoutPlanFilePhoto, "LayoutPlan");
                         }
 
-                        string uniqueLayoutPlanFileName = ProcessUploadedFile(model.layoutPlanFilePhoto, "LayoutPlan");
-
-                        int FaradValidation = AllowedCheckExtensions(model.faradFilePoto, "proof");
+                            int FaradValidation = AllowedCheckExtensions(model.faradFilePoto, "proof");
                         if (FaradValidation == 0)
                         {
                             ErrorMessage = $"Invalid farad file type. Please upload a JPG, PNG, or PDF file";
@@ -1758,16 +1768,20 @@ namespace Noc_App.Controllers
                             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
                         }
-                        else if (FaradValidation == 2)
+                        //else if (FaradValidation == 2)
+                        //{
+                        //    ErrorMessage = "Farad field is required";
+                        //    ModelState.AddModelError("", ErrorMessage);
+                        //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        //}
+                        string uniqueFaradFileName = grantDetail.FaradFilePath;
+                        if (model.faradFilePoto != null)
                         {
-                            ErrorMessage = "Farad field is required";
-                            ModelState.AddModelError("", ErrorMessage);
-                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                            uniqueFaradFileName = ProcessUploadedFile(model.faradFilePoto, "Farad");
                         }
-                        string uniqueFaradFileName = ProcessUploadedFile(model.faradFilePoto, "Farad");
 
-                        grantDetail.Hadbast = model.hadbast;
-                        grantDetail.PlotNo = model.plotNo;
+                            grantDetail.Hadbast = model.hadbast;
+                        grantDetail.PlotNo = model.plotNo=="NaN"?"": model.plotNo;
                         grantDetail.VillageID = model.selectedVillageID;
                         grantDetail.AddressProofPhotoPath = uniqueAddressProofFileName;
                         grantDetail.PlanSanctionAuthorityId = model.selectedPlanSanctionAuthorityId;
@@ -1930,12 +1944,12 @@ namespace Noc_App.Controllers
 
                             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
                         }
-                        if (model.kmlFile == null)
-                        {
-                            isValid = false;
-                            ModelState.AddModelError("", $"Please upload KML file");
-                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                        }
+                        //if (model.kmlFile == null)
+                        //{
+                        //    isValid = false;
+                        //    ModelState.AddModelError("", $"Please upload KML file");
+                        //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        //}
                         if (isValid)
                         {
                             string ErrorMessage = "";
@@ -1947,13 +1961,15 @@ namespace Noc_App.Controllers
                                 return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
                             }
-                            else if (kmlFileValidation == 2)
-                            {
-                                ErrorMessage = "KML File field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                            }
-                            string uniqueKmlFileName = ProcessUploadedFile(model.kmlFile, "kml");
+                            //else if (kmlFileValidation == 2)
+                            //{
+                            //    ErrorMessage = "KML File field is required";
+                            //    ModelState.AddModelError("", ErrorMessage);
+                            //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                            //}
+                            string uniqueKmlFileName = grantDetail.KMLFilePath;
+                            if(model.kmlFile!=null)
+                                uniqueKmlFileName = ProcessUploadedFile(model.kmlFile, "kml");
 
                             grantDetail.KMLFilePath = uniqueKmlFileName;
                             grantDetail.KMLLinkName = model.KmlLinkName;
@@ -2125,18 +2141,18 @@ namespace Noc_App.Controllers
 
                             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
                         }
-                        if (model.idProofPhotoFile == null)
-                        {
-                            isValid = false;
-                            ModelState.AddModelError("", $"Please upload identity proof file");
-                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                        }
-                        if (model.authorizationLetterPhotofile == null)
-                        {
-                            isValid = false;
-                            ModelState.AddModelError("", $"Please upload authorization letter file");
-                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                        }
+                        //if (model.idProofPhotoFile == null)
+                        //{
+                        //    isValid = false;
+                        //    ModelState.AddModelError("", $"Please upload identity proof file");
+                        //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        //}
+                        //if (model.authorizationLetterPhotofile == null)
+                        //{
+                        //    isValid = false;
+                        //    ModelState.AddModelError("", $"Please upload authorization letter file");
+                        //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        //}
                         if (isValid)
                         {
                             string ErrorMessage = "";
@@ -2150,12 +2166,12 @@ namespace Noc_App.Controllers
                                 return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
                             }
-                            else if (IdProofValidation == 2)
-                            {
-                                ErrorMessage = "ID proof field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                            }
+                            //else if (IdProofValidation == 2)
+                            //{
+                            //    ErrorMessage = "ID proof field is required";
+                            //    ModelState.AddModelError("", ErrorMessage);
+                            //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                            //}
                             if (AuthorizationValidation == 0)
                             {
                                 ErrorMessage = $"Invalid authorization letter file type. Please upload a JPG, PNG, or PDF file";
@@ -2163,14 +2179,16 @@ namespace Noc_App.Controllers
                                 return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
 
                             }
-                            else if (AuthorizationValidation == 2)
-                            {
-                                ErrorMessage = "Authorization letter field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                            }
-                            string uniqueIDProofFileName = ProcessUploadedFile(model.idProofPhotoFile, "IDProof");
-                            string uniqueAuthLetterFileName = ProcessUploadedFile(model.authorizationLetterPhotofile, "AuthLetter");
+                            //else if (AuthorizationValidation == 2)
+                            //{
+                            //    ErrorMessage = "Authorization letter field is required";
+                            //    ModelState.AddModelError("", ErrorMessage);
+                            //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                            //}
+                            string uniqueIDProofFileName = grantDetail.IDProofPhotoPath;
+                            if(model.idProofPhotoFile!=null) uniqueIDProofFileName = ProcessUploadedFile(model.idProofPhotoFile, "IDProof");
+                            string uniqueAuthLetterFileName = grantDetail.AuthorizationLetterPhotoPath;
+                            if(model.authorizationLetterPhotofile!=null) uniqueAuthLetterFileName = ProcessUploadedFile(model.authorizationLetterPhotofile, "AuthLetter");
 
                             grantDetail.IDProofPhotoPath = uniqueIDProofFileName;
                             grantDetail.AuthorizationLetterPhotoPath = uniqueAuthLetterFileName;

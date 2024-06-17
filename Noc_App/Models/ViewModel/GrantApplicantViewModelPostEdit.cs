@@ -14,10 +14,10 @@ namespace Noc_App.Models.ViewModel
         [RegularExpression(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", ErrorMessage = "Invalid Email Format")]
         [Display(Name = "Applicant Email")]
         public string ApplicantEmailID { get; set; }
-        [Required]
+       // [Required]
         [Display(Name = "Identity Proof")]
         public IFormFile idProofPhotoFile { get; set; }
-        [Required]
+        //[Required]
         [Display(Name = "Authorization Letter")]
         public IFormFile authorizationLetterPhotofile { get; set; }
         public int applicantid { get; set; }

@@ -75,10 +75,10 @@ namespace Noc_App.Controllers
                 //// Retrieve roles associated with the user
                 //var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault().ToUpper();
 
-                if (role.ToUpper() == "ADMINISTRATOR") return View();
-                else
-                {
-                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DD")
+                //if (role.ToUpper() == "ADMINISTRATOR") return View();
+                //else
+                //{
+                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
                     {
                         divisions = _divisionRepo.GetAll().ToList();
                     }
@@ -139,7 +139,7 @@ namespace Noc_App.Controllers
                     };
                     //return View(_employeeRepository.GetAllEmployees());
                     return View(model);
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -217,20 +217,22 @@ namespace Noc_App.Controllers
             var roleName = LoggedInRoleName();
 
             role = role == null ? roleName : role;
-            if (role.ToUpper() == "ADMINISTRATOR")
-            {
-                return Json(null);
-            }
-            else
-            {
+            //if (role.ToUpper() == "ADMINISTRATOR")
+            //{
+            //    return Json(null);
+            //}
+            //else
+            //{
                 DivisionDetails divisions = new DivisionDetails();
-                if (divisionId == 0)
+                //if (divisionId == 0)
                 {
-                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE")
+                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
                     {
                         divisions = _divisionRepo.GetAll().FirstOrDefault();
                     }
                     else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
+                    {
+                    if (divisionId != 0)
                     {
                         divisions = (from d in _divisionRepo.GetAll()
                                      where d.Id == Convert.ToInt32(divisionsId)
@@ -240,7 +242,10 @@ namespace Noc_App.Controllers
                                          Name = d.Name
                                      }).FirstOrDefault();
                     }
+                    }
                     else
+                    {
+                    if (subdivisionsId != "0")
                     {
                         divisions = (from sub in _subDivisionRepo.GetAll()
                                      join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
@@ -251,6 +256,7 @@ namespace Noc_App.Controllers
                                          Name = d.Name
                                      }
                                                 ).Distinct().FirstOrDefault();
+                    }
                     }
                     divisionId = divisions.Id;
                 }
@@ -335,10 +341,16 @@ namespace Noc_App.Controllers
                         "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ"
                         });
                         break;
-                    default:
+                case "PRINCIPAL SECRETARY":
+                    list.Add(new object[]
+                    {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ","CHIEF ENGINEER HQ"
+                    });
+                    break;
+                default:
                         list.Add(new object[]
                         {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ","CHIEF ENGINEER HQ"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ","CHIEF ENGINEER HQ","PRINCIPAL SECRETARY"
                         }); break;
                 }
 
@@ -406,16 +418,24 @@ namespace Noc_App.Controllers
                                 ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ)
                                });
                             break;
-                        default:
+                    case "PRINCIPAL SECRETARY":
+                        list.Add(new object[]
+                        {
+                        item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                        ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ)
+                        }); break;
+                        break;
+                    default:
                             list.Add(new object[]
                                {
                                 item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
-                                ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ)
+                                ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),
+                                   Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ), Convert.ToInt32(item.PRINCIPAL_SECRETARY)
                                }); break;
                     }
                 }
                 return Json(list);
-            }
+            //}
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
@@ -449,12 +469,12 @@ namespace Noc_App.Controllers
 
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
                 int subdivisionId = subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
-                if (roleName != null && roleName.ToUpper() == "ADMINISTRATOR")
-                {
-                    return Json(null);
-                }
-                else
-                {
+                //if (roleName != null && roleName.ToUpper() == "ADMINISTRATOR")
+                //{
+                //    return Json(null);
+                //}
+                //else
+                //{
                     DivisionDetails divisions = new DivisionDetails();
                     if (divisionId == 0)
                     {
@@ -513,7 +533,7 @@ namespace Noc_App.Controllers
                     List<DashboardPendencyViewModel> model = _pendencyRepo.ExecuteStoredProcedure<DashboardPendencyViewModel>("getpendencytoforwardReport", "'" + divisionId + "'", "'" + subdivisionId + "'", "'" + role + "'").ToList();
                     
                     return Json(model);
-                }
+                //}
             }
             catch (Exception ex)
             {
