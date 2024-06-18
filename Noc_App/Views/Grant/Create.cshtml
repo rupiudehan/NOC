@@ -76,7 +76,9 @@
                                                 <span asp-validation-for="Khasra" class="text-danger"></span>
                                                 </div> *@
                                                 <div class="form-group">
-                                                    <label asp-for="Hadbast" class="control-label"></label>
+                                                    <label asp-for="Hadbast" class="control-label"></label><span class="info-icon" style="color:royalblue" data-toggle="tooltip" data-placement="top" title="You can enter multiple hadbasts separated by commas.">
+                                                                                                                        <i class="fas fa-info-circle"></i>
+                                                                                                                    </span>
                                                     <input asp-for="Hadbast" class="form-control form-control-user" />
                                                     <span asp-validation-for="Hadbast" class="text-danger"></span>
                                                 </div>

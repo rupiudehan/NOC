@@ -201,7 +201,9 @@
                                                                     <input type="hidden" asp-for="GrantSections.addressid" id="addressid" />
                                                                     <input type="hidden" asp-for="AdId" id="AdId" name="AdId" />
                                                                     <input type="hidden" asp-for="ApplicationID" id="AddressApplicationId" name="AddressApplicationId" />
-                                                                    <label asp-for="Hadbast" class="control-label"></label>
+                                                                    <label asp-for="Hadbast" class="control-label"></label><span class="info-icon" style="color:royalblue" data-toggle="tooltip" data-placement="top" title="You can enter multiple hadbasts separated by commas.">
+                                                                        <i class="fas fa-info-circle"></i>
+                                                                    </span>
                                                                     <input asp-for="Hadbast" id="Hadbast" class="form-control form-control-user" />
                                                                     <span asp-validation-for="Hadbast" class="text-danger"></span>
                                                                 </div>
