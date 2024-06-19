@@ -80,7 +80,7 @@ namespace Noc_App.Controllers
                 //{
                     if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
                     {
-                        divisions = _divisionRepo.GetAll().ToList();
+                        divisions = _divisionRepo.GetAll().OrderBy(x=>x.Name).ToList();
                     }
                     else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
                     {
@@ -110,7 +110,7 @@ namespace Noc_App.Controllers
                                             Id = d.Id,
                                             Name = d.Name
                                         }
-                                               ).Distinct().ToList();
+                                               ).Distinct().OrderBy(x => x.Name).ToList();
                         divisions = (from sub in _subDivisionRepo.GetAll()
                                      join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
                                      where d.Id == Convert.ToInt32(subdivisionId)
@@ -119,23 +119,25 @@ namespace Noc_App.Controllers
                                          Id = d.Id,
                                          Name = d.Name
                                      }
-                                                ).Distinct().ToList();
+                                                ).Distinct().OrderBy(x => x.Name).ToList();
                     }
                     ReportApplicationCountViewModel modelreport = new ReportApplicationCountViewModel();
                     modelreport =  _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscount", "0", "0", "0", "0").FirstOrDefault();
                     //subdivisions = divisions != null && divisions.Count()>0 ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
                     DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
                     {
-                        Divisions = new SelectList(divisions, "Id", "Name"),
+                        Divisions = new SelectList(divisions, "Id", "Name",178),
                         SubDivisions = new SelectList(subdivisions, "Id", "Name"),
                         RoleName = role.ToUpper(),
-                        hdnDivisionId = divisions.Count()>0? divisions.FirstOrDefault().Id:0,
-                        hdnSubDivisionId = subdivisions.Count() > 0 ? subdivisions.FirstOrDefault().Id : 0,
+                        hdnDivisionId = divisions.Count()>0? 178/*divisions.FirstOrDefault().Id*/:0,
+                        hdnSubDivisionId = subdivisions.Count() > 0 ? 114/*subdivisions.FirstOrDefault().Id*/ : 0,
                         TotalCount= modelreport.TotalCount,
                         ApprovedCount= modelreport.ApprovedCount,
                         RejectedCount= modelreport.RejectedCount,
                         Pending= modelreport.TotalCount- (modelreport.ApprovedCount+ modelreport.RejectedCount),
-                        LoggedInRole= role
+                        LoggedInRole= role,
+                        SelectedDivisionId=178,
+                        SelectedSubDivisionId=114
                     };
                     //return View(_employeeRepository.GetAllEmployees());
                     return View(model);
@@ -155,12 +157,12 @@ namespace Noc_App.Controllers
                 List<DivisionDetails> divisions = new List<DivisionDetails>();
                 List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
                 var roleName = LoggedInRoleName();
-                divisions = _divisionRepo.GetAll().ToList();
+                divisions = _divisionRepo.GetAll().OrderBy(x => x.Name).ToList();
                 ApplicationStatusReportViewModel model = new ApplicationStatusReportViewModel
                 {
-                    Divisions = new SelectList(divisions, "Id", "Name"),
-                    hdnDivisionId = divisions.Count() > 0 ? divisions.FirstOrDefault().Id : 0,
-                    SelectedDivisionId= divisions.Count() > 0 ? divisions.FirstOrDefault().Id : 0,
+                    Divisions = new SelectList(divisions, "Id", "Name",178),
+                    hdnDivisionId = divisions.Count() > 0 ? 178/*divisions.FirstOrDefault().Id*/ : 0,
+                    SelectedDivisionId= divisions.Count() > 0 ? 178/*divisions.FirstOrDefault().Id*/ : 0,
                     LoggedInRole = roleName.ToUpper()
                 };
                 return View(model);

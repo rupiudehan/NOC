@@ -28,7 +28,6 @@ function LoadReport(divisionId) {
                     table.DataTable().destroy();
                     body.empty();
                 }
-                console.log(JSON.stringify(r))
                 var count = 1; var len = r.length;
                 $.each(r, function (key, value) {
                     var tr = '<tr>';

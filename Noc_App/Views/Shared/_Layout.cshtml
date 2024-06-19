@@ -84,7 +84,8 @@
             
             @if (User.Identity.IsAuthenticated && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER")))
             {
-                <li class="nav-item @(IsLinkActive("Home","Index") ? "active" : "")">
+                <li class="nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Home" && ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
+                  
                     <a class="nav-link" asp-action="Index" asp-controller="Home">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Dashboard</span>
@@ -94,7 +95,7 @@
             }
             @if (User.Identity.IsAuthenticated && (User.IsInRole("Administrator")))
             {
-                <li class="nav-item @(IsLink2Active(true) ? "active" : "")" id="masterid">
+                <li id="masterid" class="nav-item @((ViewContext.RouteData.Values["controller"].ToString() == "TehsilBlock" || ViewContext.RouteData.Values["controller"].ToString() == "Village") && ViewContext.RouteData.Values["action"].ToString() == "List" ? "active" : "")">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
                    aria-expanded="true" aria-controls="masters">
                     <i class="fas fa-fw fa-cog"></i>
@@ -119,7 +120,7 @@
                 </li>
                 <hr class="sidebar-divider">
 
-                <li class="nav-item @(IsLinkActive("Home","ApplicationStatus") ? "active" : "")">
+                <li class="nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Home" && ViewContext.RouteData.Values["action"].ToString() == "ApplicationStatus" ? "active" : "")">
                     <a class="nav-link" asp-action="ApplicationStatus" asp-controller="Home">
                         <i class="fas fa-fw fa-bookmark"></i>
                         <span>Application Status</span>
@@ -130,7 +131,7 @@
             @if (User.Identity.IsAuthenticated && (!User.IsInRole("Junior Engineer")) && (!User.IsInRole("Sub Divisional Officer") && (!User.IsInRole("Administrator"))))
             @* @if (User.Identity.IsAuthenticated && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER") && (!User.IsInRole("Administrator")))) *@
             {
-                <li class="nav-item @(IsLinkActive("ApprovalProcess","Index") ? "active" : "")">
+                <li class="nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "ApprovalProcess" && ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
                     <a class="nav-link" asp-action="Index" asp-controller="ApprovalProcess">
                         <i class="fas fa-fw fa-arrow-circle-right"></i>
                         <span>Approve/Reject NOC</span>
@@ -307,6 +308,20 @@
     <!-- Page level custom scripts -->
     @* <script src="~/template/js/demo/chart-area-demo.js"></script>
     <script src="~/template/js/demo/chart-pie-demo.js"></script> *@
+    @* <script>
+        $(function () {
+            SetActiveMenu();
+        });
+       function SetActiveMenu(action,controller){
+           $('#accordionSidebar').find('li').removeClass('active');
+           if (action == "Index" && controller == "ApprovalProcess") {
+               $('#appIndex').addClass('active');
+           }
+            // alert($(e).closest('ul').find('li').removeClass('active'))
+            // $(e).closest('ul').find('li').removeClass('active');
+            // $(e).addClass('active');
+       }
+    </script> *@
     @if (IsSectionDefined("Scripts"))
     {
         @await RenderSectionAsync("Scripts", required: false)
