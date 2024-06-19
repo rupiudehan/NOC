@@ -523,7 +523,7 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public IActionResult Create()
         {
-            var divisions = _divisionRepo.GetAll();
+            var divisions = _divisionRepo.GetAll().OrderBy(x=>x.Name);
             var projectType = _projectTypeRepo.GetAll();
             var nocPermission = _nocPermissionTypeRepo.GetAll();
             var nocType = _nocTypeRepo.GetAll();
@@ -1029,10 +1029,10 @@ namespace Noc_App.Controllers
                             var nocType = _nocTypeRepo.GetAll();
                             var ownerType = _ownerTypeRepo.GetAll();
                             var siteUnits = _siteUnitsRepo.GetAll();
-                            var villages = _villageRpo.Find(x => x.TehsilBlockId == grant.Village.TehsilBlockId);
-                            var tehsils = _tehsilBlockRepo.Find(x => x.SubDivisionId == grant.Tehsil.SubDivisionId);
-                            var subdivisions = _subDivisionRepo.Find(x => x.DivisionId == grant.SubDivision.DivisionId);
-                            var divisions = _divisionRepo.GetAll();
+                            var villages = _villageRpo.Find(x => x.TehsilBlockId == grant.Village.TehsilBlockId).OrderBy(x => x.Name);
+                            var tehsils = _tehsilBlockRepo.Find(x => x.SubDivisionId == grant.Tehsil.SubDivisionId).OrderBy(x => x.Name);
+                            var subdivisions = _subDivisionRepo.Find(x => x.DivisionId == grant.SubDivision.DivisionId).OrderBy(x => x.Name);
+                            var divisions = _divisionRepo.GetAll().OrderBy(x => x.Name);
                             var khasras = _khasraRepo.Find(x => x.GrantID == grant.Grant.Id);
                             var owners = (from o in _grantOwnersRepo.GetAll()
                                           join types in _ownerTypeRepo.GetAll() on o.OwnerTypeId equals types.Id
@@ -2473,7 +2473,7 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public IActionResult GetSubDivisions(int divisionId)
         {
-            var subDivision = _subDivisionRepo.GetAll();
+            var subDivision = _subDivisionRepo.GetAll().OrderBy(x => x.Name);
             var filteredSubdivisions = subDivision.Where(c => c.DivisionId == divisionId).ToList();
             return Json(new SelectList(filteredSubdivisions, "Id", "Name"));
         }
@@ -2482,7 +2482,7 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public IActionResult GetTehsilBlocks(int subDivisionId)
         {
-            var tehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == subDivisionId).ToList();
+            var tehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == subDivisionId).OrderBy(x => x.Name).ToList();
             return Json(new SelectList(tehsilBlock, "Id", "Name"));
         }
 
@@ -2490,7 +2490,7 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public IActionResult GetVillagess(int tehsilBlockId)
         {
-            var village = _villageRpo.GetAll().Where(c => c.TehsilBlockId == tehsilBlockId).ToList();
+            var village = _villageRpo.GetAll().Where(c => c.TehsilBlockId == tehsilBlockId).OrderBy(x => x.Name).ToList();
             return Json(new SelectList(village, "Id", "Name"));
         }
 
