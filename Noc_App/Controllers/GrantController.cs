@@ -288,7 +288,7 @@ namespace Noc_App.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<ViewResult> GeneratePdf(string Id)
+        public async Task<IActionResult> GeneratePdf(string Id)
         {
             try
             {
@@ -300,6 +300,7 @@ namespace Noc_App.Controllers
                          join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals sub.Id
                          join d in _divisionRepo.GetAll() on sub.DivisionId equals d.Id
                          join npt in _nocPermissionTypeRepo.GetAll() on gr.NocPermissionTypeID equals npt.Id
+                         join plan in _repoPlanSanctionAuthtoryMaster.GetAll() on gr.PlanSanctionAuthorityId equals plan.Id
                          join npr in _nocTypeRepo.GetAll() on gr.NocTypeId equals npr.Id
                          join un in _siteUnitsRepo.GetAll() on gr.SiteAreaUnitId equals un.Id
                          join p in _grantPaymentRepo.GetAll() on gr.Id equals p.GrantID into paymentdetail
@@ -315,7 +316,8 @@ namespace Noc_App.Controllers
                              Division = d,
                              PermissionType = npt,
                              NocType = npr,
-                             Unit = un
+                             Unit = un,
+                             PlanSanction=plan
                          }
                    ).FirstOrDefault();
                 GrantDetails obj = g.Grant;
@@ -379,12 +381,13 @@ namespace Noc_App.Controllers
                         ProjectTypeName = obj.Name,
                         SiteAreaUnitName = unit.Name,
                         TotalArea = totalArea.ToString(),
-                        TotalAreaSqFeet = (totalArea * 43560).ToString(),
-                        TotalAreaSqMetre = (totalArea * 4046.86).ToString(),
+                        TotalAreaSqFeet = Math.Round((totalArea * 43560),4).ToString(),
+                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86),4).ToString(),
                         Owners = owners,
-                        Khasras = khasras
+                        Khasras = khasras,
+                        PlanSanctionAuthorityName=g.PlanSanction.Name
                     };
-                    return new ViewAsPdf(model);
+                    return View(model);
                 }
                 else
                 {
@@ -417,13 +420,14 @@ namespace Noc_App.Controllers
                         ProjectTypeName = obj.Name,
                         SiteAreaUnitName = unit.Name,
                         TotalArea = totalArea.ToString(),
-                        TotalAreaSqFeet = (totalArea * 43560).ToString(),
-                        TotalAreaSqMetre = (totalArea * 4046.86).ToString(),
+                        TotalAreaSqFeet = Math.Round((totalArea * 43560), 4).ToString(),
+                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 4).ToString(),
                         Owners = owners,
-                        Khasras = khasras
+                        Khasras = khasras,
+                        PlanSanctionAuthorityName = g.PlanSanction.Name
                     };
                     model.Domain = scheme + "://" + domain;
-                    return new ViewAsPdf(model);
+                    return View(model);
                     //return new ViewAsPdf(model)
                     //{
                     //    FileName = model.ApplicationID + ".pdf"

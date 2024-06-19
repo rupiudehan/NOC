@@ -22,6 +22,7 @@ namespace Noc_App.Models.ViewModel
         public string PlotNo { get; set; }
         [Display(Name = "Pin Code")]
         public string Pincode { get; set; }
+        [Display(Name = "Plan Sanction Authority")]
         public string PlanSanctionAuthorityName { get; set; }
         public string LayoutPlanFilePath { get; set; }
         public string FaradFilePath { get; set; }

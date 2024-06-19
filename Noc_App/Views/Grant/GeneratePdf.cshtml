@@ -32,21 +32,56 @@
     <!-- Template Main CSS File -->
     <link href="@Model.Domain/landingpage/assets/css/style.css" rel="stylesheet">
     <style>
-        main {
+        /* main {
             min-height: 82vh;
             height: auto !important;
             height: 100%;
             margin: 0 auto 60px;
+        } */
+
+        body {
+            /* margin: 1in; /* Set margins for the whole page */ */
+            -webkit-print-color-adjust: exact; /* Ensure background colors and images are printed */
+        }
+        section{
+            padding: 10px 0;
+        }
+        #header {
+            position: absolute; /* Fixes the header issue in print */
+            top: 0;
+            width: 100%;
+        }
+
+        /* Example of margin for specific elements */
+        #printableArea {
+            page-break-before: auto; /* Avoid breaking before the form */
+            page-break-after: auto; /* Avoid breaking after the form */
+            /* margin: 1in;  *//* Specific margin for the form */
+        }
+
+        /* Additional styling for print if needed */
+        .form-group {
+            margin-bottom: 1em; /* Ensure spacing between form groups */
+        }
+
+        button {
+            display: none; /* Hide buttons during print */
+        }
+
+        #header{
+            display:none;
+        }
+        html {
+            scroll-behavior: smooth;
         }
     </style>
-
 </head>
 
 <body>
 
     <!-- ======= Header ======= -->
     <header id="header" class="d-flex align-items-center">
-        <div class="container d-flex align-items-center">
+        <div class="container d-flex align-items-center" style="display:none">
             <img src="@Model.Domain/landingpage/assets/img/favicon.png" alt="NOC" height="45" width="45" style="margin-right:5px;" />
             <h1 class="logo me-auto"><a href="#">NOC Drainage, Department of Water Resources, Punjab</a></h1>
 
@@ -71,310 +106,343 @@
                                 <!-- Circle Buttons -->
                                 @* <form class="user" method="get" id="grantForm"> *@
                                 <div class="card shadow mb-4 col-lg-12">
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Project Details</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                @* <div class="row"> *@
-                                                <div class="form-group">
-                                                    <label asp-for="Name" class="control-label"></label>
-                                                    <input asp-for="Name" readonly class="form-control form-control-user" />
+                                    <div id="printableArea">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-header py-3">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Project Details</h6>
                                                 </div>
-                                                <div class="form-group">
-                                                    <label asp-for="SiteAreaUnitName" class="control-label"></label>
-                                                    <input asp-for="SiteAreaUnitName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="ProjectTypeName" class="control-label"></label>
-                                                    <input asp-for="ProjectTypeName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                @if (Model.ProjectTypeName == "Any Other")
-                                                {
-                                                    <div class="form-group">
-                                                        <label asp-for="OtherProjectTypeDetail" class="control-label"></label>
-                                                        <input asp-for="OtherProjectTypeDetail" readonly class="form-control form-control-user" />
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="Name" class="control-label"></label>
+                                                                <input asp-for="Name" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6">                                                          
+                                                            <div class="form-group">
+                                                                <label asp-for="ProjectTypeName" class="control-label"></label>
+                                                                <input asp-for="ProjectTypeName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                        @if (Model.ProjectTypeName == "Any Other")
+                                                        {
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label asp-for="OtherProjectTypeDetail" class="control-label"></label>
+                                                                    <input asp-for="OtherProjectTypeDetail" readonly class="form-control form-control-user" />
+                                                                </div>
+                                                            </div>
+                                                        }
                                                     </div>
-                                                }
-                                            </div>
+                                                </div>
 
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Site Address Details</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label asp-for="Hadbast" class="control-label"></label>
-                                                    <input asp-for="Hadbast" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="PlotNo" class="control-label"></label>
-                                                    <input asp-for="PlotNo" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="DivisionName" class="control-label"></label>
-                                                    <input asp-for="DivisionName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="SubDivisionName" class="control-label"></label>
-                                                    <input asp-for="SubDivisionName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="TehsilBlockName" class="control-label"></label>
-                                                    <input asp-for="TehsilBlockName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="VillageName" class="control-label"></label>
-                                                    <input asp-for="VillageName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="Pincode" class="control-label"></label>
-                                                    <input asp-for="Pincode" readonly class="form-control form-control-user" />
-                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-header py-3">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Site Address Details</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="Hadbast" class="control-label"></label>
+                                                                <input asp-for="Hadbast" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label asp-for="PlotNo" class="control-label"></label>
+                                                                <input asp-for="PlotNo" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label asp-for="DivisionName" class="control-label"></label>
+                                                                <input asp-for="DivisionName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label asp-for="SubDivisionName" class="control-label"></label>
+                                                                <input asp-for="SubDivisionName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="TehsilBlockName" class="control-label"></label>
+                                                                <input asp-for="TehsilBlockName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label asp-for="VillageName" class="control-label"></label>
+                                                                <input asp-for="VillageName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label asp-for="Pincode" class="control-label"></label>
+                                                                <input asp-for="Pincode" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label asp-for="PlanSanctionAuthorityName" class="control-label"></label>
+                                                                <input asp-for="PlanSanctionAuthorityName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <table id="khasraTable" class="table table-responsive table-bordered table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                @* <th>#</th> *@
-                                                                <th>Khasra No.</th>
-                                                                <th>Kanal/Bigha</th>
-                                                                <th>Marla/Biswa</th>
-                                                                <th>Sarsai/Biswansi</th>
-                                                                @* <th></th> *@
-                                                                <!-- Add more columns as needed -->
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @for (int i = 0; i < Model.Khasras.Count(); i++)
-                                                            {
-                                                                <tr class="khasra-entry">
-                                                                    @* <td><span class="srKhasra">1</span></td> *@
-                                                                    <td>
-                                                                        <input asp-for="Khasras[i].KhasraNo" readonly class="form-control form-control-user" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input asp-for="Khasras[i].KanalOrBigha" readonly class="form-control form-control-user" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input asp-for="Khasras[i].MarlaOrBiswa" readonly class="form-control form-control-user" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input asp-for="Khasras[i].SarsaiOrBiswansi" readonly class="form-control form-control-user" />
-                                                                    </td>
-                                                                    <!-- Render more columns as needed -->
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-header py-3">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="SiteAreaUnitName" class="control-label"></label>
+                                                                <input asp-for="SiteAreaUnitName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                    <div class="row">
+                                                            <div class="col-lg-12">
+                                                        <table id="khasraTable" class="table table-responsive table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    @* <th>#</th> *@
+                                                                    <th>Khasra No.</th>
+                                                                    <th>Kanal/Bigha</th>
+                                                                    <th>Marla/Biswa</th>
+                                                                    <th>Sarsai/Biswansi</th>
+                                                                    @* <th></th> *@
+                                                                    <!-- Add more columns as needed -->
                                                                 </tr>
-                                                            }
-                                                        </tbody>
-                                                    </table>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for (int i = 0; i < Model.Khasras.Count(); i++)
+                                                                {
+                                                                    <tr class="khasra-entry">
+                                                                        @* <td><span class="srKhasra">1</span></td> *@
+                                                                        <td>
+                                                                            <input asp-for="Khasras[i].KhasraNo" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input asp-for="Khasras[i].KanalOrBigha" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input asp-for="Khasras[i].MarlaOrBiswa" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input asp-for="Khasras[i].SarsaiOrBiswansi" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <!-- Render more columns as needed -->
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                            </div>
 
-                                                </div>
-                                                <div class="row">
-                                                    <table class="table table-striped table-">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="col-sm-3">
-                                                                    <label class="control-label">Total Area in Acres: </label>
-                                                                    <input hidden asp-for="TotalArea" value="0" id="TotalSiteArea" />
-                                                                    <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
-
-                                                                </td>
-                                                                <td class="col-sm-3">
-                                                                    <label class="control-label">Total Area in Sq Feet: </label>
-                                                                    <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
-
-                                                                </td>
-                                                                <td class="col-sm-3">
-                                                                    <label class="control-label">Total Area in Sq Metre(s): </label>
-                                                                    <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
-
-                                                                </td>
-                                                                <td></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Types of Permissions</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label asp-for="NocPermissionTypeName" class="control-label"></label>
-                                                    <input asp-for="NocPermissionTypeName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="NocTypeName" class="control-label"></label>
-                                                    <input asp-for="NocTypeName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                @if (Model.NocTypeName.ToUpper() != "NEW")
-                                                {
-
-                                                    <div class="form-group">
-                                                        <label asp-for="NocNumber" class="control-label"></label>
-                                                        <input asp-for="NocNumber" readonly class="form-control form-control-user" />
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label asp-for="PreviousDate" class="control-label"></label>
-                                                        <input asp-for="PreviousDate" readonly class="form-control form-control-user" />
-                                                    </div>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @* <div class="row"> *@
-                                    @*  <div class="col-lg-6">
-                                <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">KML File Details</h6>
-                                </div>
-                                <div class="card-body">
-                                <div class="form-group">
-                                <label asp-for="KmlLinkName" class="control-label"></label>
-                                <a href="@Model.KmlLinkName" >KML File Link</a>
-                                <input asp-for="KmlLinkName" readonly class="form-control form-control-user" />
-                                </div>
-                                </div>
-                                </div> *@
-                                    @* <div class="col-lg-6">
-                                <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Types of Permissions</h6>
-                                </div>
-                                <div class="card-body">
-                                <div class="form-group">
-                                <label asp-for="NocPermissionTypeName" class="control-label"></label>
-                                <input asp-for="NocPermissionTypeName" readonly class="form-control form-control-user" />
-                                </div>
-                                <div class="form-group">
-                                <label asp-for="NocTypeName" class="control-label"></label>
-                                <input asp-for="NocTypeName" readonly class="form-control form-control-user" />
-                                </div>
-                                @if (Model.NocTypeName.ToUpper() != "NEW")
-                                {
+                                                    <div class="row">
+                                                                <div class="col-lg-12">
+                                                        <table class="table table-striped table-">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="col-sm-3">
+                                                                        <label class="control-label">Total Area in Acres: </label>
+                                                                        <input hidden asp-for="TotalArea" value="0" id="TotalSiteArea" />
+                                                                        <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
 
-                                <div class="form-group">
-                                <label asp-for="NocNumber" class="control-label"></label>
-                                <input asp-for="NocNumber" readonly class="form-control form-control-user" />
-                                </div>
-                                <div class="form-group">
-                                <label asp-for="PreviousDate" class="control-label"></label>
-                                <input asp-for="PreviousDate" readonly class="form-control form-control-user" />
-                                </div>
-                                }
-                                </div>
-                                </div> *@
+                                                                    </td>
+                                                                    <td class="col-sm-3">
+                                                                        <label class="control-label">Total Area in Sq Feet: </label>
+                                                                        <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
 
-                                    @* </div> *@
+                                                                    </td>
+                                                                    <td class="col-sm-3">
+                                                                        <label class="control-label">Total Area in Sq Metre(s): </label>
+                                                                        <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
 
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Details of Owners/Partners/Chief Executive/Full Time Directors</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <table id="ownerTable" class="table table-bordered table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                @* <th>#</th> *@
-                                                                <th>OwnerType</th>
-                                                                <th>Name</th>
-                                                                <th>Address</th>
-                                                                <th>Mobile Number</th>
-                                                                <th>Email</th>
-                                                                <!-- Add more columns as needed -->
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @for (int i = 0; i < Model.Owners.Count(); i++)
-                                                            {
-                                                                <tr class="owner-entry">
-                                                                    @* <td><span class="srKhasra">1</span></td> *@
-                                                                    <td>
-                                                                        <input asp-for="Owners[i].OwnerType.Name" readonly class="form-control form-control-user" />
                                                                     </td>
-                                                                    <td>
-                                                                        <input asp-for="Owners[i].Name" readonly class="form-control form-control-user" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input asp-for="Owners[i].Address" readonly class="form-control form-control-user" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input asp-for="Owners[i].MobileNo" readonly class="form-control form-control-user" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input asp-for="Owners[i].Email" readonly class="form-control form-control-user" />
-                                                                    </td>
-                                                                    <!-- Render more columns as needed -->
+                                                                    <td></td>
                                                                 </tr>
-                                                            }
-                                                        </tbody>
-                                                    </table>
-
-                                                </div>
-                                                <div asp-validation-summary="All" class="text-danger validateAll"></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-6">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label asp-for="ApplicantName" class="control-label"></label>
-                                                    <input asp-for="ApplicantName" readonly class="form-control form-control-user" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="ApplicantEmailID" class="control-label"></label>
-                                                    <input asp-for="ApplicantEmailID" readonly class="form-control form-control-user" />
-                                                </div>
-                                            </div>
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Application Detail</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="form-group">
-                                                    <label asp-for="ApplicationID" class="control-label">Application ID</label>
-                                                    <input asp-for="ApplicationID" readonly class="form-control form-control-user" />
+                                                            </tbody>
+                                                        </table>
+                                                                </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-6">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Payment Detail</h6>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-header py-3">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Types of Permissions</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="NocPermissionTypeName" class="control-label"></label>
+                                                                <input asp-for="NocPermissionTypeName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="NocTypeName" class="control-label"></label>
+                                                                <input asp-for="NocTypeName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @if (Model.NocTypeName.ToUpper() != "NEW")
+                                                    {
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label asp-for="NocNumber" class="control-label"></label>
+                                                                    <input asp-for="NocNumber" readonly class="form-control form-control-user" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label asp-for="PreviousDate" class="control-label"></label>
+                                                                    <input asp-for="PreviousDate" readonly class="form-control form-control-user" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
                                             </div>
-                                            <div class="card-body">
-                                                @if (Model.PaymentOrderId != "0")
-                                                {
-                                                    <div class="form-group">
-                                                        <label asp-for="PaymentOrderId" class="control-label">Transaction ID</label>
-                                                        <input asp-for="PaymentOrderId" readonly class="form-control form-control-user" />
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-header py-3">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Details of Owners/Partners/Chief Executive/Full Time Directors</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                                    <div class="col-lg-12">
+                                                        <table id="ownerTable" class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    @* <th>#</th> *@
+                                                                    <th>OwnerType</th>
+                                                                    <th>Name</th>
+                                                                    <th>Address</th>
+                                                                    <th>Mobile Number</th>
+                                                                    <th>Email</th>
+                                                                    <!-- Add more columns as needed -->
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @for (int i = 0; i < Model.Owners.Count(); i++)
+                                                                {
+                                                                    <tr class="owner-entry">
+                                                                        @* <td><span class="srKhasra">1</span></td> *@
+                                                                        <td>
+                                                                            <input asp-for="Owners[i].OwnerType.Name" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input asp-for="Owners[i].Name" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input asp-for="Owners[i].Address" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input asp-for="Owners[i].MobileNo" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input asp-for="Owners[i].Email" readonly class="form-control form-control-user" />
+                                                                        </td>
+                                                                        <!-- Render more columns as needed -->
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                                    </div>
                                                     </div>
-                                                }
-                                                else
-                                                {
-                                                    <div class="form-group">
-                                                        <label name="PaymentOrderId" class="control-label">Payment</label>
-                                                        <input name="PaymentOrderStatus" readonly class="form-control form-control-user" value="Pending" />
+                                                    <div asp-validation-summary="All" class="text-danger validateAll"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-header py-3">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="ApplicantName" class="control-label"></label>
+                                                                <input asp-for="ApplicantName" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="ApplicantEmailID" class="control-label"></label>
+                                                                <input asp-for="ApplicantEmailID" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-header py-3">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Application Detail</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label asp-for="ApplicationID" class="control-label">Application ID</label>
+                                                                <input asp-for="ApplicationID" readonly class="form-control form-control-user" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-header py-3">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Payment Detail</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    @if (Model.PaymentOrderId != "0")
+                                                    {
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label asp-for="PaymentOrderId" class="control-label">Transaction ID</label>
+                                                                    <input asp-for="PaymentOrderId" readonly class="form-control form-control-user" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="row">
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label name="PaymentOrderId" class="control-label">Payment</label>
+                                                                    <input name="PaymentOrderStatus" readonly class="form-control form-control-user" value="Pending" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="card-body">
+                                        <div class="col-sm-6 offset-sm-6">
+                                            <button type="button" class="btn btn-secondary btn-user btn-block" id="printButton">Print</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
+                                </div>
                                 @* </form> *@
                             }
                             else
@@ -410,8 +478,54 @@
 
     <!-- Template Main JS File -->
     <script src="@Model.Domain/landingpage/assets/js/main.js"></script>
+    
+  @*   <style>
+    @media print {
+        body {
+            margin: 1in; /* Set margins for the whole page */
+            -webkit-print-color-adjust: exact; /* Ensure background colors and images are printed */
+        }
 
+        /* Example of margin for specific elements */
+        #printableArea {
+            page-break-before: auto; /* Avoid breaking before the form */
+            page-break-after: auto; /* Avoid breaking after the form */
+            margin: 1in; /* Specific margin for the form */
+        }
 
+        /* Additional styling for print if needed */
+        .form-group {
+            margin-bottom: 1em; /* Ensure spacing between form groups */
+        }
+
+        button {
+            display: none; /* Hide buttons during print */
+        }
+    }
+</style> *@
+    <script>
+        $(document).ready(function () {
+            // Function to handle the print button click event
+            $('#printButton').click(function () {
+                printSection('printableArea');
+            });
+        });
+        function printSection(divId) {
+            // Get the HTML content of the specified section
+            // var printContents = document.getElementById(divId).innerHTML;
+            // // Open a new window
+            // var originalContents = document.body.innerHTML;
+            // document.body.innerHTML = printContents;
+            $('#printButton,#header').css('display', 'none');
+            $('#header').removeClass('fixed-top');
+            $('section').css('padding','10px 0')
+            window.print();
+            $('#printButton,#header').css('display', 'block');
+            $('#header').addClass('fixed-top');
+            // document.body.innerHTML = originalContents;
+            // location.reload(); // To reload the page back to original content
+        }
+    </script>
 </body>
 
 </html>
