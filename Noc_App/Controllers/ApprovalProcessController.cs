@@ -921,13 +921,15 @@ namespace Noc_App.Controllers
                             DrainLSectionPath = uniqueLSectionOfDrainFileName,
                             GISOrDWSReportPath= uniqueGisOrDwsFileName,
                             IsKMLByApplicantValid = model.IsKMLByApplicantValid,
+                            GrantApprovalID=approvalDetail.Id,
                             ProcessedBy = userId,
                             ProcessedOn = DateTime.Now,
                             ProcessedByRole = role,
                             ProcessedByName = LoggedInUserName() + "(" + LoggedInDesignationName() + ")"
                     };
-
-                        approvalDetail.GrantApprovalProcessDocuments.Add(approvalObj);
+                        List<GrantApprovalProcessDocumentsDetails> approvalDocList = new List<GrantApprovalProcessDocumentsDetails>();
+                        approvalDocList.Add(approvalObj);
+                        approvalDetail.GrantApprovalProcessDocuments= approvalDocList;
                         await _repoApprovalDetail.UpdateAsync(approvalDetail);
 
                     }
@@ -987,10 +989,11 @@ namespace Noc_App.Controllers
                               ).FirstOrDefault();
                 if (model == null)
                 {
-                    model = (from g in _repo.GetAll()
+                    var d = (from g in _repo.GetAll()
                              join app2 in _repoApprovalDetail.GetAll() on g.Id equals app2.GrantID
                              join doc in _repoApprovalDocument.GetAll() on app2.Id equals doc.GrantApprovalID
-                             where g.ApplicationID == grantId && (app2.ProcessedToUser == doc.ProcessedBy)
+                             where g.ApplicationID == grantId && (app2.ProcessedToUser == doc.ProcessedBy || app2.ProcessedBy == doc.ProcessedBy)
+                             orderby doc.Id descending
                              select new ApprovalDocumentsViewModelEdit
                              {
                                  CatchmentAreaFilePath = doc.CatchmentAreaAndFlowPath,
@@ -1000,10 +1003,11 @@ namespace Noc_App.Controllers
                                  IsKMLByApplicantValid = doc.IsKMLByApplicantValid,
                                  LSectionOfDrainFilePath = doc.DrainLSectionPath,
                                  SiteConditionReportFilePath = doc.SiteConditionReportPath,
-                                 GrantApprovalDocId = docId,
+                                 GrantApprovalDocId = 0,//docId,
                                  GrantApprovalId = app
                              }
-                                      ).OrderByDescending(x=>x.GrantApprovalDocId).FirstOrDefault();
+                                      );
+                    model = d.FirstOrDefault();
                 }
                 return View(model);
             }
