@@ -470,7 +470,7 @@
                                                     <th>Forwarded To Role</th>
                                                     <th>Remarks</th>
                                                     <th>View</th>
-                                                    @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER"))))
+                                                    @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.ProcessedToRole=="JUNIOR ENGINEER"))))
                                                     {
                                                         <th>Action</th>
                                                     }
@@ -524,7 +524,7 @@
                                                         <td>
                                                             <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                         </td>
-                                                        @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER"))))
+                                                        @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.ProcessedToRole == "JUNIOR ENGINEER"))))
                                                         {
                                                             <td>
                                                                 <a asp-action="Transfer" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Transfer</a>
