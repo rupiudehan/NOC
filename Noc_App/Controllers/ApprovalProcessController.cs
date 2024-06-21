@@ -966,7 +966,7 @@ namespace Noc_App.Controllers
             {
                 if (grantId == null || grantId==string.Empty)
                 {
-                    ViewBag.ErrorMessage = $"Id = {grantId} cannot be found";
+                    ViewBag.ErrorMessage = $"An error occured";
 
                     return View("NotFound");
                 }
