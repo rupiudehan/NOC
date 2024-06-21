@@ -25,10 +25,10 @@
                                     <div class="custom-file1">
                                         <input asp-for="SiteConditionReportFile" class="form-control custom-file-input1" accept=".pdf" />
                                     
-                                    @if (Model.SiteConditionReportFilePath != null && Model.SiteConditionReportFilePath != "")
+                                    @* @if (Model.SiteConditionReportFilePath != null && Model.SiteConditionReportFilePath != "")
                                     {
                                         <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.SiteConditionReportFilePath })">Download File</a>
-                                    }
+                                    } *@
                                     <span asp-validation-for="SiteConditionReportFile" id="SiteConditionReportFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -38,10 +38,10 @@
                                     <label asp-for="CatchmentAreaFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
                                     <input asp-for="CatchmentAreaFile" class="form-control custom-file-input1" accept=".pdf" />
-                                    @if (Model.CatchmentAreaFilePath != null && Model.CatchmentAreaFilePath != "")
+                                    @* @if (Model.CatchmentAreaFilePath != null && Model.CatchmentAreaFilePath != "")
                                     {
                                         <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.CatchmentAreaFilePath })">Download File</a>
-                                    }
+                                    } *@
                                     <span asp-validation-for="CatchmentAreaFile" id="CatchmentAreaFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -51,10 +51,10 @@
                                     <label asp-for="DistanceFromCreekFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
                                     <input asp-for="DistanceFromCreekFile" class="form-control custom-file-input1" accept=".pdf" />
-                                    @if (Model.DistanceFromCreekFilePath != null && Model.DistanceFromCreekFilePath != "")
+                                    @* @if (Model.DistanceFromCreekFilePath != null && Model.DistanceFromCreekFilePath != "")
                                     {
                                         <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.DistanceFromCreekFilePath })">Download File</a>
-                                    }
+                                    } *@
                                     <span asp-validation-for="DistanceFromCreekFile" id="DistanceFromCreekFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -64,10 +64,10 @@
                                     <label asp-for="GisOrDwsFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
                                     <input asp-for="GisOrDwsFile" class="form-control custom-file-input1" accept=".pdf" />
-                                    @if (Model.GisOrDwsFilePath != null && Model.GisOrDwsFilePath != "")
+                                   @*  @if (Model.GisOrDwsFilePath != null && Model.GisOrDwsFilePath != "")
                                     {
                                         <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.GisOrDwsFilePath })">Download File</a>
-                                    }
+                                    } *@
                                     <span asp-validation-for="GisOrDwsFile" id="GisOrDwsFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -79,10 +79,10 @@
                                     <label asp-for="CrossSectionOrCalculationFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
                                     <input asp-for="CrossSectionOrCalculationFile" class="form-control custom-file-input1" accept=".pdf" />
-                                    @if (Model.CrossSectionOrCalculationFilePath != null && Model.CrossSectionOrCalculationFilePath != "")
+                                    @* @if (Model.CrossSectionOrCalculationFilePath != null && Model.CrossSectionOrCalculationFilePath != "")
                                     {
                                         <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.CrossSectionOrCalculationFilePath })">Download File</a>
-                                    }
+                                    } *@
                                     <span asp-validation-for="CrossSectionOrCalculationFile" id="CrossSectionOrCalculationFile-error" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -92,10 +92,10 @@
                                     <label asp-for="LSectionOfDrainFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                     <div class="custom-file1">
                                     <input asp-for="LSectionOfDrainFile" class="form-control custom-file-input1" accept=".pdf" />
-                                    @if (Model.LSectionOfDrainFilePath != null && Model.LSectionOfDrainFilePath != "")
+                                   @*  @if (Model.LSectionOfDrainFilePath != null && Model.LSectionOfDrainFilePath != "")
                                     {
                                         <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.LSectionOfDrainFilePath })">Download File</a>
-                                    }
+                                    } *@
                                     <span asp-validation-for="LSectionOfDrainFile" id="LSectionOfDrainFile-error" class="text-danger"></span>
                                     </div>
                                 </div>

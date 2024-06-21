@@ -349,7 +349,7 @@ namespace Noc_App.Controllers
                 // Retrieve roles associated with the user
                 var role = LoggedInRoleName();
                 GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "F")).FirstOrDefault();
-                List<OfficerResponseViewModel> officers = (await LoadOfficersAsync("Junior Engineer",model.SelectedSubDivisionId, "0")).FindAll(x=>x.user_info.EmployeeId==model.SelectedOfficerId);
+                List<OfficerResponseViewModel> officers = (await LoadOfficersAsync("JUNIOR ENGINEER",model.SelectedSubDivisionId, "0")).FindAll(x=>x.user_info.EmployeeId==model.SelectedOfficerId);
                 OfficerDetail userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
                                 join officer in officers on u.Id equals officer.user_info.RoleID
                                 select new OfficerDetail
@@ -1064,14 +1064,14 @@ namespace Noc_App.Controllers
                         uniqueCrossSectionOrCalculationFileName = obj.CrossSectionOrCalculationSheetReportPath;
                         uniqueLSectionOfDrainFileName = obj.DrainLSectionPath;
                     }
-                    if(CheckFiles(model.SiteConditionReportFile)==0 && CheckFiles(model.CatchmentAreaFile) == 0 && CheckFiles(model.DistanceFromCreekFile) == 0 &&
-                        CheckFiles(model.GisOrDwsFile) == 0 && CheckFiles(model.CrossSectionOrCalculationFile) == 0 && CheckFiles(model.LSectionOfDrainFile) == 0)                   
-                    {
-                        ErrorMessage = $"Atleast one file is required to upload";
-                        ModelState.AddModelError("", ErrorMessage);
+                    //if(CheckFiles(model.SiteConditionReportFile)==0 && CheckFiles(model.CatchmentAreaFile) == 0 && CheckFiles(model.DistanceFromCreekFile) == 0 &&
+                    //    CheckFiles(model.GisOrDwsFile) == 0 && CheckFiles(model.CrossSectionOrCalculationFile) == 0 && CheckFiles(model.LSectionOfDrainFile) == 0)                   
+                    //{
+                    //    ErrorMessage = $"Atleast one file is required to upload";
+                    //    ModelState.AddModelError("", ErrorMessage);
 
-                        return View(model);
-                    }
+                    //    return View(model);
+                    //}
                     if (CheckFiles(model.SiteConditionReportFile) != 0)
                     {
                         int siteConditionValidation = AllowedCheckExtensions(model.SiteConditionReportFile);
@@ -1568,6 +1568,18 @@ namespace Noc_App.Controllers
                     totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
                    
                 }
+                List<GrantApprovalRecommendationDetail> modelRecommendation = (from ap in _repoApprovalDetail.GetAll()
+                                                                 join recommend in _repoRecommendation.GetAll() on ap.RecommendationID equals recommend.Id
+                                                                 where ap.GrantID == obj.Id && obj.IsPending == true && recommend.Code != "NA"
+                                                                 orderby ap.ProcessedOn descending
+                                                                 select new GrantApprovalRecommendationDetail
+                                                                 {
+                                                                     ApplicationId = obj.ApplicationID,
+                                                                     Recommended = recommend.Name,
+                                                                     RecommendedBy = ap.ProcessedByRole,
+                                                                     RecommendedTo = ap.ProcessedToRole,
+                                                                     Remarks = ap.Remarks
+                                                                 }).ToList();
                 var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
                 if (payment == null || payment.Count() == 0)
                 {
@@ -1607,6 +1619,7 @@ namespace Noc_App.Controllers
                         FaradFilePath=obj.FaradFilePath,
                         LayoutPlanFilePath=obj.LayoutPlanFilePath,
                         GrantInspectionDocumentsDetail = documents,
+                        GrantApprovalRecommendationDetails=modelRecommendation,
                         LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + village.Name + ", Pincode: " + village.PinCode
                     };
                     return View(model);
@@ -1650,6 +1663,7 @@ namespace Noc_App.Controllers
                         FaradFilePath = obj.FaradFilePath,
                         LayoutPlanFilePath = obj.LayoutPlanFilePath,
                         GrantInspectionDocumentsDetail = documents,
+                        GrantApprovalRecommendationDetails = modelRecommendation,
                         LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + village.Name + ", Pincode: " + village.PinCode
                     };
                     return View(model);

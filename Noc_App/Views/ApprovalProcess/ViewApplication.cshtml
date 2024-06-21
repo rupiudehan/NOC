@@ -239,6 +239,52 @@
                                         <td>@Model.PreviousDate</td>
                                     </tr>
                                 }
+                                @if (Model.GrantApprovalRecommendationDetails.Count() > 0)
+                                {
+                                    <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Recommendations</h6></td></tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="col-lg-12">
+                                                <table id="recTable" class="table table-bordered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            @* <th>#</th> *@
+                                                            <th>Application ID</th>
+                                                            <th>Recommendation</th>
+                                                            <th>Remarks</th>
+                                                            <th>Recommended By</th>
+                                                            <th>Processed To</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (int i = 0; i < Model.GrantApprovalRecommendationDetails.Count(); i++)
+                                                        {
+                                                            <tr class="owner-entry">
+                                                                @* <td><span class="srKhasra">1</span></td> *@
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].ApplicationId" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].Recommended" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].Remarks" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedBy" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedTo" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <!-- Render more columns as needed -->
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                                 @if (Model.GrantInspectionDocumentsDetail.Count() > 0)
                                 {
                                     @foreach (GrantInspectionDocuments item in Model.GrantInspectionDocumentsDetail)
