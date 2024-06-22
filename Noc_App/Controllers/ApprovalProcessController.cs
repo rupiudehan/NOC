@@ -1533,7 +1533,7 @@ namespace Noc_App.Controllers
                 List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 List<GrantInspectionDocuments> documents = (from d in _repoApprovalDocument.GetAll()
                                 join a in _repoApprovalDetail.GetAll() on d.GrantApprovalID equals a.Id
-                                where a.GrantID==obj.Id
+                                where a.GrantID==obj.Id orderby d.Id descending
                                 select new GrantInspectionDocuments
                                 { 
                                     GisOrDwsFilePath=d.GISOrDWSReportPath,
@@ -1546,7 +1546,7 @@ namespace Noc_App.Controllers
                                     UploadedByName=d.ProcessedByName,
                                     SiteConditionReportFilePath=d.SiteConditionReportPath
                                    
-                                }).ToList();
+                                }).Take(1).ToList();
                     //(await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 List<OwnerTypeDetails> ownertype = new List<OwnerTypeDetails>();
                 foreach (OwnerDetails item in owners)

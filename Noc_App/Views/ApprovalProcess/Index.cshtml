@@ -72,6 +72,10 @@
                                                             <th>Edit Documents</th>
                                                         }
                                                     }
+                                                    else if (arry[0].Any(x => (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER") && x.IsForwarded == false && x.rejectionmust != 1 && x.IsShortFall == true))
+                                                    {
+                                                        <th>Status</th>
+                                                    }
                                                     @if (arry[0].Any(x => x.IsForwarded == true && x.rejectionmust != 1))
                                                     {
                                                         <th>Recommendations</th>
@@ -216,7 +220,10 @@
                                                             }
 
                                                         }
-
+                                                        else if (arry[0].Any(x => (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER") && x.IsForwarded == false && x.rejectionmust != 1 && x.IsShortFall == true))
+                                                        {
+                                                            <td>Reverted Due to Discrepancy</td>
+                                                        }
                                                         @if (arry[0].Any(x => x.IsForwarded == true && x.rejectionmust != 1))
                                                         {
                                                             @if (data.IsForwarded == true)

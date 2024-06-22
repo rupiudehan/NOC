@@ -1123,6 +1123,13 @@ namespace Noc_App.Controllers
                                     sections.kmlid = item.rejectedSection.Id;
                                     sections.isKMLActive = sections.isPActive == "active" || sections.isADActive == "active" ? "" : "active";
                                 }
+                                else if (item.project.SectionCode.ToUpper() == "PM")
+                                {
+                                    sections.permission = 1;
+                                    sections.ispermissionCompleted = item.rejectedSection.IsCompleted;
+                                    sections.permissionid = item.rejectedSection.Id;
+                                    sections.isPrActive = sections.isPActive == "active" || sections.isADActive == "active" || sections.isKMLActive == "active" ? "" : "active";
+                                }
                                 else if (item.project.SectionCode.ToUpper() == "AP")
                                 {
                                     sections.applicant = 1;
@@ -1136,13 +1143,6 @@ namespace Noc_App.Controllers
                                     sections.isownerCompleted = item.rejectedSection.IsCompleted;
                                     sections.ownerid = item.rejectedSection.Id;
                                     sections.isOActive = sections.isPActive == "active" || sections.isADActive == "active" || sections.isKMLActive == "active" || sections.isAPActive == "active" || sections.isPrActive == "active" ? "" : "active";
-                                }
-                                else if (item.project.SectionCode.ToUpper() == "PM")
-                                {
-                                    sections.permission = 1;
-                                    sections.ispermissionCompleted = item.rejectedSection.IsCompleted;
-                                    sections.permissionid = item.rejectedSection.Id;
-                                    sections.isPrActive = sections.isPActive == "active" || sections.isADActive == "active" || sections.isKMLActive == "active" ? "" : "active";
                                 }
                             }
                             int totalCompleted = (from g in _repo.GetAll()
