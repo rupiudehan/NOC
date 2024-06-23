@@ -1548,7 +1548,7 @@ namespace Noc_App.Controllers
                                     UploadedByName=d.ProcessedByName,
                                     SiteConditionReportFilePath=d.SiteConditionReportPath
                                    
-                                }).Take(1).ToList();
+                                }).ToList();
                     //(await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 List<OwnerTypeDetails> ownertype = new List<OwnerTypeDetails>();
                 foreach (OwnerDetails item in owners)

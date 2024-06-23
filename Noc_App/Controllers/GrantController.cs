@@ -1089,6 +1089,7 @@ namespace Noc_App.Controllers
                                                  join a in _repoApprovalDetail.GetAll() on r.GrantApprovalId equals a.Id
                                                  join m in _repoApprovalMaster.GetAll() on a.ApprovalID equals m.Id
                                                  where r.GrantApprovalId == a.Id && m.Code.ToUpper() == "SF" && a.GrantID == grant.Grant.Id && grant.Grant.ShortFallLevel == a.ProcessLevel
+                                                 orderby p.Id
                                                  select new
                                                  {
                                                      project = p,
