@@ -44,6 +44,7 @@ namespace Noc_App.Models.ViewModel
         public DateTime CreatedOn { get; set; }
         public double TotalArea { get; set; }
         public string Remarks { get; set; }
+        public string CertificateFilePath { get; set; }
         //[Display(Name = "Sub-Division")]
         //public string SelectedSubDivisionId { get; set; }
         //public IEnumerable<SelectListItem> SubDivisions { get; set; }

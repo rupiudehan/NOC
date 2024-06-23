@@ -32,12 +32,16 @@
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                             <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Pending</a>
 
-                            @if ((arry[0].Any() && arry[0].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")) || (arry[1].Any() && arry[1].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")) || (arry[2].Any() && arry[2].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")))
+                            @if ((arry[0].Any() && arry[0].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")) || (arry[1].Any() && arry[1].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")) || (arry[2].Any() && arry[2].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")) || (arry[3].Any() && arry[3].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY")))
                             {
                                 <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Forwarded</a>
                                 @if (arry[2] != null && arry[2].Any() && !arry[2].Any(x => x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER"))
                                 {
                                     <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Rejected</a>
+                                }
+                                @if (arry[3] != null && arry[3].Any())
+                                {
+                                    <a class="nav-item nav-link" id="nav-shortfall-tab" data-toggle="tab" href="#nav-shortfall" role="tab" aria-controls="nav-shortfall" aria-selected="false">Issued NOC</a>
                                 }
                                 @*  @if (arry[3] != null && arry[3].Any())
                             {
@@ -459,7 +463,7 @@
                                 }
                             </div>
                         </div>
-                        @if (arry[0].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY") || arry[1].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY") || arry[2].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY"))
+                        @if (arry[0].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY") || arry[1].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY") || arry[2].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY") || arry[3].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY"))
                         {
                             <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                                 <div class="table-responsive">
@@ -628,7 +632,7 @@
                                     </div>
                                 </div>
                             }
-                            @* @if (arry[3] != null && arry[3].Any())
+                            @if (arry[3] != null && arry[3].Any())
                         {
                         <div class="tab-pane fade" id="nav-shortfall" role="tabpanel" aria-labelledby="nav-shortfall-tab">
                         <div class="table-responsive">
@@ -643,7 +647,7 @@
                         <th>Project Name</th>
                         <th>Location Details</th>
                         <th>View</th>
-                        <th>Reject</th>
+                        <th>NOC Certificate</th>
 
                         </tr>
                         </thead>
@@ -659,7 +663,7 @@
                         <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                         </td>
                         <td>
-                        <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+                            <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = data.CertificateFilePath })">Download</a>
                         </td>
                         </tr>
                         count = count + 1;
@@ -679,7 +683,7 @@
                         }
                         </div>
                         </div>
-                        } *@
+                        }
                         }
                     </div>
 

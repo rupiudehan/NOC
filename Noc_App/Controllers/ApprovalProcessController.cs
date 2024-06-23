@@ -108,11 +108,13 @@ namespace Noc_App.Controllers
                 model=await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", "0", "'" +role+"'", "'" + userId + "'");
                 var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
                 var modelRejected = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsrejected", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
+                var modelIssued = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsissued", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
                 //var modelShortfall = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsexpiredshortfall", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
 
                 modelView.Add(model);
                 modelView.Add(modelForwarded);
                 modelView.Add(modelRejected);
+                modelView.Add(modelIssued);
                 //modelView.Add(modelShortfall);
 
                 return View(modelView);
