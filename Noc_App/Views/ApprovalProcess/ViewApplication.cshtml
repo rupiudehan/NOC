@@ -173,9 +173,9 @@
                                     <td>
                                         <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.KMLFilePath })">Download File</a>
                                     </td>
-                                    <td class="boldText">Authorization Letter</td>
+                                    <td class="boldText">KML Link</td>
                                     <td>
-                                        <a href="@Url.Action("RedirectToExternalSite", "ApprovalProcess",new{siteAddress=Model.KmlLinkName})" )" target="_blank">KML Link</a>
+                                        <a href="@Url.Action("RedirectToExternalSite", "ApprovalProcess",new{siteAddress=Model.KmlLinkName})" )" target="_blank">@Model.KmlLinkName</a>
                                     </td>
                                 </tr>
                                 <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Details of Owners/Partners/Chief Executive/Full Time Directors</h6></td></tr>
@@ -289,7 +289,7 @@
                                 {
                                     @foreach (GrantInspectionDocuments item in Model.GrantInspectionDocumentsDetail)
                                     {
-                                        <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Inspection Documents Uploaded By @item.UploadedByRole and KML Detail</h6></td></tr>
+                                        <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Inspection Documents and KML Details Uploaded By @item.UploadedByRole</h6></td></tr>
                                         @if (item.SiteConditionReportFilePath != "")
                                         {
                                             <tr>

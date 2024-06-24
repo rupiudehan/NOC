@@ -1529,6 +1529,7 @@ namespace Noc_App.Controllers
                 SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(tehsil.SubDivisionId);
                 DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
                 NocPermissionTypeDetails permission = await _nocPermissionTypeRepo.GetByIdAsync(obj.NocPermissionTypeID);
+                ProjectTypeDetails projecttype = await _projectTypeRepo.GetByIdAsync(obj.ProjectTypeId);
                 NocTypeDetails noctype = await _nocTypeRepo.GetByIdAsync(obj.NocTypeId);
                 SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(obj.SiteAreaUnitId);
                 List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == obj.Id)).ToList();
@@ -1610,7 +1611,7 @@ namespace Noc_App.Controllers
                         Pincode = village.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
                         PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
-                        ProjectTypeName = obj.Name,
+                        ProjectTypeName = projecttype.Name,
                         SiteAreaUnitName = unit.Name,
                         TotalArea = totalArea.ToString(),
                         TotalAreaSqFeet = Math.Round((totalArea * 43560),4).ToString(),
@@ -1654,7 +1655,7 @@ namespace Noc_App.Controllers
                         Pincode = village.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
                         PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
-                        ProjectTypeName = obj.Name,
+                        ProjectTypeName = projecttype.Name,
                         SiteAreaUnitName = unit.Name,
                         TotalArea = totalArea.ToString(),
                         TotalAreaSqFeet = (totalArea * 43560).ToString(),

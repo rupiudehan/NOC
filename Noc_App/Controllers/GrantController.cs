@@ -301,6 +301,7 @@ namespace Noc_App.Controllers
                          join d in _divisionRepo.GetAll() on sub.DivisionId equals d.Id
                          join npt in _nocPermissionTypeRepo.GetAll() on gr.NocPermissionTypeID equals npt.Id
                          join plan in _repoPlanSanctionAuthtoryMaster.GetAll() on gr.PlanSanctionAuthorityId equals plan.Id
+                         join pr in _projectTypeRepo.GetAll() on gr.ProjectTypeId equals pr.Id
                          join npr in _nocTypeRepo.GetAll() on gr.NocTypeId equals npr.Id
                          join un in _siteUnitsRepo.GetAll() on gr.SiteAreaUnitId equals un.Id
                          join p in _grantPaymentRepo.GetAll() on gr.Id equals p.GrantID into paymentdetail
@@ -317,7 +318,8 @@ namespace Noc_App.Controllers
                              PermissionType = npt,
                              NocType = npr,
                              Unit = un,
-                             PlanSanction=plan
+                             PlanSanction=plan,
+                             Project=pr
                          }
                    ).FirstOrDefault();
                 GrantDetails obj = g.Grant;
@@ -378,7 +380,7 @@ namespace Noc_App.Controllers
                         Pincode = village.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
                         PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
-                        ProjectTypeName = obj.Name,
+                        ProjectTypeName = g.Project.Name,
                         SiteAreaUnitName = unit.Name,
                         TotalArea = totalArea.ToString(),
                         TotalAreaSqFeet = Math.Round((totalArea * 43560),4).ToString(),
@@ -417,7 +419,7 @@ namespace Noc_App.Controllers
                         Pincode = village.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
                         PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
-                        ProjectTypeName = obj.Name,
+                        ProjectTypeName = g.Project.Name,
                         SiteAreaUnitName = unit.Name,
                         TotalArea = totalArea.ToString(),
                         TotalAreaSqFeet = Math.Round((totalArea * 43560), 4).ToString(),
