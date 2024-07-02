@@ -249,11 +249,11 @@
                                                     <thead>
                                                         <tr>
                                                             @* <th>#</th> *@
-                                                            <th>Application ID</th>
-                                                            <th>Recommendation</th>
-                                                            <th>Remarks</th>
+                                                            @* <th>Application ID</th> *@
                                                             <th>Recommended By</th>
                                                             <th>Processed To</th>
+                                                            <th>Recommendation</th>
+                                                            <th>Remarks</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -261,20 +261,20 @@
                                                         {
                                                             <tr class="owner-entry">
                                                                 @* <td><span class="srKhasra">1</span></td> *@
-                                                                <td>
+                                                               @*  <td>
                                                                     <input asp-for="GrantApprovalRecommendationDetails[i].ApplicationId" readonly class="form-control form-control-user" />
+                                                    </td> *@
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedTo" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedBy" readonly class="form-control form-control-user" />
                                                                 </td>
                                                                 <td>
                                                                     <input asp-for="GrantApprovalRecommendationDetails[i].Recommended" readonly class="form-control form-control-user" />
                                                                 </td>
                                                                 <td>
                                                                     <input asp-for="GrantApprovalRecommendationDetails[i].Remarks" readonly class="form-control form-control-user" />
-                                                                </td>
-                                                                <td>
-                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedBy" readonly class="form-control form-control-user" />
-                                                                </td>
-                                                                <td>
-                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedTo" readonly class="form-control form-control-user" />
                                                                 </td>
                                                                 <!-- Render more columns as needed -->
                                                             </tr>
