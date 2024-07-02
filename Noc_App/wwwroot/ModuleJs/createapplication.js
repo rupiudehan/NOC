@@ -414,29 +414,48 @@ $(document).ready(function () {
                 alert('Error ' + e);
             }
         });
+        //var subDivisionId = $(this).val();
+            $.ajax({
+                url: "/Grant/GetTehsilBlocks",
+                type: "POST",
+                data: { divisionId: divisionId },
+                async: false,
+                success: function (data) {
+                    populateDropdown(data, "TehsilBlockId");
+                    var dropdownlistVillage = $("#SelectedVillageId");
+                    dropdownlistVillage.empty();
+                    dropdownlistVillage.html('<option value="">Select</option>');
+                },
+                failure: function (f) {
+                    alert(f);
+                },
+                error: function (e) {
+                    alert('Error ' + e);
+                }
+            });
     });
 
-    $("#SelectedSubDivisionId").change(function () {
-        var subDivisionId = $(this).val();
-        $.ajax({
-            url: "/Grant/GetTehsilBlocks",
-            type: "POST",
-            data: { subDivisionId: subDivisionId },
-            async: false,
-            success: function (data) {
-                populateDropdown(data, "TehsilBlockId");
-                var dropdownlistVillage = $("#SelectedVillageId");
-                dropdownlistVillage.empty();
-                dropdownlistVillage.html('<option value="">Select</option>');
-            },
-            failure: function (f) {
-                alert(f);
-            },
-            error: function (e) {
-                alert('Error ' + e);
-            }
-        });
-    });
+    //$("#SelectedSubDivisionId").change(function () {
+    //    var subDivisionId = $(this).val();
+    //    $.ajax({
+    //        url: "/Grant/GetTehsilBlocks",
+    //        type: "POST",
+    //        data: { subDivisionId: subDivisionId },
+    //        async: false,
+    //        success: function (data) {
+    //            populateDropdown(data, "TehsilBlockId");
+    //            var dropdownlistVillage = $("#SelectedVillageId");
+    //            dropdownlistVillage.empty();
+    //            dropdownlistVillage.html('<option value="">Select</option>');
+    //        },
+    //        failure: function (f) {
+    //            alert(f);
+    //        },
+    //        error: function (e) {
+    //            alert('Error ' + e);
+    //        }
+    //    });
+    //});
 
 
     $("#SelectedTehsilBlockId").change(function () {

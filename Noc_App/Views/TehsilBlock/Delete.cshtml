@@ -18,8 +18,16 @@
                 <hr />
                 <dl class="row">
                     <dt class="col-sm-4">
+                        District
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.District.Name)
+                    </dd>
+                    <!-- Include other properties as needed -->
+                </dl>
+                @* <dl class="row">
+                    <dt class="col-sm-4">
                         Division
-                        @* @Html.DisplayNameFor(model => model.SubDivision.Name) *@
                     </dt>
                     <dd class="col-sm-8">
                         @Html.DisplayFor(model => model.SubDivision.Division.Name)
@@ -29,13 +37,12 @@
                 <dl class="row">
                     <dt class="col-sm-4">
                         Sub-Division
-                        @* @Html.DisplayNameFor(model => model.SubDivision.Name) *@
                     </dt>
                     <dd class="col-sm-8">
                         @Html.DisplayFor(model => model.SubDivision.Name)
                     </dd>
                     <!-- Include other properties as needed -->
-                </dl>
+                </dl> *@
                 <dl class="row">
                     <dt class="col-sm-4">
                         @Html.DisplayNameFor(model => model.LGD_ID)

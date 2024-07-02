@@ -14,16 +14,19 @@ namespace Noc_App.Controllers
     {
         private readonly IRepository<VillageDetails> _repo;
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
-        private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
-        private readonly IRepository<DivisionDetails> _divisionRepo;
+        //private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
+        //private readonly IRepository<DivisionDetails> _divisionRepo;
+        private readonly IRepository<DistrictDetails> _districtRepo;
         private readonly IRepository<GrantDetails> _grantRepo;
 
-        public VillageController(IRepository<VillageDetails> repo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<GrantDetails> grantRepo, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo)
+        public VillageController(IRepository<VillageDetails> repo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<GrantDetails> grantRepo
+           , IRepository<DistrictDetails> districtRepo /*, IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo*/)
         {
             _repo = repo;
             _tehsilBlockRepo = tehsilBlockRepo;
-            _subDivisionRepo = subDivisionRepo;
-            _divisionRepo = divisionRepo;
+            //_subDivisionRepo = subDivisionRepo;
+            //_divisionRepo = divisionRepo;
+            _districtRepo = districtRepo;
             _grantRepo = grantRepo;
         }
         [HttpGet]
@@ -32,8 +35,9 @@ namespace Noc_App.Controllers
             var viewModel = new VillageViewModelCreate
             {
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
-                SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
-                Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name")
+                Districts = new SelectList(_districtRepo.GetAll().OrderBy(x => x.Name), "Id", "Name")
+                //SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
+                //Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name")
             };
 
             return View(viewModel);
@@ -45,10 +49,10 @@ namespace Noc_App.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name");
-                    var filteredSubdivisions = _subDivisionRepo.GetAll().Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
-                    model.SubDivision = new SelectList(filteredSubdivisions, "Id", "Name");
-                    var filteredtehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.SubDivisionId == model.SelectedSubDivisionId).ToList();
+                    //model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name");
+                    //var filteredSubdivisions = _subDivisionRepo.GetAll().Where(c => c.DivisionId == model.SelectedDivisionId).ToList();
+                    model.Districts = new SelectList(_districtRepo.GetAll().OrderBy(x=>x.Name), "Id", "Name");
+                    var filteredtehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.DistrictId == model.SelectedDistrictId).ToList();
                     model.TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name");
 
                     bool IsDuplicate = _repo.IsDuplicateName(model.Name);
@@ -85,7 +89,7 @@ namespace Noc_App.Controllers
         {
             try
             {
-                var list = _repo.GetAll().Include(x=>x.TehsilBlock).ThenInclude(x=>x.SubDivision).ThenInclude(x=>x.Division);
+                var list = _repo.GetAll().Include(x => x.TehsilBlock);//.ThenInclude(x=>x.SubDivision).ThenInclude(x=>x.Division);
                 var viewModels = list.Select(v => new VillageViewModel
                 {
                     Id = v.Id,
@@ -93,10 +97,10 @@ namespace Noc_App.Controllers
                     PinCode=v.PinCode,
                     TehsilBlockId = v.TehsilBlock.Id,
                     TehsilBlockName = v.TehsilBlock.Name,
-                    SubDivisionId = v.TehsilBlock.SubDivision.Id,
-                    SubDivisionName = v.TehsilBlock.SubDivision.Name,
-                    DivisionId = v.TehsilBlock.SubDivision.Division.Id,
-                    DivisionName = v.TehsilBlock.SubDivision.Division.Name,
+                    //SubDivisionId = v.TehsilBlock.SubDivision.Id,
+                    //SubDivisionName = v.TehsilBlock.SubDivision.Name,
+                    DistrictId = v.TehsilBlock.District.Id,
+                    DistrictName = v.TehsilBlock.District.Name,
                 }).ToList();
                 return View(viewModels);
             }
@@ -128,8 +132,8 @@ namespace Noc_App.Controllers
             {
                 VillageDetails obj = await _repo.GetByIdAsync(Id);
                 obj.TehsilBlock = await _tehsilBlockRepo.GetByIdAsync(obj.TehsilBlockId);
-                obj.TehsilBlock.SubDivision = await _subDivisionRepo.GetByIdAsync(obj.TehsilBlock.SubDivisionId);
-                obj.TehsilBlock.SubDivision.Division = await _divisionRepo.GetByIdAsync(obj.TehsilBlock.SubDivision.DivisionId);
+                obj.TehsilBlock.District = await _districtRepo.GetByIdAsync(obj.TehsilBlock.DistrictId);
+                //obj.TehsilBlock.SubDivision.Division = await _divisionRepo.GetByIdAsync(obj.TehsilBlock.SubDivision.DivisionId);
                 VillageViewModelEdit model = new VillageViewModelEdit
 
                 {
@@ -137,11 +141,11 @@ namespace Noc_App.Controllers
                     Name = obj.Name,
                     PinCode = obj.PinCode,
                     SelectedTehsilBlockId = obj.TehsilBlock.Id,
-                    TehsilBlock = new SelectList(_tehsilBlockRepo.GetAll().Where(x => x.SubDivisionId == obj.TehsilBlock.SubDivisionId), "Id", "Name", obj.TehsilBlockId),
-                    SelectedSubDivisionId = obj.TehsilBlock.SubDivisionId,
-                    SubDivisions = new SelectList(_subDivisionRepo.GetAll().Where(x=>x.DivisionId== obj.TehsilBlock.SubDivision.DivisionId), "Id", "Name", obj.TehsilBlock.SubDivisionId),
-                    SelectedDivisionId = obj.TehsilBlock.SubDivision.DivisionId,
-                    Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name", obj.TehsilBlock.SubDivision.DivisionId)
+                    TehsilBlock = new SelectList(_tehsilBlockRepo.GetAll().Where(x => x.DistrictId == obj.TehsilBlock.DistrictId).OrderBy(x=>x.Name), "Id", "Name", obj.TehsilBlockId),
+                    SelectedDistrictId = obj.TehsilBlock.DistrictId,
+                    Districts = new SelectList(_districtRepo.GetAll().OrderBy(x => x.Name), "Id", "Name", obj.TehsilBlock.DistrictId),
+                    //SelectedDivisionId = obj.TehsilBlock.SubDivision.DivisionId,
+                    //Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name", obj.TehsilBlock.SubDivision.DivisionId)
                 };
 
                 return View(model);
@@ -166,10 +170,10 @@ namespace Noc_App.Controllers
                 }
                 else
                 {
-                    model.TehsilBlock = new SelectList(_tehsilBlockRepo.GetAll().Where(x => x.SubDivisionId == model.SelectedSubDivisionId), "Id", "Name", model.SelectedTehsilBlockId);
+                    model.TehsilBlock = new SelectList(_tehsilBlockRepo.GetAll().Where(x => x.DistrictId == model.SelectedDistrictId), "Id", "Name", model.SelectedTehsilBlockId);
                     
-                    model.SubDivisions = new SelectList(_subDivisionRepo.GetAll().Where(x => x.DivisionId == model.SelectedDivisionId), "Id", "Name", model.SelectedSubDivisionId);
-                    model.Divisions = new SelectList(_divisionRepo.GetAll(), "Id", "Name", model.SelectedDivisionId);
+                    //model.SubDivisions = new SelectList(_subDivisionRepo.GetAll().Where(x => x.DivisionId == model.SelectedDivisionId), "Id", "Name", model.SelectedSubDivisionId);
+                    model.Districts = new SelectList(_districtRepo.GetAll().OrderBy(x=>x.Name), "Id", "Name", model.SelectedDistrictId);
                     
 
                     bool IsDuplicate = _repo.IsUniqueName(model.Name, model.Id);
@@ -216,8 +220,8 @@ namespace Noc_App.Controllers
         {
             var obj = await _repo.GetByIdAsync(id);
             obj.TehsilBlock = await _tehsilBlockRepo.GetByIdAsync(obj.TehsilBlockId);
-            obj.TehsilBlock.SubDivision = await _subDivisionRepo.GetByIdAsync(obj.TehsilBlock.SubDivisionId);
-            obj.TehsilBlock.SubDivision.Division = await _divisionRepo.GetByIdAsync(obj.TehsilBlock.SubDivision.DivisionId);
+            obj.TehsilBlock.District = await _districtRepo.GetByIdAsync(obj.TehsilBlock.DistrictId);
+            //obj.TehsilBlock.SubDivision.Division = await _divisionRepo.GetByIdAsync(obj.TehsilBlock.SubDivision.DivisionId);
             if (obj == null)
             {
                 ViewBag.ErrorMessage = $"Village with Id = {obj.Id} cannot be found";
@@ -255,19 +259,19 @@ namespace Noc_App.Controllers
             return userId;
         }
 
-        [HttpPost]
-        public IActionResult GetSubDivisions(int divisionId)
-        {
-            var subDivision = _subDivisionRepo.GetAll();
-            var filteredSubdivisions = subDivision.Where(c => c.DivisionId == divisionId).ToList();
-            return Json(new SelectList(filteredSubdivisions, "Id", "Name"));
-        }
+        //[HttpPost]
+        //public IActionResult GetSubDivisions(int divisionId)
+        //{
+        //    var subDivision = _subDivisionRepo.GetAll();
+        //    var filteredSubdivisions = subDivision.Where(c => c.DivisionId == divisionId).ToList();
+        //    return Json(new SelectList(filteredSubdivisions, "Id", "Name"));
+        //}
 
         [HttpPost]
         public IActionResult GetTehsilBlocks(int subDivisionId)
         {
             var tehsilBlock = _tehsilBlockRepo.GetAll();
-            var filteredTehsilBlocks = tehsilBlock.Where(c => c.SubDivisionId == subDivisionId).ToList();
+            var filteredTehsilBlocks = tehsilBlock.Where(c => c.DistrictId == subDivisionId).ToList();
             return Json(new SelectList(filteredTehsilBlocks, "Id", "Name"));
         }
     }

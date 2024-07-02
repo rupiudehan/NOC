@@ -246,21 +246,21 @@ namespace Noc_App.Controllers
                 ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
                 return View("NotFound");
             }
-
+           
             var grantdetail = (from g in _repo.GetAll()
                                join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
                                join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
                                join v in _villageRpo.GetAll() on g.VillageID equals v.Id
                                join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
-                               join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals sub.Id
+                               join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
                                join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
                                where a.ProcessedToRole.ToUpper() == "JUNIOR ENGINEER" && g.ApplicationID == id
                                select new
                                {
                                    Grant = g,
-                                   subdiv= sub,
-                                   division=div,
-                                   village=v,
+                                   subdiv = sub,
+                                   division = div,
+                                   village =v,
                                    tehsil=t,
                                    Approval = a
                                }).FirstOrDefault();
@@ -431,13 +431,13 @@ namespace Noc_App.Controllers
                 
                 double total = 0;
                 var divisionDetail = (from g in (await _repo.FindAsync(x => x.ApplicationID == Id))
-                                        join v in _villageRpo.GetAll() on g.VillageID equals (v.Id)
-                                        join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
-                                        join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals (sub.Id)
+                                        //join v in _villageRpo.GetAll() on g.VillageID equals (v.Id)
+                                        //join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals (t.Id)
+                                        join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals (sub.Id)
                                         select new
                                         {
                                             DivisionId = sub.DivisionId,
-                                            SubDivisionId = t.SubDivisionId
+                                            SubDivisionId = g.SubDivisionId
                                         }
                          ).ToList().FirstOrDefault();
                 //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -540,7 +540,7 @@ namespace Noc_App.Controllers
                                                       join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
                                                       join v in _villageRpo.GetAll() on g.VillageID equals v.Id
                                                       join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
-                                                      join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals sub.Id
+                                                      join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
                                                       join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
                                                       where g.ApplicationID == Id
                                                       select new ForwardApplicationViewModel
@@ -904,12 +904,12 @@ namespace Noc_App.Controllers
                             ModelState.AddModelError("", ErrorMessage);
                             return View(model);
                         }
-                        string uniqueSiteConditionFileName = ProcessUploadedFile(model.SiteConditionReportFile, "SiteCondition");
-                        string uniqueCatchmentAreaFileName = ProcessUploadedFile(model.CatchmentAreaFile, "CatchmentArea");
-                        string uniqueDistanceFromCreekFileName = ProcessUploadedFile(model.DistanceFromCreekFile, "DistanceFromCreek");
-                        string uniqueGisOrDwsFileName = ProcessUploadedFile(model.GisOrDwsFile, "GisOrDws");
-                        string uniqueCrossSectionOrCalculationFileName = ProcessUploadedFile(model.CrossSectionOrCalculationFile, "CrossSectionOrCalculation");
-                        string uniqueLSectionOfDrainFileName = ProcessUploadedFile(model.LSectionOfDrainFile, "LSectionOfDrain");
+                        string uniqueSiteConditionFileName = ProcessUploadedFileWithoutSave(model.SiteConditionReportFile, "SiteCondition");
+                        string uniqueCatchmentAreaFileName = ProcessUploadedFileWithoutSave(model.CatchmentAreaFile, "CatchmentArea");
+                        string uniqueDistanceFromCreekFileName = ProcessUploadedFileWithoutSave(model.DistanceFromCreekFile, "DistanceFromCreek");
+                        string uniqueGisOrDwsFileName = ProcessUploadedFileWithoutSave(model.GisOrDwsFile, "GisOrDws");
+                        string uniqueCrossSectionOrCalculationFileName = ProcessUploadedFileWithoutSave(model.CrossSectionOrCalculationFile, "CrossSectionOrCalculation");
+                        string uniqueLSectionOfDrainFileName = ProcessUploadedFileWithoutSave(model.LSectionOfDrainFile, "LSectionOfDrain");
                         //string uniqueKmlFileName = ProcessUploadedFile(model.KmlFile, "kmlReport");
 
                         await _repoApprovalDetail.CreateAsync(approvalDetail);
@@ -933,6 +933,12 @@ namespace Noc_App.Controllers
                         approvalDocList.Add(approvalObj);
                         approvalDetail.GrantApprovalProcessDocuments= approvalDocList;
                         await _repoApprovalDetail.UpdateAsync(approvalDetail);
+                        var SiteConditionReportPath = fileUploadeSave(model.SiteConditionReportFile, uniqueSiteConditionFileName);
+                        var CatchmentAreaFile = fileUploadeSave(model.CatchmentAreaFile, uniqueCatchmentAreaFileName);
+                        var CrossSectionOrCalculationFile = fileUploadeSave(model.CrossSectionOrCalculationFile, uniqueCrossSectionOrCalculationFileName);
+                        var DistanceFromCreekFile = fileUploadeSave(model.DistanceFromCreekFile, uniqueDistanceFromCreekFileName);
+                        var LSectionOfDrainFile = fileUploadeSave(model.LSectionOfDrainFile, uniqueLSectionOfDrainFileName);
+                        var GisOrDwsFile = fileUploadeSave(model.GisOrDwsFile, uniqueGisOrDwsFileName);
 
                     }
                     else
@@ -1245,6 +1251,12 @@ namespace Noc_App.Controllers
                     }
                     else
                     {
+                        //var SiteConditionReportPath = fileUploadeSave(model.SiteConditionReportFile, uniqueSiteConditionFileName);
+                        //var CatchmentAreaFile = fileUploadeSave(model.CatchmentAreaFile, uniqueCatchmentAreaFileName);
+                        //var CrossSectionOrCalculationFile = fileUploadeSave(model.CrossSectionOrCalculationFile, uniqueCrossSectionOrCalculationFileName);
+                        //var DistanceFromCreekFile = fileUploadeSave(model.DistanceFromCreekFile, uniqueDistanceFromCreekFileName);
+                        //var LSectionOfDrainFile = fileUploadeSave(model.LSectionOfDrainFile, uniqueLSectionOfDrainFileName);
+                        //var GisOrDwsFile = fileUploadeSave(model.GisOrDwsFile, uniqueGisOrDwsFileName);
                         obj.ProcessedOn = DateTime.Now;
                         obj.ProcessedBy = userId;
                         obj.ProcessedByRole = role;
@@ -1374,7 +1386,7 @@ namespace Noc_App.Controllers
                                              join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
                                              join v in _villageRpo.GetAll() on g.VillageID equals v.Id
                                              join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
-                                             join sub in _subDivisionRepo.GetAll() on t.SubDivisionId equals sub.Id
+                                             join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
                                              join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
                                              where g.ApplicationID == id
                                              select new IssueNocViewModelCreate
@@ -1526,7 +1538,7 @@ namespace Noc_App.Controllers
                 PlanSanctionAuthorityMaster planAuth = await  _repoPlanSanctionAuthtoryMaster.GetByIdAsync(obj.PlanSanctionAuthorityId);
                 VillageDetails village = await _villageRpo.GetByIdAsync(obj.VillageID);
                 TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(village.TehsilBlockId);
-                SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(tehsil.SubDivisionId);
+                SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(obj.SubDivisionId);
                 DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
                 NocPermissionTypeDetails permission = await _nocPermissionTypeRepo.GetByIdAsync(obj.NocPermissionTypeID);
                 ProjectTypeDetails projecttype = await _projectTypeRepo.GetByIdAsync(obj.ProjectTypeId);
@@ -1721,8 +1733,9 @@ namespace Noc_App.Controllers
             if (file != null && file.Length > 0)
             {
 
+                string extension = System.IO.Path.GetExtension(file.FileName);
                 string uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, "Documents");
-                uniqueFileName = prefixName + "_" + Guid.NewGuid().ToString() + "_" + file.FileName;
+                uniqueFileName = prefixName + "_" + Guid.NewGuid().ToString() + extension;
                 string filePath = Path.Combine(uploadFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
@@ -1731,6 +1744,43 @@ namespace Noc_App.Controllers
             }
 
             return uniqueFileName;
+        }
+        [Obsolete]
+        private string ProcessUploadedFileWithoutSave(IFormFile file, string prefixName)
+        {
+            string uniqueFileName = null;
+            if (file != null && file.Length > 0)
+            {
+                string extension = System.IO.Path.GetExtension(file.FileName);
+                string uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, "Documents");
+                uniqueFileName = prefixName + "_" + Guid.NewGuid().ToString() + extension;
+            }
+
+            return uniqueFileName;
+        }
+
+        [Obsolete]
+        private bool fileUploadeSave(IFormFile file, string uniqueFileName)
+        {
+            try
+            {
+                if (file != null && file.Length > 0)
+                {
+
+                    string uploadFolder = Path.Combine(_hostingEnvironment.WebRootPath, "Documents");
+                    string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Noc_App.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NocApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240627114422_removedsubdivfromtehsil")]
+    partial class removedsubdivfromtehsil
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1535,9 +1538,6 @@ namespace NocApp.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DistrictId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -1549,6 +1549,9 @@ namespace NocApp.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
+                    b.Property<int?>("SubDivisionDetailsId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("text");
 
@@ -1557,7 +1560,7 @@ namespace NocApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DistrictId");
+                    b.HasIndex("SubDivisionDetailsId");
 
                     b.ToTable("TehsilBlockDetails");
                 });
@@ -2058,13 +2061,9 @@ namespace NocApp.Migrations
 
             modelBuilder.Entity("Noc_App.Models.TehsilBlockDetails", b =>
                 {
-                    b.HasOne("Noc_App.Models.DistrictDetails", "District")
+                    b.HasOne("Noc_App.Models.SubDivisionDetails", null)
                         .WithMany("TehsilBlock")
-                        .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("District");
+                        .HasForeignKey("SubDivisionDetailsId");
                 });
 
             modelBuilder.Entity("Noc_App.Models.VillageDetails", b =>
@@ -2081,8 +2080,6 @@ namespace NocApp.Migrations
             modelBuilder.Entity("Noc_App.Models.DistrictDetails", b =>
                 {
                     b.Navigation("Division");
-
-                    b.Navigation("TehsilBlock");
                 });
 
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>
@@ -2127,6 +2124,11 @@ namespace NocApp.Migrations
             modelBuilder.Entity("Noc_App.Models.ProjectTypeDetails", b =>
                 {
                     b.Navigation("Grants");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.SubDivisionDetails", b =>
+                {
+                    b.Navigation("TehsilBlock");
                 });
 
             modelBuilder.Entity("Noc_App.Models.TehsilBlockDetails", b =>

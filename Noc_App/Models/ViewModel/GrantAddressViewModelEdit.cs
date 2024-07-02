@@ -12,6 +12,8 @@ namespace Noc_App.Models.ViewModel
         [MaxLength(50, ErrorMessage = "Plot No. cannot exceed 50 characters")]
         [Display(Name = "Plot No.")]
         public string? plotNo { get; set; }
+        [Display(Name = "Sub-Division")]
+        public int selectedSubDivisionId { get; set; }
         [Display(Name = "Village/Town/City")]
         public int selectedVillageID { get; set; }
         [Display(Name = "Address Proof")]

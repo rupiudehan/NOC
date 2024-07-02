@@ -225,15 +225,10 @@ $(function () {
                     alert('Error ' + e);
                 }
             });
-        });
-    }
-    if (document.getElementById("SelectedSubDivisionId") != null) {
-        $("#SelectedSubDivisionId").change(function () {
-            var subDivisionId = $(this).val();
             $.ajax({
                 url: "/Grant/GetTehsilBlocks",
                 type: "POST",
-                data: { subDivisionId: subDivisionId },
+                data: { divisionId: divisionId },
                 async: false,
                 success: function (data) {
                     populateDropdown(data, "TehsilBlockId");
@@ -249,8 +244,31 @@ $(function () {
                 }
             });
         });
-
     }
+    //if (document.getElementById("SelectedSubDivisionId") != null) {
+    //    $("#SelectedSubDivisionId").change(function () {
+    //        var subDivisionId = $(this).val();
+    //        $.ajax({
+    //            url: "/Grant/GetTehsilBlocks",
+    //            type: "POST",
+    //            data: { subDivisionId: subDivisionId },
+    //            async: false,
+    //            success: function (data) {
+    //                populateDropdown(data, "TehsilBlockId");
+    //                var dropdownlistVillage = $("#SelectedVillageId");
+    //                dropdownlistVillage.empty();
+    //                dropdownlistVillage.html('<option value="">Select</option>');
+    //            },
+    //            failure: function (f) {
+    //                alert(f);
+    //            },
+    //            error: function (e) {
+    //                alert('Error ' + e);
+    //            }
+    //        });
+    //    });
+
+    //}
     if (document.getElementById("SelectedTehsilBlockId") != null) {
         $("#SelectedTehsilBlockId").on('change', function () {
             var tehsilBlockId = $(this).val();
@@ -388,6 +406,7 @@ $(function () {
             var Hadbast = $('#Hadbast').val();
             var PlotNo = parseInt($('#PlotNo').val());
             var SelectedVillageID = $('#SelectedVillageID').val();
+            var SelectedSubDivisionId = $('#SelectedSubDivisionId').val();
             var fileInput = $('#AddressProofPhoto')[0];
             var SelectedPlanSanctionAuthorityId = $('#SelectedPlanSanctionAuthorityId').val();
             var allFileValid = true;
@@ -417,13 +436,14 @@ $(function () {
                             if (allValid && allHValid && allFileValid) {
                                 /*var file = fileInput.files[0];*/
                                 formData.append('file', $('#AddressProofPhoto')[0].files[0]);
-                                formData.append('ownerName', 'test');
-                                formData.append('address', 'testing');
+                                //formData.append('ownerName', 'test');
+                                //formData.append('address', 'testing');
                                 formData.append('addressApplicationId', AddressApplicationId);
                                 formData.append('adId', AdId);
                                 formData.append('hadbast', Hadbast);
                                 formData.append('plotNo', PlotNo);
                                 formData.append('selectedVillageID', SelectedVillageID);
+                                formData.append('selectedSubDivisionId', SelectedSubDivisionId);
                                 formData.append('addressid', addressid);
                                 formData.append('selectedPlanSanctionAuthorityId', SelectedPlanSanctionAuthorityId);
                                 formData.append('layoutPlanFilePhoto', $('#LayoutPlanFilePhoto')[0].files[0]);
@@ -445,6 +465,10 @@ $(function () {
                                             navtab.empty();
                                             navtab.html('<i class="checkmark">✓</i>Site Address Details');
                                             $('#AddressProofPhotoPath').attr('href', response.filepath);
+                                            $('#LayoutPlanFilePhoto').attr('href', response.filepath2);
+                                            $('#FaradFilePoto').attr('href', response.filepath3);
+                                            alert(response.result.plotNo)
+                                            $('#PlotNo').val(response.result.plotNo);
                                             resultProjectMessage.css('display', 'block');
                                             resultProjectMessage.html('<div class="alert alert-success">Detail saved successfully!<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
                                             $('#' + module + 'Form')[0].reset();

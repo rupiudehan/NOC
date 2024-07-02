@@ -14,7 +14,6 @@ namespace Noc_App.Models
         public int DivisionId { get; set; }
         [ForeignKey(nameof(DivisionId))]
         public DivisionDetails Division { get; set; }
-        public List<TehsilBlockDetails> TehsilBlock { get; set; }
         public bool IsActive { get; set; }
 
         public string CreatedBy { get; set; } // Assuming it's a user ID

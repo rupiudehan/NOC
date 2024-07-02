@@ -19,19 +19,19 @@
             <div class="card-body">
                 <form class="user" asp-action="Create" method="post">
                     <div class="form-group">
-                        <label asp-for="SelectedDivisionId" class="control-label">Division</label>
-                        <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                        <label asp-for="SelectedDistrictId" class="control-label">District</label>
+                        <select asp-for="SelectedDistrictId" asp-items="@Model.Districts" class="form-control">
                             <option value="">Select</option>
                         </select>
-                        <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                        <span asp-validation-for="SelectedDistrictId" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
+                    @* <div class="form-group">
                         <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
                         <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivision" class="form-control">
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
-                    </div>
+                    </div> *@
                     <div class="form-group">
                         <label asp-for="LGD_ID" class="control-label"></label>
                         <input asp-for="LGD_ID" id="LGD_ID" class="form-control form-control-user" />

@@ -14,6 +14,7 @@ namespace Noc_App.Models
         [MaxLength(150, ErrorMessage = "Name cannot exceed 150 characters")]
         public string Name { get; set; }
         public List<DivisionDetails> Division { get; set; }
+        public List<TehsilBlockDetails> TehsilBlock { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
     }

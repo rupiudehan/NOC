@@ -12,13 +12,13 @@ namespace Noc_App.Models.ViewModel
         [MaxLength(150, ErrorMessage = "Name cannot exceed 150 characters")]
         public string Name { get; set; }
         [Required]
-        [Display(Name = "Division")]
-        public int SelectedDivisionId { get; set; }
-        public IEnumerable<SelectListItem> Divisions { get; set; }
-        [Required]
-        [Display(Name = "Sub-Division")]
-        public int SelectedSubDivisionId { get; set; }
-        public IEnumerable<SelectListItem> SubDivision { get; set; }
+        [Display(Name = "District")]
+        public int SelectedDistrictId { get; set; }
+        public IEnumerable<SelectListItem> Districts { get; set; }
+        //[Required]
+        //[Display(Name = "Sub-Division")]
+        //public int SelectedSubDivisionId { get; set; }
+        //public IEnumerable<SelectListItem> SubDivision { get; set; }
         public bool IsActive { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }

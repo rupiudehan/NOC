@@ -35,28 +35,28 @@ $(document).ready(function () {
         }
     }
 
-    $("#SelectedDivisionId").change(function () {
-        var divisionId = $(this).val();
-        $.ajax({
-            url: "/Village/GetSubDivisions",
-            type: "POST",
-            data: { divisionId: divisionId },
-            success: function (data) {
-                populateDropdown(data, "SubDivisionId");
-                var dropdownlist = $("#SelectedTehsilBlockId");
-                dropdownlist.empty();
-                dropdownlist.html('<option value="">Select</option>');
-            },
-            failure: function (f) {
-                alert(f);
-            },
-            error: function (e) {
-                alert('Error ' + e);
-            }
-        });
-    });
+    //$("#SelectedDivisionId").change(function () {
+    //    var divisionId = $(this).val();
+    //    $.ajax({
+    //        url: "/Village/GetSubDivisions",
+    //        type: "POST",
+    //        data: { divisionId: divisionId },
+    //        success: function (data) {
+    //            populateDropdown(data, "SubDivisionId");
+    //            var dropdownlist = $("#SelectedTehsilBlockId");
+    //            dropdownlist.empty();
+    //            dropdownlist.html('<option value="">Select</option>');
+    //        },
+    //        failure: function (f) {
+    //            alert(f);
+    //        },
+    //        error: function (e) {
+    //            alert('Error ' + e);
+    //        }
+    //    });
+    //});
 
-    $("#SelectedSubDivisionId").change(function () {
+    $("#SelectedDistrictId").change(function () {
         var subDivisionId = $(this).val();
         $.ajax({
             url: "/Village/GetTehsilBlocks",

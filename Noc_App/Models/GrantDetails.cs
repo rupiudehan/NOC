@@ -19,6 +19,9 @@ namespace Noc_App.Models
         public List<GrantKhasraDetails> Khasras { get; set; }
         public string? Hadbast { get; set; }
         public string? PlotNo { get; set; }
+        public int SubDivisionId { get; set; }
+        [ForeignKey(nameof(SubDivisionId))]
+        public SubDivisionDetails SubDivisions { get; set; }
         public int VillageID { get; set; }
         [ForeignKey(nameof(VillageID))]
         public VillageDetails Village { get; set; }

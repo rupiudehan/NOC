@@ -206,7 +206,7 @@ namespace Noc_App.Controllers
                 return View("NotFound");
             }
             //var users = await _userManager.Users.AnyAsync(x => x.SubDivisionId == id);
-            var tehsil = await _tehsilRepo.FindAsync(x => x.SubDivisionId == id);
+            var tehsil = _tehsilRepo.GetAll();//.FindAsync(x => x.SubDivisionId == id);
             if (/*users ||*/ tehsil.Count() > 0)
             {
                 ModelState.AddModelError("e", $"Sub-Division {obj.Name} is already in use");

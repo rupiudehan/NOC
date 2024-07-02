@@ -14,21 +14,21 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
-    $("#SelectedDivisionId").change(function () {
-        var divisionId = $(this).val();
-        $.ajax({
-            url: "/TehsilBlock/GetSubDivisions",
-            type: "POST",
-            data: { divisionId: divisionId },
-            success: function (data) {
-                populateDropdown(data, "SubDivisionId");
-            },
-            failure: function (f) {
-                alert(f);
-            },
-            error: function (e) {
-                alert('Error ' + e);
-            }
-        });
-    });
+    //$("#SelectedDivisionId").change(function () {
+    //    var divisionId = $(this).val();
+    //    $.ajax({
+    //        url: "/TehsilBlock/GetSubDivisions",
+    //        type: "POST",
+    //        data: { divisionId: divisionId },
+    //        success: function (data) {
+    //            populateDropdown(data, "SubDivisionId");
+    //        },
+    //        failure: function (f) {
+    //            alert(f);
+    //        },
+    //        error: function (e) {
+    //            alert('Error ' + e);
+    //        }
+    //    });
+    //});
 });

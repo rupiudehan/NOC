@@ -227,6 +227,26 @@
                                                                     <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
                                                                 </div>
                                                                 <div class="form-group">
+                                                                    <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
+                                                                    <select asp-for="SelectedTehsilBlockId" id="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label asp-for="SelectedVillageID" class="control-label">Village/Town/City</label>
+                                                                    <select asp-for="SelectedVillageID" id="SelectedVillageID" asp-items="@Model.Village" class="form-control">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                    <span asp-validation-for="SelectedVillageID" class="text-danger"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Pin Code</label>
+                                                                    <label asp-for="Pincode" id="Pincode" class="form-control form-control-user">@Model.Pincode</label>
+                                                                </div>
+                                                                <div class="form-group">
                                                                     <label asp-for="SelectedPlanSanctionAuthorityId" class="control-label"></label>
                                                                     <select asp-for="SelectedPlanSanctionAuthorityId" id="SelectedPlanSanctionAuthorityId" asp-items="@Model.PlanSanctionAuthorityMaster" class="form-control">
                                                                         <option value="">Select</option>
@@ -241,26 +261,6 @@
                                                                         <a href="@Url.Action("Download", "Grant", new { fileName = Model.LayoutPlanFilePath })" id="LayoutPlanFilePath">Download File</a>
                                                                         <span asp-validation-for="LayoutPlanFilePhoto" id="LayoutPlanFilePhoto-error" class="text-danger"></span>
                                                                     </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <div class="form-group">
-                                                                    <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
-                                                                    <select asp-for="SelectedTehsilBlockId" id="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
-                                                                        <option value="">Select</option>
-                                                                    </select>
-                                                                    <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label asp-for="SelectedVillageID" class="control-label">Village/Town/City</label>
-                                                                    <select asp-for="SelectedVillageID" id="SelectedVillageID" asp-items="@Model.Village" class="form-control">
-                                                                        <option value="">Select</option>
-                                                                    </select>
-                                                                    <span asp-validation-for="SelectedVillageID" class="text-danger"></span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label class="control-label">Pin Code</label>
-                                                                    <label asp-for="Pincode" id="Pincode" class="form-control form-control-user">@Model.Pincode</label>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label asp-for="AddressProofPhoto" class="control-label">Address Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>

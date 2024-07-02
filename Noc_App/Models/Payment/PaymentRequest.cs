@@ -26,6 +26,8 @@ namespace Noc_App.Models.Payment
         public string PayerName { get; set; }
         public string MobileNo { get; set; }
         public string AreaCalculation { get; set; }
+        public string PayLocCode { get; set; }
+        public string DdoCode { get; set; }
         public string AreaAdditionalCalculation { get; set; }
         public string TotalAreaCalculation { get; set; }
         [Required]

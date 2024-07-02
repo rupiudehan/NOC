@@ -19,6 +19,13 @@
             <div class="card-body">
                 <form class="user" asp-action="Create" method="post">
                     <div class="form-group">
+                        <label asp-for="SelectedDistrictId" class="control-label">District</label>
+                        <select asp-for="SelectedDistrictId" id="SelectedDistrictId" asp-items="@Model.Districts" class="form-control">
+                            <option value="">Select</option>
+                        </select>
+                        <span asp-validation-for="SelectedDistrictId" class="text-danger"></span>
+                    </div>
+                    @* <div class="form-group">
                         <label asp-for="SelectedDivisionId" class="control-label">Division</label>
                         <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
                             <option value="">Select</option>
@@ -31,10 +38,10 @@
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
-                    </div>
+                    </div> *@
                     <div class="form-group">
                         <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
-                        <select asp-for="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
+                        <select asp-for="SelectedTehsilBlockId" id="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span>

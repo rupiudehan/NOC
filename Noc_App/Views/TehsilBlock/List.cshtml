@@ -23,8 +23,9 @@
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Division</th>
-                                    <th>Sub-Division</th>
+                                    <th>District</th>
+                                   @*  <th>Division</th>
+                                    <th>Sub-Division</th> *@
                                     <th>LGD ID</th>
                                     <th>Name</th>
                                     <th>Actions</th>
@@ -34,8 +35,9 @@
                                 @foreach (var data in Model)
                                 {
                                     <tr>
-                                        <td>@data.DivisionName</td>
-                                        <td>@data.SubDivisionName</td>
+                                        <td>@data.DistrictName</td>
+                                       @*  <td>@data.DivisionName</td>
+                                        <td>@data.SubDivisionName</td> *@
                                         <td>@data.LGD_ID</td>
                                         <td>@data.Name</td>
                                         <td>

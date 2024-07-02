@@ -78,7 +78,7 @@ namespace Noc_App.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    if (model.Email != "ExecutiveEngineer")
+                    if (model.Email != "ExecutiveEngineer" && (model.Email== "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
                     {
                         LoginResponseViewModel root= FetchUser().Find(x=>x.user_info.EmailId==model.Email && model.Password=="123");
                         if (root!=null)
