@@ -39,5 +39,9 @@ namespace Noc_App.Models.ViewModel
         
         [Display(Name = "L-Section of the Drain if Sanctioned")]
         public string LSectionOfDrainFilePath { get; set; }
+        public bool IsDrainNotified { get; set; }
+        public int TypeOfWidth { get; set; }
+        [Display(Name = "Width")]
+        public double DrainWidth { get; set; }
     }
 }

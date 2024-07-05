@@ -113,6 +113,23 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <b><label asp-for="IsDrainNotified" class="control-label"></label></b>
+                                    <input type="checkbox" id="IsDrainNotified" asp-for="IsDrainNotified" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="DrainWidth" id="DrainWidth" class="control-label">
+                                        Width as per Calculations
+                                    </label>
+                                    <input asp-for="DrainWidth" class="form-control form-control-user" />
+                                    <span asp-validation-for="DrainWidth" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
                     }
                     <div class="row">
                         @if (Model.LoggedInRole == "EXECUTIVE ENGINEER" && Model.IsForwarded==false)

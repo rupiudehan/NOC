@@ -51,5 +51,10 @@ namespace Noc_App.Models.ViewModel
         public int SelectedRecommendationId { get; set; }
         public IEnumerable<SelectListItem> Recommendations { get; set; }
         public string Remarks { get; set; }
+        public bool IsDrainNotified { get; set; }
+        public int TypeOfWidth { get; set; }
+        [Required]
+        [Display(Name = "Width")]
+        public double DrainWidth { get; set; }
     }
 }

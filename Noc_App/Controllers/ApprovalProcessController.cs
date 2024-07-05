@@ -51,6 +51,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<GrantSectionsDetails> _grantsectionRepository;
         private readonly IRepository<GrantRejectionShortfallSection> _grantrejectionRepository;
         private readonly IRepository<PlanSanctionAuthorityMaster> _repoPlanSanctionAuthtoryMaster;
+        private readonly IRepository<DrainWidthTypeDetails> _drainwidthRepository;
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<GrantPaymentDetails> repoPayment,IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster
@@ -59,7 +60,7 @@ namespace Noc_App.Controllers
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IWebHostEnvironment hostingEnvironment, IEmailService emailService
             , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
             , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation
-            , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository
+            , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<DrainWidthTypeDetails> drainwidthRepository
             , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
         {
             _repo = repo;
@@ -87,6 +88,7 @@ namespace Noc_App.Controllers
             _repoRecommendation = repoRecommendation;
             _userRolesRepository = userRolesRepository;
             _grantsectionRepository = grantsectionRepository;
+            _drainwidthRepository = drainwidthRepository;
             _grantrejectionRepository = grantrejectionRepository;
             _repoPlanSanctionAuthtoryMaster = repoPlanSanctionAuthtoryMaster;
         }
@@ -440,6 +442,7 @@ namespace Noc_App.Controllers
                                             SubDivisionId = g.SubDivisionId
                                         }
                          ).ToList().FirstOrDefault();
+                var typeofwidth = (await _drainwidthRepository.FindAsync(x => x.Code == "C")).FirstOrDefault();
                 //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 // Retrieve the user object
@@ -555,7 +558,10 @@ namespace Noc_App.Controllers
                                                           ForwardToRole= forwardToRole,
                                                           LoggedInRole = roleName,
                                                           Remarks="",
-                                                          Recommendations= recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
+                                                          IsDrainNotified=false,
+                                                          TypeOfWidth= typeofwidth.Id,
+                                                          DrainWidth=0,
+                                                          Recommendations = recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
                                                           SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
                                                           Officers = officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null,
                                                           LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + v.Name + ", Pincode: " + v.PinCode,
@@ -595,7 +601,9 @@ namespace Noc_App.Controllers
                 SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
                 SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
                 SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
-                
+                string code = model.IsDrainNotified ? "N" : "C";
+                var typeofwidth = (await _drainwidthRepository.FindAsync(x => x.Code == code)).FirstOrDefault();
+
                 //var total = Math.Round(((from kh in _khasraRepo.GetAll()
                 //                         where kh.GrantID == grant.Id
                 //                         select new
@@ -927,6 +935,9 @@ namespace Noc_App.Controllers
                             ProcessedBy = userId,
                             ProcessedOn = DateTime.Now,
                             ProcessedByRole = role,
+                            IsDrainNotified=Convert.ToInt16(model.IsDrainNotified),
+                            TypeOfWidth=typeofwidth.Id,
+                            DrainWidth=model.DrainWidth,
                             ProcessedByName = LoggedInUserName() + "(" + LoggedInDesignationName() + ")"
                     };
                         List<GrantApprovalProcessDocumentsDetails> approvalDocList = new List<GrantApprovalProcessDocumentsDetails>();
@@ -992,7 +1003,10 @@ namespace Noc_App.Controllers
                                   LSectionOfDrainFilePath=doc.DrainLSectionPath,
                                   SiteConditionReportFilePath=doc.SiteConditionReportPath,
                                   GrantApprovalDocId=docId,
-                                  GrantApprovalId= app
+                                  GrantApprovalId= app,
+                                  IsDrainNotified = Convert.ToBoolean(doc.IsDrainNotified),
+                                  TypeOfWidth = doc.TypeOfWidth,
+                                  DrainWidth = doc.DrainWidth
                               }
                               ).FirstOrDefault();
                 if (model == null)
@@ -1012,7 +1026,10 @@ namespace Noc_App.Controllers
                                  LSectionOfDrainFilePath = doc.DrainLSectionPath,
                                  SiteConditionReportFilePath = doc.SiteConditionReportPath,
                                  GrantApprovalDocId = 0,//docId,
-                                 GrantApprovalId = app
+                                 GrantApprovalId = app,
+                                 IsDrainNotified=false,
+                                 TypeOfWidth=doc.TypeOfWidth,
+                                 DrainWidth=0
                              }
                                       );
                     model = d.FirstOrDefault();
@@ -1231,6 +1248,8 @@ namespace Noc_App.Controllers
                         }
                         uniqueLSectionOfDrainFileName = ProcessUploadedFile(model.LSectionOfDrainFile, "LSectionOfDrain");
                     }
+                    string code = model.IsDrainNotified ? "N" : "C";
+                    var typeofwidth = (_drainwidthRepository.Find(x => x.Code == code)).FirstOrDefault();
 
                     obj.SiteConditionReportPath = uniqueSiteConditionFileName;
                     obj.CatchmentAreaAndFlowPath = uniqueCatchmentAreaFileName;
@@ -1240,6 +1259,9 @@ namespace Noc_App.Controllers
                     obj.GISOrDWSReportPath = uniqueGisOrDwsFileName;
                     obj.IsKMLByApplicantValid = model.IsKMLByApplicantValid;
                     obj.GrantApprovalID = model.GrantApprovalId;
+                    obj.IsDrainNotified = Convert.ToInt16(model.IsDrainNotified);
+                    obj.TypeOfWidth= typeofwidth.Id;
+                    obj.DrainWidth = model.DrainWidth;
                         
                     if (model.GrantApprovalDocId != 0)
                     { 
@@ -1548,6 +1570,7 @@ namespace Noc_App.Controllers
                 List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 List<GrantInspectionDocuments> documents = (from d in _repoApprovalDocument.GetAll()
                                 join a in _repoApprovalDetail.GetAll() on d.GrantApprovalID equals a.Id
+                                join dr in _drainwidthRepository.GetAll() on d.TypeOfWidth equals dr.Id
                                 where a.GrantID==obj.Id orderby d.Id descending
                                 select new GrantInspectionDocuments
                                 { 
@@ -1559,8 +1582,11 @@ namespace Noc_App.Controllers
                                     IsKMLByApplicantValid=d.IsKMLByApplicantValid,
                                     UploadedByRole = d.ProcessedByRole,
                                     UploadedByName=d.ProcessedByName,
-                                    SiteConditionReportFilePath=d.SiteConditionReportPath
-                                   
+                                    SiteConditionReportFilePath=d.SiteConditionReportPath,
+                                    IsDrainNotified= Convert.ToBoolean(d.IsDrainNotified),
+                                    DrainWidth=d.DrainWidth,
+                                    TypeOfWidthName= "Width "+dr.Name
+
                                 }).ToList();
                     //(await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 List<OwnerTypeDetails> ownertype = new List<OwnerTypeDetails>();

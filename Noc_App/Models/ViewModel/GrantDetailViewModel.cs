@@ -87,6 +87,10 @@ namespace Noc_App.Models.ViewModel
         public string LSectionOfDrainFilePath { get; set; }
         [Display(Name = "Is KML Provided by Applicant Valid")]
         public bool IsKMLByApplicantValid { get; set; }
+        [Display(Name = "Is Drain Notified")]
+        public bool IsDrainNotified { get; set; }
+        public string TypeOfWidthName { get; set; }
+        public double DrainWidth { get; set; }
         public string UploadedByRole { get; set; }
         public string UploadedByName { get; set; }
     }

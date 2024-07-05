@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -91,6 +92,7 @@ builder.Services.AddScoped<IRepository<RecommendationDetail>, Repository<Recomme
 builder.Services.AddScoped<IRepository<GrantSectionsDetails>, Repository<GrantSectionsDetails>>();
 builder.Services.AddScoped<IRepository<GrantRejectionShortfallSection>, Repository<GrantRejectionShortfallSection>>();
 builder.Services.AddScoped<IRepository<PlanSanctionAuthorityMaster>, Repository<PlanSanctionAuthorityMaster>>();
+builder.Services.AddScoped<IRepository<DrainWidthTypeDetails>, Repository<DrainWidthTypeDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

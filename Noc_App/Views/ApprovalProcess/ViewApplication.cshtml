@@ -356,6 +356,28 @@
                                                  }
                                             </td>
                                         </tr>
+                                        @if (item.DrainWidth > 0)
+                                        {
+                                            <tr>
+                                                <td class="boldText" colspan="1">Is Drain Notified</td>
+                                                <td colspan="3">
+                                                    @if (item.IsDrainNotified)
+                                                    {
+                                                        @:Yes
+                                                    }
+                                                    else
+                                                    {
+                                                        @:No
+                                                    }
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="boldText" colspan="1">@item.TypeOfWidthName</td>
+                                                <td colspan="3">
+                                                    @item.DrainWidth
+                                                </td>
+                                            </tr>
+                                        }
                                     }
                                     
                                 }

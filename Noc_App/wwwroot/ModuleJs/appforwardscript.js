@@ -27,4 +27,11 @@ $(document).ready(function () {
             }
         });
     });
+    $("#IsDrainNotified").change(function () {
+        if (this.checked) {
+            $('#DrainWidth').text("Width as per Notification");
+        } else {
+            $('#DrainWidth').text("Width as per Calculations");
+        }
+    });
 });

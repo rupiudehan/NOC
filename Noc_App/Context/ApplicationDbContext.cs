@@ -40,6 +40,7 @@ namespace Noc_App.Context
         public DbSet<GrantSectionsDetails> GrantSectionsDetails { get; set; }
         public DbSet<GrantRejectionShortfallSection> GrantRejectionShortfallSection { get; set; }
         public DbSet<PlanSanctionAuthorityMaster> PlanSanctionAuthorityMaster { get; set; }
+        public DbSet<DrainWidthTypeDetails> DrainWidthTypeDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +50,10 @@ namespace Noc_App.Context
             modelBuilder.Entity<ReportApplicationCountViewModel>().HasNoKey();
 
 
+            modelBuilder.Entity<DrainWidthTypeDetails>().HasData(
+                new DrainWidthTypeDetails { Id=1,Name="As Per Notification",Code="N"},
+                new DrainWidthTypeDetails { Id=2,Name="As Per Calculation",Code="C"}
+                );
             modelBuilder.Entity<PlanSanctionAuthorityMaster>().HasData(
                 new PlanSanctionAuthorityMaster { Id = 1, Name = "Country", Code = "C" },
                 new PlanSanctionAuthorityMaster { Id = 2, Name = "Local", Code = "L" }
