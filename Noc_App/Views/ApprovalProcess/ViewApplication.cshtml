@@ -356,7 +356,7 @@
                                                  }
                                             </td>
                                         </tr>
-                                        @if (item.DrainWidth > 0)
+                                        @if (item.UploadedByRole.ToUpper()=="JUNIOR ENGINEER" || item.DrainWidth > 0)
                                         {
                                             <tr>
                                                 <td class="boldText" colspan="1">Is Drain Notified</td>

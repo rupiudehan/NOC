@@ -34,4 +34,18 @@ $(document).ready(function () {
             $('#DrainWidth').text("Width as per Calculations");
         }
     });
+
+    $("body").on("input", ".numericField,.numericField1", function () {
+        // Remove non-numeric characters using a regular expression
+        $(this).val($(this).val().replace(/[^1-9.]/g, ''));
+
+        // Remove multiple dots, leaving only one
+        if ($(this).val().split('.').length > 2) {
+            $(this).val($(this).val().replace(/\.+$/, ''));
+        }
+        if (parseFloat($(this).val()) <= 0) {
+            $(this).val($(this).val().replace(/[^1-9.]/g, ''));
+        }
+    });
+    if ($('.numericField').val() == '0') $('.numericField').val('');
 });

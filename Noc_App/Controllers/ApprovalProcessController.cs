@@ -560,7 +560,6 @@ namespace Noc_App.Controllers
                                                           Remarks="",
                                                           IsDrainNotified=false,
                                                           TypeOfWidth= typeofwidth.Id,
-                                                          DrainWidth=0,
                                                           Recommendations = recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
                                                           SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
                                                           Officers = officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null,
@@ -760,6 +759,15 @@ namespace Noc_App.Controllers
                     if(model.SiteConditionReportFile!=null && model.CatchmentAreaFile!=null && model.DistanceFromCreekFile!=null && model.GisOrDwsFile!=null && model.CrossSectionOrCalculationFile!=null && model.LSectionOfDrainFile != null)
                     {
                         string ErrorMessage = string.Empty;
+
+                        if (model.DrainWidth <= 0)
+                        {
+                            ErrorMessage = $"Invalid width. Please enter value greater than 0";
+                            ModelState.AddModelError("", ErrorMessage);
+
+                            return View(model);
+
+                        }
                         int siteConditionValidation = AllowedCheckExtensions(model.SiteConditionReportFile);
                         int CatchmentAreaValidation = AllowedCheckExtensions(model.CatchmentAreaFile);
                         int DistanceFromCreekFileValidation = AllowedCheckExtensions(model.DistanceFromCreekFile);
@@ -1052,8 +1060,8 @@ namespace Noc_App.Controllers
         {
             try
             {
-                if (ModelState.IsValid)
-                {
+                //if (ModelState.IsValid)
+                //{
                     string uniqueSiteConditionFileName = "";
                     string uniqueCatchmentAreaFileName = "";
                     string uniqueDistanceFromCreekFileName = "";
@@ -1261,6 +1269,7 @@ namespace Noc_App.Controllers
                     obj.GrantApprovalID = model.GrantApprovalId;
                     obj.IsDrainNotified = Convert.ToInt16(model.IsDrainNotified);
                     obj.TypeOfWidth= typeofwidth.Id;
+                    if(model.DrainWidth>0)
                     obj.DrainWidth = model.DrainWidth;
                         
                     if (model.GrantApprovalDocId != 0)
@@ -1286,7 +1295,7 @@ namespace Noc_App.Controllers
                         await _repoApprovalDocument.CreateAsync(obj);
                     }
                     return RedirectToAction("Index");
-                }
+                //}
             }
             catch (Exception ex)
             {
