@@ -15,7 +15,7 @@ namespace Noc_App.Models.ViewModel
         public IFormFile DistanceFromCreekFile { get; set; }
         [Display(Name = "GIS Report/DWS Report")]
         public IFormFile GisOrDwsFile { get; set; }
-        [Display(Name = "Is KML Provided by Applicant Valid")]
+        [Display(Name = "Is KML Provided by Applicant Valid?")]
         public bool IsKMLByApplicantValid { get; set; }
         [Display(Name = "Cross-Section/Calculation Sheets")]
         public IFormFile CrossSectionOrCalculationFile { get; set; }
@@ -39,6 +39,7 @@ namespace Noc_App.Models.ViewModel
         
         [Display(Name = "L-Section of the Drain if Sanctioned")]
         public string LSectionOfDrainFilePath { get; set; }
+        [Display(Name = "Is Drain Notified?")]
         public bool IsDrainNotified { get; set; }
         public int TypeOfWidth { get; set; }
         [Display(Name = "Width")]
