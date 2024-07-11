@@ -1,0 +1,55 @@
+﻿@* @{
+    ViewBag.Title = "Failed";
+    Layout = "";
+    TempData["Message"] = ViewBag.HtmlContent;
+    ViewBag.HtmlContent = TempData["Message"];
+}
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<div>
+
+    @Html.Raw(ViewBag.HtmlContent)
+
+</div> *@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <meta name='ContentType' content='application/json' /><meta name='Accept' content='application/json' />
+    <title>Payu - IFMS Api</title>
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+    <main role="main">
+            <form id="PostForm" name="PostForm" action="http://localhost:5126/Payment/failureURL" method="POST"><input type='hidden' name='encData' value='' />
+                <input type='hidden' name='clientId' value='3dad2e78100f42ec999abb423f193333' /><input type='hidden' name='clientSecret' value='6abcc8627e34498abb4bc7c562603333' />
+                <input type='hidden' name='integratingAgency' value='DUAT01' />
+                <input type='hidden' name='ipAddress' value='103.118.160.57,52.172.29.171,52.172.35.118,10.43.19.41,192.168.5.133,112.196.25.180,52.172.29.171,14.139.239.253,10.43.19.41' />
+                <input type='hidden' name='deptRefNo' value='202407111611135882' /><input type='hidden' name='DeptCode' value='WAS' /><input type='hidden' name='statusCode' value='EC307' />
+                <input type='hidden' name='msg' value='' />
+                <h1>Something wrong has happend! Payment is not successful</h1>
+            </form>
+
+</main>
+
+<footer class="footer text-muted">
+    <div class="container" style="
+    text-align: center;
+    color: white;
+">
+        © Copyright IFMS-2020. All Rights Reserved<br />
+        Designed and Developed by NIC PUNJAB
+    </div>
+    </div>
+</footer>
+<script src="https://ifmstg.punjab.gov.in/eRctDeptInt/js/site.js?v=4q1jwFhaPaZgr8WAUSrux6hAuh0XDg9kPS3xIVq36I0"></script>
+
+</body>
+</html>

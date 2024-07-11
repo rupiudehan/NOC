@@ -229,6 +229,7 @@ namespace Noc_App.Controllers
         public IActionResult ChallanForm()
         {
             ViewBag.HtmlContent = TempData["Message"] as string;
+            TempData["Message"] = TempData["Message"];
             return View();
         }
         [HttpPost]
@@ -257,7 +258,7 @@ namespace Noc_App.Controllers
                     var url = "DistOptions.url = vdir + \"Server/SelectTel?DistCode=\" + $(\"#DistrictCode\").val()";
                     var actual = "DistOptions.url = \"/Payment/TrpSarthi?DistCode=\" + $(\"#DistrictCode\").val()";
                     
-                    TempData["Message"] = content.Replace(url,actual);
+                    TempData["Message"] = (content.Replace(url,actual)).Replace("<input type='hidden' name='DeptCode' value='WAS'/>", "<input type='hidden' name='DeptCode' value='WAS'/>@TempData.Keep()");
                     return RedirectToAction("ChallanForm", "Payment");
                 }
                 else
@@ -391,24 +392,32 @@ namespace Noc_App.Controllers
             string edKey = settings.edKey;
             string edIV = settings.edIV;
             IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
-            var detail = obj.Decrypt(model.encData);
-            ifms_dataRes ResponseData = Newtonsoft.Json.JsonConvert.DeserializeObject<ifms_dataRes>(detail);
-            var challanDetail = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == ResponseData.challandata.deptRefNo /*&& x.RequestStatus == "Fresh Request"*/)).FirstOrDefault();
+            if (model.encData != null)
+            {
+                var detail = obj.Decrypt(model.encData);
+                ifms_dataRes ResponseData = Newtonsoft.Json.JsonConvert.DeserializeObject<ifms_dataRes>(detail);
+                var challanDetail = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == ResponseData.challandata.deptRefNo /*&& x.RequestStatus == "Fresh Request"*/)).FirstOrDefault();
 
-            string id = challanDetail.ApplicationId;
-            if (ResponseData.challandata.bank_Res.desc == "failure")
-            {
-                challanDetail.RequestStatus = "Failed";
-                await _repoChallanDetails.UpdateAsync(challanDetail);
-                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                string id = challanDetail.ApplicationId;
+                if (ResponseData.challandata.bank_Res.desc == "failure")
+                {
+                    challanDetail.RequestStatus = "Failed";
+                    await _repoChallanDetails.UpdateAsync(challanDetail);
+                    return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                }
+                else if (ResponseData.challandata.bank_Res.desc == "Pending")
+                {
+                    challanDetail.RequestStatus = "Pending";
+                    await _repoChallanDetails.UpdateAsync(challanDetail);
+                    return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                }
+                return View(model);
             }
-            else if (ResponseData.challandata.bank_Res.desc == "Pending")
+            else
             {
-                challanDetail.RequestStatus = "Pending";
-                await _repoChallanDetails.UpdateAsync(challanDetail);
-                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                ViewBag.HtmlContent = TempData["Message"] as string;
+                return RedirectToAction("FailureUrl", "Grant");
             }
-            return View(model);
         }
 
         [AllowAnonymous]

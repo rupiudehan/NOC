@@ -185,6 +185,14 @@ namespace Noc_App.Controllers
             }
         }
         [AllowAnonymous]
+        [HttpGet]
+        public IActionResult FailureUrl()
+        {
+            ViewBag.HtmlContent = TempData["Message"] as string;
+            TempData["Message"] = TempData["Message"];
+            return View();
+        }
+        [AllowAnonymous]
         public ViewResult UpdateIndex(string Id)
         {
             try
@@ -496,7 +504,7 @@ namespace Noc_App.Controllers
                 {
                     Name = model.ApplicantName,
                     Email = model.ApplicantEmailID,
-                    Address = "Division:" + division.Name + ", Sub-Division:" + subDivision.Name + ", Tehsil/Block:" + tehsil.Name + ", Village:" + village.Name + ", Pincode:" + village.PinCode,
+                    Address = "Sub-Division:" + subDivision.Name + ", Tehsil/Block:" + tehsil.Name + ", Village:" + village.Name + ", Pincode:" + village.PinCode,
                     Amount = TotalPayment,
                     GrantId = model.Id,
                     ApplicationId = Id,
@@ -930,7 +938,7 @@ namespace Noc_App.Controllers
                                             PayerName = model.Owners.FirstOrDefault().Name,
                                             MobileNo = viewModel.Owners.FirstOrDefault().MobileNo,
                                             Email = model.ApplicantEmailID,
-                                            Address = "Division:" + subs.Division.Name + ",Sub-Division:" + subs.SubDivision.Name + ",Tehsil/Block:" + detail.Tehsil.Name + ",Village:" + detail.Village.Name + ",Pincode:" + detail.Village.PinCode,
+                                            Address = "Sub-Division:" + subs.SubDivision.Name + ",Tehsil/Block:" + detail.Tehsil.Name + ",Village:" + detail.Village.Name + ",Pincode:" + detail.Village.PinCode,
                                             Amount = TotalPayment,
                                             GrantId = grantid,
                                             ApplicationId = model.ApplicationID,
