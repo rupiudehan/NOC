@@ -1866,6 +1866,45 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [HttpPost]
+        public IActionResult GetRecommendationDetailForOtherThanNA(string id)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+                    return View("NotFound");
+                }
+
+                List<GrantApprovalRecommendationDetail> model = (from g in _repo.GetAll()
+                                                                 join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
+                                                                 join recommend in _repoRecommendation.GetAll() on a.RecommendationID equals recommend.Id
+                                                                 where g.ApplicationID == id && g.IsPending == true 
+                                                                 orderby a.ProcessedOn descending
+                                                                 select new GrantApprovalRecommendationDetail
+                                                                 {
+                                                                     ApplicationId = g.ApplicationID,
+                                                                     Recommended = recommend.Name,
+                                                                     RecommendedBy = a.ProcessedByRole,
+                                                                     RecommendedTo = a.ProcessedToRole,
+                                                                     Remarks = a.Remarks
+                                                                 }).ToList();
+
+
+
+                return Json(model);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                //ModelState.AddModelError(string.Empty, ex.Message);
+                return View();
+            }
+        }
+
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private List<LoginResponseViewModel> FetchUser()

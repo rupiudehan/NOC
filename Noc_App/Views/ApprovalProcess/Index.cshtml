@@ -66,6 +66,9 @@
                                                 <th>Project Name</th>
                                                 <th>Location Details</th>
                                                 <th>Processed By</th>
+                                                @if (arry[0].Any(x =>x.LastForwardedByRole != "")){
+                                                <th>Remarks</th>
+                                                 }
                                                 <th>View</th>
                                                 @if (arry[0].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY"))
                                                 {
@@ -82,7 +85,10 @@
                                                     }
                                                     @if (arry[0].Any(x => x.IsForwarded == true && x.rejectionmust != 1))
                                                     {
-                                                        <th>Recommendations</th>
+                                                        if (arry[0].Any(x => x.IsRecommended == 1))
+                                                        {
+                                                            <th>Recommendations</th>
+                                                        }
                                                     }
                                                     @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
                                                     {
@@ -154,6 +160,10 @@
                                                     {
                                                         <td>Applicant </td>
                                                     }
+                                                    @if (arry[0].Any(x =>x.LastForwardedByRole != ""))
+                                                    {
+                                                        <td>@data.Remarks </td>
+                                                     }
                                                     <td>
                                                         <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                     </td>
@@ -205,7 +215,6 @@
                                                                             else
                                                                             {
                                                                                 <td>
-
                                                                                 </td>
                                                                             }
                                                                         }
@@ -230,46 +239,70 @@
                                                         }
                                                         @if (arry[0].Any(x => x.IsForwarded == true && x.rejectionmust != 1))
                                                         {
-                                                            @if (data.IsForwarded == true)
+                                                            @if (arry[0].Any(x => x.IsRecommended == 1))
                                                             {
-                                                                if (data.rejectionmust != 1)
+                                                                if (data.IsRecommended == 1)
                                                                 {
-                                                                    if (data.IsShortFall)
+                                                                    @if (data.IsForwarded == true)
                                                                     {
-                                                                        <td>Reverted Due to Discrepancy</td>
+                                                                        if (data.rejectionmust != 1)
+                                                                        {
+                                                                            if (data.IsShortFall)
+                                                                            {
+                                                                                <td>Reverted Due to Discrepancy</td>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <td>
+                                                                                    <a href="#" onclick="SetValue('@data.ApplicationID')" class="btn btn-info">Recommendations</a>
+
+                                                                                </td>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td></td>
+                                                                        }
                                                                     }
                                                                     else
                                                                     {
-                                                                        <td>
-                                                                            <a href="#" onclick="SetValue('@data.ApplicationID')" class="btn btn-info">Recommendations</a>
+                                                                        if (data.rejectionmust != 1)
+                                                                        {
+                                                                            if (data.IsShortFall)
+                                                                            {
+                                                                                <td>Reverted Due to Discrepancy</td>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <td>
+                                                                                    <a href="#" onclick="SetValue('@data.ApplicationID')" class="btn btn-info">Recommendations</a>
 
-                                                                        </td>
+                                                                                </td>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td></td>
+                                                                        }
                                                                     }
                                                                 }
                                                                 else
                                                                 {
-                                                                    <td></td>
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                if (data.rejectionmust != 1)
-                                                                {
-                                                                    if (data.IsShortFall)
+                                                                    if (data.rejectionmust != 1)
                                                                     {
-                                                                        <td>Reverted Due to Discrepancy</td>
+                                                                        if (data.IsShortFall)
+                                                                        {
+                                                                            <td>Reverted Due to Discrepancy</td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td></td>
+                                                                        }
                                                                     }
                                                                     else
                                                                     {
-                                                                        <td>
-                                                                            <a href="#" onclick="SetValue('@data.ApplicationID')" class="btn btn-info">Recommendations</a>
-
-                                                                        </td>
+                                                                        <td></td>
                                                                     }
-                                                                }
-                                                                else
-                                                                {
-                                                                    <td></td>
                                                                 }
                                                             }
                                                         }
@@ -481,7 +514,11 @@
                                                     <th>Forwarded To Role</th>
                                                     <th>Remarks</th>
                                                     <th>View</th>
-                                                    @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.ProcessedToRole=="JUNIOR ENGINEER"))))
+                                                    @if (arry[1].Any(x => x.IsRecommended == 1))
+                                                    {
+                                                        <th>Recommendations</th>
+                                                    }
+                                                    @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.ProcessedToRole == "JUNIOR ENGINEER"))))
                                                     {
                                                         <th>Action</th>
                                                     }
@@ -535,6 +572,16 @@
                                                         <td>
                                                             <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                         </td>
+                                                        @if (arry[1].Any(x => x.IsRecommended == 1))
+                                                        {
+                                                            if (data.IsRecommended == 1)
+                                                            {
+                                                                <td>
+                                                                    <a href="#" onclick="SetValue('@data.ApplicationID')" class="btn btn-info">Recommendations</a>
+
+                                                                </td>
+                                                            }
+                                                        }
                                                         @if (arry[1].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.ProcessedToRole == "JUNIOR ENGINEER"))))
                                                         {
                                                             <td>
@@ -579,7 +626,10 @@
                                                         <th>Rejected By</th>
                                                         <th>Remarks</th>
                                                         <th>View</th>
-
+                                                        @if (arry[2].Any(x => x.IsRecommended == 1))
+                                                        {
+                                                            <th>Recommendations</th>
+                                                        }
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -612,7 +662,16 @@
                                                             <td>
                                                                 <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                             </td>
+                                                            @if (arry[2].Any(x => x.IsRecommended == 1))
+                                                            {
+                                                                if (data.IsRecommended == 1)
+                                                                {
+                                                                    <td>
+                                                                        <a href="#" onclick="SetValue('@data.ApplicationID')" class="btn btn-info">Recommendations</a>
 
+                                                                    </td>
+                                                                }
+                                                            }
                                                         </tr>
                                                         count = count + 1;
                                                     }
@@ -633,57 +692,73 @@
                                 </div>
                             }
                             @if (arry[3] != null && arry[3].Any())
-                        {
-                        <div class="tab-pane fade" id="nav-shortfall" role="tabpanel" aria-labelledby="nav-shortfall-tab">
-                        <div class="table-responsive">
-                        @if (arry[3] != null && arry[3].Any())
-                        {
-                        int @count = 1;
-                        <table class="table table-bordered" id="dataTableToReject" width="100%" cellspacing="0">
-                        <thead>
-                        <tr>
-                        <td>#</td>
-                        <th>Application Id</th>
-                        <th>Project Name</th>
-                        <th>Location Details</th>
-                        <th>View</th>
-                        <th>NOC Certificate</th>
+                            {
+                                <div class="tab-pane fade" id="nav-shortfall" role="tabpanel" aria-labelledby="nav-shortfall-tab">
+                                    <div class="table-responsive">
+                                        @if (arry[3] != null && arry[3].Any())
+                                        {
+                                            int @count = 1;
+                                            <table class="table table-bordered" id="dataTableToReject" width="100%" cellspacing="0">
+                                                <thead>
+                                                    <tr>
+                                                        <td>#</td>
+                                                        <th>Application Id</th>
+                                                        <th>Project Name</th>
+                                                        <th>Location Details</th>
+                                                        <th>Remarks</th>
+                                                        <th>View</th>
+                                                        @if (arry[3].Any(x => x.IsRecommended == 1))
+                                                        {
+                                                            <th>Recommendations</th>
+                                                        }
+                                                        <th>NOC Certificate</th>
 
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (GrantUnprocessedAppDetails data in arry[3])
-                        {
-                        <tr>
-                        <td>@count</td>
-                        <td>@data.ApplicationID</td>
-                        <td>@data.Name</td>
-                        <td>@data.LocationDetails </td>
-                        <td>
-                        <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
-                        </td>
-                        <td>
-                            <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = data.CertificateFilePath })">Download</a>
-                        </td>
-                        </tr>
-                        count = count + 1;
-                        }
-                        </tbody>
-                        </table>
-                        }
-                        else
-                        {
-                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                        <tbody>
-                        <tr>
-                        <td>No Record Found</td>
-                        </tr>
-                        </tbody>
-                        </table>
-                        }
-                        </div>
-                        </div>
-                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (GrantUnprocessedAppDetails data in arry[3])
+                                                    {
+                                                        <tr>
+                                                            <td>@count</td>
+                                                            <td>@data.ApplicationID</td>
+                                                            <td>@data.Name</td>
+                                                            <td>@data.LocationDetails </td>
+                                                            <td>@data.Remarks </td>
+                                                            <td>
+                                                                <a asp-action="ViewApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
+                                                            </td>
+                                                            @if (arry[3].Any(x => x.IsRecommended == 1))
+                                                            {
+                                                                if (data.IsRecommended == 1)
+                                                                {
+                                                                    <td>
+                                                                        <a href="#" onclick="SetValue('@data.ApplicationID')" class="btn btn-info">Recommendations</a>
+
+                                                                    </td>
+                                                                }
+                                                            }
+                                                            <td>
+                                                                <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = data.CertificateFilePath })">Download</a>
+                                                            </td>
+                                                        </tr>
+                                                        count = count + 1;
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        }
+                                        else
+                                        {
+                                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>No Record Found</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        }
+                                    </div>
+                                </div>
+                            }
                         }
                     </div>
 
