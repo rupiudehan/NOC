@@ -56,12 +56,12 @@ namespace Noc_App.Controllers
             try
             {
                 List<DivisionDetails> divisions = new List<DivisionDetails>();
-                List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
+                //List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
                 string userId = LoggedInUserID();
 
                 string divisionId = LoggedInDivisionID();
 
-                string subdivisionId = LoggedInSubDivisionID();
+                //string subdivisionId = LoggedInSubDivisionID();
 
                 // Retrieve roles associated with the user
                 var roleName = LoggedInRoleName();
@@ -82,56 +82,57 @@ namespace Noc_App.Controllers
                     {
                         divisions = _divisionRepo.GetAll().OrderBy(x=>x.Name).ToList();
                     }
-                    else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
-                    {
-                        divisions = (from d in _divisionRepo.GetAll() 
+                    else
+                //else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
+                {
+                    divisions = (from d in _divisionRepo.GetAll() 
                                      where d.Id == Convert.ToInt32(divisionId)
                                      select new DivisionDetails
                                      {
                                          Id = d.Id,
                                          Name = d.Name
                                      }).ToList();
-                        subdivisions = (from  div in _divisionRepo.GetAll()
-                                        join d in _subDivisionRepo.GetAll() on div.Id equals (d.DivisionId)
-                                        where div.Id == Convert.ToInt32(divisionId)
-                                        select new SubDivisionDetails
-                                        {
-                                            Id = d.Id,
-                                            Name = d.Name
-                                        }
-                                               ).Distinct().ToList();
+                        //subdivisions = (from  div in _divisionRepo.GetAll()
+                        //                join d in _subDivisionRepo.GetAll() on div.Id equals (d.DivisionId)
+                        //                where div.Id == Convert.ToInt32(divisionId)
+                        //                select new SubDivisionDetails
+                        //                {
+                        //                    Id = d.Id,
+                        //                    Name = d.Name
+                        //                }
+                        //                       ).Distinct().ToList();
                     }
-                    else 
-                    {
-                        subdivisions = (from d in _subDivisionRepo.GetAll()
-                                        where d.Id == Convert.ToInt32(subdivisionId)
-                                        select new SubDivisionDetails
-                                        {
-                                            Id = d.Id,
-                                            Name = d.Name
-                                        }
-                                               ).Distinct().OrderBy(x => x.Name).ToList();
-                        divisions = (from sub in _subDivisionRepo.GetAll()
-                                     join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
-                                     where d.Id == Convert.ToInt32(subdivisionId)
-                                     select new DivisionDetails
-                                     {
-                                         Id = d.Id,
-                                         Name = d.Name
-                                     }
-                                                ).Distinct().OrderBy(x => x.Name).ToList();
-                    }
+                    //else 
+                    //{
+                    //    subdivisions = (from d in _subDivisionRepo.GetAll()
+                    //                    where d.Id == Convert.ToInt32(subdivisionId)
+                    //                    select new SubDivisionDetails
+                    //                    {
+                    //                        Id = d.Id,
+                    //                        Name = d.Name
+                    //                    }
+                    //                           ).Distinct().OrderBy(x => x.Name).ToList();
+                    //    divisions = (from sub in _subDivisionRepo.GetAll()
+                    //                 join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                    //                 where d.Id == Convert.ToInt32(subdivisionId)
+                    //                 select new DivisionDetails
+                    //                 {
+                    //                     Id = d.Id,
+                    //                     Name = d.Name
+                    //                 }
+                    //                            ).Distinct().OrderBy(x => x.Name).ToList();
+                    //}
                     ReportApplicationCountViewModel modelreport = new ReportApplicationCountViewModel();
                     modelreport =  _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscount", "0", "0", "0", "0").FirstOrDefault();
                     //subdivisions = divisions != null && divisions.Count()>0 ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
                     DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
                     {
                         Divisions = new SelectList(divisions, "Id", "Name",178),
-                        SubDivisions = new SelectList(subdivisions, "Id", "Name"),
+                        //SubDivisions = new SelectList(subdivisions, "Id", "Name"),
                         RoleName = role.ToUpper(),
                         hdnDivisionId = divisions.Count()>0? 178/*divisions.FirstOrDefault().Id*/:0,
-                        hdnSubDivisionId = subdivisions.Count() > 0 ? 114/*subdivisions.FirstOrDefault().Id*/ : 0,
-                        TotalCount= modelreport.TotalCount,
+                        hdnSubDivisionId = 0,//subdivisions.Count() > 0 ? 114/*subdivisions.FirstOrDefault().Id*/ : 0,
+                        TotalCount = modelreport.TotalCount,
                         ApprovedCount= modelreport.ApprovedCount,
                         RejectedCount= modelreport.RejectedCount,
                         Pending= modelreport.TotalCount- (modelreport.ApprovedCount+ modelreport.RejectedCount),
@@ -202,7 +203,7 @@ namespace Noc_App.Controllers
         public async Task<IActionResult> GetRoleLevel(string divisiondetailId, string subdivisiondetailId, string role)
         {
             int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
-            int subdivisionId = subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
+            int subdivisionId = 0;//subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
             //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Retrieve the user object
@@ -232,7 +233,8 @@ namespace Noc_App.Controllers
                     {
                         divisions = _divisionRepo.GetAll().FirstOrDefault();
                     }
-                    else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
+                    else 
+                    //if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
                     {
                     if (divisionId != 0)
                     {
@@ -245,46 +247,46 @@ namespace Noc_App.Controllers
                                      }).FirstOrDefault();
                     }
                     }
-                    else
-                    {
-                    if (subdivisionsId != "0")
-                    {
-                        divisions = (from sub in _subDivisionRepo.GetAll()
-                                     join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
-                                     where d.Id == Convert.ToInt32(subdivisionsId)
-                                     select new DivisionDetails
-                                     {
-                                         Id = d.Id,
-                                         Name = d.Name
-                                     }
-                                                ).Distinct().FirstOrDefault();
-                    }
-                    }
+                    //else
+                    //{
+                    //if (subdivisionsId != "0")
+                    //{
+                    //    divisions = (from sub in _subDivisionRepo.GetAll()
+                    //                 join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                    //                 where d.Id == Convert.ToInt32(subdivisionsId)
+                    //                 select new DivisionDetails
+                    //                 {
+                    //                     Id = d.Id,
+                    //                     Name = d.Name
+                    //                 }
+                    //                            ).Distinct().FirstOrDefault();
+                    //}
+                    //}
                     divisionId = divisions.Id;
                 }
-                if (role.ToUpper() == "EXECUTIVE ENGINEER")
-                {
-                    if (subdivisionId == 0)
-                    {
-                        var subs = (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisionId));
-                        subdivisionId = subs.Count()>0? subs.FirstOrDefault().Id:0;
-                    }
-                }
-                else 
-                {
-                    if (subdivisionId == 0)
-                    {
-                        var subs = (from d in _subDivisionRepo.GetAll()
-                                        where d.DivisionId == Convert.ToInt32(divisionId)
-                                        select new SubDivisionDetails
-                                        {
-                                            Id = d.Id,
-                                            Name = d.Name
-                                        }
-                                              ).Distinct().ToList();
-                        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
-                    }
-                }
+                //if (role.ToUpper() == "EXECUTIVE ENGINEER")
+                //{
+                //    if (subdivisionId == 0)
+                //    {
+                //        var subs = (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisionId));
+                //        subdivisionId = subs.Count()>0? subs.FirstOrDefault().Id:0;
+                //    }
+                //}
+                //else 
+                //{
+                //    if (subdivisionId == 0)
+                //    {
+                //        var subs = (from d in _subDivisionRepo.GetAll()
+                //                        where d.DivisionId == Convert.ToInt32(divisionId)
+                //                        select new SubDivisionDetails
+                //                        {
+                //                            Id = d.Id,
+                //                            Name = d.Name
+                //                        }
+                //                              ).Distinct().ToList();
+                //        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
+                //    }
+                //}
                 List<object> list = new List<object>();
 
                 switch (role)
@@ -470,7 +472,7 @@ namespace Noc_App.Controllers
                 //roleName = (await GetRoleName(roleName)).AppRoleName;
 
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
-                int subdivisionId = subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
+                int subdivisionId = 0;// subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
                 //if (roleName != null && roleName.ToUpper() == "ADMINISTRATOR")
                 //{
                 //    return Json(null);
@@ -484,7 +486,8 @@ namespace Noc_App.Controllers
                         {
                             divisions = _divisionRepo.GetAll().FirstOrDefault();
                         }
-                        else if (roleName != "SUB DIVISIONAL OFFICER" && roleName != "JUNIOR ENGINEER")
+                        else 
+                        //if (roleName != "SUB DIVISIONAL OFFICER" && roleName != "JUNIOR ENGINEER")
                         {
                             divisions = (from d in _divisionRepo.GetAll()
                                          where d.Id == Convert.ToInt32(divisionsId)
@@ -494,42 +497,42 @@ namespace Noc_App.Controllers
                                              Name = d.Name
                                          }).FirstOrDefault();
                         }
-                        else 
-                        {
-                            divisions = (from sub in _subDivisionRepo.GetAll()
-                                         join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
-                                         where d.Id == Convert.ToInt32(subdivisionsId)
-                                         select new DivisionDetails
-                                         {
-                                             Id = d.Id,
-                                             Name = d.Name
-                                         }
-                                                ).Distinct().FirstOrDefault();
-                        }
+                        //else 
+                        //{
+                        //    divisions = (from sub in _subDivisionRepo.GetAll()
+                        //                 join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                        //                 where d.Id == Convert.ToInt32(subdivisionsId)
+                        //                 select new DivisionDetails
+                        //                 {
+                        //                     Id = d.Id,
+                        //                     Name = d.Name
+                        //                 }
+                        //                        ).Distinct().FirstOrDefault();
+                        //}
                         divisionId = divisions.Id;
                     }
-                    if (roleName.ToUpper() == "EXECUTIVE ENGINEER")
-                    {
-                        if (subdivisionId == 0)
-                        {
-                            var subs = (_subDivisionRepo.Find(x => x.DivisionId == divisionId));
-                            subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
-                        }
-                    }
-                    else { 
-                        if (subdivisionId == 0)
-                        {
-                            var subs = (from d in _subDivisionRepo.GetAll()
-                                        where d.DivisionId == Convert.ToInt32(divisionId)
-                                        select new SubDivisionDetails
-                                        {
-                                            Id = d.Id,
-                                            Name = d.Name
-                                        }
-                                              ).Distinct().ToList();
-                            subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
-                        }
-                    }
+                    //if (roleName.ToUpper() == "EXECUTIVE ENGINEER")
+                    //{
+                    //    if (subdivisionId == 0)
+                    //    {
+                    //        var subs = (_subDivisionRepo.Find(x => x.DivisionId == divisionId));
+                    //        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
+                    //    }
+                    //}
+                    //else { 
+                    //    if (subdivisionId == 0)
+                    //    {
+                    //        var subs = (from d in _subDivisionRepo.GetAll()
+                    //                    where d.DivisionId == Convert.ToInt32(divisionId)
+                    //                    select new SubDivisionDetails
+                    //                    {
+                    //                        Id = d.Id,
+                    //                        Name = d.Name
+                    //                    }
+                    //                          ).Distinct().ToList();
+                    //        subdivisionId = subs.Count() > 0 ? subs.FirstOrDefault().Id : 0;
+                    //    }
+                    //}
 
                     
                     List<DashboardPendencyViewModel> model = _pendencyRepo.ExecuteStoredProcedure<DashboardPendencyViewModel>("getpendencytoforwardReport", "'" + divisionId + "'", "'" + subdivisionId + "'", "'" + role + "'").ToList();

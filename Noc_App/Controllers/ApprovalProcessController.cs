@@ -241,7 +241,8 @@ namespace Noc_App.Controllers
         }
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
-        public IActionResult Transfer(string id)
+        [Obsolete]
+        public async Task<IActionResult> Transfer(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -288,22 +289,23 @@ namespace Noc_App.Controllers
             // Retrieve roles associated with the user
             var role = LoggedInRoleName();
 
-            List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
-            subdivisions = (from sub in _subDivisionRepo.GetAll()
-                            where sub.DivisionId == Convert.ToInt32(divisionId)
-                            select new SubDivisionDetails
-                            {
-                                Id = sub.Id,
-                                Name = sub.Name
-                            }
-                                    ).ToList();
+            //List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
+            //subdivisions = (from sub in _subDivisionRepo.GetAll()
+            //                where sub.DivisionId == Convert.ToInt32(divisionId)
+            //                select new SubDivisionDetails
+            //                {
+            //                    Id = sub.Id,
+            //                    Name = sub.Name
+            //                }
+            //                        ).ToList();
 
             List<OfficerDetails> officerDetail = new List<OfficerDetails>();
+            officerDetail = await GetOfficer(divisionId, "JUNIOR ENGINEER", "0");
 
             GrantApprovalDetailTransferCreate model = new GrantApprovalDetailTransferCreate
             {
                 id = id,
-                SubDivisions = subdivisions != null ? new SelectList(subdivisions, "Id", "Name") : null,
+                //SubDivisions = subdivisions != null ? new SelectList(subdivisions, "Id", "Name") : null,
                  Name = grantdetail.Grant.Name,
                 ApplicantEmailID = grantdetail.Grant.ApplicantEmailID,
                 ApplicantName = grantdetail.Grant.ApplicantName,
@@ -311,7 +313,7 @@ namespace Noc_App.Controllers
                 CurrentOfficer=grantdetail.Approval.ProcessedToUser,
                 ApprovalId=grantdetail.Approval.Id,
                 ForwardToRole="JUNIOR ENGINEER",
-                Officers = officerDetail != null ? new SelectList(officerDetail, "UserId", "UserName") : null,
+                Officers = officerDetail.Count>0 ? new SelectList(officerDetail, "UserId", "UserName") : null,
                 LocationDetails = "Division: " + grantdetail.division.Name + ", Sub-Division: " + grantdetail.subdiv.Name + ", Tehsil/Block: " + grantdetail.tehsil.Name + ", Village: " + grantdetail.village.Name + ", Pincode: " + grantdetail.village.PinCode,
             };
             return View(model);
@@ -348,7 +350,7 @@ namespace Noc_App.Controllers
 
                 string divisionId = LoggedInDivisionID();
 
-                string subdivisionId = LoggedInSubDivisionID();
+                //string subdivisionId = LoggedInSubDivisionID();
 
                 // Retrieve roles associated with the user
                 var role = LoggedInRoleName();
@@ -459,15 +461,14 @@ namespace Noc_App.Controllers
 
                 string role = (await GetAppRoleName(roleName)).RoleName;
                 // Get the users in the role
-                List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
+                //List<SubDivisionDetails> subdivisions = new List<SubDivisionDetails>();
                 
                 
                 string forwardToRole = "JUNIOR ENGINEER";
                 
                 List<OfficerDetails> officerDetail = new List<OfficerDetails>();
-                
-                
-                    var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
+
+                var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
                     SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
                     SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
                     SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
@@ -478,19 +479,19 @@ namespace Noc_App.Controllers
                                              TotalArea = ((kh.KanalOrBigha*k.UnitValue*k.Timesof)/k.DivideBy)+ ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy)+ ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
                                             
                                          }).Sum(d => d.TotalArea)), 4);
-                if (roleName == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
-                {
-                    subdivisions = (from sub in _subDivisionRepo.GetAll()  
-                                    where sub.DivisionId== Convert.ToInt32(divisionId)
-                                    select new SubDivisionDetails
-                                    {
-                                        Id = sub.Id,
-                                        Name = sub.Name
-                                    }
-                                    ).ToList();
-                }
-                else
-                {
+                //if (roleName == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
+                //{
+                //    subdivisions = (from sub in _subDivisionRepo.GetAll()  
+                //                    where sub.DivisionId== Convert.ToInt32(divisionId)
+                //                    select new SubDivisionDetails
+                //                    {
+                //                        Id = sub.Id,
+                //                        Name = sub.Name
+                //                    }
+                //                    ).ToList();
+                //}
+                //else
+                //{
                     switch (roleName)
                     {
                         case "JUNIOR ENGINEER":
@@ -536,7 +537,7 @@ namespace Noc_App.Controllers
 
                     //officerDetail = forwardToRole== "JUNIOR ENGINEER"? await GetOfficer(divisionId, forwardToRole, "0"): await GetOfficer(divisionId, userRoleDetails.RoleName, "0");
                     officerDetail =  await GetOfficer(divisionId, forwardToRole, "0");
-                }
+                //}
                 List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
                 recommendations = _repoRecommendation.GetAll().Where(x=>x.Code!="NA").ToList();
                 ForwardApplicationViewModel model = (from g in _repo.GetAll()
@@ -561,7 +562,7 @@ namespace Noc_App.Controllers
                                                           IsDrainNotified=false,
                                                           TypeOfWidth= typeofwidth.Id,
                                                           Recommendations = recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
-                                                          SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
+                                                          //SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
                                                           Officers = officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null,
                                                           LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + v.Name + ", Pincode: " + v.PinCode,
                                                       }).FirstOrDefault();

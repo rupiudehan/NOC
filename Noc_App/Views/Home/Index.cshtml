@@ -130,17 +130,17 @@
                                         </select>
                                     </div>
                                 </div>
-                                @if (Model.RoleName.ToUpper() == "EXECUTIVE ENGINEER" || Model.RoleName.ToUpper() == "JUNIOR ENGINEER" || Model.RoleName.ToUpper() == "SUB DIVISIONAL OFFICER")
-                                {
+                               @*  @if (Model.RoleName.ToUpper() == "EXECUTIVE ENGINEER" || Model.RoleName.ToUpper() == "JUNIOR ENGINEER" || Model.RoleName.ToUpper() == "SUB DIVISIONAL OFFICER")
+                                { *@
                                     @* @if (Model.SubDivisions.Count() > 0)
                                 { *@
-                                    <div class="col-lg-4">
+                                   @*  <div class="col-lg-4">
                                         <div class="form-group">
                                             <label asp-for="SelectedSubDivisionId" class="control-label"></label>
                                             <select asp-for="SelectedSubDivisionId" id="SelectedSubDivisionId" asp-items="@Model.SubDivisions" class="form-control">
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> *@
                                     @* }
                                 else
                                 {
@@ -152,7 +152,7 @@
                                         </div>
                                     </div>
                                 } *@
-                                }
+                                @* } *@
                             </div>
                             <div class="row">
                                 <div class=" col-md-12 barcontainer">
@@ -335,41 +335,41 @@
                 var divisionId = $(this).val();
                 var role = $('#RoleName').val();
                 $('#hdnDivisionId').val(divisionId);
-                if (role == 'EXECUTIVE ENGINEER' || role == 'JUNIOR ENGINEER' || role == 'SUB DIVISIONAL OFFICER') {
-                    $.ajax({
-                        url: "/Home/GetSubDivisions",
-                        type: "POST",
-                        data: { divisionId: divisionId },
-                        complete: function (r) {
-                            $("#divLoader").hide();
-                            $('.barcontainer,.drpd').show();
-                            $(".barcontainer text:contains('0')").each(function () {
-                                var text = $(this).text();
-                                if (text == '0') $(this).hide();
-                            });
-                        },
-                        success: function (data) {
-                            populateDropdown(data, "SubDivisionId");
-                            var subdivisionId = $('#SelectedSubDivisionId').val();
-                            $('#hdnSubDivisionId').val(subdivisionId);
+                // if (role == 'EXECUTIVE ENGINEER' || role == 'JUNIOR ENGINEER' || role == 'SUB DIVISIONAL OFFICER') {
+                //     $.ajax({
+                //         url: "/Home/GetSubDivisions",
+                //         type: "POST",
+                //         data: { divisionId: divisionId },
+                //         complete: function (r) {
+                //             $("#divLoader").hide();
+                //             $('.barcontainer,.drpd').show();
+                //             $(".barcontainer text:contains('0')").each(function () {
+                //                 var text = $(this).text();
+                //                 if (text == '0') $(this).hide();
+                //             });
+                //         },
+                //         success: function (data) {
+                //             populateDropdown(data, "SubDivisionId");
+                //             var subdivisionId = $('#SelectedSubDivisionId').val();
+                //             $('#hdnSubDivisionId').val(subdivisionId);
 
-                        },
-                        failure: function (f) {
-                            alert(f);
-                        },
-                        error: function (e) {
-                            alert('Error ' + e);
-                        }
-                    });
-                }else{
+                //         },
+                //         failure: function (f) {
+                //             alert(f);
+                //         },
+                //         error: function (e) {
+                //             alert('Error ' + e);
+                //         }
+                //     });
+                // }else{
                     LoadBarPendancyChart();
-                }
+                // }
             });
-            $("#SelectedSubDivisionId").change(function () {
-                var subdivisionId = $(this).val();
-                $('#hdnSubDivisionId').val(subdivisionId);
-                LoadBarPendancyChart();
-            });
+            // $("#SelectedSubDivisionId").change(function () {
+            //     var subdivisionId = $(this).val();
+            //     $('#hdnSubDivisionId').val(subdivisionId);
+            //     LoadBarPendancyChart();
+            // });
             LoadBarPendancyChart();
             
         });

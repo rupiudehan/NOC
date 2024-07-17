@@ -132,7 +132,7 @@
                         </div>
                     }
                     <div class="row">
-                        @if (Model.LoggedInRole == "EXECUTIVE ENGINEER" && Model.IsForwarded==false)
+                        @* @if (Model.LoggedInRole == "EXECUTIVE ENGINEER" && Model.IsForwarded==false)
                         {
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -161,7 +161,7 @@
                                     <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
                                 </div>
                             </div>
-                        }
+                        } *@
                         <div class="col-lg-3">
                             <div class="form-group">
                                 <label asp-for="SelectedOfficerId" class="control-label">Forward To</label>
