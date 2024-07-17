@@ -1,6 +1,11 @@
 ﻿@model LoginViewModel;
 @using Microsoft.Extensions.Options;
 @inject IOptions<Noc_App.Helpers.GoogleCaptchaConfig> GoogleCaptchaConfig;
+<style>
+    .close-icon:hover{
+        cursor:pointer;
+    }
+</style>
 @{
     ViewBag.Title = "Department Login";
     // Layout = "~/Views/Account/_AccountLayout.cshtml";
@@ -15,21 +20,21 @@
                 <h2>Department Login</h2>
                 @* <p>Magnam dolores commodi suscipit. Necessitatibus eius consequatur ex aliquid fuga eum quidem. Sit sint consectetur velit. Quisquam quos quisquam cupiditate. Et nemo qui impedit suscipit alias ea. Quia fugiat sit in iste officiis commodi quidem hic quas.</p> *@
             </div>
+            <div id="divLoader" style="display:none;text-align:center"> <img src="~/images/ajax-loader.gif" alt="Loader" /> </div>
 
-            <div class="row">
-
+            <div class="row" id="outerDiv">
                 <div class="col-lg-12 mt-5 mt-lg-0 d-flex align-items-stretch">
-                    <form action="Login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnedUrl)" method="post" role="form" class="php-email-form">
+                    <form action="Login?ReturnUrl=@System.Net.WebUtility.UrlEncode(returnedUrl)" id="loginForm" method="post" role="form" class="php-email-form">
                         <div class="row">
                             <div class="form-group mt-3">
                                 <label asp-for="Email">Username/Email</label>
                                 <input id="loginToken" value="0" type="hidden" asp-for="Token" />
-                                <input asp-for="Email" class="form-control form-control-user" placeholder="Enter Username/Email Address...">
+                                <input asp-for="Email" class="form-control form-control-user" id="Email" placeholder="Enter Username/Email Address...">
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
                             <div class="form-group mt-3">
                                 <label asp-for="Password"></label>
-                                    <input asp-for="Password" id="Password" class="form-control form-control-user" placeholder="Password">
+                                <input asp-for="Password" id="Password" id="Password" class="form-control form-control-user" placeholder="Password">
                                     <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
                             <div class="form-group mt-3">
@@ -43,6 +48,11 @@
                             <div class="sent-message">Your message has been sent. Thank you!</div>
                         </div>
                         <div class="row">
+                            <div id="resultloginMessage" class="mt-3 error-message" style="display:none;">
+                                <div class="alert alert-success"><span class="close-icon" style="float:right" onclick="toggleValue('login')">&times;</span></div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div asp-validation-summary="All" class="text-danger validateAll"></div>
                         </div>
                         
@@ -54,6 +64,41 @@
 
         </div>
     </section>
+    <div class="modal" id="myModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                @* <form method="post" asp-action="Reject" asp-controller="ApprovalProcess"> *@
+                <div class="modal-header">
+                <input type="hidden" id="id" name="id" />
+                <h5 class="modal-title" id="exampleModalLabel"><label id="dvBranch">Login As</label></h5>
+               @*  <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button> *@
+                
+                </div>
+                <div class="modal-body" style="max-height: 700px;overflow-y:scroll;">
+                    @*         <form action="RedirecToLoginRole" id="loginByRoleForm" method="post" role="form" class="php-email-form">
+                    <input type="hidden" name="Name" id="Name" value="" /><input type="hidden" name="Designation" id="Designation" value="" /><input type="hidden" name="EmpID" id="EmpID" value="" />
+                    <input type="hidden" name="DistrictID" id="DistrictID" value="" /><input type="hidden" name="DivisionID" id="DivisionID" value="" />
+                    <input type="hidden" name="RoleID" id="RoleID" value="" /><input type="hidden" name="Email" id="REmail" value="" /><input type="hidden" name="role" id="role" value=""/> *@
+                    <table class="table table-bordered" id="tblroles" width="100%" cellspacing="0">
+                        <tbody id="tbroles">
+                            @* <tr>
+                            <td>
+                            <div class="text-center"><button type="submit" id="login" style="width:100%;background-color:brown" class="btn btn-success btn-user btn-block">Login</button></div>
+                            </td>
+                            </tr> *@
+                        </tbody>
+                    </table>
+                    @* </form> *@
+                </div>
+                @*  <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                </div> *@
+                @* </form> *@
+            </div>
+        </div>
+    </div>
 
 </main>
 @section Scripts {
@@ -77,4 +122,5 @@
             }
         }
     </script>
+    <script src="~/modulejs/loginscript.js"></script>
 }

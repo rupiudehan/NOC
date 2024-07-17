@@ -27,7 +27,7 @@
         public string Designation { get; set; }
         public int DesignationID { get; set; }
         public string Role { get; set; }
-        public int RoleID { get; set; }
+        public string RoleID { get; set; }
         public string Status { get; set; }
         public string DateOfRetirement { get; set; }
         public string IntialJoiningDate { get; set; }
@@ -57,7 +57,7 @@
         public string DeesignationName { get; set; }
         public int DesignationID { get; set; }
         public string RoleName { get; set; }
-        public int RoleID { get; set; }
+        public string RoleID { get; set; }
         public string Status { get; set; }
         public string DateOfRetirement { get; set; }
         public string IntialJoiningDate { get; set; }
