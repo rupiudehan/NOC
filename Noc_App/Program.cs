@@ -67,7 +67,7 @@ builder.Services.AddScoped<IRepository<DistrictDetails>, Repository<DistrictDeta
 builder.Services.AddScoped<IRepository<DivisionDetails>, Repository<DivisionDetails>>();
 builder.Services.AddScoped<IRepository<SubDivisionDetails>, Repository<SubDivisionDetails>>();
 builder.Services.AddScoped<IRepository<TehsilBlockDetails>, Repository<TehsilBlockDetails>>();
-builder.Services.AddScoped<IRepository<VillageDetails>, Repository<VillageDetails>>();
+//builder.Services.AddScoped<IRepository<VillageDetails>, Repository<VillageDetails>>();
 builder.Services.AddScoped<IRepository<OwnerTypeDetails>, Repository<OwnerTypeDetails>>();
 builder.Services.AddScoped<IRepository<OwnerDetails>, Repository<OwnerDetails>>();
 builder.Services.AddScoped<IRepository<NocPermissionTypeDetails>, Repository<NocPermissionTypeDetails>>();

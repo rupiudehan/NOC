@@ -32,8 +32,8 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Tehsil/Block")]
         public List<int> SelectedTehsilBlockId { get; set; }
         public IEnumerable<TehsilBlockDetails> TehsilBlock { get; set; }
-        [Display(Name = "Village")]
-        public List<int> SelectedVillageId { get; set; }
-        public IEnumerable<VillageDetails> Village { get; set; }
+        //[Display(Name = "Village")]
+        //public List<int> SelectedVillageId { get; set; }
+        //public IEnumerable<VillageDetails> Village { get; set; }
     }
 }

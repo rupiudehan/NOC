@@ -22,7 +22,7 @@ namespace Noc_App.Controllers
     public class GrantController : Controller
     {
         private readonly IRepository<GrantDetails> _repo;
-        private readonly IRepository<VillageDetails> _villageRpo;
+        //private readonly IRepository<VillageDetails> _villageRpo;
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
@@ -48,7 +48,7 @@ namespace Noc_App.Controllers
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
-        public GrantController(IRepository<GrantDetails> repo, IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
+        public GrantController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo,
             IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService,
@@ -58,7 +58,7 @@ namespace Noc_App.Controllers
             , IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<GrantApprovalMaster> repoApprovalMaster
             , IRepository<DaysCheckMaster> repoDaysCheckMaster, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
         {
-            _villageRpo = villageRepo;
+            //_villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
             _subDivisionRepo = subDivisionRepo;
             _divisionRepo = divisionRepo;
@@ -303,8 +303,8 @@ namespace Noc_App.Controllers
                 var domain = HttpContext.Request.Host.Value;
                 var scheme = HttpContext.Request.Scheme;
                 var g = (from gr in _repo.GetAll()
-                         join v in _villageRpo.GetAll() on gr.VillageID equals v.Id
-                         join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                         //join v in _villageRpo.GetAll() on gr.VillageID equals v.Id
+                         join t in _tehsilBlockRepo.GetAll() on gr.TehsilID equals t.Id
                          join sub in _subDivisionRepo.GetAll() on gr.SubDivisionId equals sub.Id
                          join d in _divisionRepo.GetAll() on sub.DivisionId equals d.Id
                          join npt in _nocPermissionTypeRepo.GetAll() on gr.NocPermissionTypeID equals npt.Id
@@ -319,7 +319,7 @@ namespace Noc_App.Controllers
                          {
                              Grant = gr,
                              Payment = pay,
-                             Village = v,
+                             //Village = v,
                              Tehsil = t,
                              SubDivision = sub,
                              Division = d,
@@ -331,7 +331,7 @@ namespace Noc_App.Controllers
                          }
                    ).FirstOrDefault();
                 GrantDetails obj = g.Grant;
-                VillageDetails village = g.Village;
+                //VillageDetails village = g.Village;
                 TehsilBlockDetails tehsil = g.Tehsil;
                 SubDivisionDetails subDivision = g.SubDivision;
                 DivisionDetails division = g.Division;
@@ -369,7 +369,7 @@ namespace Noc_App.Controllers
                         ApplicationID = obj.ApplicationID,
                         PaymentOrderId = "0",
                         Name = obj.Name,
-                        VillageName = village.Name,
+                        VillageName = obj.VillageName,
                         TehsilBlockName = tehsil.Name,
                         SubDivisionName = subDivision.Name,
                         DivisionName = division.Name,
@@ -385,7 +385,7 @@ namespace Noc_App.Controllers
                         NocPermissionTypeName = permission.Name,
                         NocTypeName = noctype.Name,
                         OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
-                        Pincode = village.PinCode.ToString(),
+                        Pincode = obj.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
                         PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
                         ProjectTypeName = g.Project.Name,
@@ -408,7 +408,7 @@ namespace Noc_App.Controllers
                         ApplicationID = obj.ApplicationID,
                         PaymentOrderId = objPyment.PaymentOrderId,
                         Name = obj.Name,
-                        VillageName = village.Name,
+                        VillageName = obj.VillageName,
                         TehsilBlockName = tehsil.Name,
                         SubDivisionName = subDivision.Name,
                         DivisionName = division.Name,
@@ -424,7 +424,7 @@ namespace Noc_App.Controllers
                         NocPermissionTypeName = permission.Name,
                         NocTypeName = noctype.Name,
                         OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
-                        Pincode = village.PinCode.ToString(),
+                        Pincode = obj.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
                         PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
                         ProjectTypeName = g.Project.Name,
@@ -457,8 +457,8 @@ namespace Noc_App.Controllers
             GrantDetails model = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
             if (model != null)
             {
-                VillageDetails village = await _villageRpo.GetByIdAsync(model.VillageID);
-                TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(village.TehsilBlockId);
+                //VillageDetails village = await _villageRpo.GetByIdAsync(model.VillageID);
+                TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(model.TehsilID);
                 SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(model.SubDivisionId);
                 DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
                 DistrictDetails districts = await _districtRepo.GetByIdAsync(division.DistrictId);
@@ -504,7 +504,7 @@ namespace Noc_App.Controllers
                 {
                     Name = model.ApplicantName,
                     Email = model.ApplicantEmailID,
-                    Address = "Sub-Division:" + subDivision.Name + ", Tehsil/Block:" + tehsil.Name + ", Village:" + village.Name + ", Pincode:" + village.PinCode,
+                    Address = "Tehsil/Block:" + tehsil.Name + ", Village:" + model.VillageName,
                     Amount = TotalPayment,
                     GrantId = model.Id,
                     ApplicationId = Id,
@@ -513,8 +513,8 @@ namespace Noc_App.Controllers
                     Division = division.Name,
                     SubDivision = subDivision.Name,
                     Tehsil = tehsil.Name,
-                    Village = village.Name + "-" + village.PinCode.ToString(),
-                    Pincode = village.PinCode.ToString(),
+                    Village = model.VillageName + "-" + model.PinCode.ToString(),
+                    Pincode = model.PinCode.ToString(),
                     TehsilId = tehsil.LGD_ID.ToString(),
                     DistrictId = districts.LGD_ID.ToString(),
                     PayLocCode= division.PayLocationCode,
@@ -551,7 +551,7 @@ namespace Noc_App.Controllers
                 PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name"),
                 NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
                 NocType = new SelectList(nocType, "Id", "Name"),
-                Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
+                //Village = new SelectList(Enumerable.Empty<VillageDetails>(), "Id", "Name"),
                 TehsilBlock = new SelectList(Enumerable.Empty<TehsilBlockDetails>(), "Id", "Name"),
                 SubDivision = new SelectList(Enumerable.Empty<SubDivisionDetails>(), "Id", "Name"),
                 SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
@@ -588,14 +588,14 @@ namespace Noc_App.Controllers
                     var filteredSubdivisions = await _subDivisionRepo.FindAsync(c => c.DivisionId == model.SelectedDivisionId);
                     var filterredDivision = await _divisionRepo.GetByIdAsync(model.SelectedDivisionId);
                     var filteredtehsilBlock = await _tehsilBlockRepo.FindAsync(c => c.DistrictId == filterredDivision.DistrictId);
-                    var fileteedvillage = await _villageRpo.FindAsync(c => c.TehsilBlockId == model.SelectedTehsilBlockId);
-                    var selectedvillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID);
+                    //var fileteedvillage = await _villageRpo.FindAsync(c => c.TehsilBlockId == model.SelectedTehsilBlockId);
+                    //var selectedvillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID);
                     string ErrorMessage = string.Empty;
-                    if (filteredSubdivisions.Count() > 0 && filteredtehsilBlock.Count() > 0 && fileteedvillage.Count() > 0 && selectedvillage != null)
+                    if (filteredSubdivisions.Count() > 0 && filteredtehsilBlock.Count() > 0 /*&& fileteedvillage.Count() > 0 && selectedvillage != null*/)
                     {
                         var viewModel = new GrantViewModelCreate
                         {
-                            Village = new SelectList(fileteedvillage, "Id", "Name",model.SelectedVillageID),
+                            //Village = new SelectList(fileteedvillage, "Id", "Name",model.SelectedVillageID),
                             TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name", model.SelectedTehsilBlockId),
                             SubDivision = new SelectList(filteredSubdivisions, "Id", "Name", model.SelectedSubDivisionId),
                             Divisions = new SelectList(divisions, "Id", "Name", model.SelectedDivisionId),
@@ -606,12 +606,13 @@ namespace Noc_App.Controllers
                             //OwnerType = new SelectList(ownerType, "Id", "Name"),
                             SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
                             GrantKhasras = model.GrantKhasras,
-                            Owners = model.Owners,
-                            Pincode = selectedvillage.PinCode.ToString()
+                            Owners = model.Owners
+                            //,
+                            //Pincode = selectedvillage.PinCode.ToString()
                         };
                         //model.OwnerType = viewModel.OwnerType;
                         if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.LayoutPlanFilePhoto != null && model.FaradFilePoto != null && model.KmlLinkName != null && model.KmlLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
-                            && model.SelectedVillageID > 0 && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.ApplicantName != null
+                            /*&& model.SelectedVillageID > 0*/ && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.ApplicantName != null
                             && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.SelectedPlanSanctionAuthorityId > 0 && model.IsConfirmed
                             )
                         {
@@ -840,7 +841,8 @@ namespace Noc_App.Controllers
                                     IDProofPhotoPath = uniqueIDProofFileName,
                                     AddressProofPhotoPath = uniqueAddressProofFileName,
                                     AuthorizationLetterPhotoPath = uniqueAuthLetterFileName,
-                                    VillageID = model.SelectedVillageID,
+                                    VillageName = model.Villagename,
+                                    PinCode=model.Pincode,
                                     SubDivisionId=model.SelectedSubDivisionId,
                                     ProjectTypeId = model.SelectedProjectTypeId ?? 0,
                                     Hadbast = model.Hadbast,
@@ -861,7 +863,8 @@ namespace Noc_App.Controllers
                                     ApplicationID = model.ApplicationID,
                                     OtherProjectTypeDetail = model.OtherProjectTypeDetail,
                                     CreatedOn = DateTime.Now,
-                                    IsPending = true
+                                    IsPending = true,
+                                    TehsilID=model.SelectedTehsilBlockId
                                 };
                                 await _repo.CreateAsync(obj);
                                 //model.SelectedOwnerTypeID
@@ -911,12 +914,11 @@ namespace Noc_App.Controllers
                                     }
                                     if (TotalPayment > 0)
                                     {
-                                        var detail = (from v in _villageRpo.GetAll()
-                                                      join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id                                                      
-                                                      where v.Id == model.SelectedVillageID
+                                        var detail = (from t in _tehsilBlockRepo.GetAll()                                                
+                                                      where t.Id == model.SelectedTehsilBlockId
                                                       select new
                                                       {
-                                                          Village = v,
+                                                          //Village = v,
                                                           Tehsil = t,
                                                           //SubDivision = s,
                                                           //Division = d,
@@ -938,14 +940,14 @@ namespace Noc_App.Controllers
                                             PayerName = model.Owners.FirstOrDefault().Name,
                                             MobileNo = viewModel.Owners.FirstOrDefault().MobileNo,
                                             Email = model.ApplicantEmailID,
-                                            Address = "Sub-Division:" + subs.SubDivision.Name + ",Tehsil/Block:" + detail.Tehsil.Name + ",Village:" + detail.Village.Name + ",Pincode:" + detail.Village.PinCode,
+                                            Address = "Tehsil/Block:" + detail.Tehsil.Name + ",Village:" + model.Villagename,
                                             Amount = TotalPayment,
                                             GrantId = grantid,
                                             ApplicationId = model.ApplicationID,
                                             DistrictId = subs.District.LGD_ID.ToString(),
                                             Hadbast = model.Hadbast,
                                             PhoneNumber = viewModel.Owners.FirstOrDefault().MobileNo,
-                                            Pincode = detail.Village.PinCode.ToString(),
+                                            Pincode = model.Pincode.ToString(),
                                             PlotNo = model.PlotNo != null && model.PlotNo != "" ? model.PlotNo : "0",
                                             TehsilId = detail.Tehsil.LGD_ID.ToString(),
                                             Division = subs.Division.Name,
@@ -953,7 +955,7 @@ namespace Noc_App.Controllers
                                             PayLocCode=subs.Division.PayLocationCode,
                                             SubDivision = subs.SubDivision.Name,
                                             Tehsil = detail.Tehsil.Name,
-                                            Village = detail.Village.Name,
+                                            Village = model.Villagename,
                                             AreaCalculation = calculation,
                                             AreaAdditionalCalculation=additionalcalculation,
                                             TotalAreaCalculation=totalareacalculation
@@ -1014,8 +1016,8 @@ namespace Noc_App.Controllers
             {
                 var grant = (from g in _repo.GetAll()
                              join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID
-                             join v in _villageRpo.GetAll() on g.VillageID equals v.Id
-                             join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                             //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                             join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                              join s in _subDivisionRepo.GetAll() on g.SubDivisionId equals s.Id
                              join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
                              join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
@@ -1029,7 +1031,7 @@ namespace Noc_App.Controllers
                              {
                                  Grant = g,
                                  Payment = p,
-                                 Village = v,
+                                 //Village = v,
                                  Tehsil = t,
                                  SubDivision = s,
                                  Division = d
@@ -1053,7 +1055,7 @@ namespace Noc_App.Controllers
                             var nocType = _nocTypeRepo.GetAll();
                             var ownerType = _ownerTypeRepo.GetAll();
                             var siteUnits = _siteUnitsRepo.GetAll();
-                            var villages = _villageRpo.Find(x => x.TehsilBlockId == grant.Village.TehsilBlockId).OrderBy(x => x.Name);
+                            //var villages = _villageRpo.Find(x => x.TehsilBlockId == grant.Village.TehsilBlockId).OrderBy(x => x.Name);
                             var tehsils = _tehsilBlockRepo.Find(x => x.DistrictId == grant.Division.DistrictId).OrderBy(x => x.Name);
                             var subdivisions = _subDivisionRepo.Find(x => x.DivisionId == grant.SubDivision.DivisionId).OrderBy(x => x.Name);
                             var divisions = _divisionRepo.GetAll().OrderBy(x => x.Name);
@@ -1183,7 +1185,7 @@ namespace Noc_App.Controllers
                                 PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name", grant.Grant.PlanSanctionAuthorityId),
                                 NocPermissionType = new SelectList(nocPermission, "Id", "Name", grant.Grant.NocPermissionTypeID),
                                 NocType = new SelectList(nocType, "Id", "Name", grant.Grant.NocTypeId),
-                                Village = new SelectList(villages, "Id", "Name", grant.Village.Id),
+                                //Village = new SelectList(villages, "Id", "Name", grant.Village.Id),
                                 TehsilBlock = new SelectList(tehsils, "Id", "Name", grant.Tehsil.Id),
                                 SubDivision = new SelectList(subdivisions, "Id", "Name", grant.SubDivision.Id),
                                 SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
@@ -1213,7 +1215,7 @@ namespace Noc_App.Controllers
                                 KmlLinkName = grant.Grant.KMLLinkName,
                                 NocNumber = grant.Grant.NocNumber,
                                 OtherProjectTypeDetail = grant.Grant.OtherProjectTypeDetail,
-                                Pincode = grant.Village.PinCode.ToString(),
+                                Pincode = grant.Grant.PinCode.ToString(),
                                 PlotNo = grant.Grant.PlotNo,
                                 PreviousDate = grant.Grant.PreviousDate,
                                 OwnerType = new SelectList(ownertype, "Id", "Name"),
@@ -1223,7 +1225,7 @@ namespace Noc_App.Controllers
                                 SelectedProjectTypeId = grant.Grant.ProjectTypeId,
                                 SelectedSubDivisionId = grant.SubDivision.Id,
                                 SelectedTehsilBlockId = grant.Tehsil.Id,
-                                SelectedVillageID = grant.Village.Id,
+                                VillageName = grant.Grant.VillageName,
                                 SelectedPlanSanctionAuthorityId=grant.Grant.PlanSanctionAuthorityId,
                                 AddressProofPhotoPath = grant.Grant.AddressProofPhotoPath,
                                 AuthorizationLetterPhotoPath = grant.Grant.AuthorizationLetterPhotoPath,
@@ -1275,8 +1277,8 @@ namespace Noc_App.Controllers
             {
                 var grant = (from g in _repo.GetAll()
                              join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID
-                             join v in _villageRpo.GetAll() on g.VillageID equals v.Id
-                             join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                             //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                             join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                              join s in _subDivisionRepo.GetAll() on g.SubDivisionId equals s.Id
                              join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
                              join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
@@ -1290,7 +1292,7 @@ namespace Noc_App.Controllers
                              {
                                  Grant = g,
                                  Payment = p,
-                                 Village = v,
+                                 //Village = v,
                                  Tehsil = t,
                                  SubDivision = s,
                                  Division = d
@@ -1313,7 +1315,7 @@ namespace Noc_App.Controllers
                             var nocType = _nocTypeRepo.GetAll();
                             var ownerType = _ownerTypeRepo.GetAll();
                             var siteUnits = _siteUnitsRepo.GetAll();
-                            var villages = _villageRpo.Find(x => x.TehsilBlockId == grant.Village.TehsilBlockId);
+                            //var villages = _villageRpo.Find(x => x.TehsilBlockId == grant.Village.TehsilBlockId);
                             var tehsils = _tehsilBlockRepo.GetAll();//.Find(x => x.SubDivisionId == grant.Tehsil.SubDivisionId);
                             var subdivisions = _subDivisionRepo.Find(x => x.DivisionId == grant.SubDivision.DivisionId);
                             var divisions = _divisionRepo.GetAll();
@@ -1441,7 +1443,7 @@ namespace Noc_App.Controllers
                                 ProjectType = new SelectList(projectType, "Id", "Name", grant.Grant.ProjectTypeId),
                                 NocPermissionType = new SelectList(nocPermission, "Id", "Name", grant.Grant.NocPermissionTypeID),
                                 NocType = new SelectList(nocType, "Id", "Name", grant.Grant.NocTypeId),
-                                Village = new SelectList(villages, "Id", "Name", grant.Village.Id),
+                                //Village = new SelectList(villages, "Id", "Name", grant.Village.Id),
                                 TehsilBlock = new SelectList(tehsils, "Id", "Name", grant.Tehsil.Id),
                                 SubDivision = new SelectList(subdivisions, "Id", "Name", grant.SubDivision.Id),
                                 SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
@@ -1471,7 +1473,7 @@ namespace Noc_App.Controllers
                                 KmlLinkName = grant.Grant.KMLLinkName,
                                 NocNumber = grant.Grant.NocNumber,
                                 OtherProjectTypeDetail = grant.Grant.OtherProjectTypeDetail,
-                                Pincode = grant.Village.PinCode.ToString(),
+                                Pincode = grant.Grant.PinCode.ToString(),
                                 PlotNo = grant.Grant.PlotNo,
                                 PreviousDate = grant.Grant.PreviousDate,
                                 OwnerType = new SelectList(ownertype, "Id", "Name"),
@@ -1481,7 +1483,7 @@ namespace Noc_App.Controllers
                                 SelectedProjectTypeId = grant.Grant.ProjectTypeId,
                                 SelectedSubDivisionId = grant.SubDivision.Id,
                                 SelectedTehsilBlockId = grant.Tehsil.Id,
-                                SelectedVillageID = grant.Village.Id,
+                                VillageName = grant.Grant.VillageName,
                                 AddressProofPhotoPath = grant.Grant.AddressProofPhotoPath,
                                 AuthorizationLetterPhotoPath = grant.Grant.AuthorizationLetterPhotoPath,
                                 IDProofPhotoPath = grant.Grant.IDProofPhotoPath,
@@ -1705,7 +1707,7 @@ namespace Noc_App.Controllers
                         return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
                     }
 
-                    if (model.selectedVillageID <= 0)
+                    if (model.villageName ==null || model.villageName.Trim() == "")
                     {
                         isValid = false;
 
@@ -1811,7 +1813,10 @@ namespace Noc_App.Controllers
 
                             grantDetail.Hadbast = model.hadbast;
                         grantDetail.PlotNo = model.plotNo=="NaN"?"": model.plotNo;
-                        grantDetail.VillageID = model.selectedVillageID;
+                        //grantDetail.VillageID = model.selectedVillageID;
+                        grantDetail.TehsilID = model.selectedTehsilBlockId;
+                        grantDetail.PinCode = model.pinCode;
+                        grantDetail.VillageName = model.villageName;
                         grantDetail.SubDivisionId = model.selectedSubDivisionId;
                         grantDetail.AddressProofPhotoPath = uniqueAddressProofFileName;
                         grantDetail.PlanSanctionAuthorityId = model.selectedPlanSanctionAuthorityId;
@@ -2515,22 +2520,22 @@ namespace Noc_App.Controllers
             return Json(new SelectList(tehsilBlock, "Id", "Name"));
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        public IActionResult GetVillagess(int tehsilBlockId)
-        {
-            var village = _villageRpo.GetAll().Where(c => c.TehsilBlockId == tehsilBlockId).OrderBy(x => x.Name).ToList();
-            return Json(new SelectList(village, "Id", "Name"));
-        }
+        //[HttpPost]
+        //[AllowAnonymous]
+        //public IActionResult GetVillagess(int tehsilBlockId)
+        //{
+        //    var village = _villageRpo.GetAll().Where(c => c.TehsilBlockId == tehsilBlockId).OrderBy(x => x.Name).ToList();
+        //    return Json(new SelectList(village, "Id", "Name"));
+        //}
 
 
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetVillageDetail(int villageId)
-        {
-            var village = await _villageRpo.GetByIdAsync(villageId);
-            return Json(village);
-        }
+        //[HttpPost]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> GetVillageDetail(int villageId)
+        //{
+        //    var village = await _villageRpo.GetByIdAsync(villageId);
+        //    return Json(village);
+        //}
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> GetUnitsDetail(int unitId)

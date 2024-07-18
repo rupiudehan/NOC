@@ -14,8 +14,11 @@ namespace Noc_App.Models.ViewModel
         public string? plotNo { get; set; }
         [Display(Name = "Sub-Division")]
         public int selectedSubDivisionId { get; set; }
+        [Display(Name = "Tehsil/Block ID")]
+        public int selectedTehsilBlockId { get; set; }
         [Display(Name = "Village/Town/City")]
-        public int selectedVillageID { get; set; }
+        public string villageName { get; set; }
+        public string pinCode { get; set; }
         [Display(Name = "Address Proof")]
         public IFormFile file { get; set; }
         public int addressid { get; set; }

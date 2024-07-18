@@ -100,6 +100,24 @@ function validateMob(mobno, field) {
         field.next(".text-danger").text("");
     }
 }
+$(".pincode").on("blur", function () {
+    validatePin($(this).val(), $(this));
+});
+function validatePin(mobno, field) {
+    var fieldRegex = /^\d{6}$/;
+
+    if (parseInt(mobno) < 0) {
+        field.val('');
+        field.next(".text-danger").text("Please enter a valid pincode.");
+    }
+    else if (!fieldRegex.test(mobno)) {
+        // PinCode.addClass("is-invalid");
+        field.next(".text-danger").text("Please enter a valid pincode.");
+    } else {
+        // PinCode.removeClass("is-invalid");
+        field.next(".text-danger").text("");
+    }
+}
 $(function () {
     $('#IDProofPhoto').on('change', function () {
         if ((this.files[0].size) > (4 * 1024 * 1024)) {
@@ -121,12 +139,15 @@ $(function () {
             $('#KMLFile-error').text('File size cannot be greater than 4MB');
         }
     });
-    $(".mobno").on("keypress", function (event) {
+    $(".mobno,.pincode").on("keypress", function (event) {
         // Allow only numeric characters (0-9) in the input field
         var charCode = event.which;
         if (charCode < 48 || charCode > 57) {
             event.preventDefault();
         }
+    });
+    $('.mobno,.pincode').on('cut copy paste', function (e) {
+        e.preventDefault(); return false;
     });
     $(".mobno").on("blur", function () {
         validateMob($(this).val(), $(this));
@@ -176,30 +197,30 @@ $(function () {
         }
     }
 
-    if (document.getElementById("SelectedVillageID") != null) {
-        $("#SelectedVillageID").change(function () {
-            var villageId = $(this).val();
-            $.ajax({
-                url: "/Grant/GetVillageDetail",
-                type: "POST",
-                data: { villageId: villageId },
-                async: false,
-                success: function (data) {
-                    $.each(data, function (key, value) {
-                        if (key == 'pinCode') {
-                            $('#Pincode').text(value);
-                        }
-                    });
-                },
-                failure: function (f) {
-                    alert(f);
-                },
-                error: function (e) {
-                    alert('Error ' + e);
-                }
-            });
-        });
-    }
+    //if (document.getElementById("SelectedVillageID") != null) {
+    //    $("#SelectedVillageID").change(function () {
+    //        var villageId = $(this).val();
+    //        $.ajax({
+    //            url: "/Grant/GetVillageDetail",
+    //            type: "POST",
+    //            data: { villageId: villageId },
+    //            async: false,
+    //            success: function (data) {
+    //                $.each(data, function (key, value) {
+    //                    if (key == 'pinCode') {
+    //                        $('#Pincode').text(value);
+    //                    }
+    //                });
+    //            },
+    //            failure: function (f) {
+    //                alert(f);
+    //            },
+    //            error: function (e) {
+    //                alert('Error ' + e);
+    //            }
+    //        });
+    //    });
+    //}
 
     if (document.getElementById("SelectedDivisionId") != null) {
         $("#SelectedDivisionId").change(function () {
@@ -225,24 +246,24 @@ $(function () {
                     alert('Error ' + e);
                 }
             });
-            $.ajax({
-                url: "/Grant/GetTehsilBlocks",
-                type: "POST",
-                data: { divisionId: divisionId },
-                async: false,
-                success: function (data) {
-                    populateDropdown(data, "TehsilBlockId");
-                    var dropdownlistVillage = $("#SelectedVillageId");
-                    dropdownlistVillage.empty();
-                    dropdownlistVillage.html('<option value="">Select</option>');
-                },
-                failure: function (f) {
-                    alert(f);
-                },
-                error: function (e) {
-                    alert('Error ' + e);
-                }
-            });
+            //$.ajax({
+            //    url: "/Grant/GetTehsilBlocks",
+            //    type: "POST",
+            //    data: { divisionId: divisionId },
+            //    async: false,
+            //    success: function (data) {
+            //        populateDropdown(data, "TehsilBlockId");
+            //        var dropdownlistVillage = $("#SelectedVillageId");
+            //        dropdownlistVillage.empty();
+            //        dropdownlistVillage.html('<option value="">Select</option>');
+            //    },
+            //    failure: function (f) {
+            //        alert(f);
+            //    },
+            //    error: function (e) {
+            //        alert('Error ' + e);
+            //    }
+            //});
         });
     }
     //if (document.getElementById("SelectedSubDivisionId") != null) {
@@ -405,7 +426,9 @@ $(function () {
             var AddressApplicationId = $('#AddressApplicationId').val();
             var Hadbast = $('#Hadbast').val();
             var PlotNo = parseInt($('#PlotNo').val());
-            var SelectedVillageID = $('#SelectedVillageID').val();
+            var SelectedTehsilBlockId = $('#SelectedTehsilBlockId').val();
+            var VillageName = $('#SelectedVillageID').val();
+            var Pincode = $('#Pincode').val();
             var SelectedSubDivisionId = $('#SelectedSubDivisionId').val();
             var fileInput = $('#AddressProofPhoto')[0];
             var SelectedPlanSanctionAuthorityId = $('#SelectedPlanSanctionAuthorityId').val();
@@ -442,7 +465,9 @@ $(function () {
                                 formData.append('adId', AdId);
                                 formData.append('hadbast', Hadbast);
                                 formData.append('plotNo', PlotNo);
-                                formData.append('selectedVillageID', SelectedVillageID);
+                                formData.append('selectedTehsilBlockId', SelectedTehsilBlockId);
+                                formData.append('villageName', VillageName);
+                                formData.append('pincode', Pincode);
                                 formData.append('selectedSubDivisionId', SelectedSubDivisionId);
                                 formData.append('addressid', addressid);
                                 formData.append('selectedPlanSanctionAuthorityId', SelectedPlanSanctionAuthorityId);
@@ -461,14 +486,18 @@ $(function () {
                                         ToggleLoadder(false);
                                     },
                                     success: function (response) {
+                                        console.log(JSON.stringify(response))
                                         if (response.success) {
                                             navtab.empty();
                                             navtab.html('<i class="checkmark">✓</i>Site Address Details');
                                             $('#AddressProofPhotoPath').attr('href', response.filepath);
                                             $('#LayoutPlanFilePhoto').attr('href', response.filepath2);
                                             $('#FaradFilePoto').attr('href', response.filepath3);
-                                            alert(response.result.plotNo)
+                                            
                                             $('#PlotNo').val(response.result.plotNo);
+                                            $('#SelectedVillageID').val(response.result.villageName);
+                                            $('#Pincode').val(response.result.pinCode);
+                                            $('#Hadbast').val(response.result.hadbast);
                                             resultProjectMessage.css('display', 'block');
                                             resultProjectMessage.html('<div class="alert alert-success">Detail saved successfully!<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
                                             $('#' + module + 'Form')[0].reset();

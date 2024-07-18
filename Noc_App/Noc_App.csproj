@@ -8,15 +8,24 @@
 
   <ItemGroup>
     <Compile Remove="Views\Drain\**" />
+    <Compile Remove="Views\Village\**" />
     <Content Remove="Views\Drain\**" />
+    <Content Remove="Views\Village\**" />
     <EmbeddedResource Remove="Views\Drain\**" />
+    <EmbeddedResource Remove="Views\Village\**" />
     <None Remove="Views\Drain\**" />
+    <None Remove="Views\Village\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Controllers\ApprovalProcessController - Copy.cs" />
+    <Compile Remove="Controllers\VillageController.cs" />
     <Compile Remove="Models\IFMSPayment\LoggingMiddleware.cs" />
     <Compile Remove="Models\Repository\SqlEmployeeRepository.cs" />
+    <Compile Remove="Models\ViewModel\VillageViewModel.cs" />
+    <Compile Remove="Models\ViewModel\VillageViewModelCreate.cs" />
+    <Compile Remove="Models\ViewModel\VillageViewModelEdit.cs" />
+    <Compile Remove="Models\VillageDetails.cs" />
   </ItemGroup>
 
   <ItemGroup>

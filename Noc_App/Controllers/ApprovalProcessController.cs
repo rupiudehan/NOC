@@ -22,7 +22,7 @@ namespace Noc_App.Controllers
     public class ApprovalProcessController : Controller
     {
         private readonly IRepository<GrantDetails> _repo;
-        private readonly IRepository<VillageDetails> _villageRpo;
+        //private readonly IRepository<VillageDetails> _villageRpo;
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
@@ -53,7 +53,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<PlanSanctionAuthorityMaster> _repoPlanSanctionAuthtoryMaster;
         private readonly IRepository<DrainWidthTypeDetails> _drainwidthRepository;
 
-        public ApprovalProcessController(IRepository<GrantDetails> repo, IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
+        public ApprovalProcessController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<GrantPaymentDetails> repoPayment,IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster
             , IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo,
             IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo,
@@ -64,7 +64,7 @@ namespace Noc_App.Controllers
             , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
         {
             _repo = repo;
-            _villageRpo = villageRepo;
+            //_villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
             _subDivisionRepo = subDivisionRepo;
             _divisionRepo = divisionRepo;
@@ -100,6 +100,8 @@ namespace Noc_App.Controllers
             {
 
                 string userId=LoggedInUserID();
+
+                    string divisionId = LoggedInDivisionID();
                 
                 // Retrieve roles associated with the user
                 var roleName = LoggedInRoleName();
@@ -107,10 +109,10 @@ namespace Noc_App.Controllers
                 role = (await GetAppRoleName(role)).AppRoleName;
                 List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
                 List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
-                model=await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", "0", "'" +role+"'", "'" + userId + "'");
-                var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
-                var modelRejected = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsrejected", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
-                var modelIssued = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsissued", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
+                model=await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", divisionId, "'" +role+"'", "'" + userId + "'");
+                var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
+                var modelRejected = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsrejected", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
+                var modelIssued = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsissued", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
                 //var modelShortfall = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsexpiredshortfall", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
 
                 modelView.Add(model);
@@ -253,8 +255,8 @@ namespace Noc_App.Controllers
             var grantdetail = (from g in _repo.GetAll()
                                join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
                                join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
-                               join v in _villageRpo.GetAll() on g.VillageID equals v.Id
-                               join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                               //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                               join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                                join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
                                join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
                                where a.ProcessedToRole.ToUpper() == "JUNIOR ENGINEER" && g.ApplicationID == id
@@ -263,7 +265,7 @@ namespace Noc_App.Controllers
                                    Grant = g,
                                    subdiv = sub,
                                    division = div,
-                                   village =v,
+                                   //village =v,
                                    tehsil=t,
                                    Approval = a
                                }).FirstOrDefault();
@@ -314,7 +316,7 @@ namespace Noc_App.Controllers
                 ApprovalId=grantdetail.Approval.Id,
                 ForwardToRole="JUNIOR ENGINEER",
                 Officers = officerDetail.Count>0 ? new SelectList(officerDetail, "UserId", "UserName") : null,
-                LocationDetails = "Division: " + grantdetail.division.Name + ", Sub-Division: " + grantdetail.subdiv.Name + ", Tehsil/Block: " + grantdetail.tehsil.Name + ", Village: " + grantdetail.village.Name + ", Pincode: " + grantdetail.village.PinCode,
+                LocationDetails = "Division: " + grantdetail.division.Name + ", Sub-Division: " + grantdetail.subdiv.Name + ", Tehsil/Block: " + grantdetail.tehsil.Name + ", Village: " + grantdetail.Grant.VillageName + ", Pincode: " + grantdetail.Grant.PinCode,
             };
             return View(model);
         }
@@ -542,8 +544,8 @@ namespace Noc_App.Controllers
                 recommendations = _repoRecommendation.GetAll().Where(x=>x.Code!="NA").ToList();
                 ForwardApplicationViewModel model = (from g in _repo.GetAll()
                                                       join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
-                                                      join v in _villageRpo.GetAll() on g.VillageID equals v.Id
-                                                      join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                                                      //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                                                      join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                                                       join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
                                                       join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
                                                       where g.ApplicationID == Id
@@ -564,7 +566,7 @@ namespace Noc_App.Controllers
                                                           Recommendations = recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
                                                           //SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
                                                           Officers = officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null,
-                                                          LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + v.Name + ", Pincode: " + v.PinCode,
+                                                          LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                                                       }).FirstOrDefault();
                 
                 return View(model);
@@ -1416,8 +1418,8 @@ namespace Noc_App.Controllers
             }
             IssueNocViewModelCreate model = (from g in _repo.GetAll()
                                              join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
-                                             join v in _villageRpo.GetAll() on g.VillageID equals v.Id
-                                             join t in _tehsilBlockRepo.GetAll() on v.TehsilBlockId equals t.Id
+                                             //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                                             join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                                              join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
                                              join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
                                              where g.ApplicationID == id
@@ -1426,7 +1428,7 @@ namespace Noc_App.Controllers
                                                  Id = g.Id,
                                                  Name = g.Name,
                                                  ApplicationID = g.ApplicationID,
-                                                 LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + v.Name + ", Pincode: " + v.PinCode,
+                                                 LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                                              }).FirstOrDefault();
             return View(model);
         }
@@ -1568,8 +1570,8 @@ namespace Noc_App.Controllers
             {
                 GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
                 PlanSanctionAuthorityMaster planAuth = await  _repoPlanSanctionAuthtoryMaster.GetByIdAsync(obj.PlanSanctionAuthorityId);
-                VillageDetails village = await _villageRpo.GetByIdAsync(obj.VillageID);
-                TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(village.TehsilBlockId);
+                //VillageDetails village = await _villageRpo.GetByIdAsync(obj.VillageID);
+                TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(obj.TehsilID);
                 SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(obj.SubDivisionId);
                 DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
                 NocPermissionTypeDetails permission = await _nocPermissionTypeRepo.GetByIdAsync(obj.NocPermissionTypeID);
@@ -1640,7 +1642,7 @@ namespace Noc_App.Controllers
                         ApplicationID = obj.ApplicationID,
                         PaymentOrderId = "0",
                         Name = obj.Name,
-                        VillageName = village.Name,
+                        VillageName = obj.VillageName,
                         TehsilBlockName = tehsil.Name,
                         SubDivisionName = subDivision.Name,
                         DivisionName = division.Name,
@@ -1656,7 +1658,7 @@ namespace Noc_App.Controllers
                         NocPermissionTypeName = permission.Name,
                         NocTypeName = noctype.Name,
                         OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
-                        Pincode = village.PinCode.ToString(),
+                        Pincode = obj.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
                         PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
                         ProjectTypeName = projecttype.Name,
@@ -1671,7 +1673,7 @@ namespace Noc_App.Controllers
                         LayoutPlanFilePath=obj.LayoutPlanFilePath,
                         GrantInspectionDocumentsDetail = documents,
                         GrantApprovalRecommendationDetails=modelRecommendation,
-                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + village.Name + ", Pincode: " + village.PinCode
+                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode
                     };
                     return View(model);
                 }
@@ -1684,7 +1686,7 @@ namespace Noc_App.Controllers
                         ApplicationID = obj.ApplicationID,
                         PaymentOrderId = objPyment.PaymentOrderId,
                         Name = obj.Name,
-                        VillageName = village.Name,
+                        VillageName = obj.VillageName,
                         TehsilBlockName = tehsil.Name,
                         SubDivisionName = subDivision.Name,
                         DivisionName = division.Name,
@@ -1700,7 +1702,7 @@ namespace Noc_App.Controllers
                         NocPermissionTypeName = permission.Name,
                         NocTypeName = noctype.Name,
                         OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
-                        Pincode = village.PinCode.ToString(),
+                        Pincode = obj.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
                         PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
                         ProjectTypeName = projecttype.Name,
@@ -1715,7 +1717,7 @@ namespace Noc_App.Controllers
                         LayoutPlanFilePath = obj.LayoutPlanFilePath,
                         GrantInspectionDocumentsDetail = documents,
                         GrantApprovalRecommendationDetails = modelRecommendation,
-                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + village.Name + ", Pincode: " + village.PinCode
+                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode
                     };
                     return View(model);
                 }
@@ -2012,8 +2014,11 @@ namespace Noc_App.Controllers
                 //List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
                 List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
                 //officerRole = (await GetRoleName(officerRole)).RoleName;
-                officerRole = (await GetAppRoleName(officerRole)).RoleName;
+                UserRoleDetails officer = (await GetAppRoleName(officerRole));
+                officerRole = officer.RoleName;
                 user_info user = users.Find(x => x.user_info.Role.Contains(officerRole)).user_info;
+                user.Role = officerRole;
+                user.RoleID = officer.Id.ToString();
                 OfficerResponseViewModel obj = new OfficerResponseViewModel
                 {
                     msg = "success",

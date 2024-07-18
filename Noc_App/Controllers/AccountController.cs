@@ -22,7 +22,7 @@ namespace Noc_App.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private readonly IRepository<VillageDetails> _villageRepository;
+        //private readonly IRepository<VillageDetails> _villageRepository;
         private readonly IEmailService _emailService;
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepository;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepository;
@@ -33,13 +33,13 @@ namespace Noc_App.Controllers
         //private readonly IRepository<DrainDetails> _drainRepo;
 
         public AccountController(GoogleCaptchaService googleCaptchaService, IRepository<DivisionDetails> divisionRepository, 
-            IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, IRepository<VillageDetails> villageRepository, 
+            IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, /*IRepository<VillageDetails> villageRepository, */
             IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository)
         {
             _divisionRepository = divisionRepository;
             _subDivisionRepository = subDivisionRepository;
             _tehsilBlockRepository = tehsilBlockRepository;
-            _villageRepository = villageRepository;
+            //_villageRepository = villageRepository;
             _userRolesRepository = userRolesRepository;
             _googleCaptchaService = googleCaptchaService;
             _emailService = emailService;
@@ -83,7 +83,7 @@ namespace Noc_App.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    if (model.Email != "ExecutiveEngineer" && (model.Email== "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
+                    if (model.Email != "ExecutiveEngineer" && (model.Email == "xen" || model.Email== "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
                     {
                         LoginResponseViewModel root= FetchUser().Find(x=>x.user_info.EmailId==model.Email && model.Password=="123");
                         if (root!=null)
@@ -335,6 +335,7 @@ namespace Noc_App.Controllers
             user_info user_info8 = new user_info();
             user_info user_info9 = new user_info();
             user_info user_info10 = new user_info();
+            user_info user_info11 = new user_info();
             user_info1 = new user_info { Name = "Junior Engineer", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "test", SubDivisionID = 114 };
             user_info2 = new user_info { Name = "Sub Divisional Officer", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info3 = new user_info { Name = "Superintending Engineer", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
@@ -345,6 +346,7 @@ namespace Noc_App.Controllers
             user_info8 = new user_info { Name = "ADE", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info9 = new user_info { Name = "Director Drainage", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info10 = new user_info { Name = "Administrator", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info11 = new user_info { Name = "ExecutiveEngineer", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "xen", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
             LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
             LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
@@ -356,6 +358,7 @@ namespace Noc_App.Controllers
             LoginResponseViewModel o8 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info8 };
             LoginResponseViewModel o9 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info9 };
             LoginResponseViewModel o10 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info10 };
+            LoginResponseViewModel o11 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info11 };
             users.Add(o1);
             users.Add(o2);
             users.Add(o3);
@@ -366,6 +369,7 @@ namespace Noc_App.Controllers
             users.Add(o8);
             users.Add(o9);
             users.Add(o10);
+            users.Add(o11);
             return users;
 
         }

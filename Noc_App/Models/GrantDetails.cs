@@ -22,9 +22,11 @@ namespace Noc_App.Models
         public int SubDivisionId { get; set; }
         [ForeignKey(nameof(SubDivisionId))]
         public SubDivisionDetails SubDivisions { get; set; }
-        public int VillageID { get; set; }
-        [ForeignKey(nameof(VillageID))]
-        public VillageDetails Village { get; set; }
+        public string VillageName { get; set; }
+        public string PinCode { get; set; }
+        public int TehsilID { get; set; }
+        [ForeignKey(nameof(TehsilID))]
+        public TehsilBlockDetails Tehsil { get; set; }
         //[Required]
         public string AddressProofPhotoPath { get; set; }
         public int PlanSanctionAuthorityId { get; set; }

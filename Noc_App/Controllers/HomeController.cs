@@ -21,7 +21,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<DashboardPendencyViewModel> _pendencyRepo;
         private readonly IRepository<DivisionDetails> _divisionRepo;
         private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
-        private readonly IRepository<VillageDetails> _villageRpo;
+        //private readonly IRepository<VillageDetails> _villageRpo;
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         private readonly IRepository<UserRoleDetails> _userRolesRepository;
         private readonly IRepository<ReportApplicationCountViewModel> _grantReportAppCountDetailsRepo;
@@ -35,7 +35,7 @@ namespace Noc_App.Controllers
         [Obsolete]
         public HomeController(ILogger<HomeController> logger, IRepository<DashboardPendencyAll> pendencyDetailsRepo
             , IRepository<DivisionDetails> divisionRepo, IRepository<DashboardPendencyViewModel> pendencyRepo, IRepository<SubDivisionDetails> subDivisionRepo
-            , IRepository<VillageDetails> villageRepo, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<UserRoleDetails> userRolesRepository
+            /*, IRepository<VillageDetails> villageRepo*/, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<UserRoleDetails> userRolesRepository
             , IRepository<ReportApplicationCountViewModel> grantReportAppCountDetailsRepo, IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
             )
         {            
@@ -43,7 +43,7 @@ namespace Noc_App.Controllers
             _divisionRepo = divisionRepo;
             _subDivisionRepo = subDivisionRepo;
             _pendencyRepo=pendencyRepo;
-            _villageRpo = villageRepo;
+            //_villageRpo = villageRepo;
             _tehsilBlockRepo=tehsilBlockRepo;
             _userRolesRepository=userRolesRepository;
             _grantReportAppCountDetailsRepo = grantReportAppCountDetailsRepo;

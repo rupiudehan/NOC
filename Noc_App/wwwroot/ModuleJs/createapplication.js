@@ -134,12 +134,15 @@ $(function () {
     // if($('#SiteAreaOrSizeInFeet').val()=='0') $('#SiteAreaOrSizeInFeet').val('');
     // if ($('#SiteAreaOrSizeInInches').val() == '0') $('#SiteAreaOrSizeInInches').val('');
 
-    $(".mobno").on("keypress", function (event) {
+    $(".mobno,.pincode").on("keypress", function (event) {
         // Allow only numeric characters (0-9) in the input field
         var charCode = event.which;
         if (charCode < 48 || charCode > 57) {
             event.preventDefault();
         }
+    });
+    $('.mobno,.pincode').on('cut copy paste', function (e) {
+        e.preventDefault(); return false;
     });
     $('body').on('change', '#SelectedSiteAreaUnitId', function () {
         var list = ($(this).find("option:selected").text()).split('/');
@@ -257,6 +260,24 @@ $(function () {
         else if (!fieldRegex.test(mobno)) {
             // PinCode.addClass("is-invalid");
             field.next(".text-danger").text("Please enter a valid mobile number.");
+        } else {
+            // PinCode.removeClass("is-invalid");
+            field.next(".text-danger").text("");
+        }
+    }
+    $(".pincode").on("blur", function () {
+        validatePin($(this).val(), $(this));
+    });
+    function validatePin(mobno, field) {
+        var fieldRegex = /^\d{6}$/;
+
+        if (parseInt(mobno) < 0) {
+            field.val('');
+            field.next(".text-danger").text("Please enter a valid pincode.");
+        }
+        else if (!fieldRegex.test(mobno)) {
+            // PinCode.addClass("is-invalid");
+            field.next(".text-danger").text("Please enter a valid pincode.");
         } else {
             // PinCode.removeClass("is-invalid");
             field.next(".text-danger").text("");

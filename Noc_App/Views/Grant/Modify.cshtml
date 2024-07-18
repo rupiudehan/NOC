@@ -233,19 +233,29 @@
                                                                     </select>
                                                                     <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span>
                                                                 </div>
-                                                                <div class="form-group">
-                                                                    <label asp-for="SelectedVillageID" class="control-label">Village/Town/City</label>
+                                                                 <div class="form-group">
+                                                                    <label asp-for="VillageName" class="control-label">Village/Town/City</label>
+                                                                    <input asp-for="VillageName" id="SelectedVillageID" class="form-control form-control-user" />
+                                                                    <span asp-validation-for="VillageName" class="text-danger"></span>
+                                                                </div>
+                                                               @*  <div class="form-group">
+                                                                    <label asp-for="VillageName" class="control-label">Village/Town/City</label>
                                                                     <select asp-for="SelectedVillageID" id="SelectedVillageID" asp-items="@Model.Village" class="form-control">
                                                                         <option value="">Select</option>
                                                                     </select>
                                                                     <span asp-validation-for="SelectedVillageID" class="text-danger"></span>
-                                                                </div>
+                                                                </div> *@
                                                             </div>
                                                             <div class="col-lg-6">
                                                                 <div class="form-group">
+                                                                    <label asp-for="Pincode" class="control-label">Pincode</label>
+                                                                    <input asp-for="Pincode" id="Pincode" maxlength="6" class="form-control form-control-user pincode" />
+                                                                    <span asp-validation-for="Pincode" class="text-danger"></span>
+                                                                </div>
+                                                                @* <div class="form-group">
                                                                     <label class="control-label">Pin Code</label>
                                                                     <label asp-for="Pincode" id="Pincode" class="form-control form-control-user">@Model.Pincode</label>
-                                                                </div>
+                                                                </div> *@
                                                                 <div class="form-group">
                                                                     <label asp-for="SelectedPlanSanctionAuthorityId" class="control-label"></label>
                                                                     <select asp-for="SelectedPlanSanctionAuthorityId" id="SelectedPlanSanctionAuthorityId" asp-items="@Model.PlanSanctionAuthorityMaster" class="form-control">

@@ -34,15 +34,20 @@ namespace Noc_App.Models.ViewModel
         [MaxLength(50, ErrorMessage = "Plot No. cannot exceed 50 characters")]
         [Display(Name ="Plot No.")]
         public string? PlotNo { get; set; }
-        //[Required]
+        [Required]
         //[Display(Name = "Owner Type")]
         //public IEnumerable<SelectListItem> OwnerType { get; set; }
         [Display(Name="Pin Code")]
+        [DataType(DataType.PostalCode)]
+        [RegularExpression(@"^\d{6}$", ErrorMessage = "Please enter a valid 6-digit pin code.")]
         public string Pincode { get; set; }
         [Required]
         [Display(Name = "Village/Town/City")]
-        public int SelectedVillageID { get; set; }
-        public IEnumerable<SelectListItem> Village { get; set; }
+        public string Villagename { get; set; }
+        //[Required]
+        //[Display(Name = "Village/Town/City")]
+        //public int SelectedVillageID { get; set; }
+        //public IEnumerable<SelectListItem> Village { get; set; }
         [Required]
         [Display(Name = "Drainage Division")]
         public int SelectedDivisionId { get; set; }

@@ -16,15 +16,17 @@ namespace Noc_App.Controllers
         //private readonly IRepository<SubDivisionDetails> _subDivisionRepo;
         //private readonly IRepository<DivisionDetails> _divisionRepo;
         private readonly IRepository<DistrictDetails> _districtRepo;
-        private readonly IRepository<VillageDetails> _villageRepo;
+        //private readonly IRepository<VillageDetails> _villageRepo;
+        private readonly IRepository<GrantDetails> _repoGrant;
         public TehsilBlockController(IRepository<TehsilBlockDetails> repo, /*IRepository<SubDivisionDetails> subDivisionRepo, IRepository<DivisionDetails> divisionRepo,*/ 
-            IRepository<VillageDetails> villageRepo, IRepository<DistrictDetails> districtRepo)
+            /*IRepository<VillageDetails> villageRepo, */IRepository<DistrictDetails> districtRepo, IRepository<GrantDetails> repoGrant)
         {
             _repo = repo;
             //_subDivisionRepo = subDivisionRepo;
             //_divisionRepo = divisionRepo;
-            _villageRepo = villageRepo;
+            //_villageRepo = villageRepo;
             _districtRepo = districtRepo;
+            _repoGrant = repoGrant;
         }
         [HttpGet]
         public IActionResult Create()
@@ -228,8 +230,8 @@ namespace Noc_App.Controllers
             }
 
             //var users = await _userManager.Users.AnyAsync(x => x.SubDivisionId == id);
-            var village = await _villageRepo.FindAsync(x => x.TehsilBlockId == id);
-            if (/*users || */village.Count() > 0)
+            var tehsil = await _repoGrant.FindAsync(x => x.TehsilID == id);
+            if (/*users || */tehsil.Count() > 0)
             {
                 ModelState.AddModelError("e", $"Tehsil {obj.Name} is already in use");
                 return View(obj);

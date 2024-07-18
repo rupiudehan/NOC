@@ -17,9 +17,7 @@ namespace Noc_App.Context
         public DbSet<DivisionDetails> DivisionDetails { get; set; }
         public DbSet<SubDivisionDetails> SubDivisionDetails { get; set; }
         public DbSet<TehsilBlockDetails> TehsilBlockDetails { get; set; }
-        public DbSet<VillageDetails> VillageDetails { get; set; }
-        //public DbSet<DrainCoordinatesDetails> DrainCoordinatesDetails { get; set; }
-        //public DbSet<DrainDetails> DrainDetails { get; set; }
+        //public DbSet<VillageDetails> VillageDetails { get; set; }
         public DbSet<OwnerTypeDetails> OwnerTypeDetails { get; set; }
         public DbSet<OwnerDetails> OwnerDetails { get; set; }
         public DbSet<NocPermissionTypeDetails> NocPermissionTypeDetails { get; set; }
