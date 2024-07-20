@@ -43,6 +43,8 @@ namespace Noc_App.Models.ViewModel
         public string? PlotNo { get; set; }
         [Display(Name = "Pin Code")]
         public string Pincode { get; set; }
+        [Display(Name = "Village/Town/City")]
+        [MaxLength(70, ErrorMessage = "Village Name cannot exceed 70 characters")]
         public string VillageName { get; set; }
         //[Display(Name = "Village/Town/City")]
         //public int SelectedVillageID { get; set; }

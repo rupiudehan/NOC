@@ -93,6 +93,7 @@ builder.Services.AddScoped<IRepository<GrantSectionsDetails>, Repository<GrantSe
 builder.Services.AddScoped<IRepository<GrantRejectionShortfallSection>, Repository<GrantRejectionShortfallSection>>();
 builder.Services.AddScoped<IRepository<PlanSanctionAuthorityMaster>, Repository<PlanSanctionAuthorityMaster>>();
 builder.Services.AddScoped<IRepository<DrainWidthTypeDetails>, Repository<DrainWidthTypeDetails>>();
+builder.Services.AddScoped<IRepository<GrantFileTransferDetails>,Repository<GrantFileTransferDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

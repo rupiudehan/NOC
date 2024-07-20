@@ -113,7 +113,7 @@
                                                     @* <select asp-for="SelectedVillageID" asp-items="@Model.Village" class="form-control">
                                                         <option value="">Select</option>
                                                     </select> *@
-                                                    <input asp-for="Villagename" class="form-control form-control-user" />
+                                                    <input asp-for="Villagename" maxlength="70" class="form-control form-control-user village" />
                                                     <span asp-validation-for="Villagename" class="text-danger"></span>
                                                 </div>
                                             </div>

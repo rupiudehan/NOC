@@ -146,7 +146,21 @@ $(function () {
             event.preventDefault();
         }
     });
-    $('.mobno,.pincode').on('cut copy paste', function (e) {
+
+    $(".village").on("blur", function () {
+        validateVillage($(this).val(), $(this));
+    });
+    function validateVillage(mobno, field) {
+        if (mobno.length > 70) {
+            // PinCode.addClass("is-invalid");
+            field.next(".text-danger").text("Village name cannot be exceeded 70 characters.");
+        } else {
+            // PinCode.removeClass("is-invalid");
+            field.next(".text-danger").text("");
+        }
+    }
+
+    $('.mobno,.pincode,.village').on('cut copy paste', function (e) {
         e.preventDefault(); return false;
     });
     $(".mobno").on("blur", function () {

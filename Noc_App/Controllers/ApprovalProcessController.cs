@@ -52,6 +52,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<GrantRejectionShortfallSection> _grantrejectionRepository;
         private readonly IRepository<PlanSanctionAuthorityMaster> _repoPlanSanctionAuthtoryMaster;
         private readonly IRepository<DrainWidthTypeDetails> _drainwidthRepository;
+        private readonly IRepository<GrantFileTransferDetails> _grantFileTransferRepository;
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<GrantPaymentDetails> repoPayment,IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster
@@ -61,7 +62,7 @@ namespace Noc_App.Controllers
             , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
             , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation
             , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<DrainWidthTypeDetails> drainwidthRepository
-            , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
+            , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster, IRepository<GrantFileTransferDetails> grantFileTransferRepository)
         {
             _repo = repo;
             //_villageRpo = villageRepo;
@@ -91,6 +92,7 @@ namespace Noc_App.Controllers
             _drainwidthRepository = drainwidthRepository;
             _grantrejectionRepository = grantrejectionRepository;
             _repoPlanSanctionAuthtoryMaster = repoPlanSanctionAuthtoryMaster;
+            _grantFileTransferRepository= grantFileTransferRepository;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
@@ -242,6 +244,107 @@ namespace Noc_App.Controllers
             return View(model);
         }
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [HttpGet]
+        [Obsolete]
+        public async Task<IActionResult> TransferFile(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+                return View("NotFound");
+            }
+            var grantdetail = (from g in _repo.GetAll()
+                               join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
+                               //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                               join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
+                               join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
+                               join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
+                               
+                               where g.ApplicationID == id
+                               select new
+                               {
+                                   Grant = g,
+                                   subdiv = sub,
+                                   division = div,
+                                   tehsil = t
+                               }).FirstOrDefault();
+            GrantDetails grant = grantdetail.Grant;
+            if (grant == null)
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+
+                return View("NotFound");
+            }
+            string userId = LoggedInUserID();
+
+            string divisionId = LoggedInDivisionID();
+            List<OfficerDetails> officerDetail = new List<OfficerDetails>();
+            officerDetail = await GetOfficer(divisionId, "EXECUTIVE ENGINEER", "0");
+
+            GrantFileTransferDetailCreate model = new GrantFileTransferDetailCreate
+            {
+                Name = grant.Name,
+                ApplicantEmailID = grantdetail.Grant.ApplicantEmailID,
+                ApplicationID = grantdetail.Grant.ApplicationID,
+                Officers = officerDetail.Count > 0 ? new SelectList(officerDetail, "UserId", "UserName") : null,
+                LocationDetails = "Division: " + grantdetail.division.Name + ", Sub-Division: " + grantdetail.subdiv.Name + ", Tehsil/Block: " + grantdetail.tehsil.Name + ", Village: " + grantdetail.Grant.VillageName + ", Pincode: " + grantdetail.Grant.PinCode,
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [Obsolete]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TransferFile(GrantFileTransferDetailCreate model)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(model.ApplicationID))
+                {
+                    ViewBag.ErrorMessage = $"Grant with Application Id = {model.ApplicationID} cannot be found";
+                    return View("NotFound");
+                }
+
+                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == model.ApplicationID)).FirstOrDefault();
+
+                if (grant == null)
+                {
+                    ViewBag.ErrorMessage = $"Grant with Application Id = {model.ApplicationID} cannot be found";
+
+                    return View("NotFound");
+                }
+
+                string userId = LoggedInUserID();
+
+                string divisionId = LoggedInDivisionID();                
+                List<OfficerResponseViewModel> officers = (await LoadOfficersAsync("EXECUTIVE ENGINEER", "0", "0")).FindAll(x => x.user_info.EmployeeId == model.SelectedOfficerId);
+                OfficerDetail userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
+                                          join officer in officers on u.Id.ToString() equals officer.user_info.RoleID
+                                          select new OfficerDetail
+                                          {
+                                              EmployeeId = officer.user_info.EmployeeId,
+                                              RoleName = u.AppRoleName,
+                                              RoleId = u.Id.ToString(),
+                                              UserName = officer.user_info.EmployeeName + "(" + officer.user_info.DeesignationName + ")"
+                                          }).FirstOrDefault();
+                GrantFileTransferDetails details = new GrantFileTransferDetails {
+                    GrantId = grant.Id,
+                    FromAuthorityId=userId,
+                    ToAuthorityId=model.SelectedOfficerId,
+                    TransferedOn=DateTime.Now
+                };
+
+
+                await _grantFileTransferRepository.CreateAsync(details);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(model);
+            }
+        }
+
         [HttpGet]
         [Obsolete]
         public async Task<IActionResult> Transfer(string id)
@@ -1924,6 +2027,7 @@ namespace Noc_App.Controllers
             user_info user_info11 = new user_info();
             user_info user_info9 = new user_info();
             user_info user_info10 = new user_info();
+            user_info user_info12 = new user_info();
             user_info1 =new user_info { Name = "Junior Engineer", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "test", SubDivisionID = 114 };
             user_info2 = new user_info { Name = "Sub Divisional Officer", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info3 = new user_info { Name = "Superintending Engineer", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
@@ -1935,6 +2039,7 @@ namespace Noc_App.Controllers
             user_info11 = new user_info { Name = "ADE", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info9 = new user_info { Name = "Director Drainage", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info10 = new user_info { Name = "Administrator", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info12 = new user_info { Name = "XEN Faridkot", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33, Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
             LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
             LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
@@ -1947,6 +2052,7 @@ namespace Noc_App.Controllers
             LoginResponseViewModel o11 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info11 };
             LoginResponseViewModel o9 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info9 };
             LoginResponseViewModel o10 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info10 };
+            LoginResponseViewModel o12 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info12 };
             users.Add(o1);
             users.Add(o2);
             users.Add(o3);
@@ -1958,6 +2064,7 @@ namespace Noc_App.Controllers
             users.Add(o11);
             users.Add(o9);
             users.Add(o10);
+            users.Add(o12);
             return users;
 
         }
@@ -2016,17 +2123,21 @@ namespace Noc_App.Controllers
                 //officerRole = (await GetRoleName(officerRole)).RoleName;
                 UserRoleDetails officer = (await GetAppRoleName(officerRole));
                 officerRole = officer.RoleName;
-                user_info user = users.Find(x => x.user_info.Role.Contains(officerRole)).user_info;
-                user.Role = officerRole;
-                user.RoleID = officer.Id.ToString();
-                OfficerResponseViewModel obj = new OfficerResponseViewModel
+                List<LoginResponseViewModel> officers = users.FindAll(x => x.user_info.Role.Contains(officerRole));
+                //user_info user = officers.user_info;
+                //user.Role = officerRole;
+                //user.RoleID = officer.Id.ToString();
+                foreach (LoginResponseViewModel user in officers)
                 {
-                    msg = "success",
-                    Status = "200",
-                    user_info = new officer_info { EmployeeId = user.EmpID, EmployeeName = user.Name, email = user.EmailId, DeesignationName = user.Designation, DesignationID = user.DesignationID, DistrictId = user.DistrictID, DistrictName = user.District, DivisionID = user.DivisionID, DivisionName = user.Division, MobileNo = user.MobileNo, RoleID = user.RoleID, RoleName = user.Role, SubdivisionId = user.SubDivisionID, SubdivisionName = user.SubDivision }
-                };
-                list.Add(obj);
 
+                    OfficerResponseViewModel obj = new OfficerResponseViewModel
+                    {
+                        msg = "success",
+                        Status = "200",
+                        user_info = new officer_info { EmployeeId = user.user_info.EmpID, EmployeeName = user.user_info.Name, email = user.user_info.EmailId, DeesignationName = user.user_info.Designation, DesignationID = user.user_info.DesignationID, DistrictId = user.user_info.DistrictID, DistrictName = user.user_info.District, DivisionID = user.user_info.DivisionID, DivisionName = user.user_info.Division, MobileNo = user.user_info.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.user_info.SubDivisionID, SubdivisionName = user.user_info.SubDivision }
+                    };
+                    list.Add(obj);
+                }
                 if (list.FirstOrDefault().Status == "200")
                 {
                     //    //OfficerResponseViewModel list3 = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel>(resultContent);

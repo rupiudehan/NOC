@@ -141,7 +141,7 @@ $(function () {
             event.preventDefault();
         }
     });
-    $('.mobno,.pincode').on('cut copy paste', function (e) {
+    $('.mobno,.pincode,.village').on('cut copy paste', function (e) {
         e.preventDefault(); return false;
     });
     $('body').on('change', '#SelectedSiteAreaUnitId', function () {
@@ -260,6 +260,21 @@ $(function () {
         else if (!fieldRegex.test(mobno)) {
             // PinCode.addClass("is-invalid");
             field.next(".text-danger").text("Please enter a valid mobile number.");
+        } else {
+            // PinCode.removeClass("is-invalid");
+            field.next(".text-danger").text("");
+        }
+    }
+
+    $(".village").on("blur", function () {
+        validateVillage($(this).val(), $(this));
+    });
+    function validateVillage(mobno, field) {
+        
+
+        if (mobno.length>70) {
+            // PinCode.addClass("is-invalid");
+            field.next(".text-danger").text("Village name cannot be exceeded 70 characters.");
         } else {
             // PinCode.removeClass("is-invalid");
             field.next(".text-danger").text("");

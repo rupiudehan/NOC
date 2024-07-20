@@ -48,6 +48,7 @@ namespace Noc_App.Models
         //[Required]
         public string AuthorizationLetterPhotoPath { get; set; }
         public List<OwnerDetails> Owners { get; set; }
+        public List<GrantFileTransferDetails> GrantFileTransferDetails { get; set; }
         //[Required]
         public int NocPermissionTypeID { get; set; }
         [ForeignKey(nameof(NocPermissionTypeID))]

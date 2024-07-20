@@ -1,9 +1,9 @@
-﻿@model GrantApprovalDetailTransferCreate
+﻿@model GrantFileTransferDetailCreate
 @{
-    ViewBag.Title = "Transfer";
+    ViewBag.Title = "Transfer File";
 }
 
-<h1 class="h3 mb-4 text-gray-800">Transfer</h1>
+<h1 class="h3 mb-4 text-gray-800">Transfer File</h1>
 
 <div class="row">
 
@@ -12,16 +12,13 @@
         <!-- Circle Buttons -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Transfer</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Transfer File</h6>
             </div>
             <div class="card-body">
-                <form class="user" asp-action="Transfer" method="post">
-                    <input type="hidden" asp-for="id" />
-                    <input type="hidden" asp-for="ApprovalId" />
+                <form class="user" asp-action="TransferFile" method="post">
                     <div class="row">
                         <div class="col-lg-3">
                             <div class="form-group">
-                                <input asp-for="ForwardToRole" type="hidden" id="ForwardToRole" />
                                 <label asp-for="Name" class="control-label">Project</label>
                                 <input asp-for="Name" readonly class="form-control form-control-user" />
                                 <span asp-validation-for="Name" class="text-danger"></span>
@@ -41,45 +38,18 @@
                                 <span asp-validation-for="LocationDetails" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                       @*  <div class="col-lg-3">
                             <div class="form-group">
                                 <label asp-for="CurrentOfficer" class="control-label">Project</label>
                                 <input asp-for="CurrentOfficer" readonly class="form-control form-control-user" />
                                 <span asp-validation-for="CurrentOfficer" class="text-danger"></span>
                             </div>
-                        </div>
-                    </div>                    
-                    <div class="row">
-                        @* <div class="col-lg-3">
-                            <div class="form-group">
-                                <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
-                                @if (Model.SubDivisions != null)
-                                {
-                                    @if (Model.SubDivisions.Count() > 0)
-                                    {
-                                        <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivisions" class="form-control">
-                                            <option value="">Select</option>
-                                        </select>
-                                    }
-                                    else
-                                    {
-                                        <select name="SelectedSubDivisionId" disabled class="form-control">
-                                            <option value="">Select</option>
-                                        </select>
-                                    }
-                                }
-                                else
-                                {
-                                    <select name="SelectedSubDivisionId" disabled class="form-control">
-                                        <option value="">Select</option>
-                                    </select>
-                                }
-                                <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
-                            </div>
                         </div> *@
+                   @*  </div>
+                    <div class="row"> *@
                         <div class="col-lg-3">
                             <div class="form-group">
-                                <label asp-for="SelectedOfficerId" class="control-label">Transfer To JUNIOR ENGINEER</label>
+                                <label asp-for="SelectedOfficerId" class="control-label">Transfer To </label>
                                 @if (Model.Officers != null)
                                 {
                                     if (Model.Officers.Count() > 0)
@@ -108,7 +78,7 @@
                     </div>
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="row">
-                       
+
                         @if (Model.Officers.Count() <= 0)
                         {
                             <div class="col-lg-6 offset-lg-3">
@@ -138,35 +108,4 @@
 
 @section Scripts {
     <script src="~/modulejs/appforwardscript.js"></script>
-    @* <script>
-        function populateDropdown(data, dropdownId) {
-            var dropdown = $("#Selected" + dropdownId);
-            dropdown.removeAttr("disabled");
-            dropdown.html('<option value="">Select</option>');
-            $.each(data, function (key, value) {
-                dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
-            });
-        }
-        $(document).ready(function () {
-            $("#SelectedSubDivisionId").change(function () {
-                var subdivisionId = $(this).val();
-                var role = $('#ForwardToRole').val();
-                $.ajax({
-                    url: "/ApprovalProcess/GetOfficers",
-                    type: "POST",
-                    data: { subdivisionId: subdivisionId, roleName: role },
-                    async: true,
-                    success: function (data) {
-                        populateDropdown(data, "OfficerId");
-                    },
-                    failure: function (f) {
-                        alert(f);
-                    },
-                    error: function (e) {
-                        alert('Error ' + e);
-                    }
-                });
-            });
-        });
-    </script> *@
 }

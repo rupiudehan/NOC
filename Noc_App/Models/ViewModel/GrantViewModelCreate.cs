@@ -43,6 +43,7 @@ namespace Noc_App.Models.ViewModel
         public string Pincode { get; set; }
         [Required]
         [Display(Name = "Village/Town/City")]
+        [MaxLength(70, ErrorMessage = "Village Name cannot exceed 70 characters")]
         public string Villagename { get; set; }
         //[Required]
         //[Display(Name = "Village/Town/City")]

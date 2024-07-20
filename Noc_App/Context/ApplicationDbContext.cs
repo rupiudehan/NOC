@@ -39,6 +39,7 @@ namespace Noc_App.Context
         public DbSet<GrantRejectionShortfallSection> GrantRejectionShortfallSection { get; set; }
         public DbSet<PlanSanctionAuthorityMaster> PlanSanctionAuthorityMaster { get; set; }
         public DbSet<DrainWidthTypeDetails> DrainWidthTypeDetails { get; set; }
+        public DbSet<GrantFileTransferDetails> GrantFileTransferDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
