@@ -331,6 +331,7 @@ namespace Noc_App.Controllers
                     GrantId = grant.Id,
                     FromAuthorityId=userId,
                     ToAuthorityId=model.SelectedOfficerId,
+                    Remarks=model.Remarks,
                     TransferedOn=DateTime.Now
                 };
 

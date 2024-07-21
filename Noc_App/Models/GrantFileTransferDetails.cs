@@ -12,6 +12,7 @@ namespace Noc_App.Models
         public GrantDetails GrantDetail { get; set; }
         public string FromAuthorityId { get; set; }
         public string ToAuthorityId { get; set; }
+        public string Remarks { get; set; }
         public DateTime TransferedOn { get; set; } = DateTime.Now;
     }
 }
