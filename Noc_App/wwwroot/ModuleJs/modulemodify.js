@@ -304,26 +304,26 @@ $(function () {
     //    });
 
     //}
-    if (document.getElementById("SelectedTehsilBlockId") != null) {
-        $("#SelectedTehsilBlockId").on('change', function () {
-            var tehsilBlockId = $(this).val();
-            $.ajax({
-                url: "/Grant/GetVillagess",
-                type: "POST",
-                data: { tehsilBlockId: tehsilBlockId },
-                async: false,
-                success: function (data) {
-                    populateDropdown(data, "VillageID");
-                },
-                failure: function (f) {
-                    alert(f);
-                },
-                error: function (e) {
-                    alert('Error ' + e);
-                }
-            });
-        });
-    }
+    //if (document.getElementById("SelectedTehsilBlockId") != null) {
+    //    $("#SelectedTehsilBlockId").on('change', function () {
+    //        var tehsilBlockId = $(this).val();
+    //        $.ajax({
+    //            url: "/Grant/GetVillagess",
+    //            type: "POST",
+    //            data: { tehsilBlockId: tehsilBlockId },
+    //            async: false,
+    //            success: function (data) {
+    //                populateDropdown(data, "VillageID");
+    //            },
+    //            failure: function (f) {
+    //                alert(f);
+    //            },
+    //            error: function (e) {
+    //                alert('Error ' + e);
+    //            }
+    //        });
+    //    });
+    //}
     //if (document.getElementById("finalForm") != null) {
     //    $('#finalForm').on('submit', function (event) {
     //        var FGrantId = $('#FGrantId').val();

@@ -494,22 +494,22 @@ $(document).ready(function () {
     //});
 
 
-    $("#SelectedTehsilBlockId").change(function () {
-        var tehsilBlockId = $(this).val();
-        $.ajax({
-            url: "/Grant/GetVillagess",
-            type: "POST",
-            data: { tehsilBlockId: tehsilBlockId },
-            async: false,
-            success: function (data) {
-                populateDropdown(data, "VillageID");
-            },
-            failure: function (f) {
-                alert(f);
-            },
-            error: function (e) {
-                alert('Error ' + e);
-            }
-        });
-    });
+    //$("#SelectedTehsilBlockId").change(function () {
+    //    var tehsilBlockId = $(this).val();
+    //    $.ajax({
+    //        url: "/Grant/GetVillagess",
+    //        type: "POST",
+    //        data: { tehsilBlockId: tehsilBlockId },
+    //        async: false,
+    //        success: function (data) {
+    //            populateDropdown(data, "VillageID");
+    //        },
+    //        failure: function (f) {
+    //            alert(f);
+    //        },
+    //        error: function (e) {
+    //            alert('Error ' + e);
+    //        }
+    //    });
+    //});
 });
