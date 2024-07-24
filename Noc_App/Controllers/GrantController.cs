@@ -16,6 +16,7 @@ using Noc_App.Clients;
 using System.Globalization;
 using Newtonsoft.Json;
 using System.Reflection.Metadata.Ecma335;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Noc_App.Controllers
 {
@@ -45,6 +46,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<GrantApprovalMaster> _repoApprovalMaster;
         private readonly IRepository<DaysCheckMaster> _repoDaysCheckMaster;
         private readonly IRepository<PlanSanctionAuthorityMaster> _repoPlanSanctionAuthtoryMaster;
+        private readonly IRepository<MasterPlanDetails> _masterPlanDetailsRepository;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
@@ -54,7 +56,7 @@ namespace Noc_App.Controllers
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService,
             IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo, IRepository<DistrictDetails> districtRepo,
             IRepository<GrantApprovalDetail> repoApprovalDetail, IWebHostEnvironment hostEnvironment, IRepository<SiteUnitMaster> repoSiteUnitMaster
-            , ICalculations calculations, IRepository<GrantRejectionShortfallSection> grantrejectionRepository
+            , ICalculations calculations, IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<MasterPlanDetails> masterPlanDetailsRepository
             , IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<GrantApprovalMaster> repoApprovalMaster
             , IRepository<DaysCheckMaster> repoDaysCheckMaster, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
         {
@@ -83,6 +85,7 @@ namespace Noc_App.Controllers
             _repoApprovalMaster = repoApprovalMaster;
             _repoDaysCheckMaster=repoDaysCheckMaster;
             _repoPlanSanctionAuthtoryMaster=repoPlanSanctionAuthtoryMaster;
+            _masterPlanDetailsRepository = masterPlanDetailsRepository;
         }
 
         [AllowAnonymous]
@@ -102,80 +105,98 @@ namespace Noc_App.Controllers
                          }
                     ).FirstOrDefault();
                 GrantDetails obj = g.gr;
-                double total = 0;
-                var units =  _repoSiteUnitMaster.Find(x => x.SiteAreaUnitId == g.gr.SiteAreaUnitId);
-                SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
-                SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
-                SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
-                total = Math.Round(((from kh in _khasraRepo.GetAll()
-                                     where kh.GrantID == g.gr.Id
-                                     select new
-                                     {
-                                         TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
-
-                                     }).Sum(d => d.TotalArea)), 4);
-                double TotalPayment = 0;
-                //string calculation = "";
-                
-
-                if (obj != null)
+                if (g.gr.IsUnderMasterPlan)
                 {
-                    var payment = g.pay;
-                    if (payment == null)
+                    GrantViewModel model = new GrantViewModel
                     {
-                        GrantViewModel model = new GrantViewModel
-                        {
-                            Id = obj.Id,
-                            ApplicationID = obj.ApplicationID,
-                            OrderId = "0",
-                            Message = "Payment is not successfull",
-                            TotalAmount= TotalPayment
-                        };
-                        return View(model);
-                    }
-                    else
-                    {
-                        if (Convert.ToDouble(total) <= 0.50)
-                        {
-                            TotalPayment = 500;
-                            //calculation = "For " + total.ToString() + " Acre, Amount is " + TotalPayment.ToString();
-                        }
-                        else if (Convert.ToDouble(total) > 0.50 && Convert.ToDouble(total) <= 1)
-                        {
-                            TotalPayment = 1000;
-                            //calculation = "For " + total.ToString() + " Acre, Amount is " + TotalPayment.ToString();
-                        }
-                        else if (Convert.ToDouble(total) > 1)
-                        {
-                            double area = Convert.ToDouble(total) - 1;
-                            string area2 = area.ToString("#.####");
-                            TotalPayment = 1000;
-                            //calculation = "For 1 Acre, Amount is " + TotalPayment.ToString();
-                            int count = 0;
-                            do
-                            {
-                                count++;
-                                area = area - 1;
-                            } while (area > 0);
-                            // calculation += ". On Additional " + area2 + " Acres, Amount is " + 250.ToString() + " per/Acre";
-                            TotalPayment = TotalPayment + (count * 250);
-                            //calculation += ". For Total " + model.TotalArea.ToString() + " Acres, Amount is " + TotalPayment.ToString();
-                        }
-                        GrantPaymentDetails objPyment = payment;
-                        GrantViewModel model = new GrantViewModel
-                        {
-                            Id = obj.Id,
-                            ApplicationID = obj.ApplicationID,
-                            OrderId = objPyment.PaymentOrderId,
-                            Message = "Payment is successfull",
-                            TotalAmount = TotalPayment
-                        };
-                        return View(model);
-                    }
+                        Id = obj.Id,
+                        ApplicationID = obj.ApplicationID,
+                        OrderId = "0",
+                        Message = "Payment is not successfull",
+                        TotalAmount = 0,
+                        IsUnderMasterPlan=true
+                    };
+                    return View(model);
                 }
                 else
                 {
-                    return View(null);
+                    double total = 0;
+                    var units = _repoSiteUnitMaster.Find(x => x.SiteAreaUnitId == g.gr.SiteAreaUnitId);
+                    SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
+                    SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
+                    SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
+                    total = Math.Round(((from kh in _khasraRepo.GetAll()
+                                         where kh.GrantID == g.gr.Id
+                                         select new
+                                         {
+                                             TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
+
+                                         }).Sum(d => d.TotalArea)), 4);
+                    double TotalPayment = 0;
+                    //string calculation = "";
+
+
+                    if (obj != null)
+                    {
+                        var payment = g.pay;
+                        if (payment == null)
+                        {
+                            GrantViewModel model = new GrantViewModel
+                            {
+                                Id = obj.Id,
+                                ApplicationID = obj.ApplicationID,
+                                OrderId = "0",
+                                Message = "Payment is not successfull",
+                                TotalAmount = TotalPayment,
+                                IsUnderMasterPlan = false
+                            };
+                            return View(model);
+                        }
+                        else
+                        {
+                            if (Convert.ToDouble(total) <= 0.50)
+                            {
+                                TotalPayment = 500;
+                                //calculation = "For " + total.ToString() + " Acre, Amount is " + TotalPayment.ToString();
+                            }
+                            else if (Convert.ToDouble(total) > 0.50 && Convert.ToDouble(total) <= 1)
+                            {
+                                TotalPayment = 1000;
+                                //calculation = "For " + total.ToString() + " Acre, Amount is " + TotalPayment.ToString();
+                            }
+                            else if (Convert.ToDouble(total) > 1)
+                            {
+                                double area = Convert.ToDouble(total) - 1;
+                                string area2 = area.ToString("#.####");
+                                TotalPayment = 1000;
+                                //calculation = "For 1 Acre, Amount is " + TotalPayment.ToString();
+                                int count = 0;
+                                do
+                                {
+                                    count++;
+                                    area = area - 1;
+                                } while (area > 0);
+                                // calculation += ". On Additional " + area2 + " Acres, Amount is " + 250.ToString() + " per/Acre";
+                                TotalPayment = TotalPayment + (count * 250);
+                                //calculation += ". For Total " + model.TotalArea.ToString() + " Acres, Amount is " + TotalPayment.ToString();
+                            }
+                            GrantPaymentDetails objPyment = payment;
+                            GrantViewModel model = new GrantViewModel
+                            {
+                                Id = obj.Id,
+                                ApplicationID = obj.ApplicationID,
+                                OrderId = objPyment.PaymentOrderId,
+                                Message = "Payment is successfull",
+                                TotalAmount = TotalPayment,
+                                IsUnderMasterPlan = false
+                            };
+                            return View(model);
+                        }
+                    }
+                    else
+                    {
+                        return View(null);
+                    }
                 }
             }
             catch (Exception ex)
@@ -271,8 +292,9 @@ namespace Noc_App.Controllers
                                  IsApproved = g.IsApproved,
                                  CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
                                  ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
-                                 ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification" : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant" : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "UnProcessed" : "UnProcessed" : g.IsApproved ? "NOC Issued" : "UnProcessed",
-                                 CertificateFilePath = g.CertificateFilePath
+                                 ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification" : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant" : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "UnProcessed" : "UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan?"Exemption Letter Issued":"NOC Issued" : "UnProcessed",
+                                 CertificateFilePath = g.CertificateFilePath,
+                                 IsUnderMasterPlan=g.IsUnderMasterPlan
                              }
                          ).FirstOrDefault();
                 if (model != null) return View(model);
@@ -307,11 +329,11 @@ namespace Noc_App.Controllers
                          join t in _tehsilBlockRepo.GetAll() on gr.TehsilID equals t.Id
                          join sub in _subDivisionRepo.GetAll() on gr.SubDivisionId equals sub.Id
                          join d in _divisionRepo.GetAll() on sub.DivisionId equals d.Id
-                         join npt in _nocPermissionTypeRepo.GetAll() on gr.NocPermissionTypeID equals npt.Id
+                         //join npt in _nocPermissionTypeRepo.GetAll() on gr.NocPermissionTypeID equals npt.Id
                          join plan in _repoPlanSanctionAuthtoryMaster.GetAll() on gr.PlanSanctionAuthorityId equals plan.Id
                          join pr in _projectTypeRepo.GetAll() on gr.ProjectTypeId equals pr.Id
-                         join npr in _nocTypeRepo.GetAll() on gr.NocTypeId equals npr.Id
-                         join un in _siteUnitsRepo.GetAll() on gr.SiteAreaUnitId equals un.Id
+                         //join npr in _nocTypeRepo.GetAll() on gr.NocTypeId equals npr.Id
+                         //join un in _siteUnitsRepo.GetAll() on gr.SiteAreaUnitId equals un.Id
                          join p in _grantPaymentRepo.GetAll() on gr.Id equals p.GrantID into paymentdetail
                          from pay in paymentdetail.DefaultIfEmpty()
                          where gr.ApplicationID.ToLower() == Id.Trim().ToLower()
@@ -323,21 +345,24 @@ namespace Noc_App.Controllers
                              Tehsil = t,
                              SubDivision = sub,
                              Division = d,
-                             PermissionType = npt,
-                             NocType = npr,
-                             Unit = un,
+                             //PermissionType = npt,
+                             //NocType = npr,
+                             //Unit = un,
                              PlanSanction=plan,
                              Project=pr
                          }
                    ).FirstOrDefault();
+                if (g != null) { 
+                NocPermissionTypeDetails permission = (from np in _nocPermissionTypeRepo.GetAll() where g.Grant.NocPermissionTypeID == np.Id select np).FirstOrDefault();
+               
                 GrantDetails obj = g.Grant;
                 //VillageDetails village = g.Village;
                 TehsilBlockDetails tehsil = g.Tehsil;
                 SubDivisionDetails subDivision = g.SubDivision;
                 DivisionDetails division = g.Division;
-                NocPermissionTypeDetails permission = g.PermissionType;
-                NocTypeDetails noctype = g.NocType;
-                SiteAreaUnitDetails unit = g.Unit;
+                MasterPlanDetails masterplan = (from np in _masterPlanDetailsRepository.GetAll() where g.Grant.MasterPlanId == np.Id select np).FirstOrDefault();
+                NocTypeDetails noctype = (from np in _nocTypeRepo.GetAll() where g.Grant.NocTypeId == np.Id select np).FirstOrDefault();
+                SiteAreaUnitDetails unit = (from np in _siteUnitsRepo.GetAll() where g.Grant.SiteAreaUnitId == np.Id select np).FirstOrDefault();
                 List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == obj.Id)).ToList();
                 List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 //List<SiteUnitMaster> unitMaster = (await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == obj.SiteAreaUnitId)).ToList();
@@ -361,87 +386,101 @@ namespace Noc_App.Controllers
                     totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
                 }
                 var payment = g.Payment;
-                if (payment == null)
-                {
-                    GrantDetailViewModel model = new GrantDetailViewModel
+                    if (payment == null)
                     {
-                        Id = obj.Id,
-                        ApplicationID = obj.ApplicationID,
-                        PaymentOrderId = "0",
-                        Name = obj.Name,
-                        VillageName = obj.VillageName,
-                        TehsilBlockName = tehsil.Name,
-                        SubDivisionName = subDivision.Name,
-                        DivisionName = division.Name,
-                        AddressProofPhotoPath = obj.AddressProofPhotoPath,
-                        ApplicantEmailID = obj.ApplicantEmailID,
-                        ApplicantName = obj.ApplicantName,
-                        AuthorizationLetterPhotoPath = obj.AuthorizationLetterPhotoPath,
-                        Hadbast = obj.Hadbast,
-                        IDProofPhotoPath = obj.IDProofPhotoPath,
-                        KMLFilePath = obj.KMLFilePath,
-                        KmlLinkName = obj.KMLLinkName,
-                        NocNumber = obj.NocNumber,
-                        NocPermissionTypeName = permission.Name,
-                        NocTypeName = noctype.Name,
-                        OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
-                        Pincode = obj.PinCode.ToString(),
-                        PlotNo = obj.PlotNo,
-                        PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
-                        ProjectTypeName = g.Project.Name,
-                        SiteAreaUnitName = unit.Name,
-                        TotalArea = totalArea.ToString(),
-                        TotalAreaSqFeet = Math.Round((totalArea * 43560),4).ToString(),
-                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86),4).ToString(),
-                        Owners = owners,
-                        Khasras = khasras,
-                        PlanSanctionAuthorityName=g.PlanSanction.Name
-                    };
-                    return View(model);
+                        GrantDetailViewModel model = new GrantDetailViewModel
+                        {
+                            Id = obj.Id,
+                            ApplicationID = obj.ApplicationID,
+                            PaymentOrderId = "0",
+                            Name = obj.Name,
+                            VillageName = obj.VillageName,
+                            TehsilBlockName = tehsil.Name,
+                            SubDivisionName = subDivision.Name,
+                            DivisionName = division.Name,
+                            AddressProofPhotoPath = obj.AddressProofPhotoPath,
+                            ApplicantEmailID = obj.ApplicantEmailID,
+                            ApplicantName = obj.ApplicantName,
+                            AuthorizationLetterPhotoPath = obj.AuthorizationLetterPhotoPath,
+                            Hadbast = obj.Hadbast,
+                            IDProofPhotoPath = obj.IDProofPhotoPath,
+                            KMLFilePath = obj.IsUnderMasterPlan ? "" : obj.KMLFilePath,
+                            KmlLinkName = obj.IsUnderMasterPlan ? "" : obj.KMLLinkName,
+                            NocNumber = obj.IsUnderMasterPlan ? "" : obj.NocNumber,
+                            NocPermissionTypeName = obj.IsUnderMasterPlan ? "" : permission.Name,
+                            NocTypeName = obj.IsUnderMasterPlan ? "" : noctype.Name,
+                            OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
+                            Pincode = obj.PinCode.ToString(),
+                            PlotNo = obj.PlotNo,
+                            PreviousDate = obj.IsUnderMasterPlan ? "" : string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
+                            ProjectTypeName = g.Project.Name,
+                            SiteAreaUnitName = obj.IsUnderMasterPlan ? "" : unit.Name,
+                            TotalArea = totalArea.ToString(),
+                            TotalAreaSqFeet = Math.Round((totalArea * 43560), 4).ToString(),
+                            TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 4).ToString(),
+                            Owners = owners,
+                            Khasras = khasras,
+                            PlanSanctionAuthorityName = g.PlanSanction.Name,
+                            IsUnderMasterPlan = obj.IsUnderMasterPlan,
+                            MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
+                            UnderMasterPlan = obj.IsUnderMasterPlan ? "Yes" : "No"
+                        };
+                        return View(model);
+                    }
+                    else
+                    {
+                        GrantPaymentDetails objPyment = (payment);
+                        GrantDetailViewModel model = new GrantDetailViewModel
+                        {
+                            Id = obj.Id,
+                            ApplicationID = obj.ApplicationID,
+                            PaymentOrderId = objPyment.PaymentOrderId,
+                            Name = obj.Name,
+                            VillageName = obj.VillageName,
+                            TehsilBlockName = tehsil.Name,
+                            SubDivisionName = subDivision.Name,
+                            DivisionName = division.Name,
+                            AddressProofPhotoPath = obj.AddressProofPhotoPath,
+                            ApplicantEmailID = obj.ApplicantEmailID,
+                            ApplicantName = obj.ApplicantName,
+                            AuthorizationLetterPhotoPath = obj.AuthorizationLetterPhotoPath,
+                            Hadbast = obj.Hadbast,
+                            IDProofPhotoPath = obj.IDProofPhotoPath,
+                            KMLFilePath = obj.KMLFilePath,
+                            KmlLinkName = obj.KMLLinkName,
+                            NocNumber = obj.NocNumber,
+                            NocPermissionTypeName = permission.Name,
+                            NocTypeName = noctype.Name,
+                            OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
+                            Pincode = obj.PinCode.ToString(),
+                            PlotNo = obj.PlotNo,
+                            PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
+                            ProjectTypeName = g.Project.Name,
+                            SiteAreaUnitName = unit.Name,
+                            TotalArea = totalArea.ToString(),
+                            TotalAreaSqFeet = Math.Round((totalArea * 43560), 4).ToString(),
+                            TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 4).ToString(),
+                            Owners = owners,
+                            Khasras = khasras,
+                            PlanSanctionAuthorityName = g.PlanSanction.Name,
+                            IsUnderMasterPlan = obj.IsUnderMasterPlan,
+                            MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
+                            UnderMasterPlan = obj.IsUnderMasterPlan ? "Yes" : "No"
+                        };
+                        model.Domain = scheme + "://" + domain;
+                        return View(model);
+                        //return new ViewAsPdf(model)
+                        //{
+                        //    FileName = model.ApplicationID + ".pdf"
+                        //};
+                    }
+
                 }
                 else
                 {
-                    GrantPaymentDetails objPyment = (payment);
-                    GrantDetailViewModel model = new GrantDetailViewModel
-                    {
-                        Id = obj.Id,
-                        ApplicationID = obj.ApplicationID,
-                        PaymentOrderId = objPyment.PaymentOrderId,
-                        Name = obj.Name,
-                        VillageName = obj.VillageName,
-                        TehsilBlockName = tehsil.Name,
-                        SubDivisionName = subDivision.Name,
-                        DivisionName = division.Name,
-                        AddressProofPhotoPath = obj.AddressProofPhotoPath,
-                        ApplicantEmailID = obj.ApplicantEmailID,
-                        ApplicantName = obj.ApplicantName,
-                        AuthorizationLetterPhotoPath = obj.AuthorizationLetterPhotoPath,
-                        Hadbast = obj.Hadbast,
-                        IDProofPhotoPath = obj.IDProofPhotoPath,
-                        KMLFilePath = obj.KMLFilePath,
-                        KmlLinkName = obj.KMLLinkName,
-                        NocNumber = obj.NocNumber,
-                        NocPermissionTypeName = permission.Name,
-                        NocTypeName = noctype.Name,
-                        OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
-                        Pincode = obj.PinCode.ToString(),
-                        PlotNo = obj.PlotNo,
-                        PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
-                        ProjectTypeName = g.Project.Name,
-                        SiteAreaUnitName = unit.Name,
-                        TotalArea = totalArea.ToString(),
-                        TotalAreaSqFeet = Math.Round((totalArea * 43560), 4).ToString(),
-                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 4).ToString(),
-                        Owners = owners,
-                        Khasras = khasras,
-                        PlanSanctionAuthorityName = g.PlanSanction.Name
-                    };
+                    GrantDetailViewModel model = new GrantDetailViewModel();
                     model.Domain = scheme + "://" + domain;
                     return View(model);
-                    //return new ViewAsPdf(model)
-                    //{
-                    //    FileName = model.ApplicationID + ".pdf"
-                    //};
                 }
             }
             catch (Exception ex)
@@ -462,7 +501,7 @@ namespace Noc_App.Controllers
                 SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(model.SubDivisionId);
                 DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
                 DistrictDetails districts = await _districtRepo.GetByIdAsync(division.DistrictId);
-                SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(model.SiteAreaUnitId);
+                SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(model.SiteAreaUnitId??0);
                 List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == model.Id)).ToList();
                 OwnerDetails owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == model.Id)).ToList().FirstOrDefault();
                 double totalArea = 0;
@@ -544,9 +583,17 @@ namespace Noc_App.Controllers
             var ownerType = _ownerTypeRepo.GetAll();
             var siteUnits = _siteUnitsRepo.GetAll();
             var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll();
+            var masterPlan = _masterPlanDetailsRepository.GetAll();
+            List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
+            {
+                new TautologyDetails{Text="No",Value="false"},
+                new TautologyDetails{Text="Yes",Value="true"}
+            };
             var viewModel = new GrantViewModelCreate
             {
                 Divisions = new SelectList(divisions, "Id", "Name"),
+                MasterPlanTautology = new SelectList(tautologyDetails, "Value", "Text"),
+                MasterPlanDetails=new SelectList(masterPlan, "Id", "Name"),
                 ProjectType = new SelectList(projectType, "Id", "Name"),
                 PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name"),
                 NocPermissionType = new SelectList(nocPermission, "Id", "Name"),
@@ -562,7 +609,8 @@ namespace Noc_App.Controllers
                 IsConfirmed = false,
                 IsExtension = 0,
                 TotalAreaSqFeet = "0",
-                TotalAreaSqMetre = "0"
+                TotalAreaSqMetre = "0",
+                IsUnderMasterPlan=false
             };
 
             return View(viewModel);
@@ -591,10 +639,27 @@ namespace Noc_App.Controllers
                     //var fileteedvillage = await _villageRpo.FindAsync(c => c.TehsilBlockId == model.SelectedTehsilBlockId);
                     //var selectedvillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID);
                     string ErrorMessage = string.Empty;
+                    var masterPlan = _masterPlanDetailsRepository.GetAll();
+                    List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
+                    {
+                        new TautologyDetails{Text="Yes",Value="true"},
+                        new TautologyDetails{Text="No",Value="false"}
+                    };
+                    if (model.SelectedMasterPlanTautology == "true")
+                    {
+                        model.IsUnderMasterPlan = true;
+                    }
+                    else
+                    {
+                        model.IsUnderMasterPlan = false;
+                    }
+
                     if (filteredSubdivisions.Count() > 0 && filteredtehsilBlock.Count() > 0 /*&& fileteedvillage.Count() > 0 && selectedvillage != null*/)
                     {
                         var viewModel = new GrantViewModelCreate
                         {
+                            MasterPlanTautology = new SelectList(tautologyDetails, "Value", "Text",model.SelectedMasterPlanTautology),
+                            MasterPlanDetails = new SelectList(masterPlan, "Id", "Name", model.SelectedMasterPlanId),
                             //Village = new SelectList(fileteedvillage, "Id", "Name",model.SelectedVillageID),
                             TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name", model.SelectedTehsilBlockId),
                             SubDivision = new SelectList(filteredSubdivisions, "Id", "Name", model.SelectedSubDivisionId),
@@ -611,17 +676,59 @@ namespace Noc_App.Controllers
                             //Pincode = selectedvillage.PinCode.ToString()
                         };
                         //model.OwnerType = viewModel.OwnerType;
-                        if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.LayoutPlanFilePhoto != null && model.FaradFilePoto != null && model.KmlLinkName != null && model.KmlLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
+                        bool MasterPlanFlag = false;
+                        string uniqueKmlFileName = "";
+                        if (model.IsUnderMasterPlan == true)
+                        {
+                            if (model.LayoutPlanFilePhoto != null && model.FaradFilePoto != null & model.IDProofPhoto != null && model.AddressProofPhoto != null 
+                                && model.AuthorizationLetterPhoto != null && model.SelectedProjectTypeId > 0 && model.ApplicantName != null
+                            && model.ApplicantEmailID != null && model.SelectedPlanSanctionAuthorityId > 0 && model.IsConfirmed
+                            )
+                            {
+                                MasterPlanFlag = true;
+                            }
+                        }
+                        else
+                        {
+                            if (model.SelectedSiteAreaUnitId > 0 && model.KMLFile != null && model.LayoutPlanFilePhoto != null && model.FaradFilePoto != null && model.KmlLinkName != null && model.KmlLinkName != "" && model.IDProofPhoto != null && model.AddressProofPhoto != null && model.AuthorizationLetterPhoto != null
                             /*&& model.SelectedVillageID > 0*/ && model.SelectedProjectTypeId > 0 && model.SelectedNocPermissionTypeID > 0 && model.ApplicantName != null
                             && model.ApplicantEmailID != null && model.SelectedNocTypeId > 0 && model.SelectedPlanSanctionAuthorityId > 0 && model.IsConfirmed
                             )
+                            {
+                                MasterPlanFlag = true;
+                                int kmlFileValidation = AllowedCheckExtensions(model.KMLFile, "kml");
+
+                                if (kmlFileValidation == 0)
+                                {
+                                    ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
+                                    ModelState.AddModelError("", ErrorMessage);
+
+                                    return View(viewModel);
+
+                                }
+                                else if (kmlFileValidation == 2)
+                                {
+                                    ErrorMessage = "KML File field is required";
+                                    ModelState.AddModelError("", ErrorMessage);
+                                    return View(viewModel);
+                                }
+
+                                if (!AllowedFileSize(model.KMLFile))
+                                {
+                                    ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
+                                    ModelState.AddModelError("", ErrorMessage);
+                                    return View(viewModel);
+                                }
+                                uniqueKmlFileName = ProcessUploadedFile(model.KMLFile, "kml");
+                            }
+                        }
+                        if (MasterPlanFlag==true)
                         {
                             int IdProofValidation = AllowedCheckExtensions(model.IDProofPhoto, "proof");
                             int AddressProofValidation = AllowedCheckExtensions(model.AddressProofPhoto, "proof");
                             int AuthorizationValidation = AllowedCheckExtensions(model.AuthorizationLetterPhoto, "proof");
                             int LayoutPlanValidation = AllowedCheckExtensions(model.LayoutPlanFilePhoto, "proof");
                             int FaradValidation = AllowedCheckExtensions(model.FaradFilePoto, "proof");
-                            int kmlFileValidation = AllowedCheckExtensions(model.KMLFile, "kml");
                             if (IdProofValidation == 0)
                             {
                                 ErrorMessage = $"Invalid ID proof file type. Please upload a JPG, PNG, or PDF file";
@@ -691,21 +798,6 @@ namespace Noc_App.Controllers
                                 return View(viewModel);
                             }
 
-                            if (kmlFileValidation == 0)
-                            {
-                                ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
-                                ModelState.AddModelError("", ErrorMessage);
-
-                                return View(viewModel);
-
-                            }
-                            else if (kmlFileValidation == 2)
-                            {
-                                ErrorMessage = "KML File field is required";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
-                            }
-
                             if (!AllowedFileSize(model.IDProofPhoto))
                             {
                                 ErrorMessage = "ID proof file size exceeds the allowed limit of 4MB";
@@ -737,30 +829,12 @@ namespace Noc_App.Controllers
                                 return View(viewModel);
                             }
 
-                            if (!AllowedFileSize(model.KMLFile))
-                            {
-                                ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
-                                ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
-                            }
-
                             string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto, "IDProof");
                             string uniqueAddressProofFileName = ProcessUploadedFile(model.AddressProofPhoto, "Address");
                             string uniqueAuthLetterFileName = ProcessUploadedFile(model.AuthorizationLetterPhoto, "AuthLetter");
                             string uniqueLayoutPlanFileName = ProcessUploadedFile(model.LayoutPlanFilePhoto, "LayoutPlan");
                             string uniqueFaradFileName = ProcessUploadedFile(model.FaradFilePoto, "Farad");
-                            string uniqueKmlFileName = ProcessUploadedFile(model.KMLFile, "kml");
-                            if (model.IsExtension == 1)
-                            {
-                                if (model.NocNumber == null) isValid = false;
-                                if (model.PreviousDate == null) { isValid = false; }
-                                if (!isValid)
-                                {
-                                    ModelState.AddModelError("", $"NOC Number and Date both are required to fill");
-
-                                    return View(viewModel);
-                                }
-                            }
+                            
                             if (model.Hadbast == null && model.PlotNo == null)
                             {
                                 isValid = false;
@@ -810,22 +884,25 @@ namespace Noc_App.Controllers
                                     ownerList.Add(owner);
                                 }
                                 List<GrantKhasraDetails> khasraList = new List<GrantKhasraDetails>();
-                                int duplicates = viewModel.GrantKhasras.GroupBy(x => x.KhasraNo).Where(g => g.Count() > 1).Count();
+                                int duplicates = viewModel.GrantKhasras.Any() ? viewModel.GrantKhasras.GroupBy(x => x.KhasraNo).Where(g => g.Count() > 1).Count() : 0;
                                 if (duplicates <= 0)
                                 {
                                     foreach (GrantKhasraViewModelCreate item in viewModel.GrantKhasras)
                                     {
-                                        var khasraDeplicate = viewModel.GrantKhasras.Any(x => x.KhasraNo == item.KhasraNo);
-                                        GrantKhasraDetails khasra = new GrantKhasraDetails
+                                        if (item.KhasraNo != null)
                                         {
-                                            KanalOrBigha = item.KanalOrBigha,
-                                            KhasraNo = item.KhasraNo,
-                                            MarlaOrBiswa = item.MarlaOrBiswa,
-                                            SarsaiOrBiswansi = item.SarsaiOrBiswansi,
-                                            UnitId = model.SelectedSiteAreaUnitId,
-                                            //GrantID = obj.Id
-                                        };
-                                        khasraList.Add(khasra);
+                                            var khasraDeplicate = viewModel.GrantKhasras.Any(x => x.KhasraNo == item.KhasraNo);
+                                            GrantKhasraDetails khasra = new GrantKhasraDetails
+                                            {
+                                                KanalOrBigha = item.KanalOrBigha,
+                                                KhasraNo = item.KhasraNo,
+                                                MarlaOrBiswa = item.MarlaOrBiswa,
+                                                SarsaiOrBiswansi = item.SarsaiOrBiswansi,
+                                                UnitId = model.SelectedSiteAreaUnitId,
+                                                //GrantID = obj.Id
+                                            };
+                                            khasraList.Add(khasra);
+                                        }
                                     }
                                 }
                                 else
@@ -837,34 +914,36 @@ namespace Noc_App.Controllers
                                 GrantDetails obj = new GrantDetails
                                 {
                                     Name = model.Name,
-                                    SiteAreaUnitId = model.SelectedSiteAreaUnitId,
+                                    SiteAreaUnitId = model.IsUnderMasterPlan ? null : model.SelectedSiteAreaUnitId,
                                     IDProofPhotoPath = uniqueIDProofFileName,
                                     AddressProofPhotoPath = uniqueAddressProofFileName,
                                     AuthorizationLetterPhotoPath = uniqueAuthLetterFileName,
                                     VillageName = model.Villagename,
-                                    PinCode=model.Pincode,
-                                    SubDivisionId=model.SelectedSubDivisionId,
+                                    PinCode = model.Pincode,
+                                    SubDivisionId = model.SelectedSubDivisionId,
                                     ProjectTypeId = model.SelectedProjectTypeId ?? 0,
                                     Hadbast = model.Hadbast,
                                     PlotNo = model.PlotNo,
                                     ApplicantName = model.ApplicantName,
                                     ApplicantEmailID = model.ApplicantEmailID,
-                                    NocPermissionTypeID = model.SelectedNocPermissionTypeID ?? 0,
-                                    NocTypeId = model.SelectedNocTypeId ?? 0,
-                                    IsExtension = Convert.ToBoolean(model.IsExtension),
+                                    NocPermissionTypeID = model.IsUnderMasterPlan ? null : model.SelectedNocPermissionTypeID ?? null,
+                                    NocTypeId = model.IsUnderMasterPlan ? null : model.SelectedNocTypeId ?? null,
+                                    IsExtension = model.IsUnderMasterPlan ? null : Convert.ToBoolean(model.IsExtension),
                                     KMLFilePath = uniqueKmlFileName,
                                     KMLLinkName = model.KmlLinkName,
-                                    LayoutPlanFilePath=uniqueLayoutPlanFileName,
-                                    FaradFilePath=uniqueFaradFileName,
-                                    PlanSanctionAuthorityId=model.SelectedPlanSanctionAuthorityId,
+                                    LayoutPlanFilePath = uniqueLayoutPlanFileName,
+                                    FaradFilePath = uniqueFaradFileName,
+                                    PlanSanctionAuthorityId = model.SelectedPlanSanctionAuthorityId,
                                     NocNumber = model.NocNumber,
-                                    PreviousDate = model.PreviousDate,
+                                    PreviousDate = model.PreviousDate ?? null,
                                     IsConfirmed = model.IsConfirmed,
                                     ApplicationID = model.ApplicationID,
                                     OtherProjectTypeDetail = model.OtherProjectTypeDetail,
                                     CreatedOn = DateTime.Now,
                                     IsPending = true,
-                                    TehsilID=model.SelectedTehsilBlockId
+                                    TehsilID = model.SelectedTehsilBlockId,
+                                    IsUnderMasterPlan = model.IsUnderMasterPlan,
+                                    MasterPlanId = model.IsUnderMasterPlan ? model.SelectedMasterPlanId : null
                                 };
                                 await _repo.CreateAsync(obj);
                                 //model.SelectedOwnerTypeID
@@ -877,11 +956,13 @@ namespace Noc_App.Controllers
                                 await _repo.UpdateAsync(obj);
                                 //if (msg == "success")
                                 //{
-                                    var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID));
-                                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+                                var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID,model.IsUnderMasterPlan));
+                                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+                                if (!model.IsUnderMasterPlan)
+                                {
                                     double TotalPayment = 0;
-                                
-                                    string calculation = "", additionalcalculation = "", totalareacalculation="";
+
+                                    string calculation = "", additionalcalculation = "", totalareacalculation = "";
                                     if (Convert.ToDouble(model.TotalArea) <= 0.50)
                                     {
                                         TotalPayment = 500;
@@ -904,17 +985,17 @@ namespace Noc_App.Controllers
                                             count++;
                                             area = area - 1;
                                         } while (area > 0);
-                                    if(Convert.ToDouble(area2) < 0)
-                                    {
-                                        area2 = (Convert.ToDouble(area2) * -1).ToString();
-                                    }
-                                    additionalcalculation = "Additional Area Calculation With Amount ₹" + 250.ToString() + " per/Acre : On Additional " + area2 + " Acres, Amount is ₹" + (TotalPayment + (count * 250) - 1000).ToString();
+                                        if (Convert.ToDouble(area2) < 0)
+                                        {
+                                            area2 = (Convert.ToDouble(area2) * -1).ToString();
+                                        }
+                                        additionalcalculation = "Additional Area Calculation With Amount ₹" + 250.ToString() + " per/Acre : On Additional " + area2 + " Acres, Amount is ₹" + (TotalPayment + (count * 250) - 1000).ToString();
                                         TotalPayment = TotalPayment + (count * 250);
-                                    totalareacalculation = "Amount Calculation for Total " + model.TotalArea.ToString() + " Acres : ₹" + TotalPayment.ToString()+" (NON-REFUNDABLE)";
+                                        totalareacalculation = "Amount Calculation for Total " + model.TotalArea.ToString() + " Acres : ₹" + TotalPayment.ToString() + " (NON-REFUNDABLE)";
                                     }
                                     if (TotalPayment > 0)
                                     {
-                                        var detail = (from t in _tehsilBlockRepo.GetAll()                                                
+                                        var detail = (from t in _tehsilBlockRepo.GetAll()
                                                       where t.Id == model.SelectedTehsilBlockId
                                                       select new
                                                       {
@@ -924,16 +1005,17 @@ namespace Noc_App.Controllers
                                                           //Division = d,
                                                           //District = dist
                                                       }).FirstOrDefault();
-                                    var subs = (from s in _subDivisionRepo.GetAll()
-                                                join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
-                                                join dist in _districtRepo.GetAll() on d.DistrictId equals dist.Id
-                                                where model.SelectedSubDivisionId == s.Id select new
-                                                {
-                                                    SubDivision = s,
-                                                    Division = d,
-                                                    District = dist
-                                                }).FirstOrDefault();
-                                        int grantid =  _repo.Find(x => x.ApplicationID == model.ApplicationID).FirstOrDefault().Id;
+                                        var subs = (from s in _subDivisionRepo.GetAll()
+                                                    join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
+                                                    join dist in _districtRepo.GetAll() on d.DistrictId equals dist.Id
+                                                    where model.SelectedSubDivisionId == s.Id
+                                                    select new
+                                                    {
+                                                        SubDivision = s,
+                                                        Division = d,
+                                                        District = dist
+                                                    }).FirstOrDefault();
+                                        int grantid = _repo.Find(x => x.ApplicationID == model.ApplicationID).FirstOrDefault().Id;
                                         PaymentRequest paymentRequestDetail = new PaymentRequest
                                         {
                                             Name = model.Name,
@@ -951,14 +1033,14 @@ namespace Noc_App.Controllers
                                             PlotNo = model.PlotNo != null && model.PlotNo != "" ? model.PlotNo : "0",
                                             TehsilId = detail.Tehsil.LGD_ID.ToString(),
                                             Division = subs.Division.Name,
-                                            DdoCode=subs.Division.DdoCode,
-                                            PayLocCode=subs.Division.PayLocationCode,
+                                            DdoCode = subs.Division.DdoCode,
+                                            PayLocCode = subs.Division.PayLocationCode,
                                             SubDivision = subs.SubDivision.Name,
                                             Tehsil = detail.Tehsil.Name,
                                             Village = model.Villagename,
                                             AreaCalculation = calculation,
-                                            AreaAdditionalCalculation=additionalcalculation,
-                                            TotalAreaCalculation=totalareacalculation
+                                            AreaAdditionalCalculation = additionalcalculation,
+                                            TotalAreaCalculation = totalareacalculation
                                         };
                                         return RedirectToAction("Index", "Payment", paymentRequestDetail);
                                     }
@@ -966,6 +1048,11 @@ namespace Noc_App.Controllers
                                     {
                                         return RedirectToAction("Index", "Grant", new { Id = model.ApplicationID });
                                     }
+                                }
+                                else
+                                {
+                                    return RedirectToAction("Index", "Grant", new { Id = model.ApplicationID });
+                                }
                                 //}
 
                                 //else
@@ -1099,7 +1186,7 @@ namespace Noc_App.Controllers
                                     KanalOrBigha = item.KanalOrBigha,
                                     MarlaOrBiswa = item.MarlaOrBiswa,
                                     SarsaiOrBiswansi = item.SarsaiOrBiswansi,
-                                    SiteUnitId = grant.Grant.SiteAreaUnitId
+                                    SiteUnitId = grant.Grant.SiteAreaUnitId??0
                                 };
                                 var units = await _calculations.CalculateUnits(unitDetails);
                                 totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
@@ -1191,7 +1278,7 @@ namespace Noc_App.Controllers
                                 SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
                                 GrantKhasras = khasralist,
                                 Owners = ownerlist,
-                                SelectedSiteAreaUnitId = grant.Grant.SiteAreaUnitId,
+                                SelectedSiteAreaUnitId = grant.Grant.SiteAreaUnitId??0,
                                 IsOtherTypeSelected = 0,
                                 IsConfirmed = false,
                                 IsExtension = 0,
@@ -1359,7 +1446,7 @@ namespace Noc_App.Controllers
                                     KanalOrBigha = item.KanalOrBigha,
                                     MarlaOrBiswa = item.MarlaOrBiswa,
                                     SarsaiOrBiswansi = item.SarsaiOrBiswansi,
-                                    SiteUnitId = grant.Grant.SiteAreaUnitId
+                                    SiteUnitId = grant.Grant.SiteAreaUnitId??0
                                 };
                                 var units = await _calculations.CalculateUnits(unitDetails);
                                 totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
@@ -1449,7 +1536,7 @@ namespace Noc_App.Controllers
                                 SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
                                 GrantKhasras = khasralist,
                                 Owners = ownerlist,
-                                SelectedSiteAreaUnitId = grant.Grant.SiteAreaUnitId,
+                                SelectedSiteAreaUnitId = grant.Grant.SiteAreaUnitId??0,
                                 IsOtherTypeSelected = 0,
                                 IsConfirmed = false,
                                 IsExtension = 0,
@@ -1516,8 +1603,6 @@ namespace Noc_App.Controllers
             }
             return null;
         }
-
-
 
         public IActionResult UnAuthorized()
         {

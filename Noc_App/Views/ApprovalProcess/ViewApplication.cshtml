@@ -48,6 +48,24 @@
                                         <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.AuthorizationLetterPhotoPath })">Download File</a>
                                     </td>
                                 </tr>
+                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Master Plan Details</h6></td></tr>
+                                <tr>
+                                    @if (Model.IsUnderMasterPlan)
+                                    {
+                                        <td class="boldText">Is Under Master Plan</td>
+                                        <td>@Model.UnderMasterPlan</td>
+                                        <td class="boldText">Master Plan</td>
+                                        <td>@Model.MasterPlanName</td>
+                                    }
+                                    else
+                                    {
+
+                                    <td class="boldText">Is Under Master Plan</td>
+                                    <td>@Model.UnderMasterPlan</td>
+                                    <td></td><td></td>
+                                    }
+
+                                </tr>
                                 <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Project Details</h6></td></tr>
                                 <tr>
                                     <td class="boldText">Project Name</td>
@@ -91,93 +109,96 @@
                                     <td colspan="3">@Model.PlanSanctionAuthorityName</td>
 
                                 </tr>
-                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6></td></tr>
-                                <tr>
-                                    <td colspan="4">
-                                        <div class="col-lg-4">
-                                            <label class="control-label">Unit of Site Area: </label>
-                                            <label asp-for="SiteAreaUnitName" id="SiteAreaUnitName" class="form-control form-control-user">@Model.SiteAreaUnitName</label>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="4">
-                                        <div class="col-lg-12">
-                                        <table id="khasraTable" class="table table-responsive table-bordered table-striped">
-                                            <thead>
-                                                <tr>
-                                                    @* <th>#</th> *@
-                                                    <th>Khasra No.</th>
-                                                    <th>Kanal/Bigha</th>
-                                                    <th>Marla/Biswa</th>
-                                                    <th>Sarsai/Biswansi</th>
-                                                    @* <th></th> *@
-                                                    <!-- Add more columns as needed -->
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @for (int i = 0; i < Model.Khasras.Count(); i++)
-                                                {
-                                                    <tr class="khasra-entry">
-                                                        @* <td><span class="srKhasra">1</span></td> *@
-                                                        <td>
-                                                            <input asp-for="Khasras[i].KhasraNo" readonly class="form-control form-control-user" />
+                                @if (!Model.IsUnderMasterPlan)
+                                {
+                                    <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6></td></tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="col-lg-4">
+                                                <label class="control-label">Unit of Site Area: </label>
+                                                <label asp-for="SiteAreaUnitName" id="SiteAreaUnitName" class="form-control form-control-user">@Model.SiteAreaUnitName</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="col-lg-12">
+                                                <table id="khasraTable" class="table table-responsive table-bordered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            @* <th>#</th> *@
+                                                            <th>Khasra No.</th>
+                                                            <th>Kanal/Bigha</th>
+                                                            <th>Marla/Biswa</th>
+                                                            <th>Sarsai/Biswansi</th>
+                                                            @* <th></th> *@
+                                                            <!-- Add more columns as needed -->
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (int i = 0; i < Model.Khasras.Count(); i++)
+                                                        {
+                                                            <tr class="khasra-entry">
+                                                                @* <td><span class="srKhasra">1</span></td> *@
+                                                                <td>
+                                                                    <input asp-for="Khasras[i].KhasraNo" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Khasras[i].KanalOrBigha" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Khasras[i].MarlaOrBiswa" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="Khasras[i].SarsaiOrBiswansi" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <!-- Render more columns as needed -->
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <table class="table table-striped table-">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="col-sm-3">
+                                                            <label class="control-label">Total Area in Acres: </label>
+                                                            <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
+
                                                         </td>
-                                                        <td>
-                                                            <input asp-for="Khasras[i].KanalOrBigha" readonly class="form-control form-control-user" />
+                                                        <td class="col-sm-3">
+                                                            <label class="control-label">Total Area in Sq Feet: </label>
+                                                            <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
+
                                                         </td>
-                                                        <td>
-                                                            <input asp-for="Khasras[i].MarlaOrBiswa" readonly class="form-control form-control-user" />
+                                                        <td class="col-sm-3">
+                                                            <label class="control-label">Total Area in Sq Metre(s): </label>
+                                                            <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
+
                                                         </td>
-                                                        <td>
-                                                            <input asp-for="Khasras[i].SarsaiOrBiswansi" readonly class="form-control form-control-user" />
-                                                        </td>
-                                                        <!-- Render more columns as needed -->
+                                                        <td></td>
                                                     </tr>
-                                                }
-                                            </tbody>
-                                        </table>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="4">
-                                        <table class="table table-striped table-">
-                                            <tbody>
-                                                <tr>
-                                                    <td class="col-sm-3">
-                                                        <label class="control-label">Total Area in Acres: </label>
-                                                        <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Site KML File Details</h6></td></tr>
+                                    <tr>
 
-                                                    </td>
-                                                    <td class="col-sm-3">
-                                                        <label class="control-label">Total Area in Sq Feet: </label>
-                                                        <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
-
-                                                    </td>
-                                                    <td class="col-sm-3">
-                                                        <label class="control-label">Total Area in Sq Metre(s): </label>
-                                                        <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
-
-                                                    </td>
-                                                    <td></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
-                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Site KML File Details</h6></td></tr>
-                                <tr>
-
-                                    <td class="boldText">KML File</td>
-                                    <td>
-                                        <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.KMLFilePath })">Download File</a>
-                                    </td>
-                                    <td class="boldText">KML Link</td>
-                                    <td>
-                                        <a href="@Url.Action("RedirectToExternalSite", "ApprovalProcess",new{siteAddress=Model.KmlLinkName})" )" target="_blank">@Model.KmlLinkName</a>
-                                    </td>
-                                </tr>
+                                        <td class="boldText">KML File</td>
+                                        <td>
+                                            <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = Model.KMLFilePath })">Download File</a>
+                                        </td>
+                                        <td class="boldText">KML Link</td>
+                                        <td>
+                                            <a href="@Url.Action("RedirectToExternalSite", "ApprovalProcess",new{siteAddress=Model.KmlLinkName})" )" target="_blank">@Model.KmlLinkName</a>
+                                        </td>
+                                    </tr>
+                                }
                                 <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Details of Owners/Partners/Chief Executive/Full Time Directors</h6></td></tr>
                                 <tr>
                                     <td colspan="4">
@@ -222,22 +243,25 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Types of Permissions</h6></td></tr>
-                                <tr>
-                                    <td class="boldText">NOC Permission Type</td>
-                                    <td>@Model.NocPermissionTypeName</td>
-                                    <td class="boldText">NOC Type</td>
-                                    <td>@Model.NocTypeName</td>
-
-                                </tr>
-                                @if (Model.NocTypeName.ToUpper() != "NEW")
+                                @if (!Model.IsUnderMasterPlan)
                                 {
+                                    <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Types of Permissions</h6></td></tr>
                                     <tr>
-                                        <td class="boldText">NOC Number</td>
-                                        <td>@Model.NocNumber</td>
-                                        <td class="boldText">Previous Date</td>
-                                        <td>@Model.PreviousDate</td>
+                                        <td class="boldText">NOC Permission Type</td>
+                                        <td>@Model.NocPermissionTypeName</td>
+                                        <td class="boldText">NOC Type</td>
+                                        <td>@Model.NocTypeName</td>
+
                                     </tr>
+                                    @if (Model.NocTypeName.ToUpper() != "NEW")
+                                    {
+                                        <tr>
+                                            <td class="boldText">NOC Number</td>
+                                            <td>@Model.NocNumber</td>
+                                            <td class="boldText">Previous Date</td>
+                                            <td>@Model.PreviousDate</td>
+                                        </tr>
+                                    }
                                 }
                                 @if (Model.GrantApprovalRecommendationDetails.Count() > 0)
                                 {

@@ -53,10 +53,11 @@ namespace Noc_App.Controllers
         private readonly IRepository<PlanSanctionAuthorityMaster> _repoPlanSanctionAuthtoryMaster;
         private readonly IRepository<DrainWidthTypeDetails> _drainwidthRepository;
         private readonly IRepository<GrantFileTransferDetails> _grantFileTransferRepository;
+        private readonly IRepository<MasterPlanDetails> _masterPlanDetailsRepository;
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<GrantPaymentDetails> repoPayment,IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster
-            , IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo,
+            , IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo, IRepository<MasterPlanDetails> masterPlanDetailsRepository,
             IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IWebHostEnvironment hostingEnvironment, IEmailService emailService
             , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
@@ -93,6 +94,7 @@ namespace Noc_App.Controllers
             _grantrejectionRepository = grantrejectionRepository;
             _repoPlanSanctionAuthtoryMaster = repoPlanSanctionAuthtoryMaster;
             _grantFileTransferRepository= grantFileTransferRepository;
+            _masterPlanDetailsRepository=masterPlanDetailsRepository;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
@@ -254,7 +256,7 @@ namespace Noc_App.Controllers
                 return View("NotFound");
             }
             var grantdetail = (from g in _repo.GetAll()
-                               join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
+                               //join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
                                //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
                                join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                                join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
@@ -358,7 +360,7 @@ namespace Noc_App.Controllers
            
             var grantdetail = (from g in _repo.GetAll()
                                join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
-                               join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
+                               //join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
                                //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
                                join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                                join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
@@ -573,8 +575,9 @@ namespace Noc_App.Controllers
                 string forwardToRole = "JUNIOR ENGINEER";
                 
                 List<OfficerDetails> officerDetail = new List<OfficerDetails>();
-
-                var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
+                if (!grant.IsUnderMasterPlan)
+                {
+                    var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
                     SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
                     SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
                     SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
@@ -582,9 +585,10 @@ namespace Noc_App.Controllers
                                          where kh.GrantID == grant.Id
                                          select new
                                          {
-                                             TotalArea = ((kh.KanalOrBigha*k.UnitValue*k.Timesof)/k.DivideBy)+ ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy)+ ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
-                                            
+                                             TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
+
                                          }).Sum(d => d.TotalArea)), 4);
+                }
                 //if (roleName == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
                 //{
                 //    subdivisions = (from sub in _subDivisionRepo.GetAll()  
@@ -647,7 +651,7 @@ namespace Noc_App.Controllers
                 List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
                 recommendations = _repoRecommendation.GetAll().Where(x=>x.Code!="NA").ToList();
                 ForwardApplicationViewModel model = (from g in _repo.GetAll()
-                                                      join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
+                                                      //join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
                                                       //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
                                                       join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                                                       join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
@@ -703,10 +707,13 @@ namespace Noc_App.Controllers
 
                     return View("NotFound");
                 }
-                var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
-                SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
-                SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
-                SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
+                if (!grant.IsUnderMasterPlan)
+                {
+                    var units = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.SiteAreaUnitId);
+                    SiteUnitMaster k = units.Where(x => x.UnitCode.ToUpper() == "K").FirstOrDefault();
+                    SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
+                    SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
+                }
                 string code = model.IsDrainNotified ? "N" : "C";
                 var typeofwidth = (await _drainwidthRepository.FindAsync(x => x.Code == code)).FirstOrDefault();
 
@@ -1520,20 +1527,43 @@ namespace Noc_App.Controllers
 
                 return View("NotFound");
             }
-            IssueNocViewModelCreate model = (from g in _repo.GetAll()
-                                             join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
-                                             //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
-                                             join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
-                                             join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
-                                             join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
-                                             where g.ApplicationID == id
-                                             select new IssueNocViewModelCreate
-                                             {
-                                                 Id = g.Id,
-                                                 Name = g.Name,
-                                                 ApplicationID = g.ApplicationID,
-                                                 LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
-                                             }).FirstOrDefault();
+            IssueNocViewModelCreate model = new IssueNocViewModelCreate();
+            if (grant.IsUnderMasterPlan)
+            {
+                model = (from g in _repo.GetAll()
+                         join pay in _masterPlanDetailsRepository.GetAll() on g.MasterPlanId equals pay.Id
+                         //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                         join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
+                         join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
+                         join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
+                         where g.ApplicationID == id
+                         select new IssueNocViewModelCreate
+                         {
+                             Id = g.Id,
+                             Name = g.Name,
+                             ApplicationID = g.ApplicationID,
+                             IsUnderMasterPlan = g.IsUnderMasterPlan,
+                             LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
+                         }).FirstOrDefault();
+            }
+            else
+            {
+                model = (from g in _repo.GetAll()
+                         join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
+                         //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                         join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
+                         join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
+                         join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
+                         where g.ApplicationID == id
+                         select new IssueNocViewModelCreate
+                         {
+                             Id = g.Id,
+                             Name = g.Name,
+                             ApplicationID = g.ApplicationID,
+                             IsUnderMasterPlan = g.IsUnderMasterPlan,
+                             LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
+                         }).FirstOrDefault();
+            }
             return View(model);
         }
 
@@ -1561,8 +1591,9 @@ namespace Noc_App.Controllers
                 string ErrorMessage = string.Empty;
                 int certificateValidation = AllowedCheckExtensions(model.CertificateFile);
                 if (certificateValidation == 0)
-                {
-                    ErrorMessage = $"Invalid certificate file type. Please upload a PDF file only";
+                {   
+                if(model.IsUnderMasterPlan) ErrorMessage = $"Invalid exemption letter file type. Please upload a PDF file only";
+                else ErrorMessage = $"Invalid certificate file type. Please upload a PDF file only";
                     ModelState.AddModelError("", ErrorMessage);
 
                     return View(model);
@@ -1570,15 +1601,21 @@ namespace Noc_App.Controllers
                 }
                 else if (certificateValidation == 2)
                 {
+                if(model.IsUnderMasterPlan)
+                    ErrorMessage = "Exemption Letter field is required";
+                else
                     ErrorMessage = "Certificate field is required";
-                    ModelState.AddModelError("", ErrorMessage);
+                ModelState.AddModelError("", ErrorMessage);
                     return View(model);
                 }
 
                 if (!AllowedFileSize(model.CertificateFile))
                 {
+                    if(model.IsUnderMasterPlan)
+                    ErrorMessage = "Exemption Letter size exceeds the allowed limit of 4MB";
+                else
                     ErrorMessage = "Certificate size exceeds the allowed limit of 4MB";
-                    ModelState.AddModelError("", ErrorMessage);
+                ModelState.AddModelError("", ErrorMessage);
                     return View(model);
                 }
                 string uniqueCertificateFileName = ProcessUploadedFile(model.CertificateFile, "noc");
@@ -1678,10 +1715,11 @@ namespace Noc_App.Controllers
                 TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(obj.TehsilID);
                 SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(obj.SubDivisionId);
                 DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
-                NocPermissionTypeDetails permission = await _nocPermissionTypeRepo.GetByIdAsync(obj.NocPermissionTypeID);
+                NocPermissionTypeDetails permission = await _nocPermissionTypeRepo.GetByIdAsync(obj.NocPermissionTypeID??0);
                 ProjectTypeDetails projecttype = await _projectTypeRepo.GetByIdAsync(obj.ProjectTypeId);
-                NocTypeDetails noctype = await _nocTypeRepo.GetByIdAsync(obj.NocTypeId);
-                SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(obj.SiteAreaUnitId);
+                NocTypeDetails noctype = await _nocTypeRepo.GetByIdAsync(obj.NocTypeId??0);
+                SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(obj.SiteAreaUnitId??0);
+                MasterPlanDetails masterplan = (from np in _masterPlanDetailsRepository.GetAll() where obj.MasterPlanId == np.Id select np).FirstOrDefault();
                 List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == obj.Id)).ToList();
                 List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
                 List<GrantInspectionDocuments> documents = (from d in _repoApprovalDocument.GetAll()
@@ -1759,14 +1797,14 @@ namespace Noc_App.Controllers
                         KMLFilePath = obj.KMLFilePath,
                         KmlLinkName = obj.KMLLinkName,
                         NocNumber = obj.NocNumber,
-                        NocPermissionTypeName = permission.Name,
-                        NocTypeName = noctype.Name,
+                        NocPermissionTypeName = obj.IsUnderMasterPlan ? "" : permission.Name,
+                        NocTypeName = obj.IsUnderMasterPlan ? "" : noctype.Name,
                         OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
                         Pincode = obj.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
-                        PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
+                        PreviousDate = obj.IsUnderMasterPlan ? "" : string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
                         ProjectTypeName = projecttype.Name,
-                        SiteAreaUnitName = unit.Name,
+                        SiteAreaUnitName = obj.IsUnderMasterPlan ? "" : unit.Name,
                         TotalArea = totalArea.ToString(),
                         TotalAreaSqFeet = Math.Round((totalArea * 43560),4).ToString(),
                         TotalAreaSqMetre = Math.Round((totalArea * 4046.86),4).ToString(),
@@ -1777,7 +1815,10 @@ namespace Noc_App.Controllers
                         LayoutPlanFilePath=obj.LayoutPlanFilePath,
                         GrantInspectionDocumentsDetail = documents,
                         GrantApprovalRecommendationDetails=modelRecommendation,
-                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode
+                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode,
+                        IsUnderMasterPlan = obj.IsUnderMasterPlan,
+                        MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
+                        UnderMasterPlan = obj.IsUnderMasterPlan ? "Yes" : "No"
                     };
                     return View(model);
                 }
@@ -1803,14 +1844,14 @@ namespace Noc_App.Controllers
                         KMLFilePath = obj.KMLFilePath,
                         KmlLinkName = obj.KMLLinkName,
                         NocNumber = obj.NocNumber,
-                        NocPermissionTypeName = permission.Name,
-                        NocTypeName = noctype.Name,
+                        NocPermissionTypeName = obj.IsUnderMasterPlan ? "" : permission.Name,
+                        NocTypeName = obj.IsUnderMasterPlan ? "" : noctype.Name,
                         OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
                         Pincode = obj.PinCode.ToString(),
                         PlotNo = obj.PlotNo,
-                        PreviousDate = string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
+                        PreviousDate = obj.IsUnderMasterPlan ? "" : string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
                         ProjectTypeName = projecttype.Name,
-                        SiteAreaUnitName = unit.Name,
+                        SiteAreaUnitName = obj.IsUnderMasterPlan ? "" : unit.Name,
                         TotalArea = totalArea.ToString(),
                         TotalAreaSqFeet = (totalArea * 43560).ToString(),
                         TotalAreaSqMetre = (totalArea * 4046.86).ToString(),
@@ -1821,7 +1862,10 @@ namespace Noc_App.Controllers
                         LayoutPlanFilePath = obj.LayoutPlanFilePath,
                         GrantInspectionDocumentsDetail = documents,
                         GrantApprovalRecommendationDetails = modelRecommendation,
-                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode
+                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode,
+                        IsUnderMasterPlan = obj.IsUnderMasterPlan,
+                        MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
+                        UnderMasterPlan = obj.IsUnderMasterPlan ? "Yes" : "No"
                     };
                     return View(model);
                 }
@@ -2029,6 +2073,7 @@ namespace Noc_App.Controllers
             user_info user_info9 = new user_info();
             user_info user_info10 = new user_info();
             user_info user_info12 = new user_info();
+            user_info user_info13 = new user_info();
             user_info1 =new user_info { Name = "Junior Engineer", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "test", SubDivisionID = 114 };
             user_info2 = new user_info { Name = "Sub Divisional Officer", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info3 = new user_info { Name = "Superintending Engineer", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
@@ -2041,6 +2086,7 @@ namespace Noc_App.Controllers
             user_info9 = new user_info { Name = "Director Drainage", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info10 = new user_info { Name = "Administrator", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info12 = new user_info { Name = "XEN Faridkot", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33, Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info13 = new user_info { Name = "XEN Mohali", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 34, Division = "\"Executive Engineer SAS Nagar Drainage-cum-Mining & Geology Division, WRD Punjab\"", DistrictID = 19, District = "Mohali", EmailId = "xenmohali", EmpID = "15321", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
             LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
             LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
@@ -2054,6 +2100,7 @@ namespace Noc_App.Controllers
             LoginResponseViewModel o9 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info9 };
             LoginResponseViewModel o10 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info10 };
             LoginResponseViewModel o12 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info12 };
+            LoginResponseViewModel o13 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info13 };
             users.Add(o1);
             users.Add(o2);
             users.Add(o3);
@@ -2066,6 +2113,7 @@ namespace Noc_App.Controllers
             users.Add(o9);
             users.Add(o10);
             users.Add(o12);
+            users.Add(o13);
             return users;
 
         }

@@ -26,6 +26,19 @@ document.getElementById("SelectedProjectTypeId").addEventListener("change", func
     }
 
 });
+document.getElementById("SelectedMasterPlanTautology").addEventListener("change", function () {
+    var selectedText = this.options[this.selectedIndex].value;
+    if (selectedText == 'true') {
+        $('.masterPlan').css('display', 'none');
+        $('.masterPlan2').css('display', '');
+        $('#IsUnderMasterPlan').val('true');
+    } else {
+        $('.masterPlan').css('display', '');
+        $('.masterPlan2').css('display', 'none');
+        $('#IsUnderMasterPlan').val('false');
+    }
+
+});
 document.getElementById("SelectedNocTypeId").addEventListener("change", function () {
     var selectedText = this.options[this.selectedIndex].text;
     $('#PreviousDate').val('');
@@ -42,6 +55,15 @@ var today = new Date().toISOString().split('T')[0];
 document.getElementById('PreviousDate').setAttribute('max', today);
 
 $(function () {
+    if (document.getElementById("SelectedMasterPlanTautology").value == 'false') {
+        $('.masterPlan2').css('display', 'none');
+        $('.masterPlan').css('display', '');
+        $('#IsUnderMasterPlan').val('false');
+    } else {
+        $('.masterPlan2').css('display', '');
+        $('.masterPlan').css('display', 'none');
+        $('#IsUnderMasterPlan').val('true');
+    }
     $('#grantForm').on('submit', function (e) {
         if ($('#ValidKhasra').val() == '0') {
             var name = $('#ValidKhasraName').val();

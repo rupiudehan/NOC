@@ -1,19 +1,12 @@
 
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
-using Noc_App.Clients;
 using Noc_App.Context;
 using Noc_App.Helpers;
 using Noc_App.Models;
-using Noc_App.Models.IFMSPayment;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.Repository;
 using Noc_App.Models.ViewModel;
-using Noc_App.PaymentUtilities;
 using Noc_App.UtilityService;
 using Rotativa.AspNetCore;
 
@@ -94,6 +87,7 @@ builder.Services.AddScoped<IRepository<GrantRejectionShortfallSection>, Reposito
 builder.Services.AddScoped<IRepository<PlanSanctionAuthorityMaster>, Repository<PlanSanctionAuthorityMaster>>();
 builder.Services.AddScoped<IRepository<DrainWidthTypeDetails>, Repository<DrainWidthTypeDetails>>();
 builder.Services.AddScoped<IRepository<GrantFileTransferDetails>,Repository<GrantFileTransferDetails>>();
+builder.Services.AddScoped<IRepository<MasterPlanDetails>, Repository<MasterPlanDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

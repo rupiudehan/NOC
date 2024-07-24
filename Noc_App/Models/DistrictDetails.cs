@@ -15,6 +15,7 @@ namespace Noc_App.Models
         public string Name { get; set; }
         public List<DivisionDetails> Division { get; set; }
         public List<TehsilBlockDetails> TehsilBlock { get; set; }
+        public List<MasterPlanDetails> MasterPlans { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
     }

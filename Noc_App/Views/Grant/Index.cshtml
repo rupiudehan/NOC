@@ -10,20 +10,27 @@
 {
     <input hidden asp-for="Id" />
     <p>
-        
-        @if (Model.OrderId != "0")
+        @if (Model.IsUnderMasterPlan)
         {
-            @:Your application has been received successfully. <br />Payment of ₹@Model.TotalAmount has been received with transaction number @Model.OrderId
+            @:Your application has been received successfully.
         }
         else
         {
-            @:Your application has been received successfully, but payment is <b style="color:red">pending</b>.
-            <br />
-            @:Your application will be processed only after successful payment.
+
+            @if (Model.OrderId != "0")
+            {
+                @:Your application has been received successfully. <br />Payment of ₹@Model.TotalAmount has been received with transaction number @Model.OrderId
+            }
+            else
+            {
+                @:Your application has been received successfully, but payment is <b style="color:red">pending</b>.
+                <br />
+                @:Your application will be processed only after successful payment.
+            }
         }
         <br /> Track its status with the following tracking number:<br />
         <b style="color:#76ac23">
-            @Model.ApplicationID 
+            @Model.ApplicationID
         </b>
     </p>
     <p>
@@ -33,7 +40,8 @@
     <p>
         <a class="btn btn-secondary btn-user btn-block" asp-controller="Grant" asp-action="Create">Back</a>
     </p>
-}else
+}
+else
 {
     <p>Invalid request!</p>
 }

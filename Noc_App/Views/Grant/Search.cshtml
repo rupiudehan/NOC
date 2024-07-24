@@ -30,21 +30,43 @@
                                         <td><b>Date of Application</b></td>
                                         <td>@Model.CreatedOn</td>
                                     </tr>
-                                    <tr>
-                                        <td><b>Payment</b></td>
-                                        <td>@Model.ApplicationStatus</td>
-                                    </tr>
-                                    @if (Model.ApplicationStatus.ToLower() == "pending")
+
+                                    @if (!Model.IsUnderMasterPlan)
                                     {
                                         <tr>
-                                            <td><b>Action</b></td>
-                                            <td>
-                                                <a class="text-center btn btn-success btn-user btn-block" asp-controller="Grant" asp-action="PayNow" asp-route-Id="@Model.ApplicationID">Pay Now</a>
-                                            </td>
+                                            <td><b>Payment</b></td>
+                                            <td>@Model.ApplicationStatus</td>
                                         </tr>
+                                        @if (Model.ApplicationStatus.ToLower() == "pending")
+                                        {
+                                            <tr>
+                                                <td><b>Action</b></td>
+                                                <td>
+                                                    <a class="text-center btn btn-success btn-user btn-block" asp-controller="Grant" asp-action="PayNow" asp-route-Id="@Model.ApplicationID">Pay Now</a>
+                                                </td>
+                                            </tr>
 
+                                        }
+                                        @if (Model.ApplicationStatus.ToLower() != "pending")
+                                        {
+                                            <tr>
+                                                <td><b>Status</b></td>
+                                                @if (Model.IsApproved)
+                                                {
+                                                    <td>
+                                                        <a href="@Url.Action("Download", "Grant", new { fileName = Model.CertificateFilePath })">@Model.ApprovalStatus</a>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td>
+                                                        @Model.ApprovalStatus
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
                                     }
-                                    @if (Model.ApplicationStatus.ToLower() != "pending")
+                                    else
                                     {
                                         <tr>
                                             <td><b>Status</b></td>

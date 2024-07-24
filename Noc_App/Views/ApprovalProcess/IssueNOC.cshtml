@@ -1,9 +1,15 @@
 ﻿@model IssueNocViewModelCreate
 @{
-    ViewBag.Title = "Issue NOC";
+    ViewBag.Title = Model.IsUnderMasterPlan?"Issue Exemption Letter": "Issue NOC";
 }
-
-<h1 class="h3 mb-4 text-gray-800">Issue NOC</h1>
+@if (Model.IsUnderMasterPlan)
+{
+    <h1 class="h3 mb-4 text-gray-800">Issue Exemption Letter</h1>
+}
+else
+{
+    <h1 class="h3 mb-4 text-gray-800">Issue NOC</h1>
+}
 
 <div class="row">
 
@@ -12,7 +18,14 @@
         <!-- Circle Buttons -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Issue NOC</h6>
+                @if (Model.IsUnderMasterPlan)
+                {
+                    <h6 class="m-0 font-weight-bold text-primary">Issue Exemption Letter</h6>
+                }
+                else
+                {
+                    <h6 class="m-0 font-weight-bold text-primary">Issue NOC</h6>
+                }
             </div>
             <div class="card-body">
                 <form class="user" enctype="multipart/form-data" asp-action="IssueNOC" method="post">
@@ -20,6 +33,7 @@
                     <div class="row">
                         <div class="col-lg-3">
                             <div class="form-group">
+                                <input type="hidden" asp-for="IsUnderMasterPlan" />
                                 <label asp-for="Name" class="control-label">Project</label>
                                 <input asp-for="Name" readonly class="form-control form-control-user" />
                                 <span asp-validation-for="Name" class="text-danger"></span>
@@ -41,7 +55,13 @@
                         </div>
                         <div class="col-lg-3">
                             <div class="form-group">
-                                <label asp-for="CertificateFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                @if (Model.IsUnderMasterPlan)
+                                {
+                                    <label asp-for="CertificateFile" class="control-label">Upload Exemption Letter</label>
+                                }else{
+                                <label asp-for="CertificateFile" class="control-label">Upload Certificate</label>
+                                }
+                                <span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                 <div class="custom-file1">
                                     <input asp-for="CertificateFile" class="form-control custom-file-input1" accept=".pdf" />
                                     @* <label class="custom-file-label1">Choose File...</label> *@

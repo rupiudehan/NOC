@@ -8,5 +8,6 @@
         public string ApprovalStatus { get; set; }
         public string CertificateFilePath { get; set; }
         public bool IsApproved { get; set; }
+        public bool IsUnderMasterPlan { get; set; }
     }
 }

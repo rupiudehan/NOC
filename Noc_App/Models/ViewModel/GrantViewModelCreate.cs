@@ -11,7 +11,6 @@ namespace Noc_App.Models.ViewModel
         [Required]
         [MaxLength(250, ErrorMessage = "Name cannot exceed 250 characters")]
         public string Name { get; set; }
-        [Required]
         [Display(Name = "Unit of Site Area")]
         public int SelectedSiteAreaUnitId { get; set; }
         public IEnumerable<SelectListItem> SiteAreaUnit { get; set; }
@@ -74,9 +73,9 @@ namespace Noc_App.Models.ViewModel
         [Required]
         [Display(Name = "Farad")]
         public IFormFile FaradFilePoto { get; set; }
-        [Required]
+        //[Required]
         public IFormFile KMLFile { get; set; }
-        [Required]
+        //[Required]
         [RegularExpression(@"https:\/\/earth\.google\.com\/web\/\S+", ErrorMessage = "Invalid link")]
         [Display(Name = "KML Link")]
         public string KmlLinkName { get; set; }
@@ -99,7 +98,7 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "NOC Permission Type")]
         public int? SelectedNocPermissionTypeID { get; set; }
         public IEnumerable<SelectListItem> NocPermissionType { get; set; }
-        [Required]
+        //[Required]
         [Display(Name = "NOC Type")]
         public int? SelectedNocTypeId { get; set; }
         public IEnumerable<SelectListItem> NocType { get; set; }
@@ -116,5 +115,13 @@ namespace Noc_App.Models.ViewModel
         public bool IsPaymentDone { get; set; }
         public string ApplicationID { get; set; }
         public DateTime CreatedOn { get; set; }
+        public bool IsUnderMasterPlan { get; set; }
+        [Required]
+        [Display(Name = "Is Under Master Plan")]
+        public string SelectedMasterPlanTautology { get; set; }
+        public IEnumerable<SelectListItem> MasterPlanTautology { get; set; }
+        [Display(Name = "Master Plan")]
+        public int SelectedMasterPlanId { get; set; }
+        public IEnumerable<SelectListItem> MasterPlanDetails { get; set; }
     }
 }

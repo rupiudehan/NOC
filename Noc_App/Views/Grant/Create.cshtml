@@ -16,10 +16,40 @@
 
                 <div class="col-lg-12 mt-5 mt-lg-0 d-flex align-items-stretch">
 
-
                     <!-- Circle Buttons -->
                     <form enctype="multipart/form-data" class="user" asp-action="Create" asp-controller="Grant" method="post" id="grantForm">
                         <div class="card shadow mb-4">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Master Plan Details</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="form-group">
+                                                    <input hidden asp-for="IsUnderMasterPlan" value="false" id="IsUnderMasterPlan" />
+                                                    <label asp-for="SelectedMasterPlanTautology" class="control-label"></label>
+                                                    <select asp-for="SelectedMasterPlanTautology" id="SelectedMasterPlanTautology" asp-items="@Model.MasterPlanTautology" class="form-control">
+                                                        @* <option value="">Select</option> *@
+                                                    </select>
+                                                    <span asp-validation-for="SelectedMasterPlanTautology" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 masterPlan2">
+                                                <div class="form-group">
+                                                    <label asp-for="SelectedMasterPlanId" class="control-label"></label>
+                                                    <select asp-for="SelectedMasterPlanId" asp-items="@Model.MasterPlanDetails" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select>
+                                                    <span asp-validation-for="SelectedMasterPlanId" class="text-danger"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="card-header py-3">
@@ -159,7 +189,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row masterPlan">
                                 <div class="col-lg-12">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Site Area Details</h6>
@@ -264,7 +294,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row masterPlan">
                                 <div class="col-lg-6">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Site KML File Details</h6>
@@ -422,7 +452,7 @@
                                             </table>
 
                                         </div>
-                                        <div class="row col-sm-2 offset-sm-10">
+                                        <div class="row col-sm-2 offset-sm-10 masterPlan">
                                             <button type="button" class="btn btn-success" id="addMoreBtn">Add More</button>
                                         </div>
                                         <div class="row float-start">

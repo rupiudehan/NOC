@@ -11,7 +11,8 @@ namespace Noc_App.Models.ViewModel
         public string ApplicationID { get; set; }
         public string LocationDetails { get; set; }
         //[Required]
-        [Display(Name = "Upload Certificate")]
+        [Display(Name = "Upload Certificate/Exemption Letter")]
         public IFormFile CertificateFile { get; set; }
+        public bool IsUnderMasterPlan { get; set; }
     }
 }

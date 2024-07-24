@@ -64,6 +64,11 @@ namespace Noc_App.Models.ViewModel
         public List<GrantApprovalRecommendationDetail> GrantApprovalRecommendationDetails { get; set; }
         public string LocationDetail { get; set; }
         public string Domain { get; set; }
+        public bool IsUnderMasterPlan { get; set; }
+        [Display(Name = "Is Under Master Plan")]
+        public string UnderMasterPlan { get; set; }
+        [Display(Name = "Master Plan")]
+        public string MasterPlanName { get; set; }
     }
 
     public class GrantInspectionDocuments

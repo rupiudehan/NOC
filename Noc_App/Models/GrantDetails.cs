@@ -8,7 +8,7 @@ namespace Noc_App.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public int SiteAreaUnitId { get; set; }
+        public int? SiteAreaUnitId { get; set; }
         [ForeignKey(nameof(SiteAreaUnitId))]
         public SiteAreaUnitDetails SiteAreaUnits { get; set; }
 
@@ -50,14 +50,14 @@ namespace Noc_App.Models
         public List<OwnerDetails> Owners { get; set; }
         public List<GrantFileTransferDetails> GrantFileTransferDetails { get; set; }
         //[Required]
-        public int NocPermissionTypeID { get; set; }
+        public int? NocPermissionTypeID { get; set; }
         [ForeignKey(nameof(NocPermissionTypeID))]
         public NocPermissionTypeDetails NocPermissionType { get; set; }
         //[Required]
-        public int NocTypeId { get; set; }
+        public int? NocTypeId { get; set; }
         [ForeignKey(nameof(NocTypeId))]
         public NocTypeDetails NocType { get; set; }
-        public bool IsExtension { get; set; }
+        public bool? IsExtension { get; set; }
         public string? NocNumber { get; set; }
         public DateTime? PreviousDate { get; set; }
         public bool IsConfirmed { get; set; }
@@ -84,5 +84,9 @@ namespace Noc_App.Models
         public DateTime UploadedOn { get; set; }
         public string UploadedByRole { get; set; }
         public string UploadedBy { get; set; }
+        public bool IsUnderMasterPlan { get; set; }
+        public int? MasterPlanId { get; set; }
+        [ForeignKey(nameof(MasterPlanId))]
+        public MasterPlanDetails MasterPlanDetails { get; set; }
     }
 }

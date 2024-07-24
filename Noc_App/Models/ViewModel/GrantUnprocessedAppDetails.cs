@@ -46,6 +46,7 @@ namespace Noc_App.Models.ViewModel
         public string Remarks { get; set; }
         public string CertificateFilePath { get; set; }
         public int IsRecommended { get; set; }
+        public bool IsUnderMasterPlan { get; set; }
         //[Display(Name = "Sub-Division")]
         //public string SelectedSubDivisionId { get; set; }
         //public IEnumerable<SelectListItem> SubDivisions { get; set; }
