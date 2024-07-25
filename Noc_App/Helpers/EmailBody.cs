@@ -173,6 +173,52 @@ namespace Noc_App.Helpers
             </html>";
         }
 
+        public static string EmailStringBodyForIssue(string applicantName, string applicationID, string reason, bool isUnderMasterPlan)
+        {
+            if(!isUnderMasterPlan)
+            return $@"<htm>
+            <head></head>
+            <body style=""margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;"">
+            <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
+                <div>
+                    <div>
+                        <p>Dear {applicantName},</p>
+                        
+                        <p>Congratulations! 🎉 NOC Certificate with ID <b>{applicationID}</b> has been issued.</p><p>You can download the certificate from track status.</p>
+                        
+                        <p>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
+                        </p><br>
+                        <p>Best Regards,<br><br>
+                        Department of Water Resources, Punjab</p>
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>";
+            else
+                return $@"<htm>
+            <head></head>
+            <body style=""margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;"">
+            <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
+                <div>
+                    <div>
+                        <p>Dear {applicantName},</p>
+                        
+                        <p>Congratulations! 🎉 Exemption Letter with ID <b>{applicationID}</b> has been issued.</p><p>You can download the letter from track status.</p>
+                        
+                        <p>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
+                        </p><br>
+                        <p>Best Regards,<br><br>
+                        Department of Water Resources, Punjab</p>
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>";
+        }
+
         public static string EmailStringBodyForShortfall(string applicantName, string applicationID, string reason,string link)
         {
             return $@"<htm>

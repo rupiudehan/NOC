@@ -41,78 +41,92 @@
                             </div>
                         </div>
                     </div>
-                    @if (Model.IsForwarded == true && Model.LoggedInRole=="JUNIOR ENGINEER")
+                    @if (Model.IsForwarded == true && Model.LoggedInRole == "JUNIOR ENGINEER")
                     {
                         <div class="row">
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label asp-for="SiteConditionReportFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
-                                    <div class="custom-file1">
-                                        <input asp-for="SiteConditionReportFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
-                                        <span asp-validation-for="SiteConditionReportFile" id="SiteConditionReportFile-error" class="text-danger"></span>
+                            @if (Model.IsUnderMasterPlan)
+                            {
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <b><label asp-for="ConfirmUnderMasterPlan" class="control-label">Is Site Under Master Plan?</label></b>
+                                        <input type="checkbox" id="ConfirmUnderMasterPlan" asp-for="ConfirmUnderMasterPlan" />
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label asp-for="CatchmentAreaFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
-                                    <div class="custom-file1">
-                                        <input asp-for="CatchmentAreaFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
-                                        <span asp-validation-for="CatchmentAreaFile" id="CatchmentAreaFile-error" class="text-danger"></span>
+
+                            }
+                            else
+                            {
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label asp-for="SiteConditionReportFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                        <div class="custom-file1">
+                                            <input asp-for="SiteConditionReportFile" class="form-control custom-file-input1" accept=".pdf" />
+                                            @* <label class="custom-file-label1">Choose File...</label> *@
+                                            <span asp-validation-for="SiteConditionReportFile" id="SiteConditionReportFile-error" class="text-danger"></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label asp-for="DistanceFromCreekFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
-                                    <div class="custom-file1">
-                                        <input asp-for="DistanceFromCreekFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
-                                        <span asp-validation-for="DistanceFromCreekFile" id="DistanceFromCreekFile-error" class="text-danger"></span>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label asp-for="CatchmentAreaFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                        <div class="custom-file1">
+                                            <input asp-for="CatchmentAreaFile" class="form-control custom-file-input1" accept=".pdf" />
+                                            @* <label class="custom-file-label1">Choose File...</label> *@
+                                            <span asp-validation-for="CatchmentAreaFile" id="CatchmentAreaFile-error" class="text-danger"></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label asp-for="GisOrDwsFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
-                                    <div class="custom-file1">
-                                        <input asp-for="GisOrDwsFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
-                                        <span asp-validation-for="GisOrDwsFile" id="GisOrDwsFile-error" class="text-danger"></span>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label asp-for="DistanceFromCreekFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                        <div class="custom-file1">
+                                            <input asp-for="DistanceFromCreekFile" class="form-control custom-file-input1" accept=".pdf" />
+                                            @* <label class="custom-file-label1">Choose File...</label> *@
+                                            <span asp-validation-for="DistanceFromCreekFile" id="DistanceFromCreekFile-error" class="text-danger"></span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label asp-for="GisOrDwsFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                        <div class="custom-file1">
+                                            <input asp-for="GisOrDwsFile" class="form-control custom-file-input1" accept=".pdf" />
+                                            @* <label class="custom-file-label1">Choose File...</label> *@
+                                            <span asp-validation-for="GisOrDwsFile" id="GisOrDwsFile-error" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         </div>
-                        <div class="row">
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label asp-for="CrossSectionOrCalculationFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
-                                    <div class="custom-file1">
-                                        <input asp-for="CrossSectionOrCalculationFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
-                                        <span asp-validation-for="CrossSectionOrCalculationFile" id="CrossSectionOrCalculationFile-error" class="text-danger"></span>
+                        @if (!Model.IsUnderMasterPlan){
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label asp-for="CrossSectionOrCalculationFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                        <div class="custom-file1">
+                                            <input asp-for="CrossSectionOrCalculationFile" class="form-control custom-file-input1" accept=".pdf" />
+                                            @* <label class="custom-file-label1">Choose File...</label> *@
+                                            <span asp-validation-for="CrossSectionOrCalculationFile" id="CrossSectionOrCalculationFile-error" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label asp-for="LSectionOfDrainFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
+                                        <div class="custom-file1">
+                                            <input asp-for="LSectionOfDrainFile" class="form-control custom-file-input1" accept=".pdf" />
+                                            @* <label class="custom-file-label1">Choose File...</label> *@
+                                            <span asp-validation-for="LSectionOfDrainFile" id="LSectionOfDrainFile-error" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <b><label asp-for="IsKMLByApplicantValid" class="control-label"></label></b>
+                                        <input type="checkbox" asp-for="IsKMLByApplicantValid" checked />
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label asp-for="LSectionOfDrainFile" class="control-label"></label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
-                                    <div class="custom-file1">
-                                        <input asp-for="LSectionOfDrainFile" class="form-control custom-file-input1" accept=".pdf" />
-                                        @* <label class="custom-file-label1">Choose File...</label> *@
-                                        <span asp-validation-for="LSectionOfDrainFile" id="LSectionOfDrainFile-error" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <b><label asp-for="IsKMLByApplicantValid" class="control-label"></label></b>
-                                    <input type="checkbox" asp-for="IsKMLByApplicantValid" checked />
-                                </div>
-                            </div>
-                        </div>
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -130,6 +144,7 @@
                                 </div>
                             </div>
                         </div>
+                    }
                     }
                     <div class="row">
                         @* @if (Model.LoggedInRole == "EXECUTIVE ENGINEER" && Model.IsForwarded==false)

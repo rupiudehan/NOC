@@ -16,8 +16,9 @@ namespace Noc_App.Models
         //public string KmlFileVerificationReportPath { get; set; }
         public string CrossSectionOrCalculationSheetReportPath { get; set; }
         public string DrainLSectionPath { get; set; }
+        public bool IsUnderMasterPlan { get; set; }
         public int IsDrainNotified { get; set; }
-        public int TypeOfWidth { get; set; }
+        public int? TypeOfWidth { get; set; }
         [ForeignKey(nameof(TypeOfWidth))]
         public DrainWidthTypeDetails DrainWidthType { get; set; }
         public double DrainWidth { get; set; }

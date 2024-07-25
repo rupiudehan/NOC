@@ -81,7 +81,10 @@
                                                     {
                                                         @if (arry[0].Any(x => @* x.GrantApprovalDocId != 0 && *@ x.rejectionmust != 1 && x.IsShortFall == false))
                                                         {
-                                                            <th>Edit Documents</th>
+                                                            if (arry[0].Any(x => x.IsUnderMasterPlan == false))
+                                                            {
+                                                                <th>Edit Documents</th>
+                                                            }
                                                         }
                                                     }
                                                     else if (arry[0].Any(x => (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER") && x.IsForwarded == false && x.rejectionmust != 1 && x.IsShortFall == true))
@@ -208,73 +211,84 @@
                                                     }
                                                     @if (arry[0].Any(x => x.LoggedInRole != "PRINCIPAL SECRETARY"))
                                                     {
-                                                        @if (arry[0].Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.IsForwarded == true))
+
+                                                        if (arry[0].Any(x => x.IsUnderMasterPlan == false))
                                                         {
-                                                            @if (arry[0].Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.rejectionmust != 1))
+                                                            @if (arry[0].Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.IsForwarded == true))
                                                             {
-                                                                if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
-                                                                @* @if (arry[0].Any(x => x.GrantApprovalDocId != 0)) *@
+                                                                @if (arry[0].Any(x => x.LoggedInRole != "JUNIOR ENGINEER" && x.rejectionmust != 1))
                                                                 {
-
-                                                                    @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == true)
+                                                                    if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
+                                                                    @* @if (arry[0].Any(x => x.GrantApprovalDocId != 0)) *@
                                                                     {
-                                                                        @* @if (data.GrantApprovalDocId != 0)
-                                            { *@
-                                                                        if (data.rejectionmust != 1)
+
+                                                                        @if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == true)
                                                                         {
-                                                                            if (data.IsShortFall)
+                                                                            @* @if (data.GrantApprovalDocId != 0)
+                                            { *@
+                                                                            if (data.rejectionmust != 1)
                                                                             {
-                                                                                <td>Reverted Due to Discrepancy</td>
+                                                                                if (data.IsShortFall)
+                                                                                {
+                                                                                    <td>Reverted Due to Discrepancy</td>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                        if (data.IsUnderMasterPlan != true)
+                                                                                        {
+                                                                                            <td>
+                                                                                                <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.ApplicationID,docId=data.GrantApprovalDocId,app=data.GrantApprovalId })" class="btn btn-success">Edit</a>
+                                                                                                @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
+
+                                                                                            </td>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <td></td>
+                                                                                        }
+                                                                                }
                                                                             }
                                                                             else
                                                                             {
-                                                                                <td>
-                                                                                    <a href="@Url.Action("EditApprovalDocuments", "ApprovalProcess", new { grantId = data.ApplicationID,docId=data.GrantApprovalDocId,app=data.GrantApprovalId })" class="btn btn-success">Edit</a>
-                                                                                    @* <a asp-action="EditApprovalDocuments" asp-controller="ApprovalProcess" asp-route-Id="@data.GrantApprovalId" class="btn btn-success">Edit</a> *@
-
-                                                                                </td>
+                                                                                <td></td>
                                                                             }
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <td></td>
-                                                                        }
 
-                                                                    }
-                                                                    else if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == false)
-                                                                    {
-                                                                        @* @if (data.GrantApprovalDocId != 0)
-                                            { *@
-                                                                        if (data.rejectionmust != 1)
+                                                                        }
+                                                                        else if (data.LoggedInRole != "JUNIOR ENGINEER" && data.IsForwarded == false)
                                                                         {
-                                                                            if (data.IsShortFall)
+                                                                            @* @if (data.GrantApprovalDocId != 0)
+                                            { *@
+                                                                            if (data.rejectionmust != 1)
                                                                             {
-                                                                                <td>Reverted Due to Discrepancy</td>
+                                                                                if (data.IsShortFall)
+                                                                                {
+                                                                                    <td>Reverted Due to Discrepancy</td>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <td>
+                                                                                    </td>
+                                                                                }
                                                                             }
                                                                             else
                                                                             {
-                                                                                <td>
-                                                                                </td>
+                                                                                <td></td>
                                                                             }
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <td></td>
-                                                                        }
 
+                                                                        }
                                                                     }
-                                                                }
-                                                                else
-                                                                {
-                                                                    <td></td>
+                                                                    else
+                                                                    {
+                                                                        <td></td>
+                                                                    }
+
                                                                 }
 
                                                             }
-
-                                                        }
-                                                        else if (arry[0].Any(x => (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER") && x.IsForwarded == false && x.rejectionmust != 1 && x.IsShortFall == true))
-                                                        {
-                                                            <td>Reverted Due to Discrepancy</td>
+                                                            else if (arry[0].Any(x => (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER") && x.IsForwarded == false && x.rejectionmust != 1 && x.IsShortFall == true))
+                                                            {
+                                                                <td>Reverted Due to Discrepancy</td>
+                                                            }
                                                         }
                                                         @if (arry[0].Any(x => x.IsForwarded == true && x.rejectionmust != 1))
                                                         {

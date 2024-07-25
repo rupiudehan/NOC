@@ -286,13 +286,14 @@ namespace Noc_App.Controllers
                              join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID into grantApproval
                              from approval in grantApproval.DefaultIfEmpty()
                              where g.ApplicationID.ToLower() == searchString.Trim().ToLower()
+                             orderby approval.ProcessedOn descending
                              select new GrantStatusViewModel
                              {
                                  ApplicationID = g.ApplicationID,
                                  IsApproved = g.IsApproved,
                                  CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
                                  ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
-                                 ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification" : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant" : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "UnProcessed" : "UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan?"Exemption Letter Issued":"NOC Issued" : "UnProcessed",
+                                 ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification" :  g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Applicant updated modifications. Now Pending With " + approval.ProcessedByName : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant" : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "UnProcessed" : "UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan?"Exemption Letter Issued":"NOC Issued" : "UnProcessed",
                                  CertificateFilePath = g.CertificateFilePath,
                                  IsUnderMasterPlan=g.IsUnderMasterPlan
                              }
@@ -1101,9 +1102,8 @@ namespace Noc_App.Controllers
        {
             try
             {
+                int flag = 0;
                 var grant = (from g in _repo.GetAll()
-                             join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID
-                             //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
                              join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
                              join s in _subDivisionRepo.GetAll() on g.SubDivisionId equals s.Id
                              join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
@@ -1112,19 +1112,71 @@ namespace Noc_App.Controllers
                              join r in _grantrejectionRepository.GetAll() on a.Id equals r.GrantApprovalId
                              join pr in _grantsectionRepository.GetAll() on r.SectionId equals pr.Id
                              where g.ApplicationID.ToLower() == id.Trim().ToLower()
-                             && m.Code.ToUpper() == "SF" 
-                             && g.ShortFallLevel == a.ProcessLevel && g.IsShortFallCompleted==false
+                             && m.Code.ToUpper() == "SF"
+                             && g.ShortFallLevel == a.ProcessLevel && g.IsShortFallCompleted == false
                              select new
                              {
                                  Grant = g,
-                                 Payment = p,
-                                 //Village = v,
                                  Tehsil = t,
                                  SubDivision = s,
                                  Division = d
                              }
                          ).FirstOrDefault();
-                if (grant != null)
+                if (!grant.Grant.IsUnderMasterPlan)
+                {
+                    var grant2 = (from g in _repo.GetAll()
+                                  join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID
+                                  //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                                  join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
+                                  join s in _subDivisionRepo.GetAll() on g.SubDivisionId equals s.Id
+                                  join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
+                                  join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
+                                  join m in _repoApprovalMaster.GetAll() on a.ApprovalID equals m.Id
+                                  join r in _grantrejectionRepository.GetAll() on a.Id equals r.GrantApprovalId
+                                  join pr in _grantsectionRepository.GetAll() on r.SectionId equals pr.Id
+                                  where g.ApplicationID.ToLower() == id.Trim().ToLower()
+                                  && m.Code.ToUpper() == "SF"
+                                  && g.ShortFallLevel == a.ProcessLevel && g.IsShortFallCompleted == false
+                                  select new
+                                  {
+                                      Grant = g,
+                                      Payment = p,
+                                      //Village = v,
+                                      Tehsil = t,
+                                      SubDivision = s,
+                                      Division = d
+                                  }
+                             ).FirstOrDefault();
+                    if (grant2 != null) flag = 1;
+                }
+                else
+                {
+                    var grant2 = (from g in _repo.GetAll()
+                                 join p in _masterPlanDetailsRepository.GetAll() on g.MasterPlanId equals p.Id
+                                 //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                                 join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
+                                 join s in _subDivisionRepo.GetAll() on g.SubDivisionId equals s.Id
+                                 join d in _divisionRepo.GetAll() on s.DivisionId equals d.Id
+                                 join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
+                                 join m in _repoApprovalMaster.GetAll() on a.ApprovalID equals m.Id
+                                 join r in _grantrejectionRepository.GetAll() on a.Id equals r.GrantApprovalId
+                                 join pr in _grantsectionRepository.GetAll() on r.SectionId equals pr.Id
+                                 where g.ApplicationID.ToLower() == id.Trim().ToLower()
+                                 && m.Code.ToUpper() == "SF"
+                                 && g.ShortFallLevel == a.ProcessLevel && g.IsShortFallCompleted == false
+                                 select new
+                                 {
+                                     Grant = g,
+                                     Payment = p,
+                                     //Village = v,
+                                     Tehsil = t,
+                                     SubDivision = s,
+                                     Division = d
+                                 }
+                         ).FirstOrDefault();
+                    if (grant2 != null) flag = 1;
+                }
+                if (flag==1)
                 {
                     string startDateStr =  string.Format("{0:dd/MM/yyyy}", grant.Grant.ShortFallReportedOn);
                     string endDateStr = string.Format("{0:dd/MM/yyyy}", DateTime.Now);
@@ -1270,15 +1322,15 @@ namespace Noc_App.Controllers
                                 Divisions = new SelectList(divisions, "Id", "Name", grant.Division.Id),
                                 ProjectType = new SelectList(projectType, "Id", "Name", grant.Grant.ProjectTypeId),
                                 PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name", grant.Grant.PlanSanctionAuthorityId),
-                                NocPermissionType = new SelectList(nocPermission, "Id", "Name", grant.Grant.NocPermissionTypeID),
-                                NocType = new SelectList(nocType, "Id", "Name", grant.Grant.NocTypeId),
+                                NocPermissionType = grant.Grant.IsUnderMasterPlan?null: new SelectList(nocPermission, "Id", "Name", grant.Grant.NocPermissionTypeID),
+                                NocType = grant.Grant.IsUnderMasterPlan ? null : new SelectList(nocType, "Id", "Name", grant.Grant.NocTypeId),
                                 //Village = new SelectList(villages, "Id", "Name", grant.Village.Id),
                                 TehsilBlock = new SelectList(tehsils, "Id", "Name", grant.Tehsil.Id),
                                 SubDivision = new SelectList(subdivisions, "Id", "Name", grant.SubDivision.Id),
                                 SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
                                 GrantKhasras = khasralist,
                                 Owners = ownerlist,
-                                SelectedSiteAreaUnitId = grant.Grant.SiteAreaUnitId??0,
+                                SelectedSiteAreaUnitId = grant.Grant.IsUnderMasterPlan ? 0 : grant.Grant.SiteAreaUnitId??0,
                                 IsOtherTypeSelected = 0,
                                 IsConfirmed = false,
                                 IsExtension = 0,
@@ -1299,16 +1351,16 @@ namespace Noc_App.Controllers
                                 PermisionGrantId = grant.Grant.Id,
                                 OwnerGrantId = grant.Grant.Id,
                                 ApplicantGrantId = grant.Grant.Id,
-                                KmlLinkName = grant.Grant.KMLLinkName,
-                                NocNumber = grant.Grant.NocNumber,
-                                OtherProjectTypeDetail = grant.Grant.OtherProjectTypeDetail,
+                                KmlLinkName = grant.Grant.IsUnderMasterPlan ? null : grant.Grant.KMLLinkName,
+                                NocNumber = grant.Grant.IsUnderMasterPlan ? null : grant.Grant.NocNumber,
+                                OtherProjectTypeDetail = grant.Grant.IsUnderMasterPlan ? null : grant.Grant.OtherProjectTypeDetail,
                                 Pincode = grant.Grant.PinCode.ToString(),
                                 PlotNo = grant.Grant.PlotNo,
-                                PreviousDate = grant.Grant.PreviousDate,
+                                PreviousDate = grant.Grant.IsUnderMasterPlan ? null : grant.Grant.PreviousDate,
                                 OwnerType = new SelectList(ownertype, "Id", "Name"),
                                 SelectedDivisionId = grant.Division.Id,
-                                SelectedNocPermissionTypeID = grant.Grant.NocPermissionTypeID,
-                                SelectedNocTypeId = grant.Grant.NocTypeId,
+                                SelectedNocPermissionTypeID = grant.Grant.IsUnderMasterPlan ? null : grant.Grant.NocPermissionTypeID,
+                                SelectedNocTypeId = grant.Grant.IsUnderMasterPlan ? null : grant.Grant.NocTypeId,
                                 SelectedProjectTypeId = grant.Grant.ProjectTypeId,
                                 SelectedSubDivisionId = grant.SubDivision.Id,
                                 SelectedTehsilBlockId = grant.Tehsil.Id,
@@ -1320,15 +1372,15 @@ namespace Noc_App.Controllers
                                 LayoutPlanFilePath = grant.Grant.LayoutPlanFilePath,
                                 FaradFilePath = grant.Grant.FaradFilePath,
                                 KMLFilePath = grant.Grant.KMLFilePath,
-                                KUnitValue = KanalOrBigha.UnitValue,
-                                KTimesof = KanalOrBigha.Timesof,
-                                KDivideBy = KanalOrBigha.DivideBy,
-                                MUnitValue = MarlaOrBiswa.UnitValue,
-                                MTimesof = MarlaOrBiswa.Timesof,
-                                MDivideBy = MarlaOrBiswa.DivideBy,
-                                SUnitValue = SarsaiOrBiswansi.UnitValue,
-                                STimesof = SarsaiOrBiswansi.Timesof,
-                                SDivideBy = SarsaiOrBiswansi.DivideBy,
+                                KUnitValue = grant.Grant.IsUnderMasterPlan ? 0 : KanalOrBigha.UnitValue,
+                                KTimesof = grant.Grant.IsUnderMasterPlan ? 0 : KanalOrBigha.Timesof,
+                                KDivideBy = grant.Grant.IsUnderMasterPlan ? 0 : KanalOrBigha.DivideBy,
+                                MUnitValue = grant.Grant.IsUnderMasterPlan ? 0 : MarlaOrBiswa.UnitValue,
+                                MTimesof = grant.Grant.IsUnderMasterPlan ? 0 : MarlaOrBiswa.Timesof,
+                                MDivideBy = grant.Grant.IsUnderMasterPlan ? 0 : MarlaOrBiswa.DivideBy,
+                                SUnitValue = grant.Grant.IsUnderMasterPlan ? 0 : SarsaiOrBiswansi.UnitValue,
+                                STimesof = grant.Grant.IsUnderMasterPlan ? 0 : SarsaiOrBiswansi.Timesof,
+                                SDivideBy = grant.Grant.IsUnderMasterPlan ? 0 : SarsaiOrBiswansi.DivideBy,
                                 GrantSections = sections,
                                 AreAllSectionCompleted = totalCompleted
                             };
