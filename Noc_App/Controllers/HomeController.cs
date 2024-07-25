@@ -231,7 +231,20 @@ namespace Noc_App.Controllers
                 {
                     if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
                     {
+                    if (divisionId != 0)
+                    {
+                        divisions = (from d in _divisionRepo.GetAll()
+                                     where d.Id == Convert.ToInt32(divisionsId)
+                                     select new DivisionDetails
+                                     {
+                                         Id = d.Id,
+                                         Name = d.Name
+                                     }).FirstOrDefault();
+                    }
+                    else
+                    {
                         divisions = _divisionRepo.GetAll().FirstOrDefault();
+                    }
                     }
                     else 
                     //if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")

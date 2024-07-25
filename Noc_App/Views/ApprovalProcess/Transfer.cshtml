@@ -79,7 +79,9 @@
                         </div> *@
                         <div class="col-lg-3">
                             <div class="form-group">
-                                <label asp-for="SelectedOfficerId" class="control-label">Transfer To JUNIOR ENGINEER</label>
+                                <label asp-for="SelectedOfficerId" class="control-label">Transfer To JUNIOR ENGINEER/SUB DIVISIONAL OFFICER</label><span class="info-icon" style="color:royalblue" data-toggle="tooltip" data-placement="top" title="This file shall be transferred only if he has not taken action on any file.">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
                                 @if (Model.Officers != null)
                                 {
                                     if (Model.Officers.Count() > 0)

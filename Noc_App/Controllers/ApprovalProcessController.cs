@@ -416,7 +416,7 @@ namespace Noc_App.Controllers
             //                        ).ToList();
 
             List<OfficerDetails> officerDetail = new List<OfficerDetails>();
-            officerDetail = await GetOfficer(divisionId, "JUNIOR ENGINEER", "0");
+            officerDetail = await GetOfficer(divisionId, "JUNIOR ENGINEER, SUB DIVISIONAL OFFICER", "0");
 
             GrantApprovalDetailTransferCreate model = new GrantApprovalDetailTransferCreate
             {
@@ -2065,6 +2065,8 @@ namespace Noc_App.Controllers
                                                                      Recommended = recommend.Name,
                                                                      RecommendedBy = a.ProcessedByRole,
                                                                      RecommendedTo = a.ProcessedToRole,
+                                                                     RecommendedByName=a.ProcessedByName,
+                                                                     RecommendedToName=a.ProcessedToName,
                                                                      Remarks = a.Remarks
                                                                  }).ToList();
 

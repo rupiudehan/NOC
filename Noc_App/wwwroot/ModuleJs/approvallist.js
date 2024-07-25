@@ -73,7 +73,9 @@ function SetValueNA(id) {
                     tr += '<td>' + value.applicationId + '</td>';
                     tr += '<td>' + value.recommended + '</td>';
                     tr += '<td>' + value.remarks + '</td>';
+                    tr += '<td>' + value.recommendedByName + '</td>';
                     tr += '<td>' + value.recommendedBy + '</td>';
+                    tr += '<td>' + value.recommendedToName + '</td>';
                     tr += '<td>' + value.recommendedTo + '</td>';
                     tr += '</tr>';
                     body.append(tr);
