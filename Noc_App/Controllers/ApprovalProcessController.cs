@@ -1781,7 +1781,9 @@ namespace Noc_App.Controllers
                                                                      Recommended = recommend.Name,
                                                                      RecommendedBy = ap.ProcessedByRole,
                                                                      RecommendedTo = ap.ProcessedToRole,
-                                                                     Remarks = ap.Remarks
+                                                                     Remarks = ap.Remarks,
+                                                                     RecommendedByName=ap.ProcessedByName,
+                                                                     RecommendedToName=ap.ProcessedToName
                                                                  }).ToList();
                 List<GrantFileTransferDetails> modelFileTransfer = (from ap in _grantFileTransferRepository.GetAll()
                                                                                where ap.GrantId == obj.Id 

@@ -117,7 +117,7 @@ namespace Noc_App.Models.ViewModel
         public DateTime CreatedOn { get; set; }
         public bool IsUnderMasterPlan { get; set; }
         [Required]
-        [Display(Name = "Is Under Master Plan")]
+        [Display(Name = "Is Site Under Master Plan?")]
         public string SelectedMasterPlanTautology { get; set; }
         public IEnumerable<SelectListItem> MasterPlanTautology { get; set; }
         [Display(Name = "Master Plan")]

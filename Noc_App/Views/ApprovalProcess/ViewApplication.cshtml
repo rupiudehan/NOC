@@ -60,7 +60,7 @@
                                     else
                                     {
 
-                                    <td class="boldText">Is Under Master Plan</td>
+                                        <td class="boldText">Is Site Under Master Plan?</td>
                                     <td>@Model.UnderMasterPlan</td>
                                     <td></td><td></td>
                                     }
@@ -275,7 +275,9 @@
                                                             @* <th>#</th> *@
                                                             @* <th>Application ID</th> *@
                                                             <th>Recommended By</th>
+                                                            <th>Recommended By Designation</th>
                                                             <th>Processed To</th>
+                                                            <th>Processed To Designation</th>
                                                             <th>Recommendation</th>
                                                             <th>Remarks</th>
                                                         </tr>
@@ -289,10 +291,16 @@
                                                                     <input asp-for="GrantApprovalRecommendationDetails[i].ApplicationId" readonly class="form-control form-control-user" />
                                                     </td> *@
                                                                 <td>
-                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedTo" readonly class="form-control form-control-user" />
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedByName" readonly class="form-control form-control-user" />
                                                                 </td>
                                                                 <td>
                                                                     <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedBy" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedTo" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].RecommendedToName" readonly class="form-control form-control-user" />
                                                                 </td>
                                                                 <td>
                                                                     <input asp-for="GrantApprovalRecommendationDetails[i].Recommended" readonly class="form-control form-control-user" />

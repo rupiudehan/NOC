@@ -56,11 +56,10 @@ namespace Noc_App.Context
                 new MasterPlanDetails { Id = 4,MainPlanName= "GMADA", Name = "GMADA Regional Plan", Code = "G", DistrictId = 19 },
                 new MasterPlanDetails { Id = 5,MainPlanName= "GMADA", Name = "Kharar (2031)", Code = "K", DistrictId = 19 },
                 new MasterPlanDetails { Id = 6,MainPlanName= "GMADA", Name = "Lalru", Code = "L" , DistrictId = 19 },
-                new MasterPlanDetails { Id = 7,MainPlanName= "GMADA", Name = "Dera Bassi", Code = "D", DistrictId = 19 },
-                new MasterPlanDetails { Id = 8,MainPlanName= "GMADA", Name = "Mandigobindgarh (2010-2031)", Code = "MG", DistrictId = 19 },
-                new MasterPlanDetails { Id = 9,MainPlanName = "GMADA", Name = "Mullanpur", Code = "M", DistrictId = 19 },
-                new MasterPlanDetails { Id = 10, MainPlanName = "GMADA", Name = "New Chandigarh (2008-2031)", Code = "NC", DistrictId = 19 },
-                new MasterPlanDetails { Id = 11, MainPlanName = "GMADA", Name = "Zirakpur (2031)", Code = "Z" , DistrictId = 19 }
+                new MasterPlanDetails { Id = 7,MainPlanName= "GMADA", Name = "Mandigobindgarh (2010-2031)", Code = "MG", DistrictId = 19 },
+                new MasterPlanDetails { Id = 8,MainPlanName = "GMADA", Name = "Mullanpur", Code = "M", DistrictId = 19 },
+                new MasterPlanDetails { Id = 9, MainPlanName = "GMADA", Name = "New Chandigarh (2008-2031)", Code = "NC", DistrictId = 19 },
+                new MasterPlanDetails { Id = 10, MainPlanName = "GMADA", Name = "Zirakpur (2031)", Code = "Z" , DistrictId = 19 }
                 );
 
             modelBuilder.Entity<DrainWidthTypeDetails>().HasData(
