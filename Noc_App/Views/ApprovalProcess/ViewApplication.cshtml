@@ -309,6 +309,42 @@
                                         </td>
                                     </tr>
                                 }
+                                @if (Model.GrantFileTransferDetail.Count() > 0)
+                                {
+                                    <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Application Transfer History</h6></td></tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="col-lg-12">
+                                                <table id="fileTable" class="table table-bordered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Transfered By</th>
+                                                            <th>Remarks</th>
+                                                            <th>Transfered To</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @for (int i = 0; i < Model.GrantFileTransferDetail.Count(); i++)
+                                                        {
+                                                            <tr class="file-entry">
+                                                                <td>
+                                                                    <input asp-for="GrantFileTransferDetail[i].FromName" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantFileTransferDetail[i].Remarks" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantFileTransferDetail[i].ToName" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <!-- Render more columns as needed -->
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                                 @if (Model.GrantInspectionDocumentsDetail.Count() > 0)
                                 {
                                     @foreach (GrantInspectionDocuments item in Model.GrantInspectionDocumentsDetail)

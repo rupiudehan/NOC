@@ -327,14 +327,22 @@ namespace Noc_App.Controllers
                                               EmployeeId = officer.user_info.EmployeeId,
                                               RoleName = u.AppRoleName,
                                               RoleId = u.Id.ToString(),
-                                              UserName = officer.user_info.EmployeeName + "(" + officer.user_info.DeesignationName + ")"
+                                              UserName = officer.user_info.EmployeeName + "(" + officer.user_info.DeesignationName + ")",
+                                              Designation=officer.user_info.DeesignationName,
+                                              Name=officer.user_info.EmployeeName
                                           }).FirstOrDefault();
+                string username = LoggedInUserName();
+                string designation=LoggedInDesignationName();
                 GrantFileTransferDetails details = new GrantFileTransferDetails {
                     GrantId = grant.Id,
                     FromAuthorityId=userId,
                     ToAuthorityId=model.SelectedOfficerId,
                     Remarks=model.Remarks,
-                    TransferedOn=DateTime.Now
+                    TransferedOn=DateTime.Now,
+                    FromName=username,
+                    FromDesignationName=designation,
+                    ToName=userRole.Name,
+                    ToDesignationName=userRole.Designation
                 };
 
 
@@ -1775,6 +1783,20 @@ namespace Noc_App.Controllers
                                                                      RecommendedTo = ap.ProcessedToRole,
                                                                      Remarks = ap.Remarks
                                                                  }).ToList();
+                List<GrantFileTransferDetails> modelFileTransfer = (from ap in _grantFileTransferRepository.GetAll()
+                                                                               where ap.GrantId == obj.Id 
+                                                                               orderby ap.TransferedOn descending
+                                                                               select new GrantFileTransferDetails
+                                                                               {
+                                                                                   FromName=ap.FromName,
+                                                                                   Remarks = ap.Remarks,
+                                                                                   FromDesignationName=ap.FromDesignationName,
+                                                                                   FromAuthorityId=ap.FromAuthorityId,
+                                                                                   ToAuthorityId=ap.ToAuthorityId,
+                                                                                   ToName=ap.ToName,
+                                                                                   ToDesignationName=ap.ToDesignationName,
+                                                                                   TransferedOn=ap.TransferedOn
+                                                                               }).ToList();
                 var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
                 if (payment == null || payment.Count() == 0)
                 {
@@ -1815,6 +1837,7 @@ namespace Noc_App.Controllers
                         LayoutPlanFilePath=obj.LayoutPlanFilePath,
                         GrantInspectionDocumentsDetail = documents,
                         GrantApprovalRecommendationDetails=modelRecommendation,
+                        GrantFileTransferDetail= modelFileTransfer,
                         LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode,
                         IsUnderMasterPlan = obj.IsUnderMasterPlan,
                         MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
@@ -1862,6 +1885,7 @@ namespace Noc_App.Controllers
                         LayoutPlanFilePath = obj.LayoutPlanFilePath,
                         GrantInspectionDocumentsDetail = documents,
                         GrantApprovalRecommendationDetails = modelRecommendation,
+                        GrantFileTransferDetail = modelFileTransfer,
                         LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode,
                         IsUnderMasterPlan = obj.IsUnderMasterPlan,
                         MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
@@ -2254,7 +2278,9 @@ namespace Noc_App.Controllers
                                               {
                                                   EmployeeId = officer.user_info.EmployeeId,
                                                   RoleName = u.AppRoleName,
-                                                  RoleId = u.Id.ToString()
+                                                  RoleId = u.Id.ToString(),
+                                                  Name=officer.user_info.EmployeeName,
+                                                  Designation=officer.user_info.DeesignationName
                                               });
                     //var usersInRole = (await _userManager.GetUsersInRoleAsync(forwardToRole));
                     List<OfficerDetails> officerDetails = ((from u in officers.AsEnumerable()
@@ -2264,7 +2290,9 @@ namespace Noc_App.Controllers
                                                                 UserId = u.user_info.EmployeeId,
                                                                 UserName = u.user_info.EmployeeName+"("+u.user_info.DeesignationName+")",
                                                                 RoleId = u.user_info.RoleID.ToString(),
-                                                                RoleName = o.RoleName
+                                                                RoleName = o.RoleName,
+                                                                Name=o.Name,
+                                                                Designation=o.Designation
                                                             }
                                                           ).ToList());
                     return officerDetails;

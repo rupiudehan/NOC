@@ -62,6 +62,7 @@ namespace Noc_App.Models.ViewModel
         public List<GrantKhasraDetails> Khasras { get; set; }
         public List<GrantInspectionDocuments> GrantInspectionDocumentsDetail { get; set; }
         public List<GrantApprovalRecommendationDetail> GrantApprovalRecommendationDetails { get; set; }
+        public List<GrantFileTransferDetails> GrantFileTransferDetail { get; set; }
         public string LocationDetail { get; set; }
         public string Domain { get; set; }
         public bool IsUnderMasterPlan { get; set; }
