@@ -416,7 +416,7 @@ namespace Noc_App.Controllers
             //                        ).ToList();
 
             List<OfficerDetails> officerDetail = new List<OfficerDetails>();
-            officerDetail = await GetOfficer(divisionId, "JUNIOR ENGINEER, SUB DIVISIONAL OFFICER", "0");
+            officerDetail = await GetOfficer(divisionId, "JUNIOR ENGINEER", "0");//,SUB DIVISIONAL OFFICER
 
             GrantApprovalDetailTransferCreate model = new GrantApprovalDetailTransferCreate
             {
@@ -2263,7 +2263,8 @@ namespace Noc_App.Controllers
         {
             try
             {
-                return (await _userRolesRepository.FindAsync(x => x.AppRoleName == rolename)).FirstOrDefault();
+                var desig = (await _userRolesRepository.FindAsync(x => x.AppRoleName == rolename));
+                return desig.FirstOrDefault();
             }
             catch (Exception ex)
             {
