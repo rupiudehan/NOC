@@ -65,7 +65,7 @@
                                                 <th>Date of Application</th>
                                                 <th>Project Name</th>
                                                 <th>Location Details</th>
-                                                <th>Processed By</th>
+                                                <th>Processed By </th>
                                                 @if (arry[0].Any(x => x.LastForwardedByRole != ""))
                                                 {
                                                     <th>Remarks</th>
@@ -123,7 +123,7 @@
                                                     }
                                                     else
                                                     {
-                                                        if (arry[0].Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && (x.LastForwardedByRole == "" || x.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (x.LoggedInRole == "JUNIOR ENGINEER" && x.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((x.LoggedInRole == x.LastForwardedByRole) && (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (x.LoggedInRole == "SUB DIVISIONAL OFFICER" && x.LastForwardedByRole == "JUNIOR ENGINEER")))
+                                                        if (arry[0].Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && (x.LastForwardedByRole == "" || x.LastForwardedByRole == null || x.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (x.LoggedInRole == "JUNIOR ENGINEER" && x.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((x.LoggedInRole == x.LastForwardedByRole) && (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (x.LoggedInRole == "SUB DIVISIONAL OFFICER" && x.LastForwardedByRole == "JUNIOR ENGINEER")))
                                                         {
                                                             @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
                                                             {
@@ -167,12 +167,12 @@
                                                                     }
                                                                     else
                                                                     {
-                                                                        @:Applicant
+                                                                        @:Applicant 
                                                                     }
                                                                 }
                                                                 else
                                                                 {
-                                                                    @:Applicant
+                                                                    @:Applicant 
                                                                 }
                                                             }
                                                             else
@@ -399,7 +399,7 @@
                                                                     {
                                                                         if (data.IsUnderMasterPlan)
                                                                         {
-                                                                            if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "" || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
+                                                                            if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "" || data.LastForwardedByRole == null || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
                                                                             @* if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "")) || (data.LoggedInRole == "JUNIOR ENGINEER") || (data.LoggedInRole == "SUB DIVISIONAL OFFICER"))) *@
                                                                             {
                                                                                 <td>
@@ -460,9 +460,9 @@
                                                         {
                                                             @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
                                                             {
-                                                                if (arry[0].Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && (x.LastForwardedByRole == "" || x.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (x.LoggedInRole == "JUNIOR ENGINEER" && x.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((x.LoggedInRole == x.LastForwardedByRole) && (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (x.LoggedInRole == "SUB DIVISIONAL OFFICER" && x.LastForwardedByRole == "JUNIOR ENGINEER")))
+                                                                if (arry[0].Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && (x.LastForwardedByRole == "" || x.LastForwardedByRole == null || x.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (x.LoggedInRole == "JUNIOR ENGINEER" && x.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((x.LoggedInRole == x.LastForwardedByRole) && (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (x.LoggedInRole == "SUB DIVISIONAL OFFICER" && x.LastForwardedByRole == "JUNIOR ENGINEER")))
                                                                 {
-                                                                    if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "" || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
+                                                                    if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "" || data.LastForwardedByRole == null || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
                                                                     {
                                                                         @if (data.rejectionmust != 1)
                                                                         {

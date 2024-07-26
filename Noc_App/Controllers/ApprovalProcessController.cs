@@ -729,8 +729,6 @@ namespace Noc_App.Controllers
                     SiteUnitMaster m = units.Where(x => x.UnitCode.ToUpper() == "M").FirstOrDefault();
                     SiteUnitMaster s = units.Where(x => x.UnitCode.ToUpper() == "S").FirstOrDefault();
                 }
-                string code = model.IsDrainNotified ? "N" : "C";
-                var typeofwidth = (await _drainwidthRepository.FindAsync(x => x.Code == code)).FirstOrDefault();
                 
                 //var total = Math.Round(((from kh in _khasraRepo.GetAll()
                 //                         where kh.GrantID == grant.Id
@@ -866,10 +864,13 @@ namespace Noc_App.Controllers
                     var offc = (await GetOfficer(divisionId, forwardrole, subdiv)).FindAll(x => x.UserId == model.SelectedOfficerId);
                     officerDetail = offc.Find(x=>x.UserId==model.SelectedOfficerId);
                 }
-                string forwardedUser = "";// officerDetail.UserId;
-                string forwardedRole = "";// officerDetail.RoleName;
+                string forwardedUser = officerDetail.UserId;
+                string forwardedRole = officerDetail.RoleName;
                 int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
-               
+
+
+                string code = model.IsDrainNotified ? "N" : "C";
+                var typeofwidth = (await _drainwidthRepository.FindAsync(x => x.Code == code)).FirstOrDefault();
                 model.Id = grant.Id;
                 model.Name = grant.Name;
                 model.TotalArea = 0.0;
@@ -884,15 +885,6 @@ namespace Noc_App.Controllers
                 model.IsForwarded = grant.IsForwarded;
                 model.TypeOfWidth = typeofwidth.Id;
                 model.Officers = new SelectList(officerDetails, "UserId", "UserName");
-                List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
-                recommendations = _repoRecommendation.GetAll().Where(x => x.Code != "NA").ToList();
-                model.Recommendations = recommendations != null && recommendations.Count() > 0 ? new SelectList(recommendations, "Id", "Name") : null;
-                List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
-                {
-                    new TautologyDetails{Text="No",Value="false"},
-                    new TautologyDetails{Text="Yes",Value="true"}
-                };
-                model.ConfirmUnderMasterPlan = new SelectList(tautologyDetails, "Value", "Text", model.SelectedIsUnderMasterPlanId);
                 GrantApprovalDetail approvalDetail = new GrantApprovalDetail
                 {
                     GrantID = grant.Id,
@@ -908,6 +900,15 @@ namespace Noc_App.Controllers
                     RecommendationID = role == "EXECUTIVE ENGINEER" && model.SelectedRecommendationId==0?3: model.SelectedRecommendationId,
                     Remarks=model.Remarks
                 };
+                List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
+                recommendations = _repoRecommendation.GetAll().Where(x => x.Code != "NA").ToList();
+                model.Recommendations = recommendations != null && recommendations.Count() > 0 ? new SelectList(recommendations, "Id", "Name") : null;
+                List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
+                {
+                    new TautologyDetails{Text="No",Value="false"},
+                    new TautologyDetails{Text="Yes",Value="true"}
+                };
+                model.ConfirmUnderMasterPlan = new SelectList(tautologyDetails, "Value", "Text", model.SelectedIsUnderMasterPlanId);
 
                 if (role=="JUNIOR ENGINEER")
                 {
