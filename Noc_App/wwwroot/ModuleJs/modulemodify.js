@@ -914,12 +914,11 @@ $(function () {
         sarsai = sarsai != '' ? parseFloat(sarsai) : 0;
         var total = ((kanal * KUnitValue * KTimesof) / KDivideBy) + ((marla * MUnitValue * MTimesof) / MDivideBy) + ((sarsai * SUnitValue * STimesof) / SDivideBy);
         var TotalArea = parseFloat($('#TotalArea').text()) + total;
-        $('#TotalArea').text(TotalArea.toFixed(4));
+        $('#TotalArea').text(TotalArea.toFixed(5));
         var totalSqFeet = (TotalArea * 43560);
         var totalSqMeter = (TotalArea * 4046.86);
-        console.log(totalSqFeet)
-        $('#TotalAreaSqFeet').text(totalSqFeet.toFixed(4));
-        $('#TotalAreaSqMetre').text(totalSqMeter.toFixed(4));
+        $('#TotalAreaSqFeet').text(totalSqFeet.toFixed(5));
+        $('#TotalAreaSqMetre').text(totalSqMeter.toFixed(5));
     });
     $('#MarlaOrBiswa').on('change', function (e) {
         var marla = $(this).val();
@@ -948,11 +947,11 @@ $(function () {
         sarsai = sarsai != '' ? parseFloat(sarsai) : 0;
         var total = ((kanal * KUnitValue * KTimesof) / KDivideBy) + ((marla * MUnitValue * MTimesof) / MDivideBy) + ((sarsai * SUnitValue * STimesof) / SDivideBy);
         var TotalArea = parseFloat($('#TotalArea').text()) + total;
-        $('#TotalArea').text(TotalArea.toFixed(4));
+        $('#TotalArea').text(TotalArea.toFixed(5));
         var totalSqFeet = (TotalArea * 43560);
         var totalSqMeter = (TotalArea * 4046.86);
-        $('#TotalAreaSqFeet').text(totalSqFeet.toFixed(4));
-        $('#TotalAreaSqMetre').text(totalSqMeter.toFixed(4));
+        $('#TotalAreaSqFeet').text(totalSqFeet.toFixed(5));
+        $('#TotalAreaSqMetre').text(totalSqMeter.toFixed(5));
     });
     $('#SarsaiOrBiswansi').on('change', function (e) {
         var sarsai = $(this).val();
@@ -981,11 +980,11 @@ $(function () {
         sarsai = sarsai != '' ? parseFloat(sarsai) : 0;
         var total = ((kanal * KUnitValue * KTimesof) / KDivideBy) + ((marla * MUnitValue * MTimesof) / MDivideBy) + ((sarsai * SUnitValue * STimesof) / SDivideBy);
         var TotalArea = parseFloat($('#TotalArea').text()) + total;
-        $('#TotalArea').text(TotalArea.toFixed(4));
+        $('#TotalArea').text(TotalArea.toFixed(5));
         var totalSqFeet = (TotalArea * 43560);
         var totalSqMeter = (TotalArea * 4046.86);
-        $('#TotalAreaSqFeet').text(totalSqFeet.toFixed(4));
-        $('#TotalAreaSqMetre').text(totalSqMeter.toFixed(4));
+        $('#TotalAreaSqFeet').text(totalSqFeet.toFixed(5));
+        $('#TotalAreaSqMetre').text(totalSqMeter.toFixed(5));
     });
 
     const style = document.createElement('style');

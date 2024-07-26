@@ -131,7 +131,7 @@ namespace Noc_App.Controllers
                                          {
                                              TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
 
-                                         }).Sum(d => d.TotalArea)), 4);
+                                         }).Sum(d => d.TotalArea)), 5);
                     double TotalPayment = 0;
                     //string calculation = "";
 
@@ -384,7 +384,7 @@ namespace Noc_App.Controllers
                         SiteUnitId = unit.Id
                     };
                     var units = await _calculations.CalculateUnits(unitDetails);
-                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
+                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 5);
                 }
                 var payment = g.Payment;
                     if (payment == null)
@@ -417,8 +417,8 @@ namespace Noc_App.Controllers
                             ProjectTypeName = g.Project.Name,
                             SiteAreaUnitName = obj.IsUnderMasterPlan ? "" : unit.Name,
                             TotalArea = totalArea.ToString(),
-                            TotalAreaSqFeet = Math.Round((totalArea * 43560), 4).ToString(),
-                            TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 4).ToString(),
+                            TotalAreaSqFeet = Math.Round((totalArea * 43560), 5).ToString(),
+                            TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 5).ToString(),
                             Owners = owners,
                             Khasras = khasras,
                             PlanSanctionAuthorityName = g.PlanSanction.Name,
@@ -459,8 +459,8 @@ namespace Noc_App.Controllers
                             ProjectTypeName = g.Project.Name,
                             SiteAreaUnitName = unit.Name,
                             TotalArea = totalArea.ToString(),
-                            TotalAreaSqFeet = Math.Round((totalArea * 43560), 4).ToString(),
-                            TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 4).ToString(),
+                            TotalAreaSqFeet = Math.Round((totalArea * 43560), 5).ToString(),
+                            TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 5).ToString(),
                             Owners = owners,
                             Khasras = khasras,
                             PlanSanctionAuthorityName = g.PlanSanction.Name,
@@ -516,7 +516,7 @@ namespace Noc_App.Controllers
                         SiteUnitId = unit.Id
                     };
                     var units = await _calculations.CalculateUnits(unitDetails);
-                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
+                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 5);
 
                 }
                 double TotalPayment = 0;
@@ -1241,7 +1241,7 @@ namespace Noc_App.Controllers
                                     SiteUnitId = grant.Grant.SiteAreaUnitId??0
                                 };
                                 var units = await _calculations.CalculateUnits(unitDetails);
-                                totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
+                                totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 5);
                                 khasralist.Add(new GrantKhasraViewModelCreate { RowId = ++count, KId = item.Id, KanalOrBigha = item.KanalOrBigha, KhasraNo = item.KhasraNo, MarlaOrBiswa = item.MarlaOrBiswa, SarsaiOrBiswansi = item.SarsaiOrBiswansi });
                             }
                             List<SiteUnitMaster> unitMaster = (await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.Grant.SiteAreaUnitId)).ToList();
@@ -1335,8 +1335,8 @@ namespace Noc_App.Controllers
                                 IsConfirmed = false,
                                 IsExtension = 0,
                                 TotalArea = totalArea.ToString("#.####"),
-                                TotalAreaSqFeet = (totalArea * 43560).ToString("#.####"),
-                                TotalAreaSqMetre = (totalArea * 4046.86).ToString("#.####"),
+                                TotalAreaSqFeet = Math.Round((totalArea * 43560),5).ToString("#.####"),
+                                TotalAreaSqMetre = Math.Round((totalArea * 4046.86),5).ToString("#.####"),
                                 Name = grant.Grant.Name,
                                 ApplicantEmailID = grant.Grant.ApplicantEmailID,
                                 ApplicantName = grant.Grant.ApplicantName,
@@ -1501,7 +1501,7 @@ namespace Noc_App.Controllers
                                     SiteUnitId = grant.Grant.SiteAreaUnitId??0
                                 };
                                 var units = await _calculations.CalculateUnits(unitDetails);
-                                totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
+                                totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 5);
                                 khasralist.Add(new GrantKhasraViewModelCreate { RowId = ++count, KId = item.Id, KanalOrBigha = item.KanalOrBigha, KhasraNo = item.KhasraNo, MarlaOrBiswa = item.MarlaOrBiswa, SarsaiOrBiswansi = item.SarsaiOrBiswansi });
                             }
                             List<SiteUnitMaster> unitMaster = (await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == grant.Grant.SiteAreaUnitId)).ToList();
@@ -1593,8 +1593,8 @@ namespace Noc_App.Controllers
                                 IsConfirmed = false,
                                 IsExtension = 0,
                                 TotalArea = totalArea.ToString("#.####"),
-                                TotalAreaSqFeet = (totalArea * 43560).ToString("#.####"),
-                                TotalAreaSqMetre = (totalArea * 4046.86).ToString("#.####"),
+                                TotalAreaSqFeet = Math.Round((totalArea * 43560),5).ToString("#.####"),
+                                TotalAreaSqMetre = Math.Round((totalArea * 4046.86),5).ToString("#.####"),
                                 Name = grant.Grant.Name,
                                 ApplicantEmailID = grant.Grant.ApplicantEmailID,
                                 ApplicantName = grant.Grant.ApplicantName,
@@ -2554,7 +2554,7 @@ namespace Noc_App.Controllers
             {
                 if (fileType == "kml")
                 {
-                    var allowedExtensions = new[] { ".pdf" };
+                    var allowedExtensions = new[] { ".kml" };
                     var fileExtension = Path.GetExtension(file.FileName);
 
                     if (!allowedExtensions.Contains(fileExtension.ToLower()))

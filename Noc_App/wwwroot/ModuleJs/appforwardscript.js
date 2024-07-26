@@ -48,4 +48,5 @@ $(document).ready(function () {
         }
     });
     if ($('.numericField').val() == '0') $('.numericField').val('');
+    
 });

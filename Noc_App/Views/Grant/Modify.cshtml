@@ -479,7 +479,7 @@
                                                                     <input type="hidden" asp-for="ApplicationID" id="kmlApplicationId" name="kmlApplicationId" />
                                                                     <label asp-for="KMLFile" class="control-label">KML File</label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                                                     <div class="custom-file1">
-                                                                        <input asp-for="KMLFile" id="KMLFile" class="form-control custom-file-input1" accept=".pdf" />
+                                                                        <input asp-for="KMLFile" id="KMLFile" class="form-control custom-file-input1" accept=".kml" />
                                                                         <a id="KMLFilePath" href="@Url.Action("Download", "Grant", new { fileName = Model.KMLFilePath })">Download File</a>
                                                                         @* <label class="custom-file-label1">Choose File...</label> *@
                                                                         <span asp-validation-for="KMLFile" id="KMLFile-error" class="text-danger"></span>

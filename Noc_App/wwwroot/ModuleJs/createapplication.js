@@ -247,9 +247,9 @@ $(function () {
                     Kanal = _thisInner.find('.' + k).val() != '' ? (parseFloat(_thisInner.find('.' + k).val()) * parseFloat($('#' + k + 'UnitValue').val()) * parseFloat($('#' + k + 'Timesof').val())) / parseFloat($('#' + k + 'DivideBy').val()) : 0.0;
                 }
                 grandTotal = parseFloat(grandTotal) + Marla + Biswansi + Kanal + Biswa + Sarsai + Bigha;
-                total = parseFloat(grandTotal).toFixed(4);
-                totalSqFeet = parseFloat(total * 43560).toFixed(4);
-                totalSqMetre = parseFloat(total * 4046.86).toFixed(4);
+                total = parseFloat(grandTotal).toFixed(5);
+                totalSqFeet = parseFloat(total * 43560).toFixed(5);
+                totalSqMetre = parseFloat(total * 4046.86).toFixed(5);
             });
         }
         else {

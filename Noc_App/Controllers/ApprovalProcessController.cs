@@ -416,7 +416,7 @@ namespace Noc_App.Controllers
             //                        ).ToList();
 
             List<OfficerDetails> officerDetail = new List<OfficerDetails>();
-            officerDetail = await GetOfficer(divisionId, "JUNIOR ENGINEER", "0");//,SUB DIVISIONAL OFFICER
+            officerDetail = await GetOfficer("0", "JUNIOR ENGINEER", "0");//,SUB DIVISIONAL OFFICER
 
             GrantApprovalDetailTransferCreate model = new GrantApprovalDetailTransferCreate
             {
@@ -561,6 +561,7 @@ namespace Noc_App.Controllers
                                         }
                          ).ToList().FirstOrDefault();
                 var typeofwidth = (await _drainwidthRepository.FindAsync(x => x.Code == "C")).FirstOrDefault();
+                
                 //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 // Retrieve the user object
@@ -595,7 +596,7 @@ namespace Noc_App.Controllers
                                          {
                                              TotalArea = ((kh.KanalOrBigha * k.UnitValue * k.Timesof) / k.DivideBy) + ((kh.MarlaOrBiswa * m.UnitValue * m.Timesof) / m.DivideBy) + ((kh.SarsaiOrBiswansi * s.UnitValue * s.Timesof) / s.DivideBy)
 
-                                         }).Sum(d => d.TotalArea)), 4);
+                                         }).Sum(d => d.TotalArea)), 5);
                 }
                 //if (roleName == "EXECUTIVE ENGINEER" && grant.IsForwarded == false)
                 //{
@@ -656,6 +657,11 @@ namespace Noc_App.Controllers
                     //officerDetail = forwardToRole== "JUNIOR ENGINEER"? await GetOfficer(divisionId, forwardToRole, "0"): await GetOfficer(divisionId, userRoleDetails.RoleName, "0");
                     officerDetail =  await GetOfficer(divisionId, forwardToRole, "0");
                 //}
+                List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
+                {
+                    new TautologyDetails{Text="No",Value="false"},
+                    new TautologyDetails{Text="Yes",Value="true"}
+                };
                 List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
                 recommendations = _repoRecommendation.GetAll().Where(x=>x.Code!="NA").ToList();
                 ForwardApplicationViewModel model = (from g in _repo.GetAll()
@@ -681,7 +687,7 @@ namespace Noc_App.Controllers
                                                           TypeOfWidth= typeofwidth.Id,
                                                           IsUnderMasterPlan=g.IsUnderMasterPlan,
                                                           Recommendations = recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
-                                                          //SubDivisions = subdivisions!=null? new SelectList(subdivisions, "Id", "Name") : null,
+                                                          ConfirmUnderMasterPlan = new SelectList(tautologyDetails, "Value", "Text"),
                                                           Officers = officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null,
                                                           LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                                                       }).FirstOrDefault();
@@ -725,7 +731,7 @@ namespace Noc_App.Controllers
                 }
                 string code = model.IsDrainNotified ? "N" : "C";
                 var typeofwidth = (await _drainwidthRepository.FindAsync(x => x.Code == code)).FirstOrDefault();
-
+                
                 //var total = Math.Round(((from kh in _khasraRepo.GetAll()
                 //                         where kh.GrantID == grant.Id
                 //                         select new
@@ -806,6 +812,7 @@ namespace Noc_App.Controllers
                     default:
                         forwardToRole = "JUNIOR ENGINEER"; break;
                 }
+                model.LoggedInRole = role;
                 //switch (role)
                 //{
                 //    case "JUNIOR ENGINEER":
@@ -846,6 +853,7 @@ namespace Noc_App.Controllers
                 }
                 else forwardrole = forwardToRole;// (await GetAppRoleName(forwardToRole)).RoleName;
 
+                List<OfficerDetails> officerDetails = await GetOfficer(divisionId, forwardToRole, "0");
                 if (forwardToRole=="JUNIOR ENGINEER")
                 {
                     subdiv = model.SelectedSubDivisionId;
@@ -858,9 +866,33 @@ namespace Noc_App.Controllers
                     var offc = (await GetOfficer(divisionId, forwardrole, subdiv)).FindAll(x => x.UserId == model.SelectedOfficerId);
                     officerDetail = offc.Find(x=>x.UserId==model.SelectedOfficerId);
                 }
-                string forwardedUser = officerDetail.UserId;
-                string forwardedRole = officerDetail.RoleName;
+                string forwardedUser = "";// officerDetail.UserId;
+                string forwardedRole = "";// officerDetail.RoleName;
                 int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
+               
+                model.Id = grant.Id;
+                model.Name = grant.Name;
+                model.TotalArea = 0.0;
+                model.ApplicantEmailID = grant.ApplicantEmailID;
+                model.ApplicantName = grant.ApplicantName;
+                model.ApplicationID = grant.ApplicationID;
+                model.ForwardToRole = forwardToRole;
+                model.LoggedInRole = role;
+                model.Remarks = model.Remarks;
+                model.IsDrainNotified = false;
+                model.IsUnderMasterPlan = grant.IsUnderMasterPlan;
+                model.IsForwarded = grant.IsForwarded;
+                model.TypeOfWidth = typeofwidth.Id;
+                model.Officers = new SelectList(officerDetails, "UserId", "UserName");
+                List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
+                recommendations = _repoRecommendation.GetAll().Where(x => x.Code != "NA").ToList();
+                model.Recommendations = recommendations != null && recommendations.Count() > 0 ? new SelectList(recommendations, "Id", "Name") : null;
+                List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
+                {
+                    new TautologyDetails{Text="No",Value="false"},
+                    new TautologyDetails{Text="Yes",Value="true"}
+                };
+                model.ConfirmUnderMasterPlan = new SelectList(tautologyDetails, "Value", "Text", model.SelectedIsUnderMasterPlanId);
                 GrantApprovalDetail approvalDetail = new GrantApprovalDetail
                 {
                     GrantID = grant.Id,
@@ -1093,12 +1125,17 @@ namespace Noc_App.Controllers
                     }
                     else
                     {
+                        if (model.SelectedIsUnderMasterPlanId==null || model.SelectedIsUnderMasterPlanId =="")
+                        {
+                            ModelState.AddModelError("", $"Is Site Under Master Plan field is required");
+                            return View(model);
+                        }
 
                         await _repoApprovalDetail.CreateAsync(approvalDetail);
                         GrantApprovalProcessDocumentsDetails approvalObj = new GrantApprovalProcessDocumentsDetails
                         {
 
-                            IsUnderMasterPlan = model.ConfirmUnderMasterPlan,
+                            IsUnderMasterPlan = model.SelectedIsUnderMasterPlanId=="false"?false:true,
                             GrantApprovalID = approvalDetail.Id,
                             ProcessedBy = userId,
                             ProcessedOn = DateTime.Now,
@@ -1791,7 +1828,7 @@ namespace Noc_App.Controllers
                         SiteUnitId = unit.Id
                     };
                     var units = await _calculations.CalculateUnits(unitDetails);
-                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 4);
+                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 5);
                    
                 }
                 List<GrantApprovalRecommendationDetail> modelRecommendation = (from ap in _repoApprovalDetail.GetAll()
@@ -1853,8 +1890,8 @@ namespace Noc_App.Controllers
                         ProjectTypeName = projecttype.Name,
                         SiteAreaUnitName = obj.IsUnderMasterPlan ? "" : unit.Name,
                         TotalArea = totalArea.ToString(),
-                        TotalAreaSqFeet = Math.Round((totalArea * 43560),4).ToString(),
-                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86),4).ToString(),
+                        TotalAreaSqFeet = Math.Round((totalArea * 43560),5).ToString(),
+                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86),5).ToString(),
                         Owners = owners,
                         Khasras = khasras,
                         PlanSanctionAuthorityName= planAuth.Name,
@@ -1901,8 +1938,8 @@ namespace Noc_App.Controllers
                         ProjectTypeName = projecttype.Name,
                         SiteAreaUnitName = obj.IsUnderMasterPlan ? "" : unit.Name,
                         TotalArea = totalArea.ToString(),
-                        TotalAreaSqFeet = (totalArea * 43560).ToString(),
-                        TotalAreaSqMetre = (totalArea * 4046.86).ToString(),
+                        TotalAreaSqFeet = Math.Round((totalArea * 43560), 5).ToString(),
+                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 5).ToString(),
                         Owners = owners,
                         Khasras = khasras,
                         PlanSanctionAuthorityName = planAuth.Name,
@@ -2127,6 +2164,8 @@ namespace Noc_App.Controllers
             user_info user_info10 = new user_info();
             user_info user_info12 = new user_info();
             user_info user_info13 = new user_info();
+            user_info user_info14 = new user_info();
+            user_info user_info15 = new user_info();
             user_info1 =new user_info { Name = "Junior Engineer", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "test", SubDivisionID = 114 };
             user_info2 = new user_info { Name = "Sub Divisional Officer", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info3 = new user_info { Name = "Superintending Engineer", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
@@ -2140,6 +2179,8 @@ namespace Noc_App.Controllers
             user_info10 = new user_info { Name = "Administrator", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info12 = new user_info { Name = "XEN Faridkot", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33, Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info13 = new user_info { Name = "XEN Mohali", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 34, Division = "\"Executive Engineer SAS Nagar Drainage-cum-Mining & Geology Division, WRD Punjab\"", DistrictID = 19, District = "Mohali", EmailId = "xenmohali", EmpID = "15321", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info14 = new user_info { Name = "Junior Engineer Mohali", Designation = "xyz Mohali", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 34, Division = "Mohali", DistrictID = 29, District = "Mohali", EmailId = "jemohali", EmpID = "1231", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info15 = new user_info { Name = "Sub Divisional Officer Mohali", Designation = "xyz Mohali", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 34, Division = "test", DistrictID = 29, District = "Mohali", EmailId = "sdomohali", EmpID = "1242", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
             LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
             LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
@@ -2154,6 +2195,8 @@ namespace Noc_App.Controllers
             LoginResponseViewModel o10 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info10 };
             LoginResponseViewModel o12 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info12 };
             LoginResponseViewModel o13 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info13 };
+            LoginResponseViewModel o14 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info14 };
+            LoginResponseViewModel o15 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info15 };
             users.Add(o1);
             users.Add(o2);
             users.Add(o3);
@@ -2167,6 +2210,8 @@ namespace Noc_App.Controllers
             users.Add(o10);
             users.Add(o12);
             users.Add(o13);
+            users.Add(o14);
+            users.Add(o15);
             return users;
 
         }
@@ -2225,7 +2270,9 @@ namespace Noc_App.Controllers
                 //officerRole = (await GetRoleName(officerRole)).RoleName;
                 UserRoleDetails officer = (await GetAppRoleName(officerRole));
                 officerRole = officer.RoleName;
-                List<LoginResponseViewModel> officers = users.FindAll(x => x.user_info.Role.Contains(officerRole));
+                List<LoginResponseViewModel> officers = new List<LoginResponseViewModel>();
+                
+                officers = divisionId=="0"?users.FindAll(x => x.user_info.Role.Contains(officerRole)): users.FindAll(x => x.user_info.Role.Contains(officerRole) && x.user_info.DivisionID.ToString()==divisionId);
                 //user_info user = officers.user_info;
                 //user.Role = officerRole;
                 //user.RoleID = officer.Id.ToString();
@@ -2240,14 +2287,17 @@ namespace Noc_App.Controllers
                     };
                     list.Add(obj);
                 }
-                if (list.FirstOrDefault().Status == "200")
+                if (list.Count > 0)
                 {
-                    //    //OfficerResponseViewModel list3 = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel>(resultContent);
-                    //    //List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
-                    //    //list.Add(list3);
+                    if (list.FirstOrDefault().Status == "200")
+                    {
+                        //    //OfficerResponseViewModel list3 = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel>(resultContent);
+                        //    //List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
+                        //    //list.Add(list3);
 
-                    return list;
+                        return list;
 
+                    }
                 }
                 return null;
             }

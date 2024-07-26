@@ -77,7 +77,7 @@ namespace Noc_App.Models.ViewModel
         public string FaradFilePath { get; set; }
         public IFormFile KMLFile { get; set; }
         public string KMLFilePath { get; set; }
-        [RegularExpression(@"https:\/\/earth\.google\.com\/web\/\S+", ErrorMessage = "Invalid link")]
+        //[RegularExpression(@"https:\/\/earth\.google\.com\/web\/\S+", ErrorMessage = "Invalid link")]
         [Display(Name = "KML Link")]
         public string KmlLinkName { get; set; }
         [Display(Name = "Applicant Name")]

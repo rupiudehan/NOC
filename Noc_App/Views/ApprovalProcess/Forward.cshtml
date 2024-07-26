@@ -48,8 +48,10 @@
                             {
                                 <div class="col-lg-3">
                                     <div class="form-group">
-                                        <b><label asp-for="ConfirmUnderMasterPlan" class="control-label">Is Site Under Master Plan?</label></b>
-                                        <input type="checkbox" id="ConfirmUnderMasterPlan" asp-for="ConfirmUnderMasterPlan" />
+                                        <b><label asp-for="SelectedIsUnderMasterPlanId" class="control-label">Is Site Under Master Plan?</label></b>
+                                        <select name="SelectedIsUnderMasterPlanId" id="SelectedIsUnderMasterPlanId" asp-items="@Model.ConfirmUnderMasterPlan" class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -182,7 +184,7 @@
                                 <label asp-for="SelectedOfficerId" class="control-label">Forward To</label>
                                 @if (Model.Officers != null)
                                 {
-                                    if (Model.Officers.Count() > 0)
+                                    @if (Model.Officers.Count() > 0)
                                     {
                                         <select asp-for="SelectedOfficerId" id="SelectedOfficerId" asp-items="@Model.Officers" class="form-control">
                                             <option value="">Select</option>
@@ -262,7 +264,7 @@
                             { *@
                             <div class="col-lg-6">
 
-                                <button type="submit" class="btn btn-primary btn-user btn-block">Forward</button>
+                                <button type="submit" id="forward" class="btn btn-primary btn-user btn-block">Forward</button>
                             </div>
                             <div class="col-lg-6">
                                 <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
@@ -273,7 +275,7 @@
                         {
                             <div class="col-lg-6">
 
-                                <button type="submit" class="btn btn-primary btn-user btn-block">Forward</button>
+                                <button type="submit" id="forward" class="btn btn-primary btn-user btn-block">Forward</button>
                             </div>
                             <div class="col-lg-6">
                                 <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>

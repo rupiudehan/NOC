@@ -48,7 +48,10 @@ namespace Noc_App.Models.ViewModel
         public IFormFile LSectionOfDrainFile { get; set; }
         public bool IsForwarded { get; set; }
         public bool IsUnderMasterPlan { get; set; }
-        public bool ConfirmUnderMasterPlan { get; set; }
+        //public bool ConfirmUnderMasterPlan { get; set; }
+        [Display(Name = "Is Site Under Master Plan")]
+        public string SelectedIsUnderMasterPlanId { get; set; }
+        public IEnumerable<SelectListItem> ConfirmUnderMasterPlan { get; set; }
         [Display(Name = "Recommendation")]
         public int SelectedRecommendationId { get; set; }
         public IEnumerable<SelectListItem> Recommendations { get; set; }

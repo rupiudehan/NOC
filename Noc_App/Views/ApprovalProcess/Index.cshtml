@@ -98,21 +98,38 @@
                                                             <th>Recommendations</th>
                                                         }
                                                     }
-                                                    @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
+                                                    if (arry[0].Any(x => x.IsUnderMasterPlan == false))
                                                     {
-                                                        @if (arry[0].Any(x => (x.LoggedInRole == "CHIEF ENGINEER HQ" && x.TotalArea > 25)))
+                                                        @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
                                                         {
-                                                            <th>Forward</th>
+                                                            @if (arry[0].Any(x => (x.LoggedInRole == "CHIEF ENGINEER HQ" && x.TotalArea > 25)))
+                                                            {
+                                                                <th>Forward</th>
+
+                                                            }
+                                                            
+                                                            else if (arry[0].Any(x => (x.LoggedInRole != "CHIEF ENGINEER HQ")))
+                                                            {
+                                                                <th>Forward</th>
+                                                                <th>Shortfall</th>
+                                                            }
+                                                            else if (arry[0].Any(x => (x.LoggedInRole == "CHIEF ENGINEER HQ" && x.TotalArea < 25)))
+                                                            {
+                                                                <th>Shortfall</th>
+                                                            }
+                                                            
 
                                                         }
-                                                        else if (arry[0].Any(x => (x.LoggedInRole != "CHIEF ENGINEER HQ")))
+                                                    }
+                                                    else
+                                                    {
+                                                        if (arry[0].Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && (x.LastForwardedByRole == "" || x.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (x.LoggedInRole == "JUNIOR ENGINEER" && x.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((x.LoggedInRole == x.LastForwardedByRole) && (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (x.LoggedInRole == "SUB DIVISIONAL OFFICER" && x.LastForwardedByRole == "JUNIOR ENGINEER")))
                                                         {
-                                                            <th>Forward</th>
-                                                            <th>Shortfall</th>
-                                                        }
-                                                        else if (arry[0].Any(x => (x.LoggedInRole == "CHIEF ENGINEER HQ" && x.TotalArea < 25)))
-                                                        {
-                                                            <th>Shortfall</th>
+                                                            @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
+                                                            {
+                                                                <th>Forward</th>
+                                                                <th>Shortfall</th>
+                                                            }
                                                         }
                                                     }
                                                     @if (arry[0].Any(x => (x.IsShortFall == false && (x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || (x.LoggedInRole == "CHIEF ENGINEER HQ" && x.TotalArea < 25))))
@@ -359,59 +376,128 @@
                                                                 }
                                                             }
                                                         }
-                                                        @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
+                                                        if (arry[0].Any(x => x.IsUnderMasterPlan == false))
                                                         {
-                                                            @if (data.rejectionmust != 1)
+                                                            @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
                                                             {
+                                                                @if (data.rejectionmust != 1)
+                                                                {
 
-                                                                if (data.IsShortFall)
+                                                                    if (data.IsShortFall)
+                                                                    {
+                                                                        @if (data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                                                        {
+                                                                            <td>Reverted Due to Discrepancy</td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td>Reverted Due to Discrepancy</td>
+                                                                            <td>Reverted Due to Discrepancy</td>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        if (data.IsUnderMasterPlan)
+                                                                        {
+                                                                            if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "" || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
+                                                                            @* if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "")) || (data.LoggedInRole == "JUNIOR ENGINEER") || (data.LoggedInRole == "SUB DIVISIONAL OFFICER"))) *@
+                                                                            {
+                                                                                <td>
+                                                                                    <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
+                                                                                </td>
+                                                                            }
+                                                                            else @* if (((data.LastForwardedByRole != "SUB DIVISIONAL OFFICER"))) *@
+                                                                            {
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @if (data.LoggedInRole == "CHIEF ENGINEER HQ" && data.TotalArea > 25)
+                                                                            {
+                                                                                <td>
+                                                                                    <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                                                                </td>
+                                                                            }
+                                                                            else if (data.LoggedInRole == "CHIEF ENGINEER HQ" && data.TotalArea < 25)
+                                                                            {
+                                                                                <td>
+                                                                                    <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
+                                                                                </td>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <td>
+                                                                                    <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
+                                                                                </td>
+                                                                            }
+
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else
                                                                 {
                                                                     @if (data.LoggedInRole == "CHIEF ENGINEER HQ")
                                                                     {
-                                                                        <td>Reverted Due to Discrepancy</td>
+                                                                        <td></td>
                                                                     }
                                                                     else
                                                                     {
-                                                                        <td>Reverted Due to Discrepancy</td>
-                                                                        <td>Reverted Due to Discrepancy</td>
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-                                                                    @if (data.LoggedInRole == "CHIEF ENGINEER HQ" && data.TotalArea > 25)
-                                                                    {
-                                                                        <td>
-                                                                            <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
-                                                                        </td>
-                                                                    }
-                                                                    else if (data.LoggedInRole == "CHIEF ENGINEER HQ" && data.TotalArea < 25)
-                                                                    {
-                                                                        <td>
-                                                                            <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
-                                                                        </td>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <td>
-                                                                            <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
-                                                                        </td>
-                                                                        <td>
-                                                                            <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
-                                                                        </td>
+                                                                        <td></td>
+                                                                        <td></td>
                                                                     }
                                                                 }
                                                             }
-                                                            else
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (arry[0].Any(x => x.rejectionmust != 1 && x.IsShortFall == false))
                                                             {
-                                                                @if (data.LoggedInRole == "CHIEF ENGINEER HQ")
+                                                                if (arry[0].Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && (x.LastForwardedByRole == "" || x.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (x.LoggedInRole == "JUNIOR ENGINEER" && x.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((x.LoggedInRole == x.LastForwardedByRole) && (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (x.LoggedInRole == "SUB DIVISIONAL OFFICER" && x.LastForwardedByRole == "JUNIOR ENGINEER")))
                                                                 {
-                                                                    <td></td>
+                                                                    if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "" || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
+                                                                    {
+                                                                        @if (data.rejectionmust != 1)
+                                                                        {
+
+                                                                            if (data.IsShortFall)
+                                                                            {
+                                                                                <td>Reverted Due to Discrepancy</td>
+                                                                                <td>Reverted Due to Discrepancy</td>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <td>
+                                                                                    <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
+                                                                                </td>
+                                                                            }
+
+
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                        }
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                    }
                                                                 }
-                                                                else
-                                                                {
-                                                                    <td></td>
-                                                                    <td></td>
-                                                                }
+                                                                
                                                             }
                                                         }
                                                         @* else
