@@ -1,4 +1,43 @@
-﻿function CheckDuplicate(control) {
+﻿
+function handleFileSelect(event,control) {
+    const file = event.target.files[0];
+    if (file) {
+        const fileName = file.name;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById(control+'fileData').value = e.target.result;
+            document.getElementById(control+'fileDataName').value = fileName;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+window.onload = function () {
+    LoadFileName('AddressProofPhoto');
+    LoadFileName('LayoutPlanFilePhoto');
+    LoadFileName('FaradFilePoto');
+    LoadFileName('KMLFile');
+    LoadFileName('IDProofPhoto');
+    LoadFileName('AuthorizationLetterPhoto');
+};
+function LoadFileName(control) {
+    const fileData = document.getElementById(control+'fileData').value;
+    if (fileData) {
+        const byteString = atob(fileData.split(',')[1]);
+        const mimeString = fileData.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], { type: mimeString });
+        const file = new File([blob], document.getElementById(control+'fileDataName').value, { type: mimeString });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        document.getElementById(control).files = dataTransfer.files;
+    }
+}
+function CheckDuplicate(control) {
     // alert($(control).val())
     $('#khasraTable').find('tbody>tr').each(function () {
         if ($(control).prop('name') != $(this).find('.khasra').prop('name')) {
@@ -166,6 +205,89 @@ $(function () {
     $('.mobno,.pincode,.village').on('cut copy paste', function (e) {
         e.preventDefault(); return false;
     });
+    if (($('#SelectedSiteAreaUnitId').find("option:selected").text() != 'Select')) {
+        var thisUnit = $('#SelectedSiteAreaUnitId');
+        var list = (thisUnit.find("option:selected").text()).split('/');
+        var Bigha = 'K';
+        var Biswa = 'M';
+        var Biswansi = 'S';
+        var unitId = thisUnit.val();
+        $.ajax({
+            url: "/Grant/GetUnitsDetail",
+            type: "POST",
+            data: { unitId: unitId },
+            async: false,
+            success: function (data) {
+                $.each(data, function (key, value) {
+                    $('#' + value.unitCode + 'UnitValue').val(value.unitValue);
+                    $('#' + value.unitCode + 'Timesof').val(value.timesof);
+                    $('#' + value.unitCode + 'DivideBy').val(value.divideBy);
+                });
+
+            },
+            failure: function (f) {
+                alert(f);
+            },
+            error: function (e) {
+                alert('Error ' + e);
+            }
+        });
+
+        $('#khasraTable .M1').each(function () {
+            $(this).removeAttr('class');
+            $(this).attr('class', 'form-control numericField M1 ' + Biswa);
+        });
+        $('#khasraTable .K2').each(function () {
+            $(this).removeAttr('class');
+            $(this).attr('class', 'form-control numericField K2 ' + Bigha);
+        });
+        $('#khasraTable .B3').each(function () {
+            $(this).removeAttr('class');
+            $(this).attr('class', 'form-control numericField B3 ' + Biswansi);
+        });
+        var grandTotal = 0;
+        $('#khasraTable tbody .khasra-entry').each(function () {
+            var _thisInner = $(this);
+            var Marla = 0;
+            var Biswansi = 0;
+            var Kanal = 0;
+            var Biswa = 0;
+            var Sarsai = 0;
+            var Bigha = 0;
+
+            var k = 'K'; var m = 'M'; var s = 'S';
+            //var k = 'K2'; var m = 'M1'; var s = 'B3';
+            if (_thisInner.find('.' + m).length > 0) {
+                Marla = _thisInner.find('.' + m).val() != '' ? (parseFloat(_thisInner.find('.' + m).val()) * parseFloat($('#' + m + 'UnitValue').val()) * parseFloat($('#' + m + 'Timesof').val())) / parseFloat($('#' + m + 'DivideBy').val()) : 0.0;
+            }
+            if (_thisInner.find('.' + s).length > 0) {
+
+                Biswansi = _thisInner.find('.' + s).val() != '' ? (parseFloat(_thisInner.find('.' + s).val()) * parseFloat($('#' + s + 'UnitValue').val()) * parseFloat($('#' + s + 'Timesof').val())) / parseFloat($('#' + s + 'DivideBy').val()) : 0.0;
+            }
+            if (_thisInner.find('.' + k).length > 0) {
+                Kanal = _thisInner.find('.' + k).val() != '' ? (parseFloat(_thisInner.find('.' + k).val()) * parseFloat($('#' + k + 'UnitValue').val()) * parseFloat($('#' + k + 'Timesof').val())) / parseFloat($('#' + k + 'DivideBy').val()) : 0.0;
+            }
+            grandTotal = parseFloat(grandTotal) + Marla + Biswansi + Kanal + Biswa + Sarsai + Bigha;
+            total = parseFloat(grandTotal).toFixed(5);
+            totalSqFeet = parseFloat(total * 43560).toFixed(5);
+            totalSqMetre = parseFloat(total * 4046.86).toFixed(5);
+        }); 
+        $('#TotalArea').text(total.toString());
+        $('#TotalSiteArea').val(total.toString());
+        $('#hTotalAreaSqFeet').val(totalSqFeet.toString());
+        $('#hTotalAreaSqMetre').val(totalSqMetre.toString());
+        $('#TotalSiteAreaSqFeet').text(totalSqFeet.toString());
+        $('#TotalSiteAreaSqMetre').text(totalSqMetre.toString());
+        //khasraIndex++;
+        //$("#khasraTable tbody").empty();
+        //$("#khasraTable tbody").append(newEntry);
+        //$('#TotalArea').text(0.0);
+        //$('#TotalSiteArea').val(0.0);
+        //$('#hTotalAreaSqFeet').val(0.0);
+        //$('#hTotalAreaSqMetre').val(0.0);
+        //$('#TotalSiteAreaSqFeet').text(0.0);
+        //$('#TotalSiteAreaSqMetre').text(0.0);
+    }
     $('body').on('change', '#SelectedSiteAreaUnitId', function () {
         var list = ($(this).find("option:selected").text()).split('/');
         var Bigha = 'K';
@@ -218,6 +340,9 @@ $(function () {
         $("#khasraTable tbody").empty();
         $("#khasraTable tbody").append(newEntry);
         $('#TotalArea').text(0.0);
+        $('#TotalSiteArea').val(0.0);
+        $('#hTotalAreaSqFeet').val(0.0);
+        $('#hTotalAreaSqMetre').val(0.0);
         $('#TotalSiteAreaSqFeet').text(0.0);
         $('#TotalSiteAreaSqMetre').text(0.0);
     });
@@ -236,6 +361,7 @@ $(function () {
                 var Bigha = 0;
 
                 var k = 'K'; var m = 'M'; var s = 'S';
+                //var k = 'K2'; var m = 'M1'; var s = 'B3';
                 if (_thisInner.find('.' + m).length > 0) {
                     Marla = _thisInner.find('.' + m).val() != '' ? (parseFloat(_thisInner.find('.' + m).val()) * parseFloat($('#' + m + 'UnitValue').val()) * parseFloat($('#' + m + 'Timesof').val())) / parseFloat($('#' + m + 'DivideBy').val()) : 0.0;
                 }
@@ -258,10 +384,15 @@ $(function () {
         }
         $('#TotalArea').text(total.toString());
         $('#TotalSiteArea').val(total.toString());
+        $('#hTotalAreaSqFeet').val(totalSqFeet.toString());
+        $('#hTotalAreaSqMetre').val(totalSqMetre.toString());
         $('#TotalSiteAreaSqFeet').text(totalSqFeet.toString());
         $('#TotalSiteAreaSqMetre').text(totalSqMetre.toString());
     });
     $('#TotalArea').text(total.toString());
+    $('#TotalSiteArea').val(total.toString());
+    $('#hTotalAreaSqFeet').val(totalSqFeet.toString());
+    $('#hTotalAreaSqMetre').val(totalSqMetre.toString());
     $('#TotalSiteAreaSqFeet').text(totalSqFeet.toString());
     $('#TotalSiteAreaSqMetre').text(totalSqMetre.toString());
     // $(".mobno").on("input", function () {

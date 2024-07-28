@@ -163,7 +163,9 @@
                                                 <div class="form-group">
                                                     <label asp-for="AddressProofPhoto" class="control-label">Address Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
                                                     <div class="custom-file1">
-                                                        <input asp-for="AddressProofPhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
+                                                        <input type="hidden" id="AddressProofPhotofileData" name="AddressProofPhotofileData" value="@ViewBag.AddressProofPhotofileData">
+                                                        <input type="hidden" id="AddressProofPhotofileDataName" name="AddressProofPhotofileDataName" value="@ViewBag.AddressProofPhotofileDataName">
+                                                        <input asp-for="AddressProofPhoto" id="AddressProofPhoto" onchange="handleFileSelect(event,'AddressProofPhoto')" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
                                                         @* <label class="custom-file-label1">Choose File...</label> *@
                                                         <span asp-validation-for="AddressProofPhoto" id="AddressProofPhoto-error" class="text-danger"></span>
                                                     </div>
@@ -171,7 +173,9 @@
                                                 <div class="form-group">
                                                     <label asp-for="LayoutPlanFilePhoto" class="control-label">Layout Plan Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
                                                     <div class="custom-file1">
-                                                        <input asp-for="LayoutPlanFilePhoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
+                                                        <input type="hidden" id="LayoutPlanFilePhotofileData" name="LayoutPlanFilePhotofileData" value="@ViewBag.LayoutPlanFilePhotofileData">
+                                                        <input type="hidden" id="LayoutPlanFilePhotofileDataName" name="LayoutPlanFilePhotofileDataName" value="@ViewBag.LayoutPlanFilePhotofileDataName">
+                                                        <input asp-for="LayoutPlanFilePhoto" class="form-control custom-file-input1" onchange="handleFileSelect(event,'LayoutPlanFilePhoto')" accept=".jpg, .jpeg, .png, .pdf" />
                                                         @* <label class="custom-file-label1">Choose File...</label> *@
                                                         <span asp-validation-for="LayoutPlanFilePhoto" id="LayoutPlanFilePhoto-error" class="text-danger"></span>
                                                     </div>
@@ -179,7 +183,9 @@
                                                 <div class="form-group">
                                                     <label asp-for="FaradFilePoto" class="control-label">Farad Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
                                                     <div class="custom-file1">
-                                                        <input asp-for="FaradFilePoto" class="form-control custom-file-input1" accept=".jpg, .jpeg, .png, .pdf" />
+                                                        <input type="hidden" id="FaradFilePotofileData" name="FaradFilePotofileData" value="@ViewBag.FaradFilePotofileData">
+                                                        <input type="hidden" id="FaradFilePotofileDataName" name="FaradFilePotofileDataName" value="@ViewBag.FaradFilePotofileDataName">
+                                                        <input asp-for="FaradFilePoto" class="form-control custom-file-input1" onchange="handleFileSelect(event,'FaradFilePoto')" accept=".jpg, .jpeg, .png, .pdf" />
                                                         @* <label class="custom-file-label1">Choose File...</label> *@
                                                         <span asp-validation-for="FaradFilePoto" id="FaradFilePoto-error" class="text-danger"></span>
                                                     </div>
@@ -269,17 +275,19 @@
                                                         <td></td>
                                                         <td class="col-sm-3">
                                                         <label class="control-label">Total Area in Acres: </label>
-                                                        <input hidden asp-for="TotalArea" value="0" id="TotalSiteArea" />
+                                                        <input type="hidden" asp-for="TotalArea" value="0" id="TotalSiteArea" name="TotalSiteArea" />
                                                         <label asp-for="TotalArea" id="TotalArea" class="form-control form-control-user">@Model.TotalArea</label>
                                                         
                                                         </td class="col-sm-3">
                                                         <td>
                                                         <label class="control-label">Total Area in Sq Feet: </label>
+                                                        <input type="hidden" asp-for="TotalAreaSqFeet" value="0" id="hTotalAreaSqFeet" name="hTotalAreaSqFeet"/>
                                                                 <label asp-for="TotalAreaSqFeet" id="TotalSiteAreaSqFeet" class="form-control form-control-user">@Model.TotalAreaSqFeet</label>
                                                        
                                                         </td>
                                                         <td class="col-sm-3">
                                                         <label class="control-label">Total Area in Sq Metre(s): </label>
+                                                        <input type="hidden" asp-for="TotalAreaSqMetre" value="0" id="hTotalAreaSqMetre" name="hTotalAreaSqMetre"/>
                                                                 <label asp-for="TotalAreaSqMetre" id="TotalSiteAreaSqMetre" class="form-control form-control-user">@Model.TotalAreaSqMetre</label>
                                                        </td>
                                                         <td class="col-sm-3">
@@ -303,7 +311,9 @@
                                         <div class="form-group">
                                             <label asp-for="KMLFile" class="control-label">KML File</label><span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                             <div class="custom-file1">
-                                                <input asp-for="KMLFile" class="form-control custom-file-input1" accept=".kml" />
+                                                        <input type="hidden" id="KMLFilefileData" name="KMLFilefileData" value="@ViewBag.KMLFilefileData">
+                                                        <input type="hidden" id="KMLFilefileDataName" name="KMLFilefileDataName" value="@ViewBag.KMLFilefileDataName">
+                                                <input asp-for="KMLFile" class="form-control custom-file-input1" onchange="handleFileSelect(event,'KMLFile')" accept=".kml" />
                                                 @* <label class="custom-file-label1">Choose File...</label> *@
                                                 <span asp-validation-for="KMLFile" id="KMLFile-error" class="text-danger"></span>
                                             </div>
@@ -365,7 +375,9 @@
                                                 <div class="form-group">
                                                     <label asp-for="IDProofPhoto" class="control-label">ID Proof Document</label><span style="color:red"> (Max File (jpg,png,pdf) Size 4MB)</span>
                                                     <div class="custom-file3">
-                                                        <input asp-for="IDProofPhoto" class="form-control custom-file-input3" accept=".jpg, .jpeg, .png, .pdf" />
+                                                        <input type="hidden" id="IDProofPhotofileData" name="IDProofPhotofileData" value="@ViewBag.IDProofPhotofileData">
+                                                        <input type="hidden" id="IDProofPhotofileDataName" name="IDProofPhotofileDataName" value="@ViewBag.IDProofPhotofileDataName">
+                                                        <input asp-for="IDProofPhoto" class="form-control custom-file-input3" onchange="handleFileSelect(event,'IDProofPhoto')" accept=".jpg, .jpeg, .png, .pdf" />
                                                         @* <label class="custom-file-label">Choose File...</label> *@
                                                         <span asp-validation-for="IDProofPhoto" id="IDProofPhoto-error" class="text-danger"></span>
                                                     </div>
@@ -388,7 +400,9 @@
                                                         owner)-
                                                     </label><span style="color:red">Max File (jpg,png,pdf) Size 4MB</span>
                                                     <div class="custom-file2">
-                                                        <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" accept=".jpg, .jpeg, .png, .pdf" />
+                                                        <input type="hidden" id="AuthorizationLetterPhotofileData" name="AuthorizationLetterPhotofileData" value="@ViewBag.AuthorizationLetterPhotofileData">
+                                                        <input type="hidden" id="AuthorizationLetterPhotofileDataName" name="AuthorizationLetterPhotofileDataName" value="@ViewBag.AuthorizationLetterPhotofileDataName">
+                                                        <input asp-for="AuthorizationLetterPhoto" class="form-control custom-file-input2" onchange="handleFileSelect(event,'AuthorizationLetterPhoto')" accept=".jpg, .jpeg, .png, .pdf" />
                                                         @* <label class="custom-file-label2">Choose File...</label> *@
                                                         <span asp-validation-for="AuthorizationLetterPhoto" id="AuthorizationLetterPhoto-error" class="text-danger"></span>
                                                     </div>

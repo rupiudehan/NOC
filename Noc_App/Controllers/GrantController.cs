@@ -622,6 +622,26 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Create(GrantViewModelCreate model)
         {
+            if (model != null)
+            {
+                ViewBag.AddressProofPhotofileData = model.AddressProofPhotofileData;
+                ViewBag.AddressProofPhotofileDataName = model.AddressProofPhotofileDataName;
+                ViewBag.LayoutPlanFilePhotofileData = model.LayoutPlanFilePhotofileData;
+                ViewBag.LayoutPlanFilePhotofileDataName = model.LayoutPlanFilePhotofileDataName;
+                ViewBag.FaradFilePotofileData = model.FaradFilePotofileData;
+                ViewBag.FaradFilePotofileDataName = model.FaradFilePotofileDataName;
+                ViewBag.KMLFilefileData = model.KMLFilefileData;
+                ViewBag.KMLFilefileDataName = model.KMLFilefileDataName;
+                ViewBag.AuthorizationLetterPhotofileDataName = model.AuthorizationLetterPhotofileDataName;
+                ViewBag.AuthorizationLetterPhotofileData = model.AuthorizationLetterPhotofileData;
+                ViewBag.IDProofPhotofileData = model.IDProofPhotofileData;
+                ViewBag.IDProofPhotofileDataName = model.IDProofPhotofileDataName;
+            }
+            else
+            {
+                ModelState.AddModelError("", $"One of the files' size is greater than mentioned size. Please refresh the page and apply again");
+                return View(model);
+            }
             try
             {
                 if (model != null)
@@ -637,15 +657,12 @@ namespace Noc_App.Controllers
                     var filteredSubdivisions = await _subDivisionRepo.FindAsync(c => c.DivisionId == model.SelectedDivisionId);
                     var filterredDivision = await _divisionRepo.GetByIdAsync(model.SelectedDivisionId);
                     var filteredtehsilBlock = await _tehsilBlockRepo.FindAsync(c => c.DistrictId == filterredDivision.DistrictId);
-                    //var fileteedvillage = await _villageRpo.FindAsync(c => c.TehsilBlockId == model.SelectedTehsilBlockId);
-                    //var selectedvillage = await _villageRpo.GetByIdAsync(model.SelectedVillageID);
-                    string ErrorMessage = string.Empty;
-                    var masterPlan = _masterPlanDetailsRepository.GetAll();
                     List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
                     {
                         new TautologyDetails{Text="Yes",Value="true"},
                         new TautologyDetails{Text="No",Value="false"}
                     };
+                    var masterPlan = _masterPlanDetailsRepository.GetAll();
                     if (model.SelectedMasterPlanTautology == "true")
                     {
                         model.IsUnderMasterPlan = true;
@@ -653,29 +670,39 @@ namespace Noc_App.Controllers
                     else
                     {
                         model.IsUnderMasterPlan = false;
+                        model.NocPermissionType = new SelectList(nocPermission, "Id", "Name", model.SelectedNocPermissionTypeID);
+                        model.NocType = new SelectList(nocType, "Id", "Name", model.SelectedNocTypeId);
+                        model.SiteAreaUnit = new SelectList(siteUnits, "Id", "Name", model.SelectedSiteAreaUnitId);
+                        model.IsExtension = model.IsExtension;
+                        model.TotalAreaSqFeet = model.TotalAreaSqFeet;
+                        model.TotalAreaSqMetre = model.TotalAreaSqMetre;
+                        model.GrantKhasras = model.GrantKhasras;
                     }
 
+                    model.Divisions = new SelectList(divisions, "Id", "Name",model.SelectedDivisionId);
+                    model.MasterPlanTautology = new SelectList(tautologyDetails, "Value", "Text", model.SelectedMasterPlanTautology);
+                    model.MasterPlanDetails = new SelectList(masterPlan, "Id", "Name", model.SelectedMasterPlanId);
+                    model.ProjectType = new SelectList(projectType, "Id", "Name", model.SelectedProjectTypeId);
+                    model.PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name", model.SelectedPlanSanctionAuthorityId);
+                    model.IsOtherTypeSelected = model.IsOtherTypeSelected;
+                    //model.IsPaymentDone = false;
+                    model.IsConfirmed = model.IsConfirmed;
+                    string ErrorMessage = string.Empty;
                     if (filteredSubdivisions.Count() > 0 && filteredtehsilBlock.Count() > 0 /*&& fileteedvillage.Count() > 0 && selectedvillage != null*/)
                     {
-                        var viewModel = new GrantViewModelCreate
+                        model.TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name", model.SelectedTehsilBlockId);
+                        model.SubDivision = new SelectList(filteredSubdivisions, "Id", "Name", model.SelectedSubDivisionId);
+                        List<OwnerViewModelCreate> oList = new List<OwnerViewModelCreate>();
+                        foreach (var item in model.Owners)
                         {
-                            MasterPlanTautology = new SelectList(tautologyDetails, "Value", "Text",model.SelectedMasterPlanTautology),
-                            MasterPlanDetails = new SelectList(masterPlan, "Id", "Name", model.SelectedMasterPlanId),
-                            //Village = new SelectList(fileteedvillage, "Id", "Name",model.SelectedVillageID),
-                            TehsilBlock = new SelectList(filteredtehsilBlock, "Id", "Name", model.SelectedTehsilBlockId),
-                            SubDivision = new SelectList(filteredSubdivisions, "Id", "Name", model.SelectedSubDivisionId),
-                            Divisions = new SelectList(divisions, "Id", "Name", model.SelectedDivisionId),
-                            PlanSanctionAuthorityMaster = new SelectList(planAuth, "Id", "Name",model.SelectedPlanSanctionAuthorityId),
-                            ProjectType = new SelectList(projectType, "Id", "Name",model.SelectedProjectTypeId),
-                            NocPermissionType = new SelectList(nocPermission, "Id", "Name",model.SelectedNocPermissionTypeID),
-                            NocType = new SelectList(nocType, "Id", "Name",model.SelectedNocTypeId),
-                            //OwnerType = new SelectList(ownerType, "Id", "Name"),
-                            SiteAreaUnit = new SelectList(siteUnits, "Id", "Name"),
-                            GrantKhasras = model.GrantKhasras,
-                            Owners = model.Owners
-                            //,
-                            //Pincode = selectedvillage.PinCode.ToString()
-                        };
+                            OwnerViewModelCreate owner = new OwnerViewModelCreate { 
+                          Name=item.Name,Address=item.Address,MobileNo=item.MobileNo,SelectedOwnerTypeID=item.SelectedOwnerTypeID,Email=item.Email,OwnerType= new SelectList(ownerType, "Id", "Name",item.SelectedOwnerTypeID)
+                            };
+                            oList.Add(owner);
+                        }
+                        model.Owners = oList;
+
+
                         //model.OwnerType = viewModel.OwnerType;
                         bool MasterPlanFlag = false;
                         string uniqueKmlFileName = "";
@@ -697,6 +724,9 @@ namespace Noc_App.Controllers
                             )
                             {
                                 MasterPlanFlag = true;
+                                model.TotalArea = model.TotalSiteArea;
+                                model.TotalAreaSqFeet = model.hTotalAreaSqFeet;
+                                model.TotalAreaSqMetre = model.hTotalAreaSqMetre;
                                 int kmlFileValidation = AllowedCheckExtensions(model.KMLFile, "kml");
 
                                 if (kmlFileValidation == 0)
@@ -704,21 +734,21 @@ namespace Noc_App.Controllers
                                     ErrorMessage = $"Invalid KML file type. Please upload a PDF file only";
                                     ModelState.AddModelError("", ErrorMessage);
 
-                                    return View(viewModel);
+                                    return View(model);
 
                                 }
                                 else if (kmlFileValidation == 2)
                                 {
                                     ErrorMessage = "KML File field is required";
                                     ModelState.AddModelError("", ErrorMessage);
-                                    return View(viewModel);
+                                    return View(model);
                                 }
 
                                 if (!AllowedFileSize(model.KMLFile))
                                 {
                                     ErrorMessage = "KML file size exceeds the allowed limit of 4MB";
                                     ModelState.AddModelError("", ErrorMessage);
-                                    return View(viewModel);
+                                    return View(model);
                                 }
                                 uniqueKmlFileName = ProcessUploadedFile(model.KMLFile, "kml");
                             }
@@ -735,99 +765,99 @@ namespace Noc_App.Controllers
                                 ErrorMessage = $"Invalid ID proof file type. Please upload a JPG, PNG, or PDF file";
                                 ModelState.AddModelError("", ErrorMessage);
 
-                                return View(viewModel);
+                                return View(model);
 
                             }
                             else if (IdProofValidation == 2)
                             {
                                 ErrorMessage = "ID proof field is required";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (LayoutPlanValidation == 0)
                             {
                                 ErrorMessage = $"Invalid layout plan file type. Please upload a JPG, PNG, or PDF file";
                                 ModelState.AddModelError("", ErrorMessage);
 
-                                return View(viewModel);
+                                return View(model);
 
                             }
                             else if (LayoutPlanValidation == 2)
                             {
                                 ErrorMessage = "Layout plan field is required";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (FaradValidation == 0)
                             {
                                 ErrorMessage = $"Invalid farad file type. Please upload a JPG, PNG, or PDF file";
                                 ModelState.AddModelError("", ErrorMessage);
 
-                                return View(viewModel);
+                                return View(model);
 
                             }
                             else if (FaradValidation == 2)
                             {
                                 ErrorMessage = "Farad field is required";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (AddressProofValidation == 0)
                             {
                                 ErrorMessage = $"Invalid address proof file type. Please upload a JPG, PNG, or PDF file";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
 
                             }
                             else if (AddressProofValidation == 2)
                             {
                                 ErrorMessage = "Address proof field is required";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (AuthorizationValidation == 0)
                             {
                                 ErrorMessage = $"Invalid authorization letter file type. Please upload a JPG, PNG, or PDF file";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
 
                             }
                             else if (AuthorizationValidation == 2)
                             {
                                 ErrorMessage = "Authorization letter field is required";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
 
                             if (!AllowedFileSize(model.IDProofPhoto))
                             {
                                 ErrorMessage = "ID proof file size exceeds the allowed limit of 4MB";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (!AllowedFileSize(model.LayoutPlanFilePhoto))
                             {
                                 ErrorMessage = "Layout plan file size exceeds the allowed limit of 4MB";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (!AllowedFileSize(model.FaradFilePoto))
                             {
                                 ErrorMessage = "Farad file size exceeds the allowed limit of 4MB";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (!AllowedFileSize(model.AddressProofPhoto))
                             {
                                 ErrorMessage = "Address proof file size exceeds the allowed limit of 4MB";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (!AllowedFileSize(model.AuthorizationLetterPhoto))
                             {
                                 ErrorMessage = "Authorization letter file size exceeds the allowed limit of 4MB";
                                 ModelState.AddModelError("", ErrorMessage);
-                                return View(viewModel);
+                                return View(model);
                             }
 
                             string uniqueIDProofFileName = ProcessUploadedFile(model.IDProofPhoto, "IDProof");
@@ -842,7 +872,7 @@ namespace Noc_App.Controllers
 
                                 ModelState.AddModelError("", $"Atleast one field is required to fill out of Hadbast/Plot No.");
 
-                                return View(viewModel);
+                                return View(model);
                             }
                             if (model.IsOtherTypeSelected == 1)
                             {
@@ -851,7 +881,7 @@ namespace Noc_App.Controllers
                                     isValid = false;
                                     ModelState.AddModelError("", $"Other Detail is required to fill");
 
-                                    return View(viewModel);
+                                    return View(model);
                                 }
                             }
                             if (isValid)
@@ -872,7 +902,7 @@ namespace Noc_App.Controllers
 
                                 model.ApplicationID = inputString;
                                 List<OwnerDetails> ownerList = new List<OwnerDetails>();
-                                foreach (OwnerViewModelCreate item in viewModel.Owners)
+                                foreach (OwnerViewModelCreate item in model.Owners)
                                 {
                                     OwnerDetails owner = new OwnerDetails
                                     {
@@ -885,14 +915,14 @@ namespace Noc_App.Controllers
                                     ownerList.Add(owner);
                                 }
                                 List<GrantKhasraDetails> khasraList = new List<GrantKhasraDetails>();
-                                int duplicates = viewModel.GrantKhasras.Any() ? viewModel.GrantKhasras.GroupBy(x => x.KhasraNo).Where(g => g.Count() > 1).Count() : 0;
+                                int duplicates = model.GrantKhasras.Any() ? model.GrantKhasras.GroupBy(x => x.KhasraNo).Where(g => g.Count() > 1).Count() : 0;
                                 if (duplicates <= 0)
                                 {
-                                    foreach (GrantKhasraViewModelCreate item in viewModel.GrantKhasras)
+                                    foreach (GrantKhasraViewModelCreate item in model.GrantKhasras)
                                     {
                                         if (item.KhasraNo != null)
                                         {
-                                            var khasraDeplicate = viewModel.GrantKhasras.Any(x => x.KhasraNo == item.KhasraNo);
+                                            var khasraDeplicate = model.GrantKhasras.Any(x => x.KhasraNo == item.KhasraNo);
                                             GrantKhasraDetails khasra = new GrantKhasraDetails
                                             {
                                                 KanalOrBigha = item.KanalOrBigha,
@@ -910,7 +940,7 @@ namespace Noc_App.Controllers
                                 {
                                     ModelState.AddModelError("", $"Please check duplicate khasra numbers");
 
-                                    return View(viewModel);
+                                    return View(model);
                                 }
                                 GrantDetails obj = new GrantDetails
                                 {
@@ -1021,7 +1051,7 @@ namespace Noc_App.Controllers
                                         {
                                             Name = model.Name,
                                             PayerName = model.Owners.FirstOrDefault().Name,
-                                            MobileNo = viewModel.Owners.FirstOrDefault().MobileNo,
+                                            MobileNo = model.Owners.FirstOrDefault().MobileNo,
                                             Email = model.ApplicantEmailID,
                                             Address = "Tehsil/Block:" + detail.Tehsil.Name + ",Village:" + model.Villagename,
                                             Amount = TotalPayment,
@@ -1029,7 +1059,7 @@ namespace Noc_App.Controllers
                                             ApplicationId = model.ApplicationID,
                                             DistrictId = subs.District.LGD_ID.ToString(),
                                             Hadbast = model.Hadbast,
-                                            PhoneNumber = viewModel.Owners.FirstOrDefault().MobileNo,
+                                            PhoneNumber = model.Owners.FirstOrDefault().MobileNo,
                                             Pincode = model.Pincode.ToString(),
                                             PlotNo = model.PlotNo != null && model.PlotNo != "" ? model.PlotNo : "0",
                                             TehsilId = detail.Tehsil.LGD_ID.ToString(),
@@ -1043,6 +1073,18 @@ namespace Noc_App.Controllers
                                             AreaAdditionalCalculation = additionalcalculation,
                                             TotalAreaCalculation = totalareacalculation
                                         };
+                                        //ViewBag.AddressProofPhotofileData = null;
+                                        //ViewBag.AddressProofPhotofileDataName = null;
+                                        //ViewBag.LayoutPlanFilePhotofileData = null;
+                                        //ViewBag.LayoutPlanFilePhotofileDataName = null;
+                                        //ViewBag.FaradFilePotofileData = null;
+                                        //ViewBag.FaradFilePotofileDataName = null;
+                                        //ViewBag.KMLFilefileData = null;
+                                        //ViewBag.KMLFilefileDataName = null;
+                                        //ViewBag.AuthorizationLetterPhotofileDataName = null;
+                                        //ViewBag.AuthorizationLetterPhotofileData = null;
+                                        //ViewBag.IDProofPhotofileData = null;
+                                        //ViewBag.IDProofPhotofileDataName = null;
                                         return RedirectToAction("Index", "Payment", paymentRequestDetail);
                                     }
                                     else
@@ -1073,7 +1115,7 @@ namespace Noc_App.Controllers
                             ModelState.AddModelError("", $"All fields are required");
                         }
 
-                        return View(viewModel);
+                        return View(model);
                     }
                     else
                     {

@@ -15,6 +15,21 @@ namespace Noc_App.Models.ViewModel
         public int SelectedSiteAreaUnitId { get; set; }
         public IEnumerable<SelectListItem> SiteAreaUnit { get; set; }
         public List<GrantKhasraViewModelCreate> GrantKhasras { get; set; }
+        public string TotalSiteArea { get; set; }
+        public string hTotalAreaSqFeet { get; set; }
+        public string hTotalAreaSqMetre { get; set; }
+        public string AddressProofPhotofileData { get; set; }
+        public string AddressProofPhotofileDataName { get; set; }
+        public string LayoutPlanFilePhotofileData { get; set; }
+        public string LayoutPlanFilePhotofileDataName { get; set; }
+        public string FaradFilePotofileData { get; set; }
+        public string FaradFilePotofileDataName { get; set; }
+        public string KMLFilefileData { get; set; }
+        public string KMLFilefileDataName { get; set; }
+        public string AuthorizationLetterPhotofileDataName { get; set; }
+        public string AuthorizationLetterPhotofileData { get; set; }
+        public string IDProofPhotofileData { get; set; }
+        public string IDProofPhotofileDataName { get; set; }
         [Display(Name = "Total Area")]
         public string TotalArea { get; set; }
         [Display(Name = "Total Area in Sq Feet")]
@@ -74,6 +89,7 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Farad")]
         public IFormFile FaradFilePoto { get; set; }
         //[Required]
+        [Display(Name = "KML File")]
         public IFormFile KMLFile { get; set; }
         //[Required]
         //[RegularExpression(@"https:\/\/earth\.google\.com\/web\/\S+", ErrorMessage = "Invalid link")]
@@ -115,6 +131,7 @@ namespace Noc_App.Models.ViewModel
         public bool IsPaymentDone { get; set; }
         public string ApplicationID { get; set; }
         public DateTime CreatedOn { get; set; }
+        [Display(Name = "Is Site Under Master Plan")]
         public bool IsUnderMasterPlan { get; set; }
         [Required]
         [Display(Name = "Is Site Under Master Plan?")]

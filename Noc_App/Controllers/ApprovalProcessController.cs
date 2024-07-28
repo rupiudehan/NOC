@@ -688,7 +688,7 @@ namespace Noc_App.Controllers
                                                           IsUnderMasterPlan=g.IsUnderMasterPlan,
                                                           Recommendations = recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
                                                           ConfirmUnderMasterPlan = new SelectList(tautologyDetails, "Value", "Text"),
-                                                          Officers = officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null,
+                                                          Officers = officerDetail!=null?officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null:null,
                                                           LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                                                       }).FirstOrDefault();
                 
@@ -2167,6 +2167,8 @@ namespace Noc_App.Controllers
             user_info user_info13 = new user_info();
             user_info user_info14 = new user_info();
             user_info user_info15 = new user_info();
+            user_info user_info16 = new user_info();
+            user_info user_info17 = new user_info();
             user_info1 =new user_info { Name = "Junior Engineer", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "test", SubDivisionID = 114 };
             user_info2 = new user_info { Name = "Sub Divisional Officer", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info3 = new user_info { Name = "Superintending Engineer", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
@@ -2180,8 +2182,10 @@ namespace Noc_App.Controllers
             user_info10 = new user_info { Name = "Administrator", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 178, Division = "test", DistrictID = 27, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info12 = new user_info { Name = "XEN Faridkot", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33, Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info13 = new user_info { Name = "XEN Mohali", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 34, Division = "\"Executive Engineer SAS Nagar Drainage-cum-Mining & Geology Division, WRD Punjab\"", DistrictID = 19, District = "Mohali", EmailId = "xenmohali", EmpID = "15321", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info14 = new user_info { Name = "Junior Engineer Mohali", Designation = "xyz Mohali", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 34, Division = "Mohali", DistrictID = 29, District = "Mohali", EmailId = "jemohali", EmpID = "1231", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info15 = new user_info { Name = "Sub Divisional Officer Mohali", Designation = "xyz Mohali", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 34, Division = "test", DistrictID = 29, District = "Mohali", EmailId = "sdomohali", EmpID = "1242", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info14 = new user_info { Name = "Junior Engineer Mohali", Designation = "xyz Mohali", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 34, Division = "Mohali", DistrictID = 19, District = "Mohali", EmailId = "jemohali", EmpID = "1231", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info15 = new user_info { Name = "Sub Divisional Officer Mohali", Designation = "xyz Mohali", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 34, Division = "Faridkot", DistrictID = 19, District = "Mohali", EmailId = "sdomohali", EmpID = "1242", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info16 = new user_info { Name = "Junior Engineer Faridkot", Designation = "xyz Faridkot", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 33, Division = "Faridkot", DistrictID = 29, District = "Mohali", EmailId = "jefaridkot", EmpID = "1233", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info17 = new user_info { Name = "Sub Divisional Officer Faridkot", Designation = "xyz Faridkot", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 33, Division = "Faridkot", DistrictID = 29, District = "Faridkot", EmailId = "sdofaridkot", EmpID = "1243", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
             LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
             LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
@@ -2198,6 +2202,8 @@ namespace Noc_App.Controllers
             LoginResponseViewModel o13 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info13 };
             LoginResponseViewModel o14 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info14 };
             LoginResponseViewModel o15 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info15 };
+            LoginResponseViewModel o16 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info16 };
+            LoginResponseViewModel o17 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info17 };
             users.Add(o1);
             users.Add(o2);
             users.Add(o3);
@@ -2213,6 +2219,8 @@ namespace Noc_App.Controllers
             users.Add(o13);
             users.Add(o14);
             users.Add(o15);
+            users.Add(o16);
+            users.Add(o17);
             return users;
 
         }
@@ -2346,7 +2354,9 @@ namespace Noc_App.Controllers
                 for (int i = 0;i< role.Count(); i++)
                 {
                     List<OfficerResponseViewModel> officer = new List<OfficerResponseViewModel>();
-                    officer = (await LoadOfficersAsync(role[i], subDivision, divisionId)).ToList();
+                    var o = (await LoadOfficersAsync(role[i], subDivision, divisionId));
+                    officer = o==null?null:o.ToList();
+                    if(officer!=null)
                     officers.AddRange(officer);
                     
                 }
