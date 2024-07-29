@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace Noc_App.Controllers
 {
@@ -281,7 +282,7 @@ namespace Noc_App.Controllers
 
             string divisionId = LoggedInDivisionID();
             List<OfficerDetails> officerDetail = new List<OfficerDetails>();
-            officerDetail = await GetOfficer(divisionId, "EXECUTIVE ENGINEER", "0");
+            officerDetail = (await GetOfficer("0", "EXECUTIVE ENGINEER", "0")).Where(x=>x.UserId!=userId).ToList();
 
             GrantFileTransferDetailCreate model = new GrantFileTransferDetailCreate
             {
@@ -318,7 +319,10 @@ namespace Noc_App.Controllers
 
                 string userId = LoggedInUserID();
 
-                string divisionId = LoggedInDivisionID();                
+                string divisionId = LoggedInDivisionID();
+                List<OfficerDetails> officerDetail = new List<OfficerDetails>();
+                officerDetail = (await GetOfficer("0", "EXECUTIVE ENGINEER", "0")).Where(x => x.UserId != userId).ToList();
+                model.Officers = officerDetail.Count > 0 ? new SelectList(officerDetail, "UserId", "UserName", model.SelectedOfficerId) : null;
                 List<OfficerResponseViewModel> officers = (await LoadOfficersAsync("EXECUTIVE ENGINEER", "0", "0")).FindAll(x => x.user_info.EmployeeId == model.SelectedOfficerId);
                 OfficerDetail userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
                                           join officer in officers on u.Id.ToString() equals officer.user_info.RoleID
@@ -331,6 +335,8 @@ namespace Noc_App.Controllers
                                               Designation=officer.user_info.DeesignationName,
                                               Name=officer.user_info.EmployeeName
                                           }).FirstOrDefault();
+
+                
                 string username = LoggedInUserName();
                 string designation=LoggedInDesignationName();
                 GrantFileTransferDetails details = new GrantFileTransferDetails {
@@ -649,13 +655,16 @@ namespace Noc_App.Controllers
                         default:
                             forwardToRole = "JUNIOR ENGINEER"; break;
                     }
+                GrantApprovalDetail approvalOfficer = new GrantApprovalDetail();
+                //if (forwardToRole == "EXECUTIVE ENGINEER")
+                    approvalOfficer = (from a in _repoApprovalDetail.GetAll() where a.GrantID == grant.Id && a.ProcessedByRole==forwardToRole orderby a.ProcessedOn descending select a).FirstOrDefault();
+                //UserRoleDetails userRoleDetails =  (await GetAppRoleName(forwardToRole));
 
-                    //UserRoleDetails userRoleDetails =  (await GetAppRoleName(forwardToRole));
+                //officerDetail = await GetOfficer(divisionId, userRoleDetails.RoleName,"0"); 
 
-                    //officerDetail = await GetOfficer(divisionId, userRoleDetails.RoleName,"0"); 
-
-                    //officerDetail = forwardToRole== "JUNIOR ENGINEER"? await GetOfficer(divisionId, forwardToRole, "0"): await GetOfficer(divisionId, userRoleDetails.RoleName, "0");
-                    officerDetail =  await GetOfficer(divisionId, forwardToRole, "0");
+                //officerDetail = forwardToRole== "JUNIOR ENGINEER"? await GetOfficer(divisionId, forwardToRole, "0"): await GetOfficer(divisionId, userRoleDetails.RoleName, "0");
+                officerDetail = approvalOfficer == null ? await GetOfficer(divisionId, forwardToRole, "0") :
+                    (await GetOfficerLastForwardedBy(forwardToRole, approvalOfficer.ProcessedBy)) ;
                 //}
                 List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
                 {
@@ -2343,6 +2352,61 @@ namespace Noc_App.Controllers
                 return null;
             }
         }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Obsolete]
+        private async Task<List<OfficerDetails>> GetOfficerLastForwardedBy(string roleName, string lastForwardedByid)
+        {
+            try
+            {
+                var role = roleName.Split(',');
+                List<OfficerResponseViewModel> officers = new List<OfficerResponseViewModel>();
+                for (int i = 0; i < role.Count(); i++)
+                {
+                    List<OfficerResponseViewModel> officer = new List<OfficerResponseViewModel>();
+                    var o = (await LoadOfficersAsync(roleName, "0", "0")).FindAll(x => x.user_info.EmployeeId == lastForwardedByid);
+                    
+                    officer = o == null ? null : o.ToList();
+                    if (officer != null)
+                        officers.AddRange(officer);
+
+                }
+
+                if (officers != null && officers.Count > 0)
+                {
+                    var userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
+                                    join officer in officers on u.Id.ToString() equals officer.user_info.RoleID
+                                    select new OfficerDetail
+                                    {
+                                        EmployeeId = officer.user_info.EmployeeId,
+                                        RoleName = u.AppRoleName,
+                                        RoleId = u.Id.ToString(),
+                                        Name = officer.user_info.EmployeeName,
+                                        Designation = officer.user_info.DeesignationName
+                                    });
+                    //var usersInRole = (await _userManager.GetUsersInRoleAsync(forwardToRole));
+                    List<OfficerDetails> officerDetails = ((from u in officers.AsEnumerable()
+                                                            join o in userRole on u.user_info.EmployeeId equals o.EmployeeId
+                                                            select new OfficerDetails
+                                                            {
+                                                                UserId = u.user_info.EmployeeId,
+                                                                UserName = u.user_info.EmployeeName + "(" + u.user_info.DeesignationName + ")",
+                                                                RoleId = u.user_info.RoleID.ToString(),
+                                                                RoleName = o.RoleName,
+                                                                Name = o.Name,
+                                                                Designation = o.Designation
+                                                            }
+                                                          ).ToList());
+                    return officerDetails;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private async Task<List<OfficerDetails>> GetOfficer(string divisionId,string roleName,string subDivision)

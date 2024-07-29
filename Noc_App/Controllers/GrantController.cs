@@ -2334,13 +2334,13 @@ namespace Noc_App.Controllers
 
                         }
 
-                        var user = await _repo.GetAll().AnyAsync(x => x.ApplicantEmailID == model.ApplicantEmailID && x.Id != model.applicantGrantId && x.IsRejected != true);
-                        if (user)
-                        {
-                            ModelState.AddModelError("", $"Email {model.ApplicantEmailID} is already in use");
+                        //var user = await _repo.GetAll().AnyAsync(x => x.ApplicantEmailID == model.ApplicantEmailID && x.Id != model.applicantGrantId && x.IsRejected != true);
+                        //if (user)
+                        //{
+                        //    ModelState.AddModelError("", $"Email {model.ApplicantEmailID} is already in use");
 
-                            return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
-                        }
+                        //    return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                        //}
                         
                         GrantRejectionShortfallSection grantrejctionSectionDetail = await _grantrejectionRepository.GetByIdAsync(model.applicantid);
 
