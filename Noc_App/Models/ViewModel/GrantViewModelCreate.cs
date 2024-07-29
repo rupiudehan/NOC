@@ -110,7 +110,7 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Authorization Letter")]
         public IFormFile AuthorizationLetterPhoto { get; set; }
         public List<OwnerViewModelCreate> Owners { get; set; }
-        [Required]
+        //[Required]
         [Display(Name = "NOC Permission Type")]
         public int? SelectedNocPermissionTypeID { get; set; }
         public IEnumerable<SelectListItem> NocPermissionType { get; set; }

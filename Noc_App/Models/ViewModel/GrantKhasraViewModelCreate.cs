@@ -8,7 +8,7 @@ namespace Noc_App.Models.ViewModel
     {
         public int KId { get; set; }
         public int RowId { get; set; }
-        [Required]
+        //[Required]
         [MaxLength(50, ErrorMessage = "Khasra cannot exceed 50 characters")]
         public string KhasraNo { get; set; }
         //public int SelectedUnitId { get; set; }

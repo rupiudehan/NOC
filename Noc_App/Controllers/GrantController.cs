@@ -915,32 +915,35 @@ namespace Noc_App.Controllers
                                     ownerList.Add(owner);
                                 }
                                 List<GrantKhasraDetails> khasraList = new List<GrantKhasraDetails>();
-                                int duplicates = model.GrantKhasras.Any() ? model.GrantKhasras.GroupBy(x => x.KhasraNo).Where(g => g.Count() > 1).Count() : 0;
-                                if (duplicates <= 0)
+                                if (model.IsUnderMasterPlan == true)
                                 {
-                                    foreach (GrantKhasraViewModelCreate item in model.GrantKhasras)
+                                    int duplicates = model.GrantKhasras.Any() ? model.GrantKhasras.GroupBy(x => x.KhasraNo).Where(g => g.Count() > 1).Count() : 0;
+                                    if (duplicates <= 0)
                                     {
-                                        if (item.KhasraNo != null)
+                                        foreach (GrantKhasraViewModelCreate item in model.GrantKhasras)
                                         {
-                                            var khasraDeplicate = model.GrantKhasras.Any(x => x.KhasraNo == item.KhasraNo);
-                                            GrantKhasraDetails khasra = new GrantKhasraDetails
+                                            if (item.KhasraNo != null)
                                             {
-                                                KanalOrBigha = item.KanalOrBigha,
-                                                KhasraNo = item.KhasraNo,
-                                                MarlaOrBiswa = item.MarlaOrBiswa,
-                                                SarsaiOrBiswansi = item.SarsaiOrBiswansi,
-                                                UnitId = model.SelectedSiteAreaUnitId,
-                                                //GrantID = obj.Id
-                                            };
-                                            khasraList.Add(khasra);
+                                                var khasraDeplicate = model.GrantKhasras.Any(x => x.KhasraNo == item.KhasraNo);
+                                                GrantKhasraDetails khasra = new GrantKhasraDetails
+                                                {
+                                                    KanalOrBigha = item.KanalOrBigha,
+                                                    KhasraNo = item.KhasraNo,
+                                                    MarlaOrBiswa = item.MarlaOrBiswa,
+                                                    SarsaiOrBiswansi = item.SarsaiOrBiswansi,
+                                                    UnitId = model.SelectedSiteAreaUnitId,
+                                                    //GrantID = obj.Id
+                                                };
+                                                khasraList.Add(khasra);
+                                            }
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    ModelState.AddModelError("", $"Please check duplicate khasra numbers");
+                                    else
+                                    {
+                                        ModelState.AddModelError("", $"Please check duplicate khasra numbers");
 
-                                    return View(model);
+                                        return View(model);
+                                    }
                                 }
                                 GrantDetails obj = new GrantDetails
                                 {
@@ -983,7 +986,8 @@ namespace Noc_App.Controllers
                                 var authletter = fileUploadeSave(model.AuthorizationLetterPhoto, uniqueAuthLetterFileName);
                                 var kml = fileUploadeSave(model.KMLFile, uniqueKmlFileName);
                                 obj.Owners = ownerList;
-                                obj.Khasras = khasraList;
+                                if (model.IsUnderMasterPlan == true)
+                                    obj.Khasras = khasraList;
                                 await _repo.UpdateAsync(obj);
                                 //if (msg == "success")
                                 //{

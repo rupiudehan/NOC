@@ -94,6 +94,7 @@ var today = new Date().toISOString().split('T')[0];
 document.getElementById('PreviousDate').setAttribute('max', today);
 
 $(function () {
+   
     if (document.getElementById("SelectedMasterPlanTautology").value == 'false') {
         $('.masterPlan2').css('display', 'none');
         $('.masterPlan').css('display', '');
@@ -665,4 +666,8 @@ $(document).ready(function () {
     //        }
     //    });
     //});
+    $(".validateAll li").each((id, elem) => {
+        if (elem.innerText == "The value '' is invalid.")
+            elem.remove();
+    });
 });
