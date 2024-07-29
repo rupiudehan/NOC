@@ -1,42 +1,42 @@
 ﻿
-function handleFileSelect(event,control) {
-    const file = event.target.files[0];
-    if (file) {
-        const fileName = file.name;
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById(control+'fileData').value = e.target.result;
-            document.getElementById(control+'fileDataName').value = fileName;
-        };
-        reader.readAsDataURL(file);
-    }
-}
+//function handleFileSelect(event,control) {
+//    const file = event.target.files[0];
+//    if (file) {
+//        const fileName = file.name;
+//        const reader = new FileReader();
+//        reader.onload = function (e) {
+//            document.getElementById(control+'fileData').value = e.target.result;
+//            document.getElementById(control+'fileDataName').value = fileName;
+//        };
+//        reader.readAsDataURL(file);
+//    }
+//}
 
-window.onload = function () {
-    LoadFileName('AddressProofPhoto');
-    LoadFileName('LayoutPlanFilePhoto');
-    LoadFileName('FaradFilePoto');
-    LoadFileName('KMLFile');
-    LoadFileName('IDProofPhoto');
-    LoadFileName('AuthorizationLetterPhoto');
-};
-function LoadFileName(control) {
-    const fileData = document.getElementById(control+'fileData').value;
-    if (fileData) {
-        const byteString = atob(fileData.split(',')[1]);
-        const mimeString = fileData.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        const blob = new Blob([ab], { type: mimeString });
-        const file = new File([blob], document.getElementById(control+'fileDataName').value, { type: mimeString });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        document.getElementById(control).files = dataTransfer.files;
-    }
-}
+//window.onload = function () {
+//    LoadFileName('AddressProofPhoto');
+//    LoadFileName('LayoutPlanFilePhoto');
+//    LoadFileName('FaradFilePoto');
+//    LoadFileName('KMLFile');
+//    LoadFileName('IDProofPhoto');
+//    LoadFileName('AuthorizationLetterPhoto');
+//};
+//function LoadFileName(control) {
+//    const fileData = document.getElementById(control+'fileData').value;
+//    if (fileData) {
+//        const byteString = atob(fileData.split(',')[1]);
+//        const mimeString = fileData.split(',')[0].split(':')[1].split(';')[0];
+//        const ab = new ArrayBuffer(byteString.length);
+//        const ia = new Uint8Array(ab);
+//        for (let i = 0; i < byteString.length; i++) {
+//            ia[i] = byteString.charCodeAt(i);
+//        }
+//        const blob = new Blob([ab], { type: mimeString });
+//        const file = new File([blob], document.getElementById(control+'fileDataName').value, { type: mimeString });
+//        const dataTransfer = new DataTransfer();
+//        dataTransfer.items.add(file);
+//        document.getElementById(control).files = dataTransfer.files;
+//    }
+//}
 function CheckDuplicate(control) {
     // alert($(control).val())
     $('#khasraTable').find('tbody>tr').each(function () {

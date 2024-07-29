@@ -622,26 +622,26 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Create(GrantViewModelCreate model)
         {
-            if (model != null)
-            {
-                ViewBag.AddressProofPhotofileData = model.AddressProofPhotofileData;
-                ViewBag.AddressProofPhotofileDataName = model.AddressProofPhotofileDataName;
-                ViewBag.LayoutPlanFilePhotofileData = model.LayoutPlanFilePhotofileData;
-                ViewBag.LayoutPlanFilePhotofileDataName = model.LayoutPlanFilePhotofileDataName;
-                ViewBag.FaradFilePotofileData = model.FaradFilePotofileData;
-                ViewBag.FaradFilePotofileDataName = model.FaradFilePotofileDataName;
-                ViewBag.KMLFilefileData = model.KMLFilefileData;
-                ViewBag.KMLFilefileDataName = model.KMLFilefileDataName;
-                ViewBag.AuthorizationLetterPhotofileDataName = model.AuthorizationLetterPhotofileDataName;
-                ViewBag.AuthorizationLetterPhotofileData = model.AuthorizationLetterPhotofileData;
-                ViewBag.IDProofPhotofileData = model.IDProofPhotofileData;
-                ViewBag.IDProofPhotofileDataName = model.IDProofPhotofileDataName;
-            }
-            else
-            {
-                ModelState.AddModelError("", $"One of the files' size is greater than mentioned size. Please refresh the page and apply again");
-                return View(model);
-            }
+            //if (model != null)
+            //{
+            //    ViewBag.AddressProofPhotofileData = model.AddressProofPhotofileData;
+            //    ViewBag.AddressProofPhotofileDataName = model.AddressProofPhotofileDataName;
+            //    ViewBag.LayoutPlanFilePhotofileData = model.LayoutPlanFilePhotofileData;
+            //    ViewBag.LayoutPlanFilePhotofileDataName = model.LayoutPlanFilePhotofileDataName;
+            //    ViewBag.FaradFilePotofileData = model.FaradFilePotofileData;
+            //    ViewBag.FaradFilePotofileDataName = model.FaradFilePotofileDataName;
+            //    ViewBag.KMLFilefileData = model.KMLFilefileData;
+            //    ViewBag.KMLFilefileDataName = model.KMLFilefileDataName;
+            //    ViewBag.AuthorizationLetterPhotofileDataName = model.AuthorizationLetterPhotofileDataName;
+            //    ViewBag.AuthorizationLetterPhotofileData = model.AuthorizationLetterPhotofileData;
+            //    ViewBag.IDProofPhotofileData = model.IDProofPhotofileData;
+            //    ViewBag.IDProofPhotofileDataName = model.IDProofPhotofileDataName;
+            //}
+            //else
+            //{
+            //    ModelState.AddModelError("", $"One of the files' size is greater than mentioned size. Please refresh the page and apply again");
+            //    return View(model);
+            //}
             try
             {
                 if (model != null)
@@ -1077,7 +1077,7 @@ namespace Noc_App.Controllers
                                             AreaAdditionalCalculation = additionalcalculation,
                                             TotalAreaCalculation = totalareacalculation
                                         };
-                                        //ViewBag.AddressProofPhotofileData = null;
+                                        // ViewBag.AddressProofPhotofileData = null;
                                         //ViewBag.AddressProofPhotofileDataName = null;
                                         //ViewBag.LayoutPlanFilePhotofileData = null;
                                         //ViewBag.LayoutPlanFilePhotofileDataName = null;
