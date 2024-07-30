@@ -163,7 +163,8 @@ namespace Noc_App.Controllers
                 {
                     //model.SubDivisions = new SelectList(await _subDivisionRepo.FindAsync(x => x.DivisionId == model.SelectedDivisionId), "Id", "Name", model.SelectedSubDivisionId);
                     model.Districts = new SelectList(_districtRepo.GetAll().OrderBy(x=>x.Name), "Id", "Name", model.SelectedDistrictId);
-                    model.SelectedDistrictId = obj.District.Id;
+                    
+                    model.SelectedDistrictId = obj.DistrictId;
                     bool IsDuplicate = _repo.IsUniqueName(model.Name, model.Id);
                     if (IsDuplicate)
                     {

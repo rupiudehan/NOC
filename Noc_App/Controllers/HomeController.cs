@@ -130,15 +130,15 @@ namespace Noc_App.Controllers
                         Divisions = new SelectList(divisions, "Id", "Name",178),
                         //SubDivisions = new SelectList(subdivisions, "Id", "Name"),
                         RoleName = role.ToUpper(),
-                        hdnDivisionId = divisions.Count()>0? 178/*divisions.FirstOrDefault().Id*/:0,
+                        hdnDivisionId = divisions.Count()>0? 63/*divisions.FirstOrDefault().Id*/:0,
                         hdnSubDivisionId = 0,//subdivisions.Count() > 0 ? 114/*subdivisions.FirstOrDefault().Id*/ : 0,
                         TotalCount = modelreport.TotalCount,
                         ApprovedCount= modelreport.ApprovedCount,
                         RejectedCount= modelreport.RejectedCount,
                         Pending= modelreport.TotalCount- (modelreport.ApprovedCount+ modelreport.RejectedCount),
                         LoggedInRole= role,
-                        SelectedDivisionId=178,
-                        SelectedSubDivisionId=114
+                        SelectedDivisionId=63,
+                        SelectedSubDivisionId=117
                     };
                     //return View(_employeeRepository.GetAllEmployees());
                     return View(model);
@@ -212,7 +212,7 @@ namespace Noc_App.Controllers
             // Retrieve roles associated with the user
             string userId = LoggedInUserID();
 
-            string divisionsId = LoggedInDivisionID();
+            string divisionsId = role!= "ADMINISTRATOR"? LoggedInDivisionID():divisiondetailId;
 
             string subdivisionsId = LoggedInSubDivisionID();
 
