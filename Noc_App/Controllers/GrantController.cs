@@ -583,8 +583,8 @@ namespace Noc_App.Controllers
             var nocType = _nocTypeRepo.GetAll();
             var ownerType = _ownerTypeRepo.GetAll();
             var siteUnits = _siteUnitsRepo.GetAll();
-            var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll();
-            var masterPlan = _masterPlanDetailsRepository.GetAll();
+            var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll().OrderBy(x => x.Name);
+            var masterPlan = _masterPlanDetailsRepository.GetAll().OrderBy(x=>x.Name);
             List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
             {
                 new TautologyDetails{Text="No",Value="false"},
@@ -653,7 +653,7 @@ namespace Noc_App.Controllers
                     var nocType = _nocTypeRepo.GetAll();
                     var ownerType = _ownerTypeRepo.GetAll();
                     var siteUnits = _siteUnitsRepo.GetAll();
-                    var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll();
+                    var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll().OrderBy(x => x.Name);
                     var filteredSubdivisions = await _subDivisionRepo.FindAsync(c => c.DivisionId == model.SelectedDivisionId);
                     var filterredDivision = await _divisionRepo.GetByIdAsync(model.SelectedDivisionId);
                     var filteredtehsilBlock = await _tehsilBlockRepo.FindAsync(c => c.DistrictId == filterredDivision.DistrictId);
@@ -662,7 +662,7 @@ namespace Noc_App.Controllers
                         new TautologyDetails{Text="Yes",Value="true"},
                         new TautologyDetails{Text="No",Value="false"}
                     };
-                    var masterPlan = _masterPlanDetailsRepository.GetAll();
+                    var masterPlan = _masterPlanDetailsRepository.GetAll().OrderBy(x => x.Name);
                     if (model.SelectedMasterPlanTautology == "true")
                     {
                         model.IsUnderMasterPlan = true;
