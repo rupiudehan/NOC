@@ -106,7 +106,11 @@ $(".pincode").on("blur", function () {
 function validatePin(mobno, field) {
     var fieldRegex = /^\d{6}$/;
 
-    if (parseInt(mobno) < 0) {
+    if (mobno == '') {
+        field.val('');
+        field.next(".text-danger").text("Pincode field is required.");
+    }
+    else if (parseInt(mobno) < 0) {
         field.val('');
         field.next(".text-danger").text("Please enter a valid pincode.");
     }

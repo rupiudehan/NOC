@@ -13,9 +13,12 @@ namespace Noc_App.Models.ViewModel
         public int SelectedOwnerTypeID { get; set; }
         public IEnumerable<SelectListItem> OwnerType { get; set; }
         [Required]
+        [MaxLength(250, ErrorMessage = "Name cannot exceed 250 characters")]
+        [MinLength(3, ErrorMessage = "Name cannot be less than 3 characters")]
         public string Name { get; set; }
         [Required]
         [MaxLength(250, ErrorMessage = "Address cannot exceed 250 characters")]
+        [MinLength(3, ErrorMessage = "Name cannot be less than 3 characters")]
         public string Address { get; set; }
         [Required]
         [DataType(DataType.PhoneNumber)]

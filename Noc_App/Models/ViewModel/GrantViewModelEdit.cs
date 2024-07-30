@@ -17,6 +17,7 @@ namespace Noc_App.Models.ViewModel
         public int KId { get; set; }
         public int FGrantId { get; set; }
         [MaxLength(250, ErrorMessage = "Name cannot exceed 250 characters")]
+        [MinLength(3, ErrorMessage = "Name cannot be less than 3 characters")]
         public string Name { get; set; }
         [Display(Name = "Unit of Site Area")]
         public int SelectedSiteAreaUnitId { get; set; }
@@ -81,6 +82,8 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "KML Link")]
         public string KmlLinkName { get; set; }
         [Display(Name = "Applicant Name")]
+        [MaxLength(250, ErrorMessage = "Applicant Name cannot exceed 250 characters")]
+        [MinLength(3, ErrorMessage = "Applicant Name cannot be less than 3 characters")]
         public string ApplicantName { get; set; }
         [RegularExpression(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", ErrorMessage = "Invalid Email Format")]
         [Display(Name = "Applicant Email")]
