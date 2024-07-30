@@ -118,6 +118,19 @@
                                                     <span asp-validation-for="PlotNo" class="text-danger"></span>
                                                 </div>
                                                 <div class="form-group">
+                                                    <label asp-for="Villagename" class="control-label">Village/Town/City</label>
+                                                    @* <select asp-for="SelectedVillageID" asp-items="@Model.Village" class="form-control">
+                                                        <option value="">Select</option>
+                                                    </select> *@
+                                                    <input asp-for="Villagename" maxlength="70" class="form-control form-control-user village" />
+                                                    <span asp-validation-for="Villagename" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="Pincode" class="control-label">Pincode</label>
+                                                    <input asp-for="Pincode" maxlength="6" class="form-control form-control-user pincode" />
+                                                    <span asp-validation-for="Pincode" class="text-danger"></span>
+                                                </div>
+                                                <div class="form-group">
                                                     <label asp-for="SelectedDivisionId" class="control-label"></label>
                                                     <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
                                                         <option value="">Select</option>
@@ -131,27 +144,14 @@
                                                     </select>
                                                     <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
                                                 </div>
+                                            </div>
+                                            <div class="col-lg-6">
                                                 <div class="form-group">
-                                                    <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block</label>
+                                                    <label asp-for="SelectedTehsilBlockId" class="control-label">Tehsil/Block/District</label>
                                                     <select asp-for="SelectedTehsilBlockId" asp-items="@Model.TehsilBlock" class="form-control">
                                                         <option value="">Select</option>
                                                     </select>
                                                     <span asp-validation-for="SelectedTehsilBlockId" class="text-danger"></span>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="Villagename" class="control-label">Village/Town/City</label>
-                                                    @* <select asp-for="SelectedVillageID" asp-items="@Model.Village" class="form-control">
-                                                        <option value="">Select</option>
-                                                    </select> *@
-                                                    <input asp-for="Villagename" maxlength="70" class="form-control form-control-user village" />
-                                                    <span asp-validation-for="Villagename" class="text-danger"></span>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-group">
-                                                    <label asp-for="Pincode" class="control-label">Pincode</label>
-                                                    <input asp-for="Pincode" maxlength="6" class="form-control form-control-user pincode" />
-                                                    <span asp-validation-for="Pincode" class="text-danger"></span>
                                                 </div>
                                                 <div class="form-group">
                                                     <label asp-for="SelectedPlanSanctionAuthorityId" class="control-label"></label>
