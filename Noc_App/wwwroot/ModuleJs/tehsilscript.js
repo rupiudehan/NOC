@@ -2,7 +2,6 @@
     var dropdown = $("#Selected" + dropdownId);
     dropdown.html('<option value="">Select</option>');
     $.each(data, function (key, value) {
-        console.log(value);
         dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
     });
 }
@@ -14,21 +13,21 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
-    //$("#SelectedDivisionId").change(function () {
-    //    var divisionId = $(this).val();
-    //    $.ajax({
-    //        url: "/TehsilBlock/GetSubDivisions",
-    //        type: "POST",
-    //        data: { divisionId: divisionId },
-    //        success: function (data) {
-    //            populateDropdown(data, "SubDivisionId");
-    //        },
-    //        failure: function (f) {
-    //            alert(f);
-    //        },
-    //        error: function (e) {
-    //            alert('Error ' + e);
-    //        }
-    //    });
-    //});
+    $("#SelectedDistrictId").change(function () {
+        var districtId = $(this).val();
+        $.ajax({
+            url: "/TehsilBlock/GetDivisions",
+            type: "POST",
+            data: { districtId: districtId },
+            success: function (data) {
+                populateDropdown(data, "DivisionId");
+            },
+            failure: function (f) {
+                alert(f);
+            },
+            error: function (e) {
+                alert('Error ' + e);
+            }
+        });
+    });
 });

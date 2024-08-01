@@ -16,10 +16,10 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "District")]
         public int SelectedDistrictId { get; set; }
         public IEnumerable<SelectListItem> Districts { get; set; }
-        //[Required]
-        //[Display(Name = "Division")]
-        //public int SelectedDivisionId { get; set; }
-        //public IEnumerable<SelectListItem> Divisions { get; set; }
+        [Required]
+        [Display(Name = "Division")]
+        public int SelectedDivisionId { get; set; }
+        public IEnumerable<SelectListItem> Divisions { get; set; }
         //[Required]
         //[Display(Name = "Sub-Division")]
         //public int SelectedSubDivisionId { get; set; }

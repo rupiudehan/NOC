@@ -10,7 +10,7 @@ $(document).ready(function () {
     $("#SelectedSubDivisionId").change(function () {
         var subdivisionId = $(this).val();
         var role = $('#ForwardToRole').val();
-        console.log(role);
+        //console.log(role);
         $.ajax({
             url: "/ApprovalProcess/GetOfficers",
             type: "POST",

@@ -21,20 +21,20 @@
                         District
                     </dt>
                     <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.District.Name)
-                    </dd>
-                    <!-- Include other properties as needed -->
-                </dl>
-                @* <dl class="row">
-                    <dt class="col-sm-4">
-                        Division
-                    </dt>
-                    <dd class="col-sm-8">
-                        @Html.DisplayFor(model => model.SubDivision.Division.Name)
+                        @Html.DisplayFor(model => model.Divisions.District.Name)
                     </dd>
                     <!-- Include other properties as needed -->
                 </dl>
                 <dl class="row">
+                    <dt class="col-sm-4">
+                        Division
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Divisions.Name)
+                    </dd>
+                    <!-- Include other properties as needed -->
+                </dl>
+                @* <dl class="row">
                     <dt class="col-sm-4">
                         Sub-Division
                     </dt>

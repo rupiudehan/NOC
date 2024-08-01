@@ -504,7 +504,7 @@ $(function () {
                                         ToggleLoadder(false);
                                     },
                                     success: function (response) {
-                                        console.log(JSON.stringify(response))
+                                        //console.log(JSON.stringify(response))
                                         if (response.success) {
                                             navtab.empty();
                                             navtab.html('<i class="checkmark">✓</i>Site Address Details');

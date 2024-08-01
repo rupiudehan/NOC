@@ -20,19 +20,19 @@
                     <input type="hidden" asp-for="Id" />
                     <div class="form-group">
                         <label asp-for="SelectedDistrictId" class="control-label">District</label>
-                        <select asp-for="SelectedDistrictId" asp-items="@Model.Districts" class="form-control">
+                        <select asp-for="SelectedDistrictId" id="SelectedDistrictId" asp-items="@Model.Districts" class="form-control">
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="SelectedDistrictId" class="text-danger"></span>
                     </div>
-                    @* <div class="form-group">
+                    <div class="form-group">
                         <label asp-for="SelectedDivisionId" class="control-label">Division</label>
-                        <select asp-for="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                        <select asp-for="SelectedDivisionId" id="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
                             <option value="">Select</option>
                         </select>
                         <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
+                    @* <div class="form-group">
                         <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
                         <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivisions" class="form-control">
                             <option value="">Select</option>

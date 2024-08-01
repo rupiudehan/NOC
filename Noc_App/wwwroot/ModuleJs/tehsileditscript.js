@@ -2,7 +2,6 @@
     var dropdown = $("#Selected" + dropdownId);
     dropdown.html('<option value="">Select</option>');
     $.each(data, function (key, value) {
-        console.log(value);
         dropdown.append('<option value="' + value.value + '">' + value.text + '</option>');
     });
 }
@@ -14,14 +13,14 @@ $(document).ready(function () {
             event.preventDefault();
         }
     });
-    $("#SelectedDivisionId").change(function () {
-        var divisionId = $(this).val();
+    $("#SelectedDistrictId").change(function () {
+        var districtId = $(this).val();
         $.ajax({
-            url: "/TehsilBlock/GetSubDivisions",
+            url: "/TehsilBlock/GetDivisions",
             type: "POST",
-            data: { divisionId: divisionId },
+            data: { districtId: districtId },
             success: function (data) {
-                populateDropdown(data, "SubDivisionId");
+                populateDropdown(data, "DivisionId");
             },
             failure: function (f) {
                 alert(f);

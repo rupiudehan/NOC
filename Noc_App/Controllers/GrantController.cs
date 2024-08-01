@@ -656,7 +656,7 @@ namespace Noc_App.Controllers
                     var planAuth = _repoPlanSanctionAuthtoryMaster.GetAll().OrderBy(x => x.Name);
                     var filteredSubdivisions = await _subDivisionRepo.FindAsync(c => c.DivisionId == model.SelectedDivisionId);
                     var filterredDivision = await _divisionRepo.GetByIdAsync(model.SelectedDivisionId);
-                    var filteredtehsilBlock = await _tehsilBlockRepo.FindAsync(c => c.DistrictId == filterredDivision.DistrictId);
+                    var filteredtehsilBlock = await _tehsilBlockRepo.FindAsync(c => c.Divisions.DistrictId == filterredDivision.DistrictId);
                     List<TautologyDetails> tautologyDetails = new List<TautologyDetails>
                     {
                         new TautologyDetails{Text="Yes",Value="true"},
@@ -1241,7 +1241,7 @@ namespace Noc_App.Controllers
                             var ownerType = _ownerTypeRepo.GetAll();
                             var siteUnits = _siteUnitsRepo.GetAll();
                             //var villages = _villageRpo.Find(x => x.TehsilBlockId == grant.Village.TehsilBlockId).OrderBy(x => x.Name);
-                            var tehsils = _tehsilBlockRepo.Find(x => x.DistrictId == grant.Division.DistrictId).OrderBy(x => x.Name);
+                            var tehsils = _tehsilBlockRepo.Find(x => x.Divisions.DistrictId == grant.Division.DistrictId).OrderBy(x => x.Name);
                             var subdivisions = _subDivisionRepo.Find(x => x.DivisionId == grant.SubDivision.DivisionId).OrderBy(x => x.Name);
                             var divisions = _divisionRepo.GetAll().OrderBy(x => x.Name);
                             var khasras = _khasraRepo.Find(x => x.GrantID == grant.Grant.Id);
@@ -2698,8 +2698,7 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public IActionResult GetTehsilBlocks(int divisionId)
         {
-            var division = _divisionRepo.GetById(divisionId);
-            var tehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.DistrictId == division.DistrictId).OrderBy(x => x.Name).ToList();
+            var tehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.DivisiontId == divisionId).OrderBy(x => x.Name).ToList();
             return Json(new SelectList(tehsilBlock, "Id", "Name"));
         }
 

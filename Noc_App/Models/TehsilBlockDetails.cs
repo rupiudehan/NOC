@@ -12,9 +12,12 @@ namespace Noc_App.Models
         [Required]
         [MaxLength(150, ErrorMessage = "Name cannot exceed 150 characters")]
         public string Name { get; set; }
-        public int DistrictId { get; set; }
-        [ForeignKey(nameof(DistrictId))]
-        public DistrictDetails District { get; set; }
+        //public int DistrictId { get; set; }
+        //[ForeignKey(nameof(DistrictId))]
+        //public DistrictDetails District { get; set; }
+        public int DivisiontId { get; set; }
+        [ForeignKey(nameof(DivisiontId))]
+        public DivisionDetails Divisions { get; set; }
         //public List<VillageDetails> Village { get; set; }
         public bool IsActive { get; set; }
 
