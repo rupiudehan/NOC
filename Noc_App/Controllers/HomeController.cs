@@ -127,7 +127,7 @@ namespace Noc_App.Controllers
                     //subdivisions = divisions != null && divisions.Count()>0 ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
                     DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
                     {
-                        Divisions = new SelectList(divisions, "Id", "Name",178),
+                        Divisions = new SelectList(divisions, "Id", "Name",54),
                         //SubDivisions = new SelectList(subdivisions, "Id", "Name"),
                         RoleName = role.ToUpper(),
                         hdnDivisionId = divisions.Count()>0? 63/*divisions.FirstOrDefault().Id*/:0,
@@ -161,9 +161,9 @@ namespace Noc_App.Controllers
                 divisions = _divisionRepo.GetAll().OrderBy(x => x.Name).ToList();
                 ApplicationStatusReportViewModel model = new ApplicationStatusReportViewModel
                 {
-                    Divisions = new SelectList(divisions, "Id", "Name",178),
-                    hdnDivisionId = divisions.Count() > 0 ? 178/*divisions.FirstOrDefault().Id*/ : 0,
-                    SelectedDivisionId= divisions.Count() > 0 ? 178/*divisions.FirstOrDefault().Id*/ : 0,
+                    Divisions = new SelectList(divisions, "Id", "Name",54),
+                    hdnDivisionId = divisions.Count() > 0 ? 54/*divisions.FirstOrDefault().Id*/ : 0,
+                    SelectedDivisionId= divisions.Count() > 0 ? 54/*divisions.FirstOrDefault().Id*/ : 0,
                     LoggedInRole = roleName.ToUpper()
                 };
                 return View(model);
