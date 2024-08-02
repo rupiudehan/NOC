@@ -254,7 +254,7 @@ namespace Noc_App.Controllers
                 RestResponse response = await client.ExecuteAsync(request);
                 if (response.IsSuccessful)
                 {
-                    var content = response.Content.Replace("/eRctDeptInt", "https://ifmstg.punjab.gov.in/eRctDeptInt");
+                    var content = response.Content.Replace("/eRctDeptInt", "https://ifms.punjab.gov.in/eRctDeptInt");
                     var url = "DistOptions.url = vdir + \"Server/SelectTel?DistCode=\" + $(\"#DistrictCode\").val()";
                     var actual = "DistOptions.url = \"/Payment/TrpSarthi?DistCode=\" + $(\"#DistrictCode\").val()";
                     
