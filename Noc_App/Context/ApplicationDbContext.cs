@@ -53,7 +53,7 @@ namespace Noc_App.Context
                 new MasterPlanDetails { Id = 1,MainPlanName= "GMADA", Name = "Banur (2031)", Code = "B",DistrictId=19 },
                 new MasterPlanDetails { Id = 2,MainPlanName= "GMADA", Name = "Dera Bassi", Code = "D", DistrictId = 19 },
                 new MasterPlanDetails { Id = 3,MainPlanName= "GMADA", Name = "FatehGarh Sahib (2010-2031)", Code = "F", DistrictId = 19 },
-                new MasterPlanDetails { Id = 4,MainPlanName= "GMADA", Name = "GMADA Regional Plan", Code = "G", DistrictId = 19 },
+                new MasterPlanDetails { Id = 4,MainPlanName= "GMADA", Name = "SAS Nagar Master Plan", Code = "G", DistrictId = 19 },
                 new MasterPlanDetails { Id = 5,MainPlanName= "GMADA", Name = "Kharar (2031)", Code = "K", DistrictId = 19 },
                 new MasterPlanDetails { Id = 6,MainPlanName= "GMADA", Name = "Lalru", Code = "L" , DistrictId = 19 },
                 new MasterPlanDetails { Id = 7,MainPlanName= "GMADA", Name = "Mandigobindgarh (2010-2031)", Code = "MG", DistrictId = 19 },
