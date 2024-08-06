@@ -79,6 +79,8 @@
                     <li><a class="nav-link scrollto @(IsLinkActive("Account","Login") ? "active" : "")" id="login" asp-action="login" asp-controller="Account">Department Login</a></li>
                     <li><a class="nav-link scrollto @(IsLinkActive("Grant","Create") ? "active" : "")" id="GrantCreate" asp-action="Create" asp-controller="Grant">Apply For NOC</a></li>
                     <li><a class="nav-link scrollto @(IsLinkActive("Grant","TrackStatus") ? "active" : "")" id="GrantTrackStatus" asp-action="TrackStatus" asp-controller="Grant">Track Status</a></li>
+                    <li><a class="nav-link scrollto" target="_blank" id="usermanual" href="@Url.Action("UserDownload", "Grant", new { fileName = "User Manual_NOC Drainage_I.pdf" })">UserManual</a></li>
+                    <li><a class="nav-link scrollto" target="_blank" id="sopDoc" href="@Url.Action("UserDownload", "Grant", new { fileName = "SOP.pdf" })">Notification</a></li>
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>
             </nav><!-- .navbar -->

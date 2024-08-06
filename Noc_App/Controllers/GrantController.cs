@@ -2725,5 +2725,30 @@ namespace Noc_App.Controllers
             var obj = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == unitId);
             return Json(obj);
         }
+
+        public IActionResult UserDownload(string fileName)
+        {
+            // Replace "path_to_your_file" with the actual path to your file
+            string relativeFilePath = "../wwwroot/UserDocuments/" + fileName;
+            string filePath = Path.Combine(_hostingEnvironment.WebRootPath, relativeFilePath);
+            //var fileName = "your_file_name.extension"; // Specify the file name
+
+            // Check if the file exists
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound();
+            }
+
+            // Determine the MIME type
+            var mimeType = "application/octet-stream"; // Default MIME type
+            var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+            if (provider.TryGetContentType(fileName, out var resolvedContentType))
+            {
+                mimeType = resolvedContentType;
+            }
+
+            // Return the file
+            return PhysicalFile(filePath, mimeType, fileName);
+        }
     }
 }
