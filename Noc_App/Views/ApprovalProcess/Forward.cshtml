@@ -36,7 +36,8 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label asp-for="LocationDetails" class="control-label">Location</label>
-                                <input asp-for="LocationDetails" readonly class="form-control form-control-user" />
+                                <textarea asp-for="LocationDetails" readonly placeholder="LocationDetails" class="form-control" cols="3" rows="2"></textarea>
+                                @* <input asp-for="LocationDetails" readonly class="form-control form-control-user" /> *@
                                 <span asp-validation-for="LocationDetails" class="text-danger"></span>
                             </div>
                         </div>
