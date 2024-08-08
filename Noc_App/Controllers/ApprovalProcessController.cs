@@ -2370,7 +2370,21 @@ namespace Noc_App.Controllers
                     {
                         if (list.FirstOrDefault().Status == "200")
                         {
-                            return list;
+                            List<OfficerResponseViewModel> listOfficers = new List<OfficerResponseViewModel>();
+                            List<OfficerResponseViewModel> officers = new List<OfficerResponseViewModel>();
+                            officers = divisionId == "0" ? list.FindAll(x => x.user_info.RoleName.Contains(officerRole)) : list.FindAll(x => x.user_info.RoleName.Contains(officerRole) && x.user_info.DivisionID.ToString() == divisionId);
+                            foreach (OfficerResponseViewModel user in officers)
+                            {
+
+                                OfficerResponseViewModel obj = new OfficerResponseViewModel
+                                {
+                                    msg = "success",
+                                    Status = "200",
+                                    user_info = new officer_info { EmployeeId = user.user_info.EmployeeId, EmployeeName = user.user_info.EmployeeName, email = user.user_info.email, DeesignationName = user.user_info.DeesignationName, DesignationID = user.user_info.DesignationID, DistrictId = user.user_info.DistrictId, DistrictName = user.user_info.DistrictName, DivisionID = user.user_info.DivisionID, DivisionName = user.user_info.DivisionName, MobileNo = user.user_info.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.user_info.SubdivisionId, SubdivisionName = user.user_info.SubdivisionName }
+                                };
+                                listOfficers.Add(obj);
+                            }
+                            return listOfficers;
 
                         }
                     }
