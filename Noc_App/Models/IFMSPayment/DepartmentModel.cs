@@ -12,6 +12,19 @@
         {
             public string data { get; set; }
         }
+        public class ifms_verifydata
+        {
+            public string chcksum { get; set; }
+            public Challanverifydata challandata { get; set; }
+        }
+        public class Challanverifydata
+        {
+            public string deptRefNo { get; set; }
+            public string clientId { get; set; }
+            public string deptCode { get; set; }
+            //public DateTime challanDate { get; set; }
+            public string challanDate { get; set; }
+        }
         public class ifms_data
         {
             public string chcksum { get; set; }
@@ -74,6 +87,7 @@
             public string integratingAgency { get; set; }
             public string ipAddress { get; set; }
             public string transactionID { get; set; }
+            public string dateTime { get; set; } = null;
         }
         public class IFMSHeader
         {

@@ -70,6 +70,8 @@ namespace Noc_App.Models.ViewModel
         public string UnderMasterPlan { get; set; }
         [Display(Name = "Master Plan")]
         public string MasterPlanName { get; set; }
+        public string ReceiptNo { get; set; }
+        public string Amount { get; set; }
     }
 
     public class GrantInspectionDocuments

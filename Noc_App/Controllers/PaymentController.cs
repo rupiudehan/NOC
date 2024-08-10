@@ -15,6 +15,7 @@ using RestSharp;
 using HttpMethod = System.Net.Http.HttpMethod;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Noc_App.Controllers
 {
@@ -254,7 +255,7 @@ namespace Noc_App.Controllers
                 RestResponse response = await client.ExecuteAsync(request);
                 if (response.IsSuccessful)
                 {
-                    var content = response.Content.Replace("/eRctDeptInt", "https://ifms.punjab.gov.in/eRctDeptInt");
+                    var content = response.Content.Replace("/eRctDeptInt", _configuration["IFMSPayOptions:replace"]);
                     var url = "DistOptions.url = vdir + \"Server/SelectTel?DistCode=\" + $(\"#DistrictCode\").val()";
                     var actual = "DistOptions.url = \"/Payment/TrpSarthi?DistCode=\" + $(\"#DistrictCode\").val()";
                     
@@ -273,38 +274,90 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
+        [HttpGet]
+        public IActionResult VerifyPayment()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult VerifyPayment(string transId,string challandate) {
+            try
+            {
+                IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
+                  _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
+                  _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
+                  _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
+                  , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
+                  , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+
+                ifms_verifydata data = new ifms_verifydata();
+                IFMS_EncrDecr obj = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
+                //var challanDetail = (await _repoChallanDetails.FindAsync(x => x.receiptNo == transId)).OrderByDescending(x=>x.Id).FirstOrDefault();
+                data.challandata = new Challanverifydata()
+                {
+                    deptRefNo = transId,//challanDetail.deptRefNo,
+                    clientId = settings.clientId,
+                    deptCode = settings.deptCode,
+                    challanDate = challandate,//DateTime.Now.ToString("yyyy-MM-ddT00:00:00")
+                };
+                string json = JsonConvert.SerializeObject(data.challandata);
+                data.chcksum = obj.CheckSum(json);//CheckSum of Chllan data 
+                string jsonCHK = JsonConvert.SerializeObject(data);
+                string encData = obj.Encrypt(jsonCHK);
+
+                Checkdata cHeader = new Checkdata()
+                {
+                    encData = encData,
+                    clientId = settings.headerClientId,
+                    clientSecret = settings.clientSecret,
+                    transactionID = new Random().Next(100000,999999).ToString(),
+                    ipAddress = settings.IpAddress,
+                    integratingAgency = settings.IntegratingAgency,
+                    dateTime=null
+                };
+                string result=ChallanVerify(cHeader);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return View();
+        }
 
         public string ChallanVerify(/*ifms_data dataFrm*/Checkdata cHeader)
         {
-            //DepartmentDl dpt = new DepartmentDl();
-            //ifms_data data = new ifms_data();
-            //IFMS_EncrDecr obj = new IFMS_EncrDecr(_configuration["IFMSPayOptions:ChecksumKey"], _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"]);
-            //data.challandata = new Challandata()
-            //{
-            //    deptRefNo = "128",
-            //    clientId = _configuration["IFMSPayOptions:clientId"],
-            //    deptCode = "WAS",
-            //    challanDate = DateTime.Now
-            //};
-            //string json = JsonConvert.SerializeObject(data.challandata);
-            //data.chcksum = obj.CheckSum(json);//CheckSum of Chllan data 
-            //string jsonCHK = JsonConvert.SerializeObject(data);
-            //string encData = obj.Encrypt(jsonCHK);
-
-            //Checkdata cHeader = new Checkdata()
-            //{
-            //    encData = encData,
-            //    clientId = _configuration["IFMSPayOptions:clientId"],
-            //    clientSecret = _configuration["IFMSPayOptions:clientSecret"],
-            //    transactionID = new Random().Next(100000, 999999).ToString(),
-            //    ipAddress = _configuration["IFMSPayOptions:ipAddress"],
-            //    integratingAgency = _configuration["IFMSPayOptions:integratingAgency"]
-            //};
             var reqData = JsonConvert.SerializeObject(cHeader);
             HttpResponseMessage resMsg = ExecuteAPI(_configuration["IFMSPayOptions:Verify"], reqData);
+            //ExecuteAPIRequest(_configuration["IFMSPayOptions:Verify"], reqData);
             string retJson = resMsg.Content.ReadAsStringAsync().Result;
             return retJson;
 
+        }
+
+        private async void ExecuteAPIRequest(string URL, string PostData)
+        {
+            try
+            {
+                var options = new RestClientOptions(URL)
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest(URL, Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                var body =  @"{""encData"":""Asrv4OIbe5hiUGCJk84Je0nWdt+22svrDtZNFROBK7eVkePkm6exLx9mWNnFQdjXWGca8+GOfXh3adMAYBZUH7djCRRumKuww8ZBZhI1kNkwok0hMn/Ulw+4QB/J81L7h/uwjVFIZ+nJ15DCfNDBXGd01aq00Qwd3cLThZgoj3dRw8QgkdBNsVGCsfU6sIW4VRXKfZIDSbFmWor243sj24q2gwhN88ZM9kPihA1RJsqQWulk//QNZGxLb3qo6ijCElgutqeS9g3XMB7EQghjwMuI4ao++myMq39UrRRO0HYmcLTcMcXEOfrr495KPaEOarVTjRdRRvwQcc7SuO7WBTYocqiF2bH+uaMf2owII/E="",""clientId"":""DWR002"",""clientSecret"":""5bd6f6c874b9479fb7ed09f760faa709"",""integratingAgency"":""DWR002"",""ipAddress"":""112.196.25.180"",""transactionID"":""202408051023157035""}";
+                request.AddStringBody(body, DataFormat.Json);
+                RestResponse response = await client.ExecuteAsync(request);
+                var responseData = response.Content;
+                Console.WriteLine(response.Content);
+                //return response;
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         private HttpResponseMessage ExecuteAPI(string URL, string PostData)
@@ -342,18 +395,29 @@ namespace Noc_App.Controllers
             if (ResponseData.challandata.bank_Res.status.ToLower() == "failure")
             {
                 challanDetail.RequestStatus = "Failed";
+                challanDetail.receiptNo = ResponseData.challandata.receiptNo;
                 await _repoChallanDetails.UpdateAsync(challanDetail);
+                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
                 return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
             }
             else if (ResponseData.challandata.bank_Res.status.ToLower() == "pending")
             {
                 challanDetail.RequestStatus = "Pending";
+                challanDetail.receiptNo = ResponseData.challandata.receiptNo;
                 await _repoChallanDetails.UpdateAsync(challanDetail);
+                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
                 return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
             }
-            else
+            else if (ResponseData.challandata.bank_Res.status.ToLower() == "success")
             {
                 challanDetail.RequestStatus = "Successful";
+                challanDetail.receiptNo = ResponseData.challandata.receiptNo;
                 GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
                 GrantPaymentDetails payment = new GrantPaymentDetails
                 {
@@ -361,16 +425,27 @@ namespace Noc_App.Controllers
                     GrantID = grant.Id,
                     PayerEmail = challanDetail.emailId,
                     PayerName = challanDetail.payerName,
-                    PaymentOrderId = challanDetail.deptRefNo,
+                    PaymentOrderId = ResponseData.challandata.receiptNo,
                     TotalAmount = Convert.ToDecimal(challanDetail.totalAmt),
                     CreatedOn = DateTime.Now
 
                 };
                 await _repoPayment.CreateAsync(payment);
                 await _repoChallanDetails.UpdateAsync(challanDetail);
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, ResponseData.challandata.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
                 _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
                 return RedirectToAction("Index", "Grant", new { Id = id });
+            }
+            else 
+            {
+                challanDetail.RequestStatus = ResponseData.challandata.bank_Res.status;
+                challanDetail.receiptNo = ResponseData.challandata.receiptNo;
+                await _repoChallanDetails.UpdateAsync(challanDetail);
+                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
+                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
             }
         }
         [AllowAnonymous]
@@ -402,13 +477,34 @@ namespace Noc_App.Controllers
                 if (ResponseData.challandata.bank_Res.desc == "failure")
                 {
                     challanDetail.RequestStatus = "Failed";
+                    challanDetail.receiptNo = ResponseData.challandata.receiptNo;
                     await _repoChallanDetails.UpdateAsync(challanDetail);
+                    GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
                     return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
                 }
                 else if (ResponseData.challandata.bank_Res.desc == "Pending")
                 {
                     challanDetail.RequestStatus = "Pending";
+                    challanDetail.receiptNo = ResponseData.challandata.receiptNo;
                     await _repoChallanDetails.UpdateAsync(challanDetail);
+                    GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
+                    return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                }
+                else
+                {
+                    challanDetail.RequestStatus = ResponseData.challandata.bank_Res.status;
+                    challanDetail.receiptNo = ResponseData.challandata.receiptNo;
+                    await _repoChallanDetails.UpdateAsync(challanDetail);
+                    GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
                     return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
                 }
                 return View(model);
@@ -474,6 +570,7 @@ namespace Noc_App.Controllers
                                 Message = "Payment is successful"
                             };
                             challanDetail.RequestStatus = "Successful";
+                            challanDetail.receiptNo = objPyment.PaymentOrderId;
                             await _repoChallanDetails.UpdateAsync(challanDetail);
                             return View(model);
                         }

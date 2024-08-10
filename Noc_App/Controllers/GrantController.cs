@@ -17,6 +17,9 @@ using System.Globalization;
 using Newtonsoft.Json;
 using System.Reflection.Metadata.Ecma335;
 using System.Diagnostics.Eventing.Reader;
+using Noc_App.PaymentUtilities;
+using static Noc_App.Models.IFMSPayment.DepartmentModel;
+using System.Text;
 
 namespace Noc_App.Controllers
 {
@@ -47,17 +50,19 @@ namespace Noc_App.Controllers
         private readonly IRepository<DaysCheckMaster> _repoDaysCheckMaster;
         private readonly IRepository<PlanSanctionAuthorityMaster> _repoPlanSanctionAuthtoryMaster;
         private readonly IRepository<MasterPlanDetails> _masterPlanDetailsRepository;
+        private readonly IRepository<ChallanDetails> _repoChallanDetails;
+        private readonly IConfiguration _configuration;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
         public GrantController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo,
             IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment,
-            IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService,
+            IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService, IConfiguration configuration,
             IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo, IRepository<DistrictDetails> districtRepo,
             IRepository<GrantApprovalDetail> repoApprovalDetail, IWebHostEnvironment hostEnvironment, IRepository<SiteUnitMaster> repoSiteUnitMaster
             , ICalculations calculations, IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<MasterPlanDetails> masterPlanDetailsRepository
-            , IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<GrantApprovalMaster> repoApprovalMaster
+            , IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<GrantApprovalMaster> repoApprovalMaster, IRepository<ChallanDetails> repoChallanDetails
             , IRepository<DaysCheckMaster> repoDaysCheckMaster, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
         {
             //_villageRpo = villageRepo;
@@ -86,6 +91,8 @@ namespace Noc_App.Controllers
             _repoDaysCheckMaster=repoDaysCheckMaster;
             _repoPlanSanctionAuthtoryMaster=repoPlanSanctionAuthtoryMaster;
             _masterPlanDetailsRepository = masterPlanDetailsRepository;
+            _repoChallanDetails = repoChallanDetails;
+            _configuration = configuration;
         }
 
         [AllowAnonymous]
@@ -185,7 +192,7 @@ namespace Noc_App.Controllers
                             {
                                 Id = obj.Id,
                                 ApplicationID = obj.ApplicationID,
-                                OrderId = objPyment.PaymentOrderId,
+                                OrderId = objPyment.deptRefNo,
                                 Message = "Payment is successfull",
                                 TotalAmount = TotalPayment,
                                 IsUnderMasterPlan = false
@@ -292,12 +299,102 @@ namespace Noc_App.Controllers
                                  ApplicationID = g.ApplicationID,
                                  IsApproved = g.IsApproved,
                                  CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
-                                 ApplicationStatus = payment != null && payment.PaymentOrderId != "0" ? "Paid" : "Pending",
+                                 ApplicationStatus = payment != null && payment.deptRefNo != "0" ? "Paid" : "Pending",
+                                 GrantId=g.Id,
+                                 TransId= payment != null && payment.deptRefNo != "0" ? payment.deptRefNo : "0",
                                  ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification" :  g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Applicant updated modifications. Now Pending With " + approval.ProcessedByName : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant" : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "UnProcessed" : "UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan?"Exemption Letter Issued":"NOC Issued" : "UnProcessed",
                                  CertificateFilePath = g.CertificateFilePath,
                                  IsUnderMasterPlan=g.IsUnderMasterPlan
                              }
                          ).FirstOrDefault();
+                if (model.TransId != "0")
+                {
+                    var result = (from p in _repoChallanDetails.GetAll()
+                                  where p.ApplicationId.ToLower() == searchString.Trim().ToLower()
+                                  orderby p.Id descending
+                                  select new { Payment=p }
+                                  ).FirstOrDefault();
+                    model.TransId = result.Payment.deptRefNo;
+                    //model.ApplicationStatus = result.Payment.RequestStatus;
+                    IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
+                  _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
+                  _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
+                  _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
+                  , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
+                  , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+
+                    ifms_verifydata data = new ifms_verifydata();
+                    IFMS_EncrDecr obj = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
+                    //var challanDetail = (await _repoChallanDetails.FindAsync(x => x.receiptNo == transId)).OrderByDescending(x=>x.Id).FirstOrDefault();
+                    data.challandata = new Challanverifydata()
+                    {
+                        deptRefNo = model.TransId,//challanDetail.deptRefNo,
+                        clientId = settings.clientId,
+                        deptCode = settings.deptCode,
+                        challanDate = result.Payment.challanDate,//DateTime.Now.ToString("yyyy-MM-ddT00:00:00")
+                    };
+                    string json = JsonConvert.SerializeObject(data.challandata);
+                    data.chcksum = obj.CheckSum(json);//CheckSum of Chllan data 
+                    string jsonCHK = JsonConvert.SerializeObject(data);
+                    string encData = obj.Encrypt(jsonCHK);
+
+                    Checkdata cHeader = new Checkdata()
+                    {
+                        encData = encData,
+                        clientId = settings.headerClientId,
+                        clientSecret = settings.clientSecret,
+                        transactionID = new Random().Next(100000, 999999).ToString(),
+                        ipAddress = settings.IpAddress,
+                        integratingAgency = settings.IntegratingAgency,
+                        dateTime = null
+                    };
+                    PaymentStatusDetailViewModel result1 = ChallanVerify(cHeader);
+                    if(result1.statusCode.ToUpper()== "SC300")
+                    {
+                        model.ApplicationStatus = "Paid";
+                    }
+                    else if (result1.statusCode.ToUpper() == "SC310")
+                    {
+                        model.ApplicationStatus = "Sent To Payment Gateway";
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC301")
+                    {
+                        model.ApplicationStatus = "Authentication Failed"; //Authentication Failed
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC302")
+                    {
+                        model.ApplicationStatus = "Failed"; //Payment Failed At Bank End
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC303")
+                    {
+                        model.ApplicationStatus = "Verification Failed"; //Verification Not Completed
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC304")
+                    {
+                        model.ApplicationStatus = "Failed";  //Duplicate deptRefNo number
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC305")
+                    {
+                        model.ApplicationStatus = "Failed";  //CheckSum Mismatched
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC306")
+                    {
+                        model.ApplicationStatus = "Pending";    //exception occurred update in DB
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC307")
+                    {
+                        model.ApplicationStatus = "Failed";  //Validation Failed    //Failed again pay
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC308")
+                    {
+                        model.ApplicationStatus = "Pending"; //Status pending (corporate banking, NEFT/RTGS)
+                    }
+                    else if (result1.statusCode.ToUpper() == "EC309")
+                    {
+                        model.ApplicationStatus = "Not Applicable"; //Status null or empty
+                    }
+                }
+
                 if (model != null) return View(model);
                 else
                 {
@@ -309,6 +406,29 @@ namespace Noc_App.Controllers
                 ModelState.AddModelError("", "Application ID field is required");
                 return View();
             }
+        }
+
+        public PaymentStatusDetailViewModel ChallanVerify(/*ifms_data dataFrm*/Checkdata cHeader)
+        {
+            var reqData = JsonConvert.SerializeObject(cHeader);
+            HttpResponseMessage resMsg = ExecuteAPI(_configuration["IFMSPayOptions:Verify"], reqData);
+            //ExecuteAPIRequest(_configuration["IFMSPayOptions:Verify"], reqData);
+            string retJson = resMsg.Content.ReadAsStringAsync().Result;
+            PaymentStatusDetailViewModel data = Newtonsoft.Json.JsonConvert.DeserializeObject<PaymentStatusDetailViewModel>(retJson);
+            //PaymentStatusDetailViewModel
+            return data;
+
+        }
+
+        private HttpResponseMessage ExecuteAPI(string URL, string PostData)
+        {
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Clear();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, URL);
+            request.Content = new StringContent(PostData, Encoding.UTF8, "application/json");
+            HttpContent inputContent = new StringContent(PostData, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = client.PostAsync(URL, inputContent).Result;
+            return response;
         }
 
         [HttpGet]
@@ -394,6 +514,8 @@ namespace Noc_App.Controllers
                             Id = obj.Id,
                             ApplicationID = obj.ApplicationID,
                             PaymentOrderId = "0",
+                            Amount = "0",
+                            ReceiptNo ="0",
                             Name = obj.Name,
                             VillageName = obj.VillageName,
                             TehsilBlockName = tehsil.Name,
@@ -435,7 +557,9 @@ namespace Noc_App.Controllers
                         {
                             Id = obj.Id,
                             ApplicationID = obj.ApplicationID,
-                            PaymentOrderId = objPyment.PaymentOrderId,
+                            PaymentOrderId = objPyment.deptRefNo,
+                            Amount = Math.Round(objPyment.TotalAmount ?? 0, 5).ToString(),
+                            ReceiptNo = objPyment.PaymentOrderId,
                             Name = obj.Name,
                             VillageName = obj.VillageName,
                             TehsilBlockName = tehsil.Name,

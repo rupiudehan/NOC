@@ -37,7 +37,7 @@
                                             <td><b>Payment</b></td>
                                             <td>@Model.ApplicationStatus</td>
                                         </tr>
-                                        @if (Model.ApplicationStatus.ToLower() == "pending")
+                                        @if (Model.ApplicationStatus.ToLower() == "failed")
                                         {
                                             <tr>
                                                 <td><b>Action</b></td>
@@ -47,7 +47,7 @@
                                             </tr>
 
                                         }
-                                        @if (Model.ApplicationStatus.ToLower() != "pending")
+                                        @if (Model.ApplicationStatus.ToLower() != "failed")
                                         {
                                             <tr>
                                                 <td><b>Status</b></td>

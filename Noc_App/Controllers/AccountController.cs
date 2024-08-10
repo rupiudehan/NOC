@@ -83,8 +83,8 @@ namespace Noc_App.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    if ((model.Email == "admin"))
-                    //if (model.Email != "ExecutiveEngineer" && (model.Email == "xen" || model.Email == "jefaridkot" || model.Email == "sdofaridkot" || model.Email == "jemohali" || model.Email == "sdomohali" || model.Email == "xen2" || model.Email == "xenmohali" || model.Email == "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
+                    //if ((model.Email == "admin"))
+                    if (model.Email != "ExecutiveEngineer" && (model.Email == "xen" || model.Email == "jefaridkot" || model.Email == "sdofaridkot" || model.Email == "jemohali" || model.Email == "sdomohali" || model.Email == "xen2" || model.Email == "xenmohali" || model.Email == "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
                     {
                         LoginResponseViewModel root = FetchUser().Find(x => x.user_info.EmailId == model.Email && model.Password == "123");
                         if (root != null)
@@ -253,8 +253,8 @@ namespace Noc_App.Controllers
                         role = RoleDetail.AppRoleName;
                     }
                     List<Claim> claims = new List<Claim>();
-                    claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Email));
-                    claims.Add(new Claim(ClaimTypes.Name, model.Email));
+                    claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Name));
+                    claims.Add(new Claim(ClaimTypes.Name, model.Name));
                     claims.Add(new Claim(ClaimTypes.Role, role));
                     //claims.Add(new Claim(ClaimTypes.Role, "Dev"));
                     ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

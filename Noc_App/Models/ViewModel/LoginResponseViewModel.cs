@@ -62,6 +62,7 @@
         public string DateOfRetirement { get; set; }
         public string IntialJoiningDate { get; set; }
         public string CurrentJoiningDate { get; set; }
+        public string UserName { get; set; }
 
     }
 }

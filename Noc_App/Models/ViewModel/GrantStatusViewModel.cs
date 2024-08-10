@@ -9,5 +9,8 @@
         public string CertificateFilePath { get; set; }
         public bool IsApproved { get; set; }
         public bool IsUnderMasterPlan { get; set; }
+        public int GrantId { get; set; }
+        public string TransId { get; set; }
+        public string ChallanDate { get; set; }
     }
 }

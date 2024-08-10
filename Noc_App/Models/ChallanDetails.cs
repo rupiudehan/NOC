@@ -32,5 +32,6 @@
         public string tehsil { get; set; }
         public string ApplicationId { get; set; }
         public string RequestStatus { get; set; }
+        public string receiptNo { get; set; }
     }
 }

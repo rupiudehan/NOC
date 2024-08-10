@@ -149,6 +149,29 @@ namespace Noc_App.Helpers
             </html>";
         }
 
+        public static string EmailStringBodyForGrantMessageWithPaymentFailure(string applicantName, string applicationID, string transactionID, decimal totalamount)
+        {
+            return $@"<htm>
+            <head></head>
+            <body style=""margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;"">
+            <div style=""height:auto;background:linear-gradient: to top #c9c9ff 50% #6e6ef6 90%) no-repeat;width:400px;padding:30px;"">
+                <div>
+                    <div>
+                        <p>Dear {applicantName},</p>
+                        
+                        <p>Congratulations! 🎉 Your application for the NOC Certificate with ID <b>{applicationID}</b> has been submitted successfully. <br/>Payment of ₹{totalamount} is not received successfully.</p><p>Keep track of its progress easily by using this Application ID on our portal.</p>
+                        <p>
+                            <b>Note :- ""This is auto generated email, do not reply to this email.""</b>
+                        </p><br>
+                        <p>Best Regards,<br><br>
+                        Department of Water Resources, Punjab</p>
+                    </div>
+                </div>
+            </div>
+            </body>
+            </html>";
+        }
+
         public static string EmailStringBodyForRejection(string applicantName, string applicationID, string reason)
         {
             return $@"<htm>
