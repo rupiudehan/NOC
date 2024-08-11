@@ -307,12 +307,12 @@ namespace Noc_App.Controllers
                                  IsUnderMasterPlan=g.IsUnderMasterPlan
                              }
                          ).FirstOrDefault();
-                if (model.TransId != "0")
+                //if (model.ApplicationStatus != "Pending")
                 {
                     var result = (from p in _repoChallanDetails.GetAll()
                                   where p.ApplicationId.ToLower() == searchString.Trim().ToLower()
                                   orderby p.Id descending
-                                  select new { Payment=p }
+                                  select new { Payment = p }
                                   ).FirstOrDefault();
                     model.TransId = result.Payment.deptRefNo;
                     //model.ApplicationStatus = result.Payment.RequestStatus;
@@ -349,49 +349,52 @@ namespace Noc_App.Controllers
                         dateTime = null
                     };
                     PaymentStatusDetailViewModel result1 = ChallanVerify(cHeader);
-                    if(result1.statusCode.ToUpper()== "SC300")
+                    if (result1.statusCode != null)
                     {
-                        model.ApplicationStatus = "Paid";
-                    }
-                    else if (result1.statusCode.ToUpper() == "SC310")
-                    {
-                        model.ApplicationStatus = "Sent To Payment Gateway";
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC301")
-                    {
-                        model.ApplicationStatus = "Authentication Failed"; //Authentication Failed
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC302")
-                    {
-                        model.ApplicationStatus = "Failed"; //Payment Failed At Bank End
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC303")
-                    {
-                        model.ApplicationStatus = "Verification Failed"; //Verification Not Completed
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC304")
-                    {
-                        model.ApplicationStatus = "Failed";  //Duplicate deptRefNo number
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC305")
-                    {
-                        model.ApplicationStatus = "Failed";  //CheckSum Mismatched
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC306")
-                    {
-                        model.ApplicationStatus = "Pending";    //exception occurred update in DB
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC307")
-                    {
-                        model.ApplicationStatus = "Failed";  //Validation Failed    //Failed again pay
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC308")
-                    {
-                        model.ApplicationStatus = "Pending"; //Status pending (corporate banking, NEFT/RTGS)
-                    }
-                    else if (result1.statusCode.ToUpper() == "EC309")
-                    {
-                        model.ApplicationStatus = "Not Applicable"; //Status null or empty
+                        if (result1.statusCode.ToUpper() == "SC300")
+                        {
+                            model.ApplicationStatus = "Paid";
+                        }
+                        else if (result1.statusCode.ToUpper() == "SC310")
+                        {
+                            model.ApplicationStatus = "Sent To Payment Gateway";
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC301")
+                        {
+                            model.ApplicationStatus = "Authentication Failed"; //Authentication Failed
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC302")
+                        {
+                            model.ApplicationStatus = "Failed"; //Payment Failed At Bank End
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC303")
+                        {
+                            model.ApplicationStatus = "Verification Failed"; //Verification Not Completed
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC304")
+                        {
+                            model.ApplicationStatus = "Failed";  //Duplicate deptRefNo number
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC305")
+                        {
+                            model.ApplicationStatus = "Failed";  //CheckSum Mismatched
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC306")
+                        {
+                            model.ApplicationStatus = "Pending At Branch";    //exception occurred update in DB
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC307")
+                        {
+                            model.ApplicationStatus = "Failed";  //Validation Failed    //Failed again pay
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC308")
+                        {
+                            model.ApplicationStatus = "Pending (corporate banking, NEFT/RTGS)"; //Status pending (corporate banking, NEFT/RTGS)
+                        }
+                        else if (result1.statusCode.ToUpper() == "EC309")
+                        {
+                            model.ApplicationStatus = "Not Applicable"; //Status null or empty
+                        }
                     }
                 }
 
