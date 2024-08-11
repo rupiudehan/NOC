@@ -299,7 +299,7 @@ namespace Noc_App.Controllers
                                  ApplicationID = g.ApplicationID,
                                  IsApproved = g.IsApproved,
                                  CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
-                                 ApplicationStatus = payment != null && payment.deptRefNo != "0" ? "Paid" : "Pending",
+                                 ApplicationStatus = payment != null? payment.deptRefNo != "0" ? "Paid" : "Pending": "Pending",
                                  GrantId=g.Id,
                                  TransId= payment != null && payment.deptRefNo != "0" ? payment.deptRefNo : "0",
                                  ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification" :  g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Applicant updated modifications. Now Pending With " + approval.ProcessedByName : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant" : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : "UnProcessed" : "UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan?"Exemption Letter Issued":"NOC Issued" : "UnProcessed",
@@ -314,7 +314,6 @@ namespace Noc_App.Controllers
                                   orderby p.Id descending
                                   select new { Payment = p }
                                   ).FirstOrDefault();
-                    model.TransId = result.Payment.deptRefNo;
                     //model.ApplicationStatus = result.Payment.RequestStatus;
                     IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
                   _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
@@ -326,74 +325,79 @@ namespace Noc_App.Controllers
                     ifms_verifydata data = new ifms_verifydata();
                     IFMS_EncrDecr obj = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
                     //var challanDetail = (await _repoChallanDetails.FindAsync(x => x.receiptNo == transId)).OrderByDescending(x=>x.Id).FirstOrDefault();
-                    data.challandata = new Challanverifydata()
-                    {
-                        deptRefNo = model.TransId,//challanDetail.deptRefNo,
-                        clientId = settings.clientId,
-                        deptCode = settings.deptCode,
-                        challanDate = result.Payment.challanDate,//DateTime.Now.ToString("yyyy-MM-ddT00:00:00")
-                    };
-                    string json = JsonConvert.SerializeObject(data.challandata);
-                    data.chcksum = obj.CheckSum(json);//CheckSum of Chllan data 
-                    string jsonCHK = JsonConvert.SerializeObject(data);
-                    string encData = obj.Encrypt(jsonCHK);
 
-                    Checkdata cHeader = new Checkdata()
+                    if (result != null && result.Payment != null)
                     {
-                        encData = encData,
-                        clientId = settings.headerClientId,
-                        clientSecret = settings.clientSecret,
-                        transactionID = new Random().Next(100000, 999999).ToString(),
-                        ipAddress = settings.IpAddress,
-                        integratingAgency = settings.IntegratingAgency,
-                        dateTime = null
-                    };
-                    PaymentStatusDetailViewModel result1 = ChallanVerify(cHeader);
-                    if (result1.statusCode != null)
-                    {
-                        if (result1.statusCode.ToUpper() == "SC300")
+                        model.TransId = result.Payment.deptRefNo;
+                        data.challandata = new Challanverifydata()
                         {
-                            model.ApplicationStatus = "Paid";
-                        }
-                        else if (result1.statusCode.ToUpper() == "SC310")
+                            deptRefNo = model.TransId,//challanDetail.deptRefNo,
+                            clientId = settings.clientId,
+                            deptCode = settings.deptCode,
+                            challanDate = result.Payment.challanDate,//DateTime.Now.ToString("yyyy-MM-ddT00:00:00")
+                        };
+                        string json = JsonConvert.SerializeObject(data.challandata);
+                        data.chcksum = obj.CheckSum(json);//CheckSum of Chllan data 
+                        string jsonCHK = JsonConvert.SerializeObject(data);
+                        string encData = obj.Encrypt(jsonCHK);
+
+                        Checkdata cHeader = new Checkdata()
                         {
-                            model.ApplicationStatus = "Sent To Payment Gateway";
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC301")
+                            encData = encData,
+                            clientId = settings.headerClientId,
+                            clientSecret = settings.clientSecret,
+                            transactionID = new Random().Next(100000, 999999).ToString(),
+                            ipAddress = settings.IpAddress,
+                            integratingAgency = settings.IntegratingAgency,
+                            dateTime = null
+                        };
+                        PaymentStatusDetailViewModel result1 = ChallanVerify(cHeader);
+                        if (result1.statusCode != null)
                         {
-                            model.ApplicationStatus = "Authentication Failed"; //Authentication Failed
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC302")
-                        {
-                            model.ApplicationStatus = "Failed"; //Payment Failed At Bank End
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC303")
-                        {
-                            model.ApplicationStatus = "Verification Failed"; //Verification Not Completed
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC304")
-                        {
-                            model.ApplicationStatus = "Failed";  //Duplicate deptRefNo number
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC305")
-                        {
-                            model.ApplicationStatus = "Failed";  //CheckSum Mismatched
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC306")
-                        {
-                            model.ApplicationStatus = "Pending At Branch";    //exception occurred update in DB
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC307")
-                        {
-                            model.ApplicationStatus = "Failed";  //Validation Failed    //Failed again pay
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC308")
-                        {
-                            model.ApplicationStatus = "Pending (corporate banking, NEFT/RTGS)"; //Status pending (corporate banking, NEFT/RTGS)
-                        }
-                        else if (result1.statusCode.ToUpper() == "EC309")
-                        {
-                            model.ApplicationStatus = "Not Applicable"; //Status null or empty
+                            if (result1.statusCode.ToUpper() == "SC300")
+                            {
+                                model.ApplicationStatus = "Paid";
+                            }
+                            else if (result1.statusCode.ToUpper() == "SC310")
+                            {
+                                model.ApplicationStatus = "Sent To Payment Gateway";
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC301")
+                            {
+                                model.ApplicationStatus = "Authentication Failed"; //Authentication Failed
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC302")
+                            {
+                                model.ApplicationStatus = "Failed"; //Payment Failed At Bank End
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC303")
+                            {
+                                model.ApplicationStatus = "Verification Failed"; //Verification Not Completed
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC304")
+                            {
+                                model.ApplicationStatus = "Failed";  //Duplicate deptRefNo number
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC305")
+                            {
+                                model.ApplicationStatus = "Failed";  //CheckSum Mismatched
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC306")
+                            {
+                                model.ApplicationStatus = "Pending At Branch";    //exception occurred update in DB
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC307")
+                            {
+                                model.ApplicationStatus = "Failed";  //Validation Failed    //Failed again pay
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC308")
+                            {
+                                model.ApplicationStatus = "Pending (corporate banking, NEFT/RTGS)"; //Status pending (corporate banking, NEFT/RTGS)
+                            }
+                            else if (result1.statusCode.ToUpper() == "EC309")
+                            {
+                                model.ApplicationStatus = "Not Applicable"; //Status null or empty
+                            }
                         }
                     }
                 }
