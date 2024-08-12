@@ -69,9 +69,9 @@ $(function () {
                     $.each(response.roles, function (key, value) {
                         var tr = '<tr>';
                         tr += '<td><form action="RedirecToLoginRole" id="loginByRoleForm' + value.id + '" method="post" role="form" class="php-email-form"><input type="hidden" name="Name" id="Name" value="' + response.name + '" /><input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="Designation" id="Designation" value="' + response.designation + '" /><input type="hidden" name="EmpID" id="EmpID" value="' + response.empID + '" />';
-                        tr += '<input type="hidden" name="DistrictID" id="DistrictID" value="' + response.districtID + '" /><input type="hidden" name="DivisionID" id="DivisionID" value="' + response.divisionID + '" />';
-                        tr += '<input type="hidden" name="Email" id="REmail" value="' + response.email + '" />';
-                        tr += '<input type="hidden" name="RoleID" id="RoleID" value="' + value.id + '"/><input type="hidden" name="role" id="rolename" value="' + value.roleName + '"/><div class="text-center" > <button type="submit" style="width:100%;background-color:#4c9e37" class="btn btn-success btn-user btn-block">' + value.roleName +'</button></div></form></td> ';
+                        tr += '<input type="hidden" name="DistrictID" id="DistrictID" value="' + response.districtID + '" /><input type="hidden" name="DivisionID" id="DivisionID" value="' + value.divisionId + '" />';
+                        tr += '<input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" />';
+                        tr += '<input type="hidden" name="RoleID" id="RoleID" value="' + value.id + '"/><input type="hidden" name="role" id="rolename" value="' + value.roleName + '"/><div class="text-center" > <button type="submit" style="width:100%;background-color:#4c9e37" class="btn btn-success btn-user btn-block"><strong>' + value.roleName + '</strong> At ' + value.divisionName +'</button></div></form></td> ';
                         
                         tr += '</tr>';
                         body.append(tr);

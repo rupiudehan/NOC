@@ -96,20 +96,36 @@ namespace Noc_App.Controllers
                                                       select new
                                                       {
                                                           Roles = r,
-                                                          Location = rr,
-                                                          //Division=loc
+                                                          Location = rr
                                                       }
                                                                  ).ToList();
-                            List<UserRoleDetails> RoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
-                                                                where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
-                                                                select new UserRoleDetails
+                            List<UserRoleDetailsViewModel> RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                                                                join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                                //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                                                                //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                                                                select new UserRoleDetailsViewModel
                                                                 {
-                                                                    AppRoleName = r.RoleName,
-                                                                    Id = r.Id,
-                                                                    RoleLevel = r.RoleLevel,
-                                                                    RoleName = r.RoleName
+                                                                    DivisionId = r.Id,
+                                                                    DivisionName = r.Name,
+                                                                    AppRoleName = rr.Roles.RoleName,
+                                                                    Id = rr.Roles.Id,
+                                                                    RoleLevel = rr.Roles.RoleLevel,
+                                                                    RoleName = rr.Roles.RoleName
                                                                 }
-                                                                ).ToList();
+                                                                 ).ToList();
+
+                            //List<UserRoleDetailsViewModel> RoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
+                            //                                    where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                            //                                    select new UserRoleDetailsViewModel
+                            //                                    {
+                            //                                        AppRoleName = r.RoleName,
+                            //                                        Id = r.Id,
+                            //                                        RoleLevel = r.RoleLevel,
+                            //                                        RoleName = r.RoleName,
+                            //                                        DivisionId= root.user_info.DivisionID,
+                            //                                        DivisionName=""
+                            //                                    }
+                            //                                    ).ToList();
 
                             login.Roles = RoleDetail;
                             login.Designation = root.user_info.Designation;
@@ -188,26 +204,44 @@ namespace Noc_App.Controllers
 
                         if (root.Status == "200")
                         {
-                           var LocationRoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
-                                                                        join rr in root.user_info.OfficeWiseRoleID on r.Id equals rr.role
+                            var LocationRoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
+                                                      join rr in root.user_info.OfficeWiseRoleID on r.Id equals rr.role
+                                                      //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                                                      //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                                                      select new
+                                                      {
+                                                          Roles = r,
+                                                          Location = rr,
+                                                          //Division=loc
+                                                      }
+                                                                  ).ToList();
+                            List<UserRoleDetailsViewModel> RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                                                                join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                                //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
                                                                 //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
-                                                                select new 
+                                                                select new UserRoleDetailsViewModel
                                                                 {
-                                                                    Roles=r,
-                                                                    Location=rr
+                                                                    DivisionId = r.Id,
+                                                                    DivisionName = r.Name,
+                                                                    AppRoleName = rr.Roles.RoleName,
+                                                                    Id = rr.Roles.Id,
+                                                                    RoleLevel = rr.Roles.RoleLevel,
+                                                                    RoleName = rr.Roles.RoleName
                                                                 }
-                                                                ).ToList();
+                                                                 ).ToList();
 
-                            List<UserRoleDetails> RoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
-                                                                where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
-                                                                select new UserRoleDetails
-                                                                {
-                                                                    AppRoleName = r.RoleName,
-                                                                    Id = r.Id,
-                                                                    RoleLevel = r.RoleLevel,
-                                                                    RoleName = r.RoleName
-                                                                }
-                                                                ).ToList();
+                            //List<UserRoleDetailsViewModel> RoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
+                            //                                    where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                            //                                    select new UserRoleDetailsViewModel
+                            //                                    {
+                            //                                        AppRoleName = r.RoleName,
+                            //                                        Id = r.Id,
+                            //                                        RoleLevel = r.RoleLevel,
+                            //                                        RoleName = r.RoleName,
+                            //                                        DivisionId=root.user_info.DivisionID,
+                            //                                        DivisionName=""
+                            //                                    }
+                            //                                    ).ToList();
 
                             login.Roles = RoleDetail;
                             login.Designation = root.user_info.Designation;

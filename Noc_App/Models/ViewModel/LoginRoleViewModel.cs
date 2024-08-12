@@ -14,6 +14,6 @@
         public string Token { get; set; }
         public string Success { get; set; }
         public string Errors { get; set; }
-        public List<UserRoleDetails> Roles { get; set; }
+        public List<UserRoleDetailsViewModel> Roles { get; set; }
     }
 }
