@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Noc_App.Models.ViewModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Noc_App.Models
 {
@@ -9,5 +10,6 @@ namespace Noc_App.Models
         public string RoleName { get; set; }
         public string AppRoleName { get; set; }
         public int RoleLevel { get; set; }
+        public List<OfficeWiseRolesIds> OfficeWiseRoleID { get; set; }
     }
 }

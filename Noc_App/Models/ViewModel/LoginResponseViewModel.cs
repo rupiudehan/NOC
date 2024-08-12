@@ -1,4 +1,7 @@
-﻿namespace Noc_App.Models.ViewModel
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace Noc_App.Models.ViewModel
 {
     public class ResponseViewModel
     {
@@ -29,6 +32,8 @@
         public int DesignationID { get; set; }
         public string Role { get; set; }
         public string RoleID { get; set; }
+        public List<OfficeWiseRolesIds> OfficeWiseRoleID { get; set; }
+        public List<OfficeWiseRolesNames> OfficeWiseRoleName { get; set; }
         public string Status { get; set; }
         public string DateOfRetirement { get; set; }
         public string IntialJoiningDate { get; set; }
@@ -36,6 +41,20 @@
 
     }
 
+    public class OfficeWiseRolesIds
+    {
+        [Key]
+        public int Id { get; set; }
+        public int office_id { get; set; }
+        public int role { get; set; }
+    }
+    public class OfficeWiseRolesNames
+    {
+        [Key]
+        public int Id { get; set; }
+        public string office_name { get; set; }
+        public string role_name { get; set; }
+    }
     public class OfficerResponseViewModel
     {
         public string Status { get; set; }
