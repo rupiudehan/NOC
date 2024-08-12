@@ -409,7 +409,7 @@ namespace Noc_App.Controllers
                 challanDetail.receiptNo = ResponseData.challandata.receiptNo;
                 await _repoChallanDetails.UpdateAsync(challanDetail);
                 GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentPending(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt), challanDetail.receiptNo));
                 _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
 
                 return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
@@ -432,7 +432,7 @@ namespace Noc_App.Controllers
                 };
                 await _repoPayment.CreateAsync(payment);
                 await _repoChallanDetails.UpdateAsync(challanDetail);
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt),challanDetail.receiptNo));
                 _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
                 return RedirectToAction("Index", "Grant", new { Id = id });
             }
@@ -491,7 +491,7 @@ namespace Noc_App.Controllers
                     challanDetail.receiptNo = ResponseData.challandata.receiptNo;
                     await _repoChallanDetails.UpdateAsync(challanDetail);
                     GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
-                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentPending(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt), challanDetail.receiptNo));
                     _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
 
                     return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });

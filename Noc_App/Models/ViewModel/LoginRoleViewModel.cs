@@ -8,7 +8,7 @@
         public string DistrictID { get; set; }
         public string DivisionID { get; set; }
         public string RoleID { get; set; }
-        public string Email { get; set; }
+        public string EmployeeName { get; set; }
         public string role { get; set; }
         public string Password { get; set; }
         public string Token { get; set; }

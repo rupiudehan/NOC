@@ -15,6 +15,7 @@
     public class user_info
     {
         public string Name { get; set; }
+        public string EmployeeName { get; set; }
         public string EmpID { get; set; }
         public string MobileNo { get; set; }
         public string EmailId { get; set; }

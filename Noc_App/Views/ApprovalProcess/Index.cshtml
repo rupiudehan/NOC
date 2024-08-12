@@ -670,7 +670,7 @@
                                                     <th>Date of Application</th>
                                                     <th>Project Name</th>
                                                     <th>Location Details</th>
-                                                    <th>Forwarded To Role</th>
+                                                    <th>Forwarded To</th>
                                                     <th>Remarks</th>
                                                     <th>View</th>
                                                     @if (arry[1].Any(x => x.IsRecommended == 1))
@@ -702,7 +702,7 @@
                                                                 }
                                                                 else
                                                                 {
-                                                                    @data.ProcessedToRole
+                                                                    @data.ProcessedToName
                                                                 }
                                                             </td>
                                                         }

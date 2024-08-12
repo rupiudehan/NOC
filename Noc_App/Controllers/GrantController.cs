@@ -364,7 +364,7 @@ namespace Noc_App.Controllers
                             }
                             else if (result1.statusCode.ToUpper() == "EC301")
                             {
-                                model.ApplicationStatus = "Authentication Failed"; //Authentication Failed
+                                model.ApplicationStatus = "Failed"; //Authentication Failed
                             }
                             else if (result1.statusCode.ToUpper() == "EC302")
                             {
@@ -372,7 +372,7 @@ namespace Noc_App.Controllers
                             }
                             else if (result1.statusCode.ToUpper() == "EC303")
                             {
-                                model.ApplicationStatus = "Verification Failed"; //Verification Not Completed
+                                model.ApplicationStatus = "Transaction ID does not exist"; //Verification Not Completed
                             }
                             else if (result1.statusCode.ToUpper() == "EC304")
                             {
