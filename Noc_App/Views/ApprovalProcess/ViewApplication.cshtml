@@ -29,6 +29,17 @@
                                     <td></td>
 
                                 </tr>
+                                @if (!Model.IsUnderMasterPlan)
+                                {
+                                    <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Payment Details</h6></td></tr>
+                                    <tr>
+
+                                        <td class="boldText">Amount</td>
+                                        <td>@Model.Amount</td>
+                                        <td class="boldText">Receipt No.</td>
+                                        <td>@Model.ReceiptNo</td>
+                                    </tr>
+                                }
                                 <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Applicant Details</h6></td></tr>
                                 <tr>
                                     <td class="boldText">Applicant Name</td>
@@ -262,14 +273,6 @@
                                             <td>@Model.PreviousDate</td>
                                         </tr>
                                     }
-                                    <tr><td colspan="4"><h6 class="m-0 font-weight-bold text-primary">Payment Details</h6></td></tr>
-                                    <tr>
-
-                                        <td class="boldText">Amount</td>
-                                        <td>@Model.Amount</td>
-                                        <td class="boldText">Receipt No.</td>
-                                        <td>@Model.ReceiptNo</td>
-                                    </tr>
                                 }
                                 @if (Model.GrantApprovalRecommendationDetails.Count() > 0)
                                 {

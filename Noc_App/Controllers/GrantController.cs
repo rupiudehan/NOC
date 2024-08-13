@@ -360,7 +360,7 @@ namespace Noc_App.Controllers
                             }
                             else if (result1.statusCode.ToUpper() == "SC310")
                             {
-                                model.ApplicationStatus = "Sent To Payment Gateway";
+                                model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";    //Sent To Payment Gateway
                             }
                             else if (result1.statusCode.ToUpper() == "EC301")
                             {
@@ -384,7 +384,7 @@ namespace Noc_App.Controllers
                             }
                             else if (result1.statusCode.ToUpper() == "EC306")
                             {
-                                model.ApplicationStatus = "Pending At Branch";    //exception occurred update in DB
+                                model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId+". Please check payment status after some time.";    //exception occurred update in DB
                             }
                             else if (result1.statusCode.ToUpper() == "EC307")
                             {
@@ -392,11 +392,11 @@ namespace Noc_App.Controllers
                             }
                             else if (result1.statusCode.ToUpper() == "EC308")
                             {
-                                model.ApplicationStatus = "Pending (corporate banking, NEFT/RTGS)"; //Status pending (corporate banking, NEFT/RTGS)
+                                model.ApplicationStatus = "Pending (corporate banking, NEFT/RTGS) with Transaction ID:"+ model.TransId + ". Please check payment status after some time."; //Status pending (corporate banking, NEFT/RTGS)
                             }
                             else if (result1.statusCode.ToUpper() == "EC309")
                             {
-                                model.ApplicationStatus = "Not Applicable"; //Status null or empty
+                                model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";  //Status null or empty
                             }
                         }
                     }
