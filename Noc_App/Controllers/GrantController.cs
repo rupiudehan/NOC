@@ -1046,7 +1046,7 @@ namespace Noc_App.Controllers
                                     ownerList.Add(owner);
                                 }
                                 List<GrantKhasraDetails> khasraList = new List<GrantKhasraDetails>();
-                                if (model.IsUnderMasterPlan == true)
+                                if (model.IsUnderMasterPlan == false)
                                 {
                                     int duplicates = model.GrantKhasras.Any() ? model.GrantKhasras.GroupBy(x => x.KhasraNo).Where(g => g.Count() > 1).Count() : 0;
                                     if (duplicates <= 0)
@@ -1117,7 +1117,7 @@ namespace Noc_App.Controllers
                                 var authletter = fileUploadeSave(model.AuthorizationLetterPhoto, uniqueAuthLetterFileName);
                                 var kml = fileUploadeSave(model.KMLFile, uniqueKmlFileName);
                                 obj.Owners = ownerList;
-                                if (model.IsUnderMasterPlan == true)
+                                if (model.IsUnderMasterPlan == false)
                                     obj.Khasras = khasraList;
                                 await _repo.UpdateAsync(obj);
                                 //if (msg == "success")
