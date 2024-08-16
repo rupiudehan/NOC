@@ -25,7 +25,7 @@ namespace Noc_App.Models.ViewModel
         public int DistrictID { get; set; }
         public string District { get; set; }
         public string Division { get; set; }
-        public int DivisionID { get; set; }
+        public string DivisionID { get; set; }
         public string SubDivision { get; set; }
         public int SubDivisionID { get; set; }
         public string Designation { get; set; }
