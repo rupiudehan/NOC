@@ -282,7 +282,9 @@ namespace Noc_App.Controllers
 
             string divisionId = LoggedInDivisionID();
             List<OfficerDetails> officerDetail = new List<OfficerDetails>();
-            officerDetail = (await GetOfficer("0", "EXECUTIVE ENGINEER", "0")).Where(x=>x.UserId!=userId).ToList();
+            var users = (await GetOfficer("0", "EXECUTIVE ENGINEER", "0"));
+            if(users!=null && users.Count>0)
+                officerDetail = users.Where(x=>x.UserId!=userId).ToList();
 
             GrantFileTransferDetailCreate model = new GrantFileTransferDetailCreate
             {
@@ -2239,96 +2241,6 @@ namespace Noc_App.Controllers
         }
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
-        //private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole, string subdivisionId, string divisionId)
-        //{
-        //    try
-        //    {
-        //        string baseUrl = "";
-        //        string salt = "";
-        //        string checksum = "";
-        //        string combinedPassword = "";
-        //        //officerRole = "Employee";
-        //        List<LoginResponseViewModel> users = FetchUser();
-        //        //if (subdivisionId != "0")
-        //        //{
-        //        //    subdivisionId = "114";
-        //        //    baseUrl = "https://wrdpbind.com/api/login5.php";
-        //        //    salt = "4RCHhk3cJ6OMGdEf";
-        //        //    checksum = "eUOwFCGMqKvJARC1tU6l4s34";
-        //        //    combinedPassword = officerRole + "|" + subdivisionId + "|" + checksum;
-        //        //}
-        //        //else
-        //        //{
-        //        //    divisionId = "114";
-        //        //    baseUrl = "https://wrdpbind.com/api/login6.php";
-        //        //    salt = "6WCHhk3cJ6OMGdRg";
-        //        //    checksum = "dTOwFCGMqKvJARC1tU6l4sv6";
-        //        //    combinedPassword = officerRole + "|" + divisionId + "|" + checksum;
-        //        //}
-
-
-        //        //string plainText = combinedPassword;
-
-        //        //var keyBytes = new byte[16];
-        //        //var ivBytes = new byte[16];
-
-        //        //string key = salt;
-        //        //var keySalt = Encoding.UTF8.GetBytes(key);
-        //        //var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
-
-        //        //Array.Copy(pdb.GetBytes(16), keyBytes, 16);
-        //        //Array.Copy(pdb.GetBytes(16), ivBytes, 16);
-        //        //string encryptedString = NCC_encryptHelper(plainText, key, key);
-
-        //        //HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
-        //        //HttpClient client = new HttpClient(handler);
-        //        //client.BaseAddress = new Uri(baseUrl);
-        //        //client.DefaultRequestHeaders.Accept.Clear();
-        //        //client.DefaultRequestHeaders.Add("details", encryptedString);
-        //        //var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
-        //        //string resultContent = "["+tokenResponse1.Content.ReadAsStringAsync().Result.Replace("}{", "},{")+"]";
-        //        //List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
-        //        List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
-        //        //officerRole = (await GetRoleName(officerRole)).RoleName;
-        //        UserRoleDetails officer = (await GetAppRoleName(officerRole));
-        //        officerRole = officer.RoleName;
-        //        List<LoginResponseViewModel> officers = new List<LoginResponseViewModel>();
-
-        //        officers = divisionId == "0" ? users.FindAll(x => x.user_info.Role.Contains(officerRole)) : users.FindAll(x => x.user_info.Role.Contains(officerRole) && x.user_info.DivisionID.ToString() == divisionId);
-        //        //user_info user = officers.user_info;
-        //        //user.Role = officerRole;
-        //        //user.RoleID = officer.Id.ToString();
-        //        foreach (LoginResponseViewModel user in officers)
-        //        {
-
-        //            OfficerResponseViewModel obj = new OfficerResponseViewModel
-        //            {
-        //                msg = "success",
-        //                Status = "200",
-        //                user_info = new officer_info { EmployeeId = user.user_info.EmpID, EmployeeName = user.user_info.Name,UserName=user.user_info.EmailId, email = user.user_info.EmailId, DeesignationName = user.user_info.Designation, DesignationID = user.user_info.DesignationID, DistrictId = user.user_info.DistrictID, DistrictName = user.user_info.District, DivisionID = user.user_info.DivisionID, DivisionName = user.user_info.Division, MobileNo = user.user_info.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.user_info.SubDivisionID, SubdivisionName = user.user_info.SubDivision }
-        //            };
-        //            list.Add(obj);
-        //        }
-        //        if (list.Count > 0)
-        //        {
-        //            if (list.FirstOrDefault().Status == "200")
-        //            {
-        //                //    //OfficerResponseViewModel list3 = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel>(resultContent);
-        //                //    //List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
-        //                //    //list.Add(list3);
-
-        //                return list;
-
-        //            }
-        //        }
-        //        return null;
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        return null;
-        //    }
-        //}
         private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole, string subdivisionId, string divisionId)
         {
             try
@@ -2337,60 +2249,78 @@ namespace Noc_App.Controllers
                 string salt = "";
                 string checksum = "";
                 string combinedPassword = "";
+                //officerRole = "Employee";
+                List<LoginResponseViewModel> users = FetchUser();
+                //if (subdivisionId != "0")
+                //{
+                //    subdivisionId = "114";
+                //    baseUrl = "https://wrdpbind.com/api/login5.php";
+                //    salt = "4RCHhk3cJ6OMGdEf";
+                //    checksum = "eUOwFCGMqKvJARC1tU6l4s34";
+                //    combinedPassword = officerRole + "|" + subdivisionId + "|" + checksum;
+                //}
+                //else
+                //{
+                //    divisionId = "114";
+                //    baseUrl = "https://wrdpbind.com/api/login6.php";
+                //    salt = "6WCHhk3cJ6OMGdRg";
+                //    checksum = "dTOwFCGMqKvJARC1tU6l4sv6";
+                //    combinedPassword = officerRole + "|" + divisionId + "|" + checksum;
+                //}
+
+
+                //string plainText = combinedPassword;
+
+                //var keyBytes = new byte[16];
+                //var ivBytes = new byte[16];
+
+                //string key = salt;
+                //var keySalt = Encoding.UTF8.GetBytes(key);
+                //var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
+
+                //Array.Copy(pdb.GetBytes(16), keyBytes, 16);
+                //Array.Copy(pdb.GetBytes(16), ivBytes, 16);
+                //string encryptedString = NCC_encryptHelper(plainText, key, key);
+
+                //HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+                //HttpClient client = new HttpClient(handler);
+                //client.BaseAddress = new Uri(baseUrl);
+                //client.DefaultRequestHeaders.Accept.Clear();
+                //client.DefaultRequestHeaders.Add("details", encryptedString);
+                //var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
+                //string resultContent = "["+tokenResponse1.Content.ReadAsStringAsync().Result.Replace("}{", "},{")+"]";
+                //List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
+                List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
+                //officerRole = (await GetRoleName(officerRole)).RoleName;
                 UserRoleDetails officer = (await GetAppRoleName(officerRole));
                 officerRole = officer.RoleName;
-                baseUrl = "https://wrdpbind.com/api/login6.php";
-                salt = "6WCHhk3cJ6OMGdRg";
-                checksum = "dTOwFCGMqKvJARC1tU6l4sv6";
-                combinedPassword = officerRole + "|" + divisionId + "|" + checksum;
-                string plainText = combinedPassword;
+                List<LoginResponseViewModel> officers = new List<LoginResponseViewModel>();
 
-                var keyBytes = new byte[16];
-                var ivBytes = new byte[16];
-
-                string key = salt;
-                var keySalt = Encoding.UTF8.GetBytes(key);
-                var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
-
-                Array.Copy(pdb.GetBytes(16), keyBytes, 16);
-                Array.Copy(pdb.GetBytes(16), ivBytes, 16);
-                string encryptedString = NCC_encryptHelper(plainText, key, key);
-
-                HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
-                HttpClient client = new HttpClient(handler);
-                client.BaseAddress = new Uri(baseUrl);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("details", encryptedString);
-                var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
-                string resultContent = "[" + tokenResponse1.Content.ReadAsStringAsync().Result.Replace("}{", "},{") + "]";
-                List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
-                if (list.FirstOrDefault().Status == "400")
+                officers = divisionId == "0" ? users.FindAll(x => x.user_info.Role.Contains(officerRole)) : users.FindAll(x => x.user_info.Role.Contains(officerRole) && x.user_info.DivisionID.ToString() == divisionId);
+                //user_info user = officers.user_info;
+                //user.Role = officerRole;
+                //user.RoleID = officer.Id.ToString();
+                foreach (LoginResponseViewModel user in officers)
                 {
-                    return null;
-                }
-                else
-                {
-                    if (list.Count > 0)
+
+                    OfficerResponseViewModel obj = new OfficerResponseViewModel
                     {
-                        if (list.FirstOrDefault().Status == "200")
-                        {
-                            List<OfficerResponseViewModel> listOfficers = new List<OfficerResponseViewModel>();
-                            List<OfficerResponseViewModel> officers = new List<OfficerResponseViewModel>();
-                            officers = divisionId == "0" ? list.FindAll(x => x.user_info.RoleName.Contains(officerRole)) : list.FindAll(x => x.user_info.RoleName.Contains(officerRole) && x.user_info.DivisionID.ToString() == divisionId);
-                            foreach (OfficerResponseViewModel user in officers)
-                            {
+                        msg = "success",
+                        Status = "200",
+                        user_info = new officer_info { EmployeeId = user.user_info.EmpID, EmployeeName = user.user_info.Name, UserName = user.user_info.EmailId, email = user.user_info.EmailId, DeesignationName = user.user_info.Designation, DesignationID = user.user_info.DesignationID, DistrictId = user.user_info.DistrictID, DistrictName = user.user_info.District, DivisionID = user.user_info.DivisionID, DivisionName = user.user_info.Division, MobileNo = user.user_info.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.user_info.SubDivisionID, SubdivisionName = user.user_info.SubDivision }
+                    };
+                    list.Add(obj);
+                }
+                if (list.Count > 0)
+                {
+                    if (list.FirstOrDefault().Status == "200")
+                    {
+                        //    //OfficerResponseViewModel list3 = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel>(resultContent);
+                        //    //List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
+                        //    //list.Add(list3);
 
-                                OfficerResponseViewModel obj = new OfficerResponseViewModel
-                                {
-                                    msg = "success",
-                                    Status = "200",
-                                    user_info = new officer_info { UserName = user.user_info.UserName, EmployeeId = user.user_info.EmployeeId, EmployeeName = user.user_info.EmployeeName, email = user.user_info.email, DeesignationName = user.user_info.DeesignationName, DesignationID = user.user_info.DesignationID, DistrictId = user.user_info.DistrictId, DistrictName = user.user_info.DistrictName, DivisionID = user.user_info.DivisionID, DivisionName = user.user_info.DivisionName, MobileNo = user.user_info.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.user_info.SubdivisionId, SubdivisionName = user.user_info.SubdivisionName }
-                                };
-                                listOfficers.Add(obj);
-                            }
-                            return listOfficers;
+                        return list;
 
-                        }
                     }
                 }
                 return null;
@@ -2401,6 +2331,78 @@ namespace Noc_App.Controllers
                 return null;
             }
         }
+        //private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole, string subdivisionId, string divisionId)
+        //{
+        //    try
+        //    {
+        //        string baseUrl = "";
+        //        string salt = "";
+        //        string checksum = "";
+        //        string combinedPassword = "";
+        //        UserRoleDetails officer = (await GetAppRoleName(officerRole));
+        //        officerRole = officer.RoleName;
+        //        baseUrl = "https://wrdpbind.com/api/login6.php";
+        //        salt = "6WCHhk3cJ6OMGdRg";
+        //        checksum = "dTOwFCGMqKvJARC1tU6l4sv6";
+        //        combinedPassword = officerRole + "|" + divisionId + "|" + checksum;
+        //        string plainText = combinedPassword;
+
+        //        var keyBytes = new byte[16];
+        //        var ivBytes = new byte[16];
+
+        //        string key = salt;
+        //        var keySalt = Encoding.UTF8.GetBytes(key);
+        //        var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
+
+        //        Array.Copy(pdb.GetBytes(16), keyBytes, 16);
+        //        Array.Copy(pdb.GetBytes(16), ivBytes, 16);
+        //        string encryptedString = NCC_encryptHelper(plainText, key, key);
+
+        //        HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+        //        HttpClient client = new HttpClient(handler);
+        //        client.BaseAddress = new Uri(baseUrl);
+        //        client.DefaultRequestHeaders.Accept.Clear();
+        //        client.DefaultRequestHeaders.Add("details", encryptedString);
+        //        var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
+        //        string resultContent = "[" + tokenResponse1.Content.ReadAsStringAsync().Result.Replace("}{", "},{") + "]";
+        //        List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
+        //        if (list.FirstOrDefault().Status == "400")
+        //        {
+        //            return null;
+        //        }
+        //        else
+        //        {
+        //            if (list.Count > 0)
+        //            {
+        //                if (list.FirstOrDefault().Status == "200")
+        //                {
+        //                    List<OfficerResponseViewModel> listOfficers = new List<OfficerResponseViewModel>();
+        //                    List<OfficerResponseViewModel> officers = new List<OfficerResponseViewModel>();
+        //                    officers = divisionId == "0" ? list.FindAll(x => x.user_info.RoleName.Contains(officerRole)) : list.FindAll(x => x.user_info.RoleName.Contains(officerRole) && x.user_info.DivisionID.ToString() == divisionId);
+        //                    foreach (OfficerResponseViewModel user in officers)
+        //                    {
+
+        //                        OfficerResponseViewModel obj = new OfficerResponseViewModel
+        //                        {
+        //                            msg = "success",
+        //                            Status = "200",
+        //                            user_info = new officer_info { UserName = user.user_info.UserName, EmployeeId = user.user_info.EmployeeId, EmployeeName = user.user_info.EmployeeName, email = user.user_info.email, DeesignationName = user.user_info.DeesignationName, DesignationID = user.user_info.DesignationID, DistrictId = user.user_info.DistrictId, DistrictName = user.user_info.DistrictName, DivisionID = user.user_info.DivisionID, DivisionName = user.user_info.DivisionName, MobileNo = user.user_info.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.user_info.SubdivisionId, SubdivisionName = user.user_info.SubdivisionName }
+        //                        };
+        //                        listOfficers.Add(obj);
+        //                    }
+        //                    return listOfficers;
+
+        //                }
+        //            }
+        //        }
+        //        return null;
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        return null;
+        //    }
+        //}
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DD")]
         private async Task<UserRoleDetails> GetAppRoleName(string rolename)
@@ -2440,7 +2442,10 @@ namespace Noc_App.Controllers
                 for (int i = 0; i < role.Count(); i++)
                 {
                     List<OfficerResponseViewModel> officer = new List<OfficerResponseViewModel>();
-                    var o = (await LoadOfficersAsync(roleName, "0", "0")).FindAll(x => x.user_info.EmployeeId == lastForwardedByid);
+                    var users = (await LoadOfficersAsync(roleName, "0", "0"));
+                    List<OfficerResponseViewModel> o = new List<OfficerResponseViewModel>();
+                    if (users!=null && users.Count>0)
+                        o = users.FindAll(x => x.user_info.EmployeeId == lastForwardedByid);
                     
                     officer = o == null ? null : o.ToList();
                     if (officer != null)
