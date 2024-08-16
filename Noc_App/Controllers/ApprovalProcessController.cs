@@ -2365,29 +2365,31 @@ namespace Noc_App.Controllers
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Add("details", encryptedString);
                 var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
-                string resultContent = "[" + tokenResponse1.Content.ReadAsStringAsync().Result.Replace("}{", "},{") + "]";
-                List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
-                if (list.FirstOrDefault().Status == "400")
+                string resultContent = //"[" + 
+                    tokenResponse1.Content.ReadAsStringAsync().Result;//.Replace("}{", "},{") + "]";
+                OfficerResponseViewModel1 list = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel1>(resultContent);
+                if (list.Status == "400")
                 {
                     return null;
                 }
                 else
                 {
-                    if (list.Count > 0)
+                    if (list!=null)
                     {
-                        if (list.FirstOrDefault().Status == "200")
+                        if (list.Status == "200")
                         {
                             List<OfficerResponseViewModel> listOfficers = new List<OfficerResponseViewModel>();
-                            List<OfficerResponseViewModel> officers = new List<OfficerResponseViewModel>();
-                            officers = divisionId == "0" ? list.FindAll(x => x.user_info.RoleName.Contains(officerRole)) : list.FindAll(x => x.user_info.RoleName.Contains(officerRole) && x.user_info.DivisionID.ToString() == divisionId);
-                            foreach (OfficerResponseViewModel user in officers)
+                            List<officer_info> officers = new List<officer_info>();
+
+                            officers = divisionId == "0" ? list.user_info.FindAll(x => x.RoleName.Contains(officerRole)) : list.user_info.FindAll(x => x.RoleName.Contains(officerRole) && x.DivisionID.Contains(divisionId));
+                            foreach (officer_info user in officers)
                             {
 
                                 OfficerResponseViewModel obj = new OfficerResponseViewModel
                                 {
                                     msg = "success",
                                     Status = "200",
-                                    user_info = new officer_info { UserName = user.user_info.UserName, EmployeeId = user.user_info.EmployeeId, EmployeeName = user.user_info.EmployeeName, email = user.user_info.email, DeesignationName = user.user_info.DeesignationName, DesignationID = user.user_info.DesignationID, DistrictId = user.user_info.DistrictId, DistrictName = user.user_info.DistrictName, DivisionID = user.user_info.DivisionID, DivisionName = user.user_info.DivisionName, MobileNo = user.user_info.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.user_info.SubdivisionId, SubdivisionName = user.user_info.SubdivisionName }
+                                    user_info = new officer_info { UserName = user.UserName, EmployeeId = user.EmployeeId, EmployeeName = user.EmployeeName, email = user.email, DeesignationName = user.DeesignationName, DesignationID = user.DesignationID, DistrictId = user.DistrictId, DistrictName = user.DistrictName, DivisionID = user.DivisionID, DivisionName = user.DivisionName, MobileNo = user.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.SubdivisionId, SubdivisionName = user.SubdivisionName }
                                 };
                                 listOfficers.Add(obj);
                             }

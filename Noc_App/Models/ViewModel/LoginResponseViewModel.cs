@@ -55,6 +55,12 @@ namespace Noc_App.Models.ViewModel
         public string office_name { get; set; }
         public string role_name { get; set; }
     }
+    public class OfficerResponseViewModel1
+    {
+        public string Status { get; set; }
+        public string msg { get; set; }
+        public List<officer_info> user_info { get; set; }
+    }
     public class OfficerResponseViewModel
     {
         public string Status { get; set; }
@@ -71,7 +77,7 @@ namespace Noc_App.Models.ViewModel
         public int DistrictId { get; set; }
         public string DistrictName { get; set; }
         public string DivisionName { get; set; }
-        public int DivisionID { get; set; }
+        public string DivisionID { get; set; }
         public string SubdivisionName { get; set; }
         public int SubdivisionId { get; set; }
         public string DeesignationName { get; set; }
