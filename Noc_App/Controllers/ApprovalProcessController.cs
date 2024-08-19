@@ -619,44 +619,63 @@ namespace Noc_App.Controllers
                 //}
                 //else
                 //{
-                    switch (roleName)
-                    {
-                        case "JUNIOR ENGINEER":
-                            forwardToRole = "SUB DIVISIONAL OFFICER";
-                            break;
-                        case "SUB DIVISIONAL OFFICER":
-                            forwardToRole = "EXECUTIVE ENGINEER";
-                            break;
-                        case "EXECUTIVE ENGINEER":
-                            if (grant.IsForwarded == false)
-                                forwardToRole = "JUNIOR ENGINEER";
-                            else if (approval.ProcessedByRole== "SUB DIVISIONAL OFFICER")
-                                forwardToRole = "DWS,CIRCLE OFFICER";
-                            else forwardToRole = "CIRCLE OFFICER";
-                            break;
-                        case "CIRCLE OFFICER":
-                            forwardToRole = "EXECUTIVE ENGINEER HQ";
-                            break;
-                        case "DWS":
-                            if (approval.ProcessedByRole == "EXECUTIVE ENGINEER")
-                                forwardToRole = "ADE";
-                            else forwardToRole = "DIRECTOR DRAINAGE";
-                            break;
-                        case "ADE":
-                            forwardToRole = "DWS";
-                            break;
-                        case "DIRECTOR DRAINAGE":
-                            forwardToRole = "EXECUTIVE ENGINEER";
-                            break;
-                        case "EXECUTIVE ENGINEER HQ":
-                            forwardToRole = "CHIEF ENGINEER HQ";
-                            break;
-                        case "CHIEF ENGINEER HQ":
-                            forwardToRole = "PRINCIPAL SECRETARY";
-                            break;
-                        default:
-                            forwardToRole = "JUNIOR ENGINEER"; break;
-                    }
+                switch (roleName)
+                {
+                    case "JUNIOR ENGINEER":
+                        forwardToRole = "SUB DIVISIONAL OFFICER";
+                        break;
+                    case "SUB DIVISIONAL OFFICER":
+                        forwardToRole = "EXECUTIVE ENGINEER";
+                        break;
+                    case "EXECUTIVE ENGINEER":
+                        if (grant.IsForwarded == false)
+                            forwardToRole = "JUNIOR ENGINEER";
+                        else if (approval.ProcessedByRole == "SUB DIVISIONAL OFFICER")
+                        {
+                            forwardToRole = "DWS,CIRCLE OFFICER";
+                            divisionId = "0";
+                        }
+                        else
+                        {
+                            forwardToRole = "CIRCLE OFFICER";
+                            divisionId = "0";
+                        }
+                        break;
+                    case "CIRCLE OFFICER":
+                        forwardToRole = "EXECUTIVE ENGINEER HQ";
+                        divisionId = "0";
+                        break;
+                    case "DWS":
+                        if (approval.ProcessedByRole == "EXECUTIVE ENGINEER")
+                        {
+                            forwardToRole = "ADE";
+                            divisionId = "0";
+                        }
+                        else
+                        {
+                            forwardToRole = "DIRECTOR DRAINAGE";
+                            divisionId = "0";
+                        }
+                        break;
+                    case "ADE":
+                        forwardToRole = "DWS";
+                        divisionId = "0";
+                        break;
+                    case "DIRECTOR DRAINAGE":
+                        forwardToRole = "EXECUTIVE ENGINEER";
+                        divisionId = "0";
+                        break;
+                    case "EXECUTIVE ENGINEER HQ":
+                        forwardToRole = "CHIEF ENGINEER HQ";
+                        divisionId = "0";
+                        break;
+                    case "CHIEF ENGINEER HQ":
+                        forwardToRole = "PRINCIPAL SECRETARY";
+                        divisionId = "0";
+                        break;
+                    default:
+                        forwardToRole = "JUNIOR ENGINEER"; break;
+                }
                 GrantApprovalDetail approvalOfficer = new GrantApprovalDetail();
                 //if (forwardToRole == "EXECUTIVE ENGINEER")
                     approvalOfficer = (from a in _repoApprovalDetail.GetAll() where a.GrantID == grant.Id && a.ProcessedByRole==forwardToRole orderby a.ProcessedOn descending select a).FirstOrDefault();
