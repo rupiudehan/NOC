@@ -41,8 +41,8 @@ namespace Noc_App.Context
         public DbSet<DrainWidthTypeDetails> DrainWidthTypeDetails { get; set; }
         public DbSet<GrantFileTransferDetails> GrantFileTransferDetails { get; set; }
         public DbSet<MasterPlanDetails> MasterPlanDetails { get; set; }
-        //public DbSet<CircleDetails> CircleDetails { get; set; }
-        //public DbSet<CircleDivisionMapping> CircleDivisionMapping { get; set; }
+        public DbSet<CircleDetails> CircleDetails { get; set; }
+        public DbSet<CircleDivisionMapping> CircleDivisionMapping { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,34 +52,34 @@ namespace Noc_App.Context
             modelBuilder.Entity<ReportApplicationCountViewModel>().HasNoKey();
 
 
-            //modelBuilder.Entity<CircleDetails>().HasData(
-            //    new CircleDetails { Id = 1, Name = "Superintending Engineer Patiala Drainage-cum-Mining and Geology, Circle, WRD, Punjab", Code = "P" },
-            //    new CircleDetails { Id = 2, Name = "Superintending Engineer Jalandhar Drainage-cum-Mining & Geology Circle, WRD, Punjab", Code = "J" },
-            //    new CircleDetails { Id = 3, Name = "Superintending Engineer Ferozepur Drainage-cum-Mining and Geology, Circle, WRD, Punjab", Code = "FE" },
-            //    new CircleDetails { Id = 4, Name = "Superintending Engineer Amritsar Drainage-cum-Mining & Geology Circle, WRD Punjab", Code = "A" },
-            //    new CircleDetails { Id = 5, Name = "Superintending Engineer Ropar  Drainage-cum-Mining & Geology Circle, WRD Punjab", Code = "R" }
-            //    );
-            //modelBuilder.Entity<CircleDivisionMapping>().HasData(
-            //    new CircleDivisionMapping { Id = 2, CircleId = 1, DivisionId = 43 },
-            //    new CircleDivisionMapping { Id = 3, CircleId = 1, DivisionId = 34 },
-            //    new CircleDivisionMapping { Id = 4, CircleId = 1, DivisionId = 60 },
-            //    new CircleDivisionMapping { Id = 5, CircleId = 1, DivisionId = 88 },
-            //    new CircleDivisionMapping { Id = 6, CircleId = 2, DivisionId = 4 },
-            //    new CircleDivisionMapping { Id = 7, CircleId = 2, DivisionId = 46 },
-            //    new CircleDivisionMapping { Id = 8, CircleId = 2, DivisionId = 75 },
-            //    new CircleDivisionMapping { Id = 9, CircleId = 3, DivisionId = 30 },
-            //    new CircleDivisionMapping { Id = 10, CircleId = 3, DivisionId = 33 },
-            //    new CircleDivisionMapping { Id = 11, CircleId = 3, DivisionId = 54 },
-            //    new CircleDivisionMapping { Id = 12, CircleId = 3, DivisionId = 9 },
-            //    new CircleDivisionMapping { Id = 13, CircleId = 4, DivisionId = 63 },
-            //    new CircleDivisionMapping { Id = 14, CircleId = 4, DivisionId = 81 },
-            //    new CircleDivisionMapping { Id = 15, CircleId = 4, DivisionId = 39 },
-            //    new CircleDivisionMapping { Id = 16, CircleId = 4, DivisionId = 125 },
-            //    new CircleDivisionMapping { Id = 17, CircleId = 4, DivisionId = 187 },
-            //    new CircleDivisionMapping { Id = 18, CircleId = 5, DivisionId = 19 },
-            //    new CircleDivisionMapping { Id = 19, CircleId = 5, DivisionId = 27 },
-            //    new CircleDivisionMapping { Id = 20, CircleId = 5, DivisionId = 14 }
-            //    );
+            modelBuilder.Entity<CircleDetails>().HasData(
+                new CircleDetails { Id = 1, Name = "Superintending Engineer Patiala Drainage-cum-Mining and Geology, Circle, WRD, Punjab", Code = "P" },
+                new CircleDetails { Id = 2, Name = "Superintending Engineer Jalandhar Drainage-cum-Mining & Geology Circle, WRD, Punjab", Code = "J" },
+                new CircleDetails { Id = 3, Name = "Superintending Engineer Ferozepur Drainage-cum-Mining and Geology, Circle, WRD, Punjab", Code = "FE" },
+                new CircleDetails { Id = 4, Name = "Superintending Engineer Amritsar Drainage-cum-Mining & Geology Circle, WRD Punjab", Code = "A" },
+                new CircleDetails { Id = 5, Name = "Superintending Engineer Ropar  Drainage-cum-Mining & Geology Circle, WRD Punjab", Code = "R" }
+                );
+            modelBuilder.Entity<CircleDivisionMapping>().HasData(
+                new CircleDivisionMapping { Id = 2, CircleId = 1, DivisionId = 43 },
+                new CircleDivisionMapping { Id = 3, CircleId = 1, DivisionId = 34 },
+                new CircleDivisionMapping { Id = 4, CircleId = 1, DivisionId = 60 },
+                new CircleDivisionMapping { Id = 5, CircleId = 1, DivisionId = 88 },
+                new CircleDivisionMapping { Id = 6, CircleId = 2, DivisionId = 4 },
+                new CircleDivisionMapping { Id = 7, CircleId = 2, DivisionId = 46 },
+                new CircleDivisionMapping { Id = 8, CircleId = 2, DivisionId = 75 },
+                new CircleDivisionMapping { Id = 9, CircleId = 3, DivisionId = 30 },
+                new CircleDivisionMapping { Id = 10, CircleId = 3, DivisionId = 33 },
+                new CircleDivisionMapping { Id = 11, CircleId = 3, DivisionId = 54 },
+                new CircleDivisionMapping { Id = 12, CircleId = 3, DivisionId = 9 },
+                new CircleDivisionMapping { Id = 13, CircleId = 4, DivisionId = 63 },
+                new CircleDivisionMapping { Id = 14, CircleId = 4, DivisionId = 81 },
+                new CircleDivisionMapping { Id = 15, CircleId = 4, DivisionId = 39 },
+                new CircleDivisionMapping { Id = 16, CircleId = 4, DivisionId = 125 },
+                new CircleDivisionMapping { Id = 17, CircleId = 4, DivisionId = 187 },
+                new CircleDivisionMapping { Id = 18, CircleId = 5, DivisionId = 19 },
+                new CircleDivisionMapping { Id = 19, CircleId = 5, DivisionId = 27 },
+                new CircleDivisionMapping { Id = 20, CircleId = 5, DivisionId = 14 }
+                );
 
             modelBuilder.Entity<MasterPlanDetails>().HasData(
                 new MasterPlanDetails { Id = 1,MainPlanName= "GMADA", Name = "Banur (2031)", Code = "B",DistrictId=19 },

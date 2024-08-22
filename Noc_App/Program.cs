@@ -88,6 +88,8 @@ builder.Services.AddScoped<IRepository<PlanSanctionAuthorityMaster>, Repository<
 builder.Services.AddScoped<IRepository<DrainWidthTypeDetails>, Repository<DrainWidthTypeDetails>>();
 builder.Services.AddScoped<IRepository<GrantFileTransferDetails>,Repository<GrantFileTransferDetails>>();
 builder.Services.AddScoped<IRepository<MasterPlanDetails>, Repository<MasterPlanDetails>>();
+builder.Services.AddScoped<IRepository<CircleDetails>, Repository<CircleDetails>>();
+builder.Services.AddScoped<IRepository<CircleDivisionMapping>, Repository<CircleDivisionMapping>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
