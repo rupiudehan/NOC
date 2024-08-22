@@ -125,6 +125,197 @@ namespace NocApp.Migrations
                     b.ToTable("ChallanDetails");
                 });
 
+            modelBuilder.Entity("Noc_App.Models.CircleDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CircleDetails");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "P",
+                            Name = "Superintending Engineer Patiala Drainage-cum-Mining and Geology, Circle, WRD, Punjab"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "J",
+                            Name = "Superintending Engineer Jalandhar Drainage-cum-Mining & Geology Circle, WRD, Punjab"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "FE",
+                            Name = "Superintending Engineer Ferozepur Drainage-cum-Mining and Geology, Circle, WRD, Punjab"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "A",
+                            Name = "Superintending Engineer Amritsar Drainage-cum-Mining & Geology Circle, WRD Punjab"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Code = "R",
+                            Name = "Superintending Engineer Ropar  Drainage-cum-Mining & Geology Circle, WRD Punjab"
+                        });
+                });
+
+            modelBuilder.Entity("Noc_App.Models.CircleDivisionMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CircleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DivisionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CircleId");
+
+                    b.HasIndex("DivisionId");
+
+                    b.ToTable("CircleDivisionMapping");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 2,
+                            CircleId = 1,
+                            DivisionId = 43
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CircleId = 1,
+                            DivisionId = 34
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CircleId = 1,
+                            DivisionId = 60
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CircleId = 1,
+                            DivisionId = 88
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CircleId = 2,
+                            DivisionId = 4
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CircleId = 2,
+                            DivisionId = 46
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CircleId = 2,
+                            DivisionId = 75
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CircleId = 3,
+                            DivisionId = 30
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CircleId = 3,
+                            DivisionId = 33
+                        },
+                        new
+                        {
+                            Id = 11,
+                            CircleId = 3,
+                            DivisionId = 54
+                        },
+                        new
+                        {
+                            Id = 12,
+                            CircleId = 3,
+                            DivisionId = 9
+                        },
+                        new
+                        {
+                            Id = 13,
+                            CircleId = 4,
+                            DivisionId = 63
+                        },
+                        new
+                        {
+                            Id = 14,
+                            CircleId = 4,
+                            DivisionId = 81
+                        },
+                        new
+                        {
+                            Id = 15,
+                            CircleId = 4,
+                            DivisionId = 39
+                        },
+                        new
+                        {
+                            Id = 16,
+                            CircleId = 4,
+                            DivisionId = 125
+                        },
+                        new
+                        {
+                            Id = 17,
+                            CircleId = 4,
+                            DivisionId = 187
+                        },
+                        new
+                        {
+                            Id = 18,
+                            CircleId = 5,
+                            DivisionId = 19
+                        },
+                        new
+                        {
+                            Id = 19,
+                            CircleId = 5,
+                            DivisionId = 27
+                        },
+                        new
+                        {
+                            Id = 20,
+                            CircleId = 5,
+                            DivisionId = 14
+                        });
+                });
+
             modelBuilder.Entity("Noc_App.Models.DashboardPendencyAll", b =>
                 {
                     b.Property<string>("ADE")
@@ -1937,6 +2128,9 @@ namespace NocApp.Migrations
                     b.Property<bool>("IsUnderMasterPlan")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("LastForwardedByName")
+                        .HasColumnType("text");
+
                     b.Property<string>("LastForwardedByRole")
                         .HasColumnType("text");
 
@@ -1972,6 +2166,9 @@ namespace NocApp.Migrations
 
                     b.Property<int>("ProcessedLevel")
                         .HasColumnType("integer");
+
+                    b.Property<string>("ProcessedToName")
+                        .HasColumnType("text");
 
                     b.Property<string>("ProcessedToRole")
                         .HasColumnType("text");
@@ -2024,6 +2221,25 @@ namespace NocApp.Migrations
                         .HasColumnType("bigint");
 
                     b.ToTable("ReportApplicationCountViewModel");
+                });
+
+            modelBuilder.Entity("Noc_App.Models.CircleDivisionMapping", b =>
+                {
+                    b.HasOne("Noc_App.Models.CircleDetails", "Circle")
+                        .WithMany("CircleDivisionMappings")
+                        .HasForeignKey("CircleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Noc_App.Models.DivisionDetails", "Divisions")
+                        .WithMany("CircleDivisionMappings")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Circle");
+
+                    b.Navigation("Divisions");
                 });
 
             modelBuilder.Entity("Noc_App.Models.DaysCheckMaster", b =>
@@ -2275,6 +2491,11 @@ namespace NocApp.Migrations
                     b.Navigation("Divisions");
                 });
 
+            modelBuilder.Entity("Noc_App.Models.CircleDetails", b =>
+                {
+                    b.Navigation("CircleDivisionMappings");
+                });
+
             modelBuilder.Entity("Noc_App.Models.DistrictDetails", b =>
                 {
                     b.Navigation("Division");
@@ -2284,6 +2505,8 @@ namespace NocApp.Migrations
 
             modelBuilder.Entity("Noc_App.Models.DivisionDetails", b =>
                 {
+                    b.Navigation("CircleDivisionMappings");
+
                     b.Navigation("SubDivision");
 
                     b.Navigation("TehsilBlock");

@@ -28,13 +28,15 @@ namespace Noc_App.Controllers
         private readonly IRepository<SubDivisionDetails> _subDivisionRepository;
         private readonly IRepository<DivisionDetails> _divisionRepository;
         private readonly IRepository<UserRoleDetails> _userRolesRepository;
+        //private readonly IRepository<CircleDetails> _circleRepository;
+        //private readonly IRepository<CircleDivisionMapping> _circleDivRepository;
         private readonly GoogleCaptchaService _googleCaptchaService;
 
         //private readonly IRepository<DrainDetails> _drainRepo;
 
         public AccountController(GoogleCaptchaService googleCaptchaService, IRepository<DivisionDetails> divisionRepository, 
             IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, /*IRepository<VillageDetails> villageRepository, */
-            IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository)
+            IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository/*, IRepository<CircleDetails> circleRepository*/)
         {
             _divisionRepository = divisionRepository;
             _subDivisionRepository = subDivisionRepository;
@@ -43,6 +45,8 @@ namespace Noc_App.Controllers
             _userRolesRepository = userRolesRepository;
             _googleCaptchaService = googleCaptchaService;
             _emailService = emailService;
+            //_circleRepository = circleRepository;
+
         }
 
         [HttpPost]
@@ -215,20 +219,65 @@ namespace Noc_App.Controllers
                                                           //Division=loc
                                                       }
                                                                   ).ToList();
-                            List<UserRoleDetailsViewModel> RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
-                                                                join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
-                                                                //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
-                                                                //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
-                                                                select new UserRoleDetailsViewModel
-                                                                {
-                                                                    DivisionId = r.Id,
-                                                                    DivisionName = r.Name,
-                                                                    AppRoleName = rr.Roles.RoleName,
-                                                                    Id = rr.Roles.Id,
-                                                                    RoleLevel = rr.Roles.RoleLevel,
-                                                                    RoleName = rr.Roles.RoleName
-                                                                }
-                                                                 ).ToList();
+                            List<UserRoleDetailsViewModel> RoleDetail = new List<UserRoleDetailsViewModel>();
+                            RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                                          join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                          //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                                          //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                                          select new UserRoleDetailsViewModel
+                                          {
+                                              DivisionId = r.Id,
+                                              DivisionName = r.Name,
+                                              AppRoleName = rr.Roles.RoleName,
+                                              Id = rr.Roles.Id,
+                                              RoleLevel = rr.Roles.RoleLevel,
+                                              RoleName = rr.Roles.RoleName
+                                          }
+                                                                     ).ToList();
+                            //string[] roles = root.user_info.RoleID.Split(',');
+                            //foreach(string role in roles) {
+                            //    if (role != "2")
+                            //    {
+                            //        if (role == "8" /*|| role == "10" || role == "128" || role == "6"*/)
+                            //        {
+                            //            RoleDetail = (from r in _circleRepository.GetAll().AsEnumerable()
+                            //                          join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                            //                          join loc in _circleDivRepository.GetAll() on rr.Location.office_id equals loc.CircleId
+                            //                          join div in _divisionRepository.GetAll() on loc.DivisionId equals div.Id
+                            //                          //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                            //                          //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                            //                          select new UserRoleDetailsViewModel
+                            //                          {
+                            //                              DivisionId = div.Id,
+                            //                              DivisionName = div.Name,
+                            //                              AppRoleName = rr.Roles.RoleName,
+                            //                              Id = rr.Roles.Id,
+                            //                              RoleLevel = rr.Roles.RoleLevel,
+                            //                              RoleName = rr.Roles.RoleName
+                            //                          }
+                            //                                         ).ToList();
+                            //        }
+                            //        else
+                            //        {
+
+                            //            RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                            //                          join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                            //                          //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                            //                          //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                            //                          select new UserRoleDetailsViewModel
+                            //                          {
+                            //                              DivisionId = r.Id,
+                            //                              DivisionName = r.Name,
+                            //                              AppRoleName = rr.Roles.RoleName,
+                            //                              Id = rr.Roles.Id,
+                            //                              RoleLevel = rr.Roles.RoleLevel,
+                            //                              RoleName = rr.Roles.RoleName
+                            //                          }
+                            //                                         ).ToList();
+                            //        }
+                            //    }
+                            //}
+
 
                             //List<UserRoleDetailsViewModel> RoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
                             //                                    where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
@@ -400,13 +449,13 @@ namespace Noc_App.Controllers
             user_info user_info17 = new user_info();
             user_info1 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 10 }, new OfficeWiseRolesIds { office_id = 33, role = 60 }}, Name = "Junior Engineer",EmployeeName="N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info2 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=67}} ,Name = "Sub Divisional Officer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info3 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=8}} ,Name = "Superintending Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info4 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=83}} ,Name = "XEN/DWS", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN/DWS", RoleID = 83.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "dws", EmpID = "126", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info5 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=128}} ,Name = "XEN HO Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN HO Drainage", RoleID = 128.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "eehq", EmpID = "122", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info6 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=10}} ,Name = "Chief Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 10.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info7 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=6}} ,Name = "Principal Secretary", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 6.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info8 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=90}} ,Name = "ADE", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info9 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=35}} ,Name = "Director Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info3 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=8}} ,Name = "Superintending Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 33.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 29, District = "Faridkot", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info4 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=83}} ,Name = "XEN/DWS", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN/DWS", RoleID = 83.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "dws", EmpID = "126", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info5 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=128}} ,Name = "XEN HO Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN HO Drainage", RoleID = 128.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "eehq", EmpID = "122", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info6 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=10}} ,Name = "Chief Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 10.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info7 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=6}} ,Name = "Principal Secretary", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 6.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info8 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=90}} ,Name = "ADE", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info9 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=35}} ,Name = "Director Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info10 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 63, role = 1 }} ,Name = "Administrator", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 63.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info11 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=7}} ,Name = "ExecutiveEngineer", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "xen", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
             user_info12 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=33,role=7}} ,Name = "XEN Faridkot", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
