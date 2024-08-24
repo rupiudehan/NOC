@@ -29,6 +29,12 @@
                             <div class="form-group mt-3">
                                 <label asp-for="Email">Username/Email</label>
                                 <input id="loginToken" value="0" type="hidden" asp-for="Token" />
+                               @*  <div id="recaptcha-container"></div> *@
+                                <div class="g-recaptcha"  data-sitekey="@GoogleCaptchaConfig.Value.SiteKey" data-callback="onReCaptchaSuccess" data-size="invisible"></div>
+                                @* <div class="g-recaptcha"
+                                     data-sitekey="@GoogleCaptchaConfig.Value.SiteKey"
+                                     data-callback="onReCaptchaSuccess"
+                                     data-size="invisible"></div> *@
                                 <input asp-for="Email" class="form-control form-control-user" id="Email" placeholder="Enter Username/Email Address...">
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
@@ -112,7 +118,17 @@
                 $('button[type=submit]').css("visibility", "unset");
             });
         });
-
+        function onReCaptchaSuccess(token) {
+            $('#loginToken').val(token);
+        }
+        function setRecaptchaResponse() {
+            if (typeof grecaptcha !== 'undefined') {
+                grecaptcha.reset();  // Reset the reCAPTCHA widget
+                grecaptcha.execute();
+            } else {
+                console.error("reCAPTCHA is not initialized.");
+            }
+        }
         function myFunction() {
             var x = document.getElementById("Password");
             if (x.type === "password") {

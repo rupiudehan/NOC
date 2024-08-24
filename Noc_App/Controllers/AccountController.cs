@@ -80,6 +80,7 @@ namespace Noc_App.Controllers
             try
             {
                 var googlereCaptchaResponse = _googleCaptchaService.VerifyreCaptcha(model.Token);
+                login.Success = "0";
                 if (!googlereCaptchaResponse.Result.success && googlereCaptchaResponse.Result.score <= 0.5)
                 {
                     login.Errors = "You are not human. Please the refresh page.";
@@ -295,12 +296,13 @@ namespace Noc_App.Controllers
                     ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
 
                 }
+                login.Errors = "Invalid Login Attempt";
             }
             catch (Exception ex)
             {
+                login.Errors = "An error occured while doing login attempt";
                 ModelState.AddModelError(string.Empty, "Token has expired now. Please refresh the page.");
             }
-            login.Errors = "Invalid Login Attempt";
             return Json(login);
         }
 

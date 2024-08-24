@@ -37,6 +37,7 @@ function ToggleLoadder(isVisible) {
     }
 }
 
+
 $(function () {
 
     $('#loginForm').on('submit', function (event) {
@@ -80,9 +81,11 @@ $(function () {
                         });
                     });
                     resultProjectMessage.css('display', 'none');
+                    //setRecaptchaResponse();
                     //resultProjectMessage.html('<div class="alert alert-success">LoggedIn successfully!<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
                     $('#myModal').modal('show');
                 } else {
+                    setRecaptchaResponse();
                     var errors = response.errors;
                     resultProjectMessage.css('display', 'block');
                     resultProjectMessage.html('<div class="alert alert-danger">' + errors + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
