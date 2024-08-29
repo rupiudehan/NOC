@@ -90,6 +90,7 @@ builder.Services.AddScoped<IRepository<GrantFileTransferDetails>,Repository<Gran
 builder.Services.AddScoped<IRepository<MasterPlanDetails>, Repository<MasterPlanDetails>>();
 builder.Services.AddScoped<IRepository<CircleDetails>, Repository<CircleDetails>>();
 builder.Services.AddScoped<IRepository<CircleDivisionMapping>, Repository<CircleDivisionMapping>>();
+builder.Services.AddScoped<IRepository<EstablishmentOfficeDetails>, Repository<EstablishmentOfficeDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

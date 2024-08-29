@@ -55,6 +55,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<DrainWidthTypeDetails> _drainwidthRepository;
         private readonly IRepository<GrantFileTransferDetails> _grantFileTransferRepository;
         private readonly IRepository<MasterPlanDetails> _masterPlanDetailsRepository;
+        private readonly IRepository<CircleDivisionMapping> _circleDivRepository;
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<GrantPaymentDetails> repoPayment,IRepository<GrantApprovalDetail> repoApprovalDetail, IRepository<GrantApprovalMaster> repoApprovalMaster
@@ -64,7 +65,8 @@ namespace Noc_App.Controllers
             , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
             , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation
             , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<DrainWidthTypeDetails> drainwidthRepository
-            , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster, IRepository<GrantFileTransferDetails> grantFileTransferRepository)
+            , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster
+            , IRepository<GrantFileTransferDetails> grantFileTransferRepository, IRepository<CircleDivisionMapping> circleDivRepository)
         {
             _repo = repo;
             //_villageRpo = villageRepo;
@@ -96,6 +98,7 @@ namespace Noc_App.Controllers
             _repoPlanSanctionAuthtoryMaster = repoPlanSanctionAuthtoryMaster;
             _grantFileTransferRepository= grantFileTransferRepository;
             _masterPlanDetailsRepository=masterPlanDetailsRepository;
+            _circleDivRepository = circleDivRepository;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
@@ -114,7 +117,7 @@ namespace Noc_App.Controllers
                 role = (await GetAppRoleName(role)).AppRoleName;
                 List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
                 List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
-                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER HQ" || role== "EXECUTIVE ENGINEER HQ")
+                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER HQ" || role== "EXECUTIVE ENGINEER HQ" || role== "DIRECTOR DRAINAGE" || role== "DWS" || role== "ADE")
                     divisionId = "0";
                 model =await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", divisionId, "'" +role+"'", "'" + userId + "'");
                 var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
@@ -621,6 +624,15 @@ namespace Noc_App.Controllers
                 //}
                 //else
                 //{
+                string circleId = (from c in _circleDivRepository.GetAll().AsEnumerable()
+                                   join d in _divisionRepo.GetAll() on c.DivisionId equals d.Id
+                                   where d.Id.ToString()==divisionId
+                                   select new
+                                   {
+                                       CircleId=c.Id
+                                   }
+                                   ).FirstOrDefault().ToString();
+
                 switch (roleName)
                 {
                     case "JUNIOR ENGINEER":
@@ -640,7 +652,7 @@ namespace Noc_App.Controllers
                         else
                         {
                             forwardToRole = "CIRCLE OFFICER";
-                            divisionId = "0";
+                            divisionId = circleId;
                         }
                         break;
                     case "CIRCLE OFFICER":

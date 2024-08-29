@@ -30,6 +30,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<UserRoleDetails> _userRolesRepository;
         private readonly IRepository<CircleDetails> _circleRepository;
         private readonly IRepository<CircleDivisionMapping> _circleDivRepository;
+        private readonly IRepository<EstablishmentOfficeDetails> _estabOfficeRepository;
         private readonly GoogleCaptchaService _googleCaptchaService;
 
         //private readonly IRepository<DrainDetails> _drainRepo;
@@ -37,7 +38,7 @@ namespace Noc_App.Controllers
         public AccountController(GoogleCaptchaService googleCaptchaService, IRepository<DivisionDetails> divisionRepository, 
             IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, /*IRepository<VillageDetails> villageRepository, */
             IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository, IRepository<CircleDetails> circleRepository
-            , IRepository<CircleDivisionMapping> circleDivRepository)
+            , IRepository<CircleDivisionMapping> circleDivRepository, IRepository<EstablishmentOfficeDetails> estabOfficeRepository)
         {
             _divisionRepository = divisionRepository;
             _subDivisionRepository = subDivisionRepository;
@@ -48,6 +49,8 @@ namespace Noc_App.Controllers
             _emailService = emailService;
             _circleRepository = circleRepository;
             _circleDivRepository = circleDivRepository;
+            _estabOfficeRepository = estabOfficeRepository;
+
         }
 
         [HttpPost]
@@ -246,10 +249,27 @@ namespace Noc_App.Controllers
                                                       }
                                                                      ).ToList();
                                     }
-                                    else
+                                    else if(role == "60" || role == "67" || role == "7")
                                     {
 
                                         RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                                                      join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                      //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                                                      //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                                                      select new UserRoleDetailsViewModel
+                                                      {
+                                                          DivisionId = r.Id,
+                                                          DivisionName = r.Name,
+                                                          AppRoleName = rr.Roles.RoleName,
+                                                          Id = rr.Roles.Id,
+                                                          RoleLevel = rr.Roles.RoleLevel,
+                                                          RoleName = rr.Roles.RoleName
+                                                      }
+                                                                     ).ToList();
+                                    }
+                                    else
+                                    {
+                                        RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
                                                       join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
                                                       //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
                                                       //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
