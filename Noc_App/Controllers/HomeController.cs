@@ -212,7 +212,7 @@ namespace Noc_App.Controllers
             // Retrieve roles associated with the user
             string userId = LoggedInUserID();
 
-            string divisionsId = role!= "ADMINISTRATOR"? LoggedInDivisionID():divisiondetailId;
+            string divisionsId = role== "EXECUTIVE ENGINEER" || role=="CIRCLE OFFICER" ? LoggedInDivisionID():divisiondetailId;
 
             string subdivisionsId = LoggedInSubDivisionID();
 

@@ -232,8 +232,8 @@ namespace Noc_App.Controllers
                                 {
                                     if (role == "8" /*|| role == "10" || role == "128" || role == "6"*/)
                                     {
-                                        RoleDetail = (from r in _circleRepository.GetAll().AsEnumerable()
-                                                      join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                        RoleDetail = (from rr in LocationRoleDetail
+                                                      join r in _circleRepository.GetAll().AsEnumerable() on rr.Location.office_id equals r.Id
                                                       join loc in _circleDivRepository.GetAll() on rr.Location.office_id equals loc.CircleId
                                                       join div in _divisionRepository.GetAll() on loc.DivisionId equals div.Id
                                                       //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
@@ -241,7 +241,7 @@ namespace Noc_App.Controllers
                                                       select new UserRoleDetailsViewModel
                                                       {
                                                           DivisionId = div.Id,
-                                                          DivisionName = div.Name,
+                                                          DivisionName = div.Name+" ("+r.Name+")",
                                                           AppRoleName = rr.Roles.RoleName,
                                                           Id = rr.Roles.Id,
                                                           RoleLevel = rr.Roles.RoleLevel,
@@ -249,7 +249,7 @@ namespace Noc_App.Controllers
                                                       }
                                                                      ).ToList();
                                     }
-                                    else if(role == "60" || role == "67" || role == "7")
+                                    else if(role == "60" || role == "67" || role == "7" )
                                     {
 
                                         RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
@@ -267,7 +267,7 @@ namespace Noc_App.Controllers
                                                       }
                                                                      ).ToList();
                                     }
-                                    else
+                                    else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128")
                                     {
                                         RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
                                                       join rr in LocationRoleDetail on r.Id equals rr.Location.office_id

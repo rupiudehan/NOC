@@ -624,14 +624,6 @@ namespace Noc_App.Controllers
                 //}
                 //else
                 //{
-                string circleId = (from c in _circleDivRepository.GetAll().AsEnumerable()
-                                   join d in _divisionRepo.GetAll() on c.DivisionId equals d.Id
-                                   where d.Id.ToString()==divisionId
-                                   select new
-                                   {
-                                       CircleId=c.Id
-                                   }
-                                   ).FirstOrDefault().ToString();
 
                 switch (roleName)
                 {
@@ -652,7 +644,17 @@ namespace Noc_App.Controllers
                         else
                         {
                             forwardToRole = "CIRCLE OFFICER";
-                            divisionId = circleId;
+
+                            //string circleId = (from c in _circleDivRepository.GetAll()
+                            //                   join d in _divisionRepo.GetAll() on c.DivisionId equals d.Id
+                            //                   where d.Id.ToString() == divisionId
+                            //                   select new
+                            //                   {
+                            //                       CircleId = c.Id
+                            //                   }
+                            //                   ).FirstOrDefault().ToString();
+                            //divisionId = circleId;
+                            divisionId = "0";
                         }
                         break;
                     case "CIRCLE OFFICER":
@@ -828,28 +830,57 @@ namespace Noc_App.Controllers
                         if (grant.IsForwarded == false)
                             forwardToRole = "JUNIOR ENGINEER";
                         else if (approval.ProcessedByRole == "SUB DIVISIONAL OFFICER")
+                        {
                             forwardToRole = "DWS,CIRCLE OFFICER";
-                        else forwardToRole = "CIRCLE OFFICER";
+                            divisionId = "0";
+                        }
+                        else
+                        {
+                            forwardToRole = "CIRCLE OFFICER";
+
+                            //string circleId = (from c in _circleDivRepository.GetAll()
+                            //                   join d in _divisionRepo.GetAll() on c.DivisionId equals d.Id
+                            //                   where d.Id.ToString() == divisionId
+                            //                   select new
+                            //                   {
+                            //                       CircleId = c.Id
+                            //                   }
+                            //                   ).FirstOrDefault().ToString();
+                            //divisionId = circleId;
+                            divisionId = "0";
+                        }
                         break;
                     case "CIRCLE OFFICER":
                         forwardToRole = "EXECUTIVE ENGINEER HQ";
+                        divisionId = "0";
                         break;
                     case "DWS":
                         if (approval.ProcessedByRole == "EXECUTIVE ENGINEER")
+                        {
                             forwardToRole = "ADE";
-                        else forwardToRole = "DIRECTOR DRAINAGE";
+                            divisionId = "0";
+                        }
+                        else
+                        {
+                            forwardToRole = "DIRECTOR DRAINAGE";
+                            divisionId = "0";
+                        }
                         break;
                     case "ADE":
                         forwardToRole = "DWS";
+                        divisionId = "0";
                         break;
                     case "DIRECTOR DRAINAGE":
                         forwardToRole = "EXECUTIVE ENGINEER";
+                        divisionId = "0";
                         break;
                     case "EXECUTIVE ENGINEER HQ":
                         forwardToRole = "CHIEF ENGINEER HQ";
+                        divisionId = "0";
                         break;
                     case "CHIEF ENGINEER HQ":
                         forwardToRole = "PRINCIPAL SECRETARY";
+                        divisionId = "0";
                         break;
                     default:
                         forwardToRole = "JUNIOR ENGINEER"; break;
@@ -2524,7 +2555,7 @@ namespace Noc_App.Controllers
                                                             select new OfficerDetails
                                                             {
                                                                 UserId = u.user_info.EmployeeId,
-                                                                UserName = u.user_info.EmployeeName + "(" + u.user_info.DeesignationName + ")",
+                                                                UserName = u.user_info.EmployeeName + "-" + u.user_info.UserName + "(" + u.user_info.DeesignationName + ")",
                                                                 RoleId = u.user_info.RoleID.ToString(),
                                                                 RoleName = o.RoleName,
                                                                 Name = o.Name,

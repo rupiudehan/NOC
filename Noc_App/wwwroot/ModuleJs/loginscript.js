@@ -60,6 +60,7 @@ $(function () {
             },
 
             success: function (response) {
+                console.log(JSON.stringify(response))
                 if (response.success == '1') {
                     //$('#Name').val(response.name);
                     //$('#Designation').val(response.designation);
