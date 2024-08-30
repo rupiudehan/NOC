@@ -256,11 +256,18 @@ namespace Noc_App.Controllers
                 if (response.IsSuccessful)
                 {
                     var content = response.Content.Replace("/eRctDeptInt", _configuration["IFMSPayOptions:replace"]);
-                    var url = "DistOptions.url = vdir + \"Server/SelectTel?DistCode=\" + $(\"#DistrictCode\").val()";
-                    var actual = "DistOptions.url = \"/Payment/TrpSarthi?DistCode=\" + $(\"#DistrictCode\").val()";
-                    
-                    TempData["Message"] = (content.Replace(url,actual)).Replace("<input type='hidden' name='DeptCode' value='WAS'/>", "<input type='hidden' name='DeptCode' value='WAS'/>@TempData.Keep()");
-                    return RedirectToAction("ChallanForm", "Payment");
+                    if (content.Contains("An error occurred while processing your request."))
+                    {
+                        return RedirectToAction("Failed", new { id = data.ApplicationId });
+                    }
+                    else
+                    {
+                        var url = "DistOptions.url = vdir + \"Server/SelectTel?DistCode=\" + $(\"#DistrictCode\").val()";
+                        var actual = "DistOptions.url = \"/Payment/TrpSarthi?DistCode=\" + $(\"#DistrictCode\").val()";
+
+                        TempData["Message"] = (content.Replace(url, actual)).Replace("<input type='hidden' name='DeptCode' value='WAS'/>", "<input type='hidden' name='DeptCode' value='WAS'/>@TempData.Keep()");
+                        return RedirectToAction("ChallanForm", "Payment");
+                    }
                 }
                 else
                 {
