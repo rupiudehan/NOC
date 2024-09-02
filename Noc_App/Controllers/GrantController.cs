@@ -375,7 +375,7 @@ namespace Noc_App.Controllers
                                 }
                                 else if (result1.statusCode.ToUpper() == "EC303")
                                 {
-                                    model.ApplicationStatus = "Transaction ID does not exist"; //Verification Not Completed
+                                    model.ApplicationStatus = "Failed"; //Transaction ID does not exist //Verification Not Completed
                                 }
                                 else if (result1.statusCode.ToUpper() == "EC304")
                                 {
