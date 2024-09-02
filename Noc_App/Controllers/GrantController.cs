@@ -20,6 +20,7 @@ using System.Diagnostics.Eventing.Reader;
 using Noc_App.PaymentUtilities;
 using static Noc_App.Models.IFMSPayment.DepartmentModel;
 using System.Text;
+using System.Net;
 
 namespace Noc_App.Controllers
 {
@@ -351,7 +352,7 @@ namespace Noc_App.Controllers
                             integratingAgency = settings.IntegratingAgency,
                             dateTime = null
                         };
-                        PaymentStatusDetailViewModel result1 = ChallanVerify(cHeader);
+                        PaymentStatusDetailViewModel result1 =  ChallanVerify(cHeader);
                         if (result1 != null)
                         {
                             if (result1.statusCode != null)
@@ -400,6 +401,10 @@ namespace Noc_App.Controllers
                                 {
                                     model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";  //Status null or empty
                                 }
+                                else
+                                {
+                                    model.ApplicationStatus = result1.msg+". Cannot fetch payment details.";  //Status null or empty
+                                }
                             }
                         }
                         else
@@ -427,11 +432,22 @@ namespace Noc_App.Controllers
             var reqData = JsonConvert.SerializeObject(cHeader);
             HttpResponseMessage resMsg = ExecuteAPI(_configuration["IFMSPayOptions:Verify"], reqData);
             //ExecuteAPIRequest(_configuration["IFMSPayOptions:Verify"], reqData);
-            string retJson = resMsg.Content.ReadAsStringAsync().Result;
-            PaymentStatusDetailViewModel data = Newtonsoft.Json.JsonConvert.DeserializeObject<PaymentStatusDetailViewModel>(retJson);
-            //PaymentStatusDetailViewModel
-            return data;
-
+            if (resMsg.IsSuccessStatusCode)
+            {
+                string retJson = resMsg.Content.ReadAsStringAsync().Result;
+                PaymentStatusDetailViewModel data = Newtonsoft.Json.JsonConvert.DeserializeObject<PaymentStatusDetailViewModel>(retJson);
+                //PaymentStatusDetailViewModel
+                return data;
+            }
+            else
+            {
+                HttpStatusCode code =  resMsg.StatusCode;
+                string reasonPhrase = resMsg.ReasonPhrase;
+                PaymentStatusDetailViewModel data = new PaymentStatusDetailViewModel();
+                data.statusCode = code== System.Net.HttpStatusCode.InternalServerError? "500":code.ToString();
+                data.msg = reasonPhrase;
+                return data;
+            }
         }
 
         private HttpResponseMessage ExecuteAPI(string URL, string PostData)
