@@ -2643,7 +2643,16 @@ namespace Noc_App.Controllers
                                               UserName = ofi.user_info.UserName,
                                               Status = ofi.user_info.Status
 
-                                          }).ToList();
+                                          }).GroupBy(x => new
+                                          {
+                                              x.EmployeeId,
+                                              x.EmployeeName,
+                                              x.DesignationID,
+                                              x.DistrictId,
+                                              x.DivisionID,
+                                              x.SubdivisionId
+                                          })
+                                          .Select(g => g.First()).ToList();
                         List<OfficerResponseViewModel> officerDetails = new List<OfficerResponseViewModel>();
                         foreach (var item in userdetail)
                         {
@@ -2666,10 +2675,59 @@ namespace Noc_App.Controllers
                     else if (role[i] == "EXECUTIVE ENGINEER" || role[i] == "JUNIOR ENGINEER" || role[i] == "SUB DIVISIONAL OFFICER")
                     {
                         var o = (await LoadOfficersAsync(role[i], subDivision, divisionId, circleid, establishmentOfficeId));
+                        var userdetail = (from ofi in o.AsEnumerable()
+                                          from divisId in ofi.user_info.DivisionID.Split(',').Select(id => id.Trim())
+                                          join ofice in _divisionRepo.GetAll().AsEnumerable() on divisId equals ofice.Id.ToString()
+                                          orderby ofi.user_info.UserName
+                                          select new officer_info
+                                          {
+                                              CurrentJoiningDate = ofi.user_info.CurrentJoiningDate,
+                                              DateOfRetirement = ofi.user_info.DateOfRetirement,
+                                              DesignationID = ofi.user_info.DesignationID,
+                                              DeesignationName = ofi.user_info.DeesignationName,
+                                              DistrictId = ofi.user_info.DistrictId,
+                                              DistrictName = ofi.user_info.DistrictName,
+                                              DivisionID = ofi.user_info.DivisionID,
+                                              DivisionName = ofi.user_info.DivisionName,
+                                              email = ofi.user_info.email,
+                                              EmployeeId = ofi.user_info.EmployeeId,
+                                              EmployeeName = ofi.user_info.EmployeeName,
+                                              IntialJoiningDate = ofi.user_info.IntialJoiningDate,
+                                              MobileNo = ofi.user_info.MobileNo,
+                                              RoleID = ofi.user_info.RoleID,
+                                              RoleName = ofi.user_info.RoleName,
+                                              SubdivisionId = ofi.user_info.SubdivisionId,
+                                              SubdivisionName = ofi.user_info.SubdivisionName,
+                                              UserName = ofi.user_info.UserName,
+                                              Status = ofi.user_info.Status
 
-                        officer = o == null ? null : o.ToList();
+                                          }).GroupBy(x => new
+                                          {
+                                              x.EmployeeId,
+                                              x.EmployeeName,
+                                              x.DesignationID,
+                                              x.DistrictId,
+                                              x.DivisionID,
+                                              x.SubdivisionId
+                                          })
+                                          .Select(g => g.First()).ToList();
+                        List<OfficerResponseViewModel> officerDetails = new List<OfficerResponseViewModel>();
+                        foreach (var item in userdetail)
+                        {
+                            OfficerResponseViewModel obj = new OfficerResponseViewModel
+                            {
+                                msg = "success",
+                                Status = "200",
+                                user_info = item
+                            };
+                            officerDetails.Add(obj);
+                        }
+                        officer = officerDetails == null ? null : officerDetails.ToList();
                         if (officer != null)
                             officers.AddRange(officer);
+                        //officer = o == null ? null : o.ToList();
+                        //if (officer != null)
+                        //    officers.AddRange(officer);
                     }
                     
                     else
@@ -2705,7 +2763,16 @@ namespace Noc_App.Controllers
                                               UserName = ofi.user_info.UserName,
                                               Status = ofi.user_info.Status
 
-                                          }).ToList();
+                                          }).GroupBy(x => new
+                                          {
+                                              x.EmployeeId,
+                                              x.EmployeeName,
+                                              x.DesignationID,
+                                              x.DistrictId,
+                                              x.DivisionID,
+                                              x.SubdivisionId
+                                          })
+                                          .Select(g => g.First()).ToList();
                         List<OfficerResponseViewModel> officerDetails = new List<OfficerResponseViewModel>();
                         foreach (var item in userdetail)
                         {
