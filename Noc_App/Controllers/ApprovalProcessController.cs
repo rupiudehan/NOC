@@ -57,6 +57,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<MasterPlanDetails> _masterPlanDetailsRepository;
         private readonly IRepository<CircleDivisionMapping> _circleDivRepository;
         private readonly IRepository<EstablishmentOfficeDetails> _establishOffRepository;
+        private readonly IRepository<ProcessedApplicationsViewModel> _processedAppDetailsRepo;
 
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
@@ -69,7 +70,7 @@ namespace Noc_App.Controllers
             , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<DrainWidthTypeDetails> drainwidthRepository
             , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster
             , IRepository<GrantFileTransferDetails> grantFileTransferRepository, IRepository<CircleDivisionMapping> circleDivRepository
-            , IRepository<EstablishmentOfficeDetails> establishOffRepository)
+            , IRepository<EstablishmentOfficeDetails> establishOffRepository, IRepository<ProcessedApplicationsViewModel> processedAppDetailsRepo)
         {
             _repo = repo;
             //_villageRpo = villageRepo;
@@ -103,6 +104,7 @@ namespace Noc_App.Controllers
             _masterPlanDetailsRepository=masterPlanDetailsRepository;
             _circleDivRepository = circleDivRepository;
             _establishOffRepository = establishOffRepository;
+            _processedAppDetailsRepo = processedAppDetailsRepo;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
@@ -138,6 +140,25 @@ namespace Noc_App.Controllers
                 return View(modelView);
             }
            catch(Exception ex){
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View();
+            }
+        }
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        public async Task<ViewResult> ProcessedApplications()
+        {
+            try
+            {
+
+                string userId = LoggedInUserID();           
+                List<ProcessedApplicationsViewModel> model = new List<ProcessedApplicationsViewModel>();
+               
+                model = await _processedAppDetailsRepo.ExecuteStoredProcedureAsync<ProcessedApplicationsViewModel>("getprocessedapplications", "0", "'" + userId + "'");
+               
+                return View(model);
+            }
+            catch (Exception ex)
+            {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View();
             }
@@ -2052,6 +2073,219 @@ namespace Noc_App.Controllers
                         MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
                         UnderMasterPlan = obj.IsUnderMasterPlan ? "Yes" : "No"
                     };
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View();
+            }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        public async Task<IActionResult> ViewProcessedApplication(string Id)
+        {
+            try
+            {
+                GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == Id.ToLower())).FirstOrDefault();
+                PlanSanctionAuthorityMaster planAuth = await _repoPlanSanctionAuthtoryMaster.GetByIdAsync(obj.PlanSanctionAuthorityId);
+                //VillageDetails village = await _villageRpo.GetByIdAsync(obj.VillageID);
+                TehsilBlockDetails tehsil = await _tehsilBlockRepo.GetByIdAsync(obj.TehsilID);
+                SubDivisionDetails subDivision = await _subDivisionRepo.GetByIdAsync(obj.SubDivisionId);
+                DivisionDetails division = await _divisionRepo.GetByIdAsync(subDivision.DivisionId);
+                NocPermissionTypeDetails permission = await _nocPermissionTypeRepo.GetByIdAsync(obj.NocPermissionTypeID ?? 0);
+                ProjectTypeDetails projecttype = await _projectTypeRepo.GetByIdAsync(obj.ProjectTypeId);
+                NocTypeDetails noctype = await _nocTypeRepo.GetByIdAsync(obj.NocTypeId ?? 0);
+                SiteAreaUnitDetails unit = await _siteUnitsRepo.GetByIdAsync(obj.SiteAreaUnitId ?? 0);
+                MasterPlanDetails masterplan = (from np in _masterPlanDetailsRepository.GetAll() where obj.MasterPlanId == np.Id select np).FirstOrDefault();
+                List<GrantKhasraDetails> khasras = (await _khasraRepo.FindAsync(x => x.GrantID == obj.Id)).ToList();
+                List<OwnerDetails> owners = (await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
+                List<GrantInspectionDocuments> documents = (from d in _repoApprovalDocument.GetAll()
+                                                            join a in _repoApprovalDetail.GetAll() on d.GrantApprovalID equals a.Id
+                                                            join dr in _drainwidthRepository.GetAll() on d.TypeOfWidth equals dr.Id
+                                                            where a.GrantID == obj.Id
+                                                            orderby d.Id descending
+                                                            select new GrantInspectionDocuments
+                                                            {
+                                                                GisOrDwsFilePath = d.GISOrDWSReportPath,
+                                                                CatchmentAreaFilePath = d.CatchmentAreaAndFlowPath,
+                                                                CrossSectionOrCalculationFilePath = d.CrossSectionOrCalculationSheetReportPath,
+                                                                DistanceFromCreekFilePath = d.DistanceFromCreekPath,
+                                                                LSectionOfDrainFilePath = d.DrainLSectionPath,
+                                                                IsKMLByApplicantValid = d.IsKMLByApplicantValid,
+                                                                UploadedByRole = d.ProcessedByRole,
+                                                                UploadedByName = d.ProcessedByName,
+                                                                SiteConditionReportFilePath = d.SiteConditionReportPath,
+                                                                IsDrainNotified = Convert.ToBoolean(d.IsDrainNotified),
+                                                                DrainWidth = d.DrainWidth,
+                                                                TypeOfWidthName = "Width " + dr.Name
+
+                                                            }).ToList();
+                //(await _grantOwnersRepo.FindAsync(x => x.GrantId == obj.Id)).ToList();
+                List<OwnerTypeDetails> ownertype = new List<OwnerTypeDetails>();
+                foreach (OwnerDetails item in owners)
+                {
+                    OwnerTypeDetails type = await _ownerTypeRepo.GetByIdAsync(item.OwnerTypeId);
+                    item.OwnerType = type;
+                }
+                double totalArea = 0;
+                foreach (GrantKhasraDetails item in khasras)
+                {
+                    SiteUnitsViewModel unitDetails = new SiteUnitsViewModel
+                    {
+                        KanalOrBigha = item.KanalOrBigha,
+                        MarlaOrBiswa = item.MarlaOrBiswa,
+                        SarsaiOrBiswansi = item.SarsaiOrBiswansi,
+                        SiteUnitId = unit.Id
+                    };
+                    var units = await _calculations.CalculateUnits(unitDetails);
+                    totalArea = Math.Round(totalArea + units.KanalOrBigha + units.MarlaOrBiswa + units.SarsaiOrBiswansi, 5);
+
+                }
+                List<GrantApprovalRecommendationDetail> modelRecommendation = (from ap in _repoApprovalDetail.GetAll()
+                                                                               join recommend in _repoRecommendation.GetAll() on ap.RecommendationID equals recommend.Id
+                                                                               where ap.GrantID == obj.Id && obj.IsPending == true && recommend.Code != "NA"
+                                                                               orderby ap.ProcessedOn descending
+                                                                               select new GrantApprovalRecommendationDetail
+                                                                               {
+                                                                                   ApplicationId = obj.ApplicationID,
+                                                                                   Recommended = recommend.Name,
+                                                                                   RecommendedBy = ap.ProcessedByRole,
+                                                                                   RecommendedTo = ap.ProcessedToRole,
+                                                                                   Remarks = ap.Remarks,
+                                                                                   RecommendedByName = ap.ProcessedByName,
+                                                                                   RecommendedToName = ap.ProcessedToName
+                                                                               }).ToList();
+                var rm = (from ap in _repoApprovalDetail.GetAll()
+                          join recommend in _repoRecommendation.GetAll() on ap.RecommendationID equals recommend.Id
+                          join ma in _repoApprovalMaster.GetAll() on ap.ApprovalID equals ma.Id
+                          where ap.GrantID == obj.Id && (obj.IsRejected == true || obj.IsApproved == true) && recommend.Code == "NA"
+                          orderby ap.ProcessedOn descending
+                          select new GrantApprovalRecommendationDetail
+                          {
+                              Remarks = ap.Remarks
+                          });
+                string remarks =rm!=null && rm.Count()>0?rm.AsEnumerable().FirstOrDefault().Remarks.ToString():"";
+                List<GrantFileTransferDetails> modelFileTransfer = (from ap in _grantFileTransferRepository.GetAll()
+                                                                    where ap.GrantId == obj.Id
+                                                                    orderby ap.TransferedOn descending
+                                                                    select new GrantFileTransferDetails
+                                                                    {
+                                                                        FromName = ap.FromName,
+                                                                        Remarks = ap.Remarks,
+                                                                        FromDesignationName = ap.FromDesignationName,
+                                                                        FromAuthorityId = ap.FromAuthorityId,
+                                                                        ToAuthorityId = ap.ToAuthorityId,
+                                                                        ToName = ap.ToName,
+                                                                        ToDesignationName = ap.ToDesignationName,
+                                                                        TransferedOn = ap.TransferedOn
+                                                                    }).ToList();
+                var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
+                if (payment == null || payment.Count() == 0)
+                {
+                    GrantDetailViewModel model = new GrantDetailViewModel
+                    {
+                        Id = obj.Id,
+                        IsApproved=obj.IsApproved,
+                        IsRejected=obj.IsRejected,
+                        ApplicationID = obj.ApplicationID,
+                        PaymentOrderId = "0",
+                        ReceiptNo = "0",
+                        Amount = "0",
+                        Name = obj.Name,
+                        VillageName = obj.VillageName,
+                        TehsilBlockName = tehsil.Name,
+                        SubDivisionName = subDivision.Name,
+                        DivisionName = division.Name,
+                        AddressProofPhotoPath = obj.AddressProofPhotoPath,
+                        ApplicantEmailID = obj.ApplicantEmailID,
+                        ApplicantName = obj.ApplicantName,
+                        AuthorizationLetterPhotoPath = obj.AuthorizationLetterPhotoPath,
+                        Hadbast = obj.Hadbast,
+                        IDProofPhotoPath = obj.IDProofPhotoPath,
+                        KMLFilePath = obj.KMLFilePath,
+                        KmlLinkName = obj.KMLLinkName,
+                        NocNumber = obj.NocNumber,
+                        NocPermissionTypeName = obj.IsUnderMasterPlan ? "" : permission.Name,
+                        NocTypeName = obj.IsUnderMasterPlan ? "" : noctype.Name,
+                        OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
+                        Pincode = obj.PinCode.ToString(),
+                        PlotNo = obj.PlotNo,
+                        PreviousDate = obj.IsUnderMasterPlan ? "" : string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
+                        ProjectTypeName = projecttype.Name,
+                        SiteAreaUnitName = obj.IsUnderMasterPlan ? "" : unit.Name,
+                        TotalArea = totalArea.ToString(),
+                        TotalAreaSqFeet = Math.Round((totalArea * 43560), 5).ToString(),
+                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 5).ToString(),
+                        Owners = owners,
+                        Khasras = khasras,
+                        PlanSanctionAuthorityName = planAuth.Name,
+                        FaradFilePath = obj.FaradFilePath,
+                        LayoutPlanFilePath = obj.LayoutPlanFilePath,
+                        GrantInspectionDocumentsDetail = documents,
+                        GrantApprovalRecommendationDetails = modelRecommendation,
+                        GrantFileTransferDetail = modelFileTransfer,
+                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode,
+                        IsUnderMasterPlan = obj.IsUnderMasterPlan,
+                        MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
+                        UnderMasterPlan = obj.IsUnderMasterPlan ? "Yes" : "No",
+                        Remarks = remarks
+                    };
+                    return View(model);
+                }
+                else
+                {
+                    GrantPaymentDetails objPyment = (payment).FirstOrDefault();
+                    GrantDetailViewModel model = new GrantDetailViewModel
+                    {
+                        Id = obj.Id,
+                        IsApproved = obj.IsApproved,
+                        IsRejected = obj.IsRejected,
+                        ApplicationID = obj.ApplicationID,
+                        PaymentOrderId = objPyment.deptRefNo,
+                        Amount = Math.Round(objPyment.TotalAmount ?? 0, 5).ToString(),
+                        ReceiptNo = objPyment.PaymentOrderId,
+                        Name = obj.Name,
+                        VillageName = obj.VillageName,
+                        TehsilBlockName = tehsil.Name,
+                        SubDivisionName = subDivision.Name,
+                        DivisionName = division.Name,
+                        AddressProofPhotoPath = obj.AddressProofPhotoPath,
+                        ApplicantEmailID = obj.ApplicantEmailID,
+                        ApplicantName = obj.ApplicantName,
+                        AuthorizationLetterPhotoPath = obj.AuthorizationLetterPhotoPath,
+                        Hadbast = obj.Hadbast,
+                        IDProofPhotoPath = obj.IDProofPhotoPath,
+                        KMLFilePath = obj.KMLFilePath,
+                        KmlLinkName = obj.KMLLinkName,
+                        NocNumber = obj.NocNumber,
+                        NocPermissionTypeName = obj.IsUnderMasterPlan ? "" : permission.Name,
+                        NocTypeName = obj.IsUnderMasterPlan ? "" : noctype.Name,
+                        OtherProjectTypeDetail = obj.OtherProjectTypeDetail,
+                        Pincode = obj.PinCode.ToString(),
+                        PlotNo = obj.PlotNo,
+                        PreviousDate = obj.IsUnderMasterPlan ? "" : string.Format("{0:dd/MM/yyyy}", obj.PreviousDate),
+                        ProjectTypeName = projecttype.Name,
+                        SiteAreaUnitName = obj.IsUnderMasterPlan ? "" : unit.Name,
+                        TotalArea = totalArea.ToString(),
+                        TotalAreaSqFeet = Math.Round((totalArea * 43560), 5).ToString(),
+                        TotalAreaSqMetre = Math.Round((totalArea * 4046.86), 5).ToString(),
+                        Owners = owners,
+                        Khasras = khasras,                        
+                        PlanSanctionAuthorityName = planAuth.Name,
+                        FaradFilePath = obj.FaradFilePath,
+                        LayoutPlanFilePath = obj.LayoutPlanFilePath,
+                        GrantInspectionDocumentsDetail = documents,
+                        GrantApprovalRecommendationDetails = modelRecommendation,
+                        GrantFileTransferDetail = modelFileTransfer,
+                        LocationDetail = "Hadbast: " + obj.Hadbast + ", Plot No: " + obj.PlotNo + ", Division: " + division.Name + ", Sub-Division: " + subDivision.Name + ", Tehsil/Block: " + tehsil.Name + ", Village: " + obj.VillageName + ", Pincode: " + obj.PinCode,
+                        IsUnderMasterPlan = obj.IsUnderMasterPlan,
+                        MasterPlanName = obj.IsUnderMasterPlan ? masterplan.Name : "",
+                        UnderMasterPlan = obj.IsUnderMasterPlan ? "Yes" : "No",
+                        Remarks=remarks
+                    };
+                    
                     return View(model);
                 }
             }

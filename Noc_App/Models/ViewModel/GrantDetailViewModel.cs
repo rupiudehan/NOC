@@ -7,6 +7,7 @@ namespace Noc_App.Models.ViewModel
     public class GrantDetailViewModel
     {
         public int Id { get; set; }
+        public string ActionName { get; set; }
         public string Name { get; set; }
         [Display(Name = "Unit of Site Area")]
         public string SiteAreaUnitName { get; set; }
@@ -72,6 +73,9 @@ namespace Noc_App.Models.ViewModel
         public string MasterPlanName { get; set; }
         public string ReceiptNo { get; set; }
         public string Amount { get; set; }
+        public string Remarks { get; set; }
+        public bool IsApproved { get; set; }
+        public bool IsRejected { get; set; }
     }
 
     public class GrantInspectionDocuments

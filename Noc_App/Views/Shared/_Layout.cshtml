@@ -85,7 +85,7 @@
             @if (User.Identity.IsAuthenticated && (!User.IsInRole("JUNIOR ENGINEER")) && (!User.IsInRole("SUB DIVISIONAL OFFICER")))
             {
                 <li class="nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "Home" && ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
-                  
+
                     <a class="nav-link" asp-action="Index" asp-controller="Home">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Dashboard</span>
@@ -96,27 +96,27 @@
             @if (User.Identity.IsAuthenticated && (User.IsInRole("Administrator")))
             {
                 <li id="masterid" class="nav-item @((ViewContext.RouteData.Values["controller"].ToString() == "TehsilBlock" || ViewContext.RouteData.Values["controller"].ToString() == "Village") && ViewContext.RouteData.Values["action"].ToString() == "List" ? "active" : "")">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
-                   aria-expanded="true" aria-controls="masters">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Masters</span>
-                </a>
-                
-                <div id="masters" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        @* <h6 class="collapse-header">Custom Components:</h6> *@
-                       @*  <a class="collapse-item" asp-action="ListRoles" asp-controller="Administration">Roles</a> *@
-                        
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#masters"
+                    aria-expanded="true" aria-controls="masters">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Masters</span>
+                    </a>
+
+                    <div id="masters" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            @* <h6 class="collapse-header">Custom Components:</h6> *@
+                            @*  <a class="collapse-item" asp-action="ListRoles" asp-controller="Administration">Roles</a> *@
+
                             @* <a class="collapse-item" asp-action="List" asp-controller="Division">Division</a>
                             <a class="collapse-item" asp-action="List" asp-controller="SubDivision">SubDivision</a> *@
                             <a class="collapse-item" asp-action="List" asp-controller="TehsilBlock">Tehsil/Block</a>
                             @* <a class="collapse-item" asp-action="List" asp-controller="Village">Village</a> *@
                             @* <a class="collapse-item" asp-action="List" asp-controller="Account">User</a> *@
-                        
+
+                        </div>
                     </div>
-                </div>
-                
-                
+
+
                 </li>
                 <hr class="sidebar-divider">
 
@@ -139,8 +139,17 @@
                 </li>
                 <hr class="sidebar-divider">
             }
-                       
 
+            @if (!User.IsInRole("Administrator"))
+            {
+                <li class="nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "ApprovalProcess" && ViewContext.RouteData.Values["action"].ToString() == "ProcessedApplications" ? "active" : "")">
+                    <a class="nav-link" asp-action="ProcessedApplications" asp-controller="ApprovalProcess">
+                        <i class="fas fa-fw fa-file"></i>
+                        <span>Processed Applications</span>
+                    </a>
+                </li>
+                <hr class="sidebar-divider">
+            }
         </ul>
         <!-- End of Sidebar -->
         <!-- Content Wrapper -->

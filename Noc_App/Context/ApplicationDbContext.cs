@@ -51,6 +51,7 @@ namespace Noc_App.Context
             modelBuilder.Entity<DashboardPendencyAll>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyViewModel>().HasNoKey();
             modelBuilder.Entity<ReportApplicationCountViewModel>().HasNoKey();
+            modelBuilder.Entity<ProcessedApplicationsViewModel>().HasNoKey();
 
             modelBuilder.Entity<EstablishmentOfficeDetails>().HasData(
                 new EstablishmentOfficeDetails { Id=3,Name= "CHIEF ENGINEER HEAD QUARTER" },
