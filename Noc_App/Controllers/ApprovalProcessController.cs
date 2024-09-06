@@ -150,10 +150,16 @@ namespace Noc_App.Controllers
             try
             {
 
-                string userId = LoggedInUserID();           
+                string userId = LoggedInUserID();
+                string divisionId = LoggedInDivisionID();
+                var roleName = LoggedInRoleName();
+                string role = roleName;
+                role = (await GetAppRoleName(role)).AppRoleName;
+                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER HQ" || role == "EXECUTIVE ENGINEER HQ" || role == "DIRECTOR DRAINAGE" || role == "DWS" || role == "ADE")
+                    divisionId = "0";
                 List<ProcessedApplicationsViewModel> model = new List<ProcessedApplicationsViewModel>();
                
-                model = await _processedAppDetailsRepo.ExecuteStoredProcedureAsync<ProcessedApplicationsViewModel>("getprocessedapplications", "0", "'" + userId + "'");
+                model = await _processedAppDetailsRepo.ExecuteStoredProcedureAsync<ProcessedApplicationsViewModel>("getprocessedapplications", "0",divisionId, "'" + userId + "'");
                
                 return View(model);
             }
