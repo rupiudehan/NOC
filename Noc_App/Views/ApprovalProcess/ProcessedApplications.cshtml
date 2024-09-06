@@ -32,10 +32,10 @@
                                             <th>Project Name</th>
                                             <th>Location Details</th>
                                             <th>View</th>
-                                            @if (Model.Any(x => x.IsRecommended == 1))
+                                           @*  @if (Model.Any(x => x.IsRecommended == 1))
                                             {
                                                 <th>Recommendations</th>
-                                            }
+                                            } *@
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -51,7 +51,7 @@
                                                 <td>
                                                     <a asp-action="ViewProcessedApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                 </td>
-                                                @if (Model.Any(x => x.IsRecommended == 1)) {
+                                            @*     @if (Model.Any(x => x.IsRecommended == 1)) {
                                                     @if (data.IsRecommended == 1)
                                                     {
                                                         <td>
@@ -64,7 +64,7 @@
                                                             No Recommendations
                                                         </td>
                                                     }
-                                                }
+                                                } *@
                                                 <td>
                                                     @if(data.isrejected){
                                                         @:Rejected

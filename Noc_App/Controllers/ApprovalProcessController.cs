@@ -2166,7 +2166,7 @@ namespace Noc_App.Controllers
                           {
                               Remarks = ap.Remarks
                           });
-                string remarks =rm!=null && rm.Count()>0?rm.AsEnumerable().FirstOrDefault().Remarks.ToString():"";
+                string remarks =rm!=null && rm.Count()>0? rm.AsEnumerable().FirstOrDefault().Remarks==null?"": rm.AsEnumerable().LastOrDefault().Remarks:"";
                 List<GrantFileTransferDetails> modelFileTransfer = (from ap in _grantFileTransferRepository.GetAll()
                                                                     where ap.GrantId == obj.Id
                                                                     orderby ap.TransferedOn descending
