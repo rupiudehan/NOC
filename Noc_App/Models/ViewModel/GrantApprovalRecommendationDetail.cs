@@ -9,5 +9,6 @@
         public string RecommendedToName { get; set; }
         public string Recommended { get; set; }
         public string Remarks { get; set; }
+        public string CreatedOn { get; set; }
     }
 }

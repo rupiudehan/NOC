@@ -33,5 +33,19 @@ namespace Noc_App.Models.ViewModel
         public string CertificateFilePath { get; set; }
         public int IsRecommended { get; set; }
         public bool IsUnderMasterPlan { get; set; }
+        public string ProcessedBy { get; set; }
+        public string ProcessedByName { get; set; }
+        public string ProcessedByRole { get; set; }
+        public DateTime ProcessedOn { get; set; }
+        public string ProcessedToUser { get; set; }
+        public string ProcessedToName { get; set; }
+        public string ProcessedToRole { get; set; }
+        public string CurrentProcessedBy { get; set; }
+        public string CurrentProcessedByName { get; set; }
+        public string CurrentProcessedByRole { get; set; }
+        public DateTime CurrentProcessedOn { get; set; }
+        public string CurrentProcessedToUser { get; set; }
+        public string CurrentProcessedToName { get; set; }
+        public string CurrentProcessedToRole { get; set; }
     }
 }

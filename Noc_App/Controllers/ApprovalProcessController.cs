@@ -1965,12 +1965,13 @@ namespace Noc_App.Controllers
                                                                      RecommendedTo = ap.ProcessedToRole,
                                                                      Remarks = ap.Remarks,
                                                                      RecommendedByName=ap.ProcessedByName,
-                                                                     RecommendedToName=ap.ProcessedToName
+                                                                     RecommendedToName=ap.ProcessedToName,
+                                                                     CreatedOn= string.Format("{0:dd/MM/yyyy HH:mm tt}", ap.ProcessedOn)
                                                                  }).ToList();
-                List<GrantFileTransferDetails> modelFileTransfer = (from ap in _grantFileTransferRepository.GetAll()
+                List<GrantFileTransferDetailsViewModel> modelFileTransfer = (from ap in _grantFileTransferRepository.GetAll()
                                                                                where ap.GrantId == obj.Id 
                                                                                orderby ap.TransferedOn descending
-                                                                               select new GrantFileTransferDetails
+                                                                               select new GrantFileTransferDetailsViewModel
                                                                                {
                                                                                    FromName=ap.FromName,
                                                                                    Remarks = ap.Remarks,
@@ -1979,7 +1980,7 @@ namespace Noc_App.Controllers
                                                                                    ToAuthorityId=ap.ToAuthorityId,
                                                                                    ToName=ap.ToName,
                                                                                    ToDesignationName=ap.ToDesignationName,
-                                                                                   TransferedOn=ap.TransferedOn
+                                                                                   TransferedOn=string.Format("{0:dd/MM/yyyy HH:mm tt}", ap.TransferedOn)
                                                                                }).ToList();
                 var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
                 if (payment == null || payment.Count() == 0)
@@ -2161,7 +2162,8 @@ namespace Noc_App.Controllers
                                                                                    RecommendedTo = ap.ProcessedToRole,
                                                                                    Remarks = ap.Remarks,
                                                                                    RecommendedByName = ap.ProcessedByName,
-                                                                                   RecommendedToName = ap.ProcessedToName
+                                                                                   RecommendedToName = ap.ProcessedToName,
+                                                                                   CreatedOn = string.Format("{0:dd/MM/yyyy HH:mm tt}", ap.ProcessedOn)
                                                                                }).ToList();
                 var rm = (from ap in _repoApprovalDetail.GetAll()
                           join recommend in _repoRecommendation.GetAll() on ap.RecommendationID equals recommend.Id
@@ -2173,10 +2175,10 @@ namespace Noc_App.Controllers
                               Remarks = ap.Remarks
                           });
                 string remarks =rm!=null && rm.Count()>0? rm.AsEnumerable().FirstOrDefault().Remarks==null?"": rm.AsEnumerable().LastOrDefault().Remarks:"";
-                List<GrantFileTransferDetails> modelFileTransfer = (from ap in _grantFileTransferRepository.GetAll()
+                List<GrantFileTransferDetailsViewModel> modelFileTransfer = (from ap in _grantFileTransferRepository.GetAll()
                                                                     where ap.GrantId == obj.Id
                                                                     orderby ap.TransferedOn descending
-                                                                    select new GrantFileTransferDetails
+                                                                    select new GrantFileTransferDetailsViewModel
                                                                     {
                                                                         FromName = ap.FromName,
                                                                         Remarks = ap.Remarks,
@@ -2185,7 +2187,7 @@ namespace Noc_App.Controllers
                                                                         ToAuthorityId = ap.ToAuthorityId,
                                                                         ToName = ap.ToName,
                                                                         ToDesignationName = ap.ToDesignationName,
-                                                                        TransferedOn = ap.TransferedOn
+                                                                        TransferedOn = string.Format("{0:dd/MM/yyyy HH:mm tt}", ap.TransferedOn)
                                                                     }).ToList();
                 var payment = await _grantPaymentRepo.FindAsync(x => x.GrantID == obj.Id);
                 if (payment == null || payment.Count() == 0)
@@ -2430,7 +2432,8 @@ namespace Noc_App.Controllers
                                                                      RecommendedTo = a.ProcessedToRole,
                                                                      RecommendedByName = a.ProcessedByName,
                                                                      RecommendedToName = a.ProcessedToName,
-                                                                     Remarks = a.Remarks
+                                                                     Remarks = a.Remarks,
+                                                                     CreatedOn = string.Format("{0:dd/MM/yyyy HH:mm tt}", a.ProcessedOn)
                                                                  }).ToList();
 
 

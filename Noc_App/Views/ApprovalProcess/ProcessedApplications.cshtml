@@ -31,12 +31,12 @@
                                             <th>Date of Application</th>
                                             <th>Project Name</th>
                                             <th>Location Details</th>
+                                            <th>Processed To</th>
+                                            <th>Processed On</th>
                                             <th>View</th>
-                                           @*  @if (Model.Any(x => x.IsRecommended == 1))
-                                            {
-                                                <th>Recommendations</th>
-                                            } *@
-                                            <th>Status</th>
+                                            <th>Currentrly With</th>
+                                            <th>Current Status</th>
+                                            <th>Currently Processed On</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tbody">
@@ -48,23 +48,12 @@
                                                 <td>@string.Format("{0:dd/MM/yyyy}", data.CreatedOn)</td>
                                                 <td>@data.Name</td>
                                                 <td>@data.LocationDetails </td>
+                                                <td>@data.ProcessedToName  - @data.ProcessedToRole </td>
+                                                <td>@string.Format("{0:dd/MM/yyyy HH:mm tt}", data.ProcessedOn) </td>
                                                 <td>
                                                     <a asp-action="ViewProcessedApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                 </td>
-                                            @*     @if (Model.Any(x => x.IsRecommended == 1)) {
-                                                    @if (data.IsRecommended == 1)
-                                                    {
-                                                        <td>
-                                                            <a href="#" onclick="SetProcessedValue('@data.ApplicationID')" class="btn btn-info">Recommendations</a>
-                                                        </td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td>
-                                                            No Recommendations
-                                                        </td>
-                                                    }
-                                                } *@
+                                                <td>@data.CurrentProcessedToName - @data.CurrentProcessedToRole </td>
                                                 <td>
                                                     @if(data.isrejected){
                                                         @:Rejected
@@ -86,6 +75,7 @@
                                                         @:In Process
                                                     }
                                                 </td>
+                                                <td>@string.Format("{0:dd/MM/yyyy HH:mm tt}", data.CurrentProcessedOn) </td>
                                             </tr>
                                         }
                                     </tbody>

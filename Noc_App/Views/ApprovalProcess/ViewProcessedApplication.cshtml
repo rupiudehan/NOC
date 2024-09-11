@@ -311,6 +311,7 @@
                                                             <th>Processed To Designation</th>
                                                             <th>Recommendation</th>
                                                             <th>Remarks</th>
+                                                            <th>Recommended On</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -337,8 +338,10 @@
                                                                     <input asp-for="GrantApprovalRecommendationDetails[i].Recommended" readonly class="form-control form-control-user" />
                                                                 </td>
                                                                 <td>
-                                                                    <input asp-for="GrantApprovalRecommendationDetails[i].Remarks" readonly class="form-control form-control-user" />
+                                                                    <textarea asp-for="GrantApprovalRecommendationDetails[i].Remarks" readonly class="form-control form-control-user"></textarea>
                                                                 </td>
+                                                                <td><textarea asp-for="GrantApprovalRecommendationDetails[i].CreatedOn" readonly class="form-control form-control-user"></textarea></td>
+
                                                                 <!-- Render more columns as needed -->
                                                             </tr>
                                                         }
@@ -357,9 +360,10 @@
                                                 <table id="fileTable" class="table table-bordered table-striped">
                                                     <thead>
                                                         <tr>
-                                                            <th>Transfered By</th>
+                                                            <th>Transferred By</th>
                                                             <th>Remarks</th>
-                                                            <th>Transfered To</th>
+                                                            <th>Transferred To</th>
+                                                            <th>Transferred On</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -370,10 +374,13 @@
                                                                     <input asp-for="GrantFileTransferDetail[i].FromName" readonly class="form-control form-control-user" />
                                                                 </td>
                                                                 <td>
-                                                                    <input asp-for="GrantFileTransferDetail[i].Remarks" readonly class="form-control form-control-user" />
+                                                                    <textarea asp-for="GrantFileTransferDetail[i].Remarks" readonly class="form-control form-control-user"></textarea>
                                                                 </td>
                                                                 <td>
                                                                     <input asp-for="GrantFileTransferDetail[i].ToName" readonly class="form-control form-control-user" />
+                                                                </td>
+                                                                <td>
+                                                                    <input asp-for="GrantFileTransferDetail[i].TransferedOn" readonly class="form-control form-control-user" />
                                                                 </td>
                                                                 <!-- Render more columns as needed -->
                                                             </tr>

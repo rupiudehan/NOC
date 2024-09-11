@@ -31,6 +31,7 @@
                     tr += '<td>' + value.recommendedBy + '</td>';
                     tr += '<td>' + value.recommendedToName + '</td>';
                     tr += '<td>' + value.recommendedTo + '</td>';
+                    tr += '<td>' + value.createdOn + '</td>';
                     tr += '</tr>';
                     body.append(tr);
                     count++;
