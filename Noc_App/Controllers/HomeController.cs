@@ -25,6 +25,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepo;
         private readonly IRepository<UserRoleDetails> _userRolesRepository;
         private readonly IRepository<ReportApplicationCountViewModel> _grantReportAppCountDetailsRepo;
+        private readonly IRepository<ReportApplicationsViewModel> _grantReportTotalAppDetailsRepo;
 
         public IRepository<GrantUnprocessedAppDetails> _grantUnprocessedAppDetailsRepo { get; }
 
@@ -37,6 +38,7 @@ namespace Noc_App.Controllers
             , IRepository<DivisionDetails> divisionRepo, IRepository<DashboardPendencyViewModel> pendencyRepo, IRepository<SubDivisionDetails> subDivisionRepo
             /*, IRepository<VillageDetails> villageRepo*/, IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<UserRoleDetails> userRolesRepository
             , IRepository<ReportApplicationCountViewModel> grantReportAppCountDetailsRepo, IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
+            , IRepository<ReportApplicationsViewModel> grantReportTotalAppDetailsRepo
             )
         {            
             _pendencyDetailsRepo = pendencyDetailsRepo;
@@ -48,6 +50,7 @@ namespace Noc_App.Controllers
             _userRolesRepository=userRolesRepository;
             _grantReportAppCountDetailsRepo = grantReportAppCountDetailsRepo;
             _grantUnprocessedAppDetailsRepo = grantUnprocessedAppDetailsRepo;
+            _grantReportTotalAppDetailsRepo = grantReportTotalAppDetailsRepo;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
@@ -590,7 +593,91 @@ namespace Noc_App.Controllers
             catch (Exception ex)
             {
 
-                return View();
+                return Json(null);
+            }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
+        [HttpPost]
+        public async Task<IActionResult> GetTotalApplicationReport(string divisiondetailId)
+        {
+            try
+            {
+                string divisionsId = LoggedInDivisionID();
+                int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+
+                List<ReportApplicationsViewModel> model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapplications",divisionId)).ToList();
+
+                return Json(model);
+
+            }
+            catch (Exception ex)
+            {
+
+                return Json(null);
+            }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
+        [HttpPost]
+        public async Task<IActionResult> GetApprovedApplicationReport(string divisiondetailId)
+        {
+            try
+            {
+                string divisionsId = LoggedInDivisionID();
+                int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+
+                List<ReportApplicationsViewModel> model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapprovedapplications", divisionId)).ToList();
+
+                return Json(model);
+
+            }
+            catch (Exception ex)
+            {
+
+                return Json(null);
+            }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
+        [HttpPost]
+        public async Task<IActionResult> GetRejectedApplicationReport(string divisiondetailId)
+        {
+            try
+            {
+                string divisionsId = LoggedInDivisionID();
+                int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+
+                List<ReportApplicationsViewModel> model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalrejectedapplications",  divisionId)).ToList();
+
+                return Json(model);
+
+            }
+            catch (Exception ex)
+            {
+
+                return Json(null);
+            }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,Administrator,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
+        [HttpPost]
+        public async Task<IActionResult> GetPendingApplicationReport(string divisiondetailId)
+        {
+            try
+            {
+                string divisionsId = LoggedInDivisionID();
+                int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+
+                List<ReportApplicationsViewModel> model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalpendingapplications", divisionId)).ToList();
+
+                return Json(model);
+
+            }
+            catch (Exception ex)
+            {
+
+                return Json(null);
             }
         }
 

@@ -2444,7 +2444,7 @@ namespace Noc_App.Controllers
             {
                 ViewBag.ErrorMessage = ex.Message;
                 //ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
+                return Json(null);
             }
         }
 
@@ -2484,7 +2484,7 @@ namespace Noc_App.Controllers
             {
                 ViewBag.ErrorMessage = ex.Message;
                 //ModelState.AddModelError(string.Empty, ex.Message);
-                return View();
+                return Json(null);
             }
         }
 

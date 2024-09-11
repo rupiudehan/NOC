@@ -77,6 +77,10 @@
                                                 </td>
                                                 <td>@string.Format("{0:dd/MM/yyyy HH:mm tt}", data.CurrentProcessedOn) </td>
                                             </tr>
+                                            {
+                                                count = count + 1;
+                                            }
+                                        
                                         }
                                     </tbody>
                                 </table>
@@ -132,5 +136,6 @@
     </div>
 </div>
 @section Scripts {
-    <script src="~/modulejs/approvallist.js"></script>
+    @* <script src="~/modulejs/approvallist.js"></script> *@
+    <script src="~/modulejs/datatabledownload.js"></script>
 }
