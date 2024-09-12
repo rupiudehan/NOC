@@ -242,6 +242,106 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="myApprovedModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabelA"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <input type="hidden" id="id" name="id" />
+                <h5 class="modal-title" id="ModalLabelA"><label id="dvATitle">Approved Applications</label></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height: 500px;overflow-y:scroll;">
+                <table class="table table-bordered" id="tblA" width="100%" cellspacing="0">
+                    <thead id="tbhA">
+                        <tr>
+                            <th>#</th>
+                            <th>Application ID</th>
+                            <th>Date Of Application</th>
+                            <th>Division</th>
+                            <th>Status</th>
+                            <th>Processed On</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbA">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myRejectedModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabelR"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <input type="hidden" id="id" name="id" />
+                <h5 class="modal-title" id="ModalLabelR"><label id="dvRTitle">Rejected Applications</label></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height: 500px;overflow-y:scroll;">
+                <table class="table table-bordered" id="tblR" width="100%" cellspacing="0">
+                    <thead id="tbhR">
+                        <tr>
+                            <th>#</th>
+                            <th>Application ID</th>
+                            <th>Date Of Application</th>
+                            <th>Division</th>
+                            <th>Status</th>
+                            <th>Processed On</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbR">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myPendingModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabelP"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <input type="hidden" id="id" name="id" />
+                <h5 class="modal-title" id="ModalLabelP"><label id="dvPTitle">Pending Applications</label></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height: 500px;overflow-y:scroll;">
+                <table class="table table-bordered" id="tblP" width="100%" cellspacing="0">
+                    <thead id="tbhP">
+                        <tr>
+                            <th>#</th>
+                            <th>Application ID</th>
+                            <th>Date Of Application</th>
+                            <th>Division</th>
+                            <th>Status</th>
+                            <th>Pending With</th>
+                            <th>Pending for (No. of Days)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbP">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section  Scripts {
     <script src="~/modulejs/dashboard.js"></script>
 }

@@ -132,46 +132,52 @@ $(function () {
 // Notice that e is not used or needed.
 
 function BindTable(tbl) {
-    tbl.DataTable({
-        dom: 'Blfrtip',
-        buttons: [
 
-            // {
-            //     extend: 'copy',
-            //     text: '<i class="fas fa-copy"></i>',
-            //     titleAttr: 'Copy',
-            //     className: 'btn btn-md mr-2 btn-copy'
-            // },
-            {
-                extend: 'excel',
-                text: '<i class="fas fa-file-excel"></i>',
-                titleAttr: 'Excel',
-                className: 'btn btn-primary btn-sm',
-                title: 'Report'
-            },
-            // {
-            //     extend: 'pdf',
-            //     text: '<i class="fas fa-file-pdf"></i>',
-            //     titleAttr: 'PDF',
-            //     className: 'btn btn-md mr-2 btn-pdf'
-            // },
-            {
-                extend: 'print',
-                text: '<i class="fas fa-print"></i>',
-                titleAttr: 'Print',
-                className: 'btn btn-md mr-2 btn-print',
-                title: 'Report'
-            },
+    if (tbl.find('tr').length > 0) {
+        
+        tbl.DataTable({
+            destroy: true,
+            responsive: false, // Disable responsive 
+            dom: 'Blfrtip',
+            buttons: [
 
-        ],
-        'ordering': true,
-        'searching': true,
-        'info': false,
-        "serverSide": false,
-        "lengthMenu": [[10, 30, 50 - 1], [10, 30, 50, "All"]],
-        "pageLength": 10,
+                // {
+                //     extend: 'copy',
+                //     text: '<i class="fas fa-copy"></i>',
+                //     titleAttr: 'Copy',
+                //     className: 'btn btn-md mr-2 btn-copy'
+                // },
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel"></i>',
+                    titleAttr: 'Excel',
+                    className: 'btn btn-primary btn-sm',
+                    title: 'Report'
+                },
+                // {
+                //     extend: 'pdf',
+                //     text: '<i class="fas fa-file-pdf"></i>',
+                //     titleAttr: 'PDF',
+                //     className: 'btn btn-md mr-2 btn-pdf'
+                // },
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print"></i>',
+                    titleAttr: 'Print',
+                    className: 'btn btn-md mr-2 btn-print',
+                    title: 'Report'
+                },
 
-    });
+            ],
+            'ordering': true,
+            'searching': true,
+            'info': false,
+            "serverSide": false,
+            "lengthMenu": [[10, 30, 50 - 1], [10, 30, 50, "All"]],
+            "pageLength": 10,
+
+        });
+    }
 }
 function LoadBarPendancyChart() {
     drawMultSeries();
@@ -233,30 +239,30 @@ function LoadReport(DivisionId, subdivisionId, roleName) {
 }
 
 function LoadReportApplications(flag) {
+    if (flag == 'T') {
+        LoadReportApplicationsT();
+    }
+    else if (flag == 'A') {
+        LoadReportApplicationsA();
+    }
+    else if (flag == 'R') {
+        LoadReportApplicationsR();
+    }
+    else
+        LoadReportApplicationsP();
+}
+function LoadReportApplicationsP() {
     var DivisionId = 0;
-    var body = $('#tb');
-    var table = $("#tbl");
-    var thead = $('#tbh');
-    var modal = $("#myTotalModal");
+    var body = $('#tbP');
+    var table = $("#tblP");
+    var thead = $('#tbhP');
+    var modal = $("#myPendingModal");
     modal.hide();
     thead.empty();
     body.empty();
     var method = 'GetPendingApplicationReport';
-    var title = $('#dvTitle');
-    if (flag == 'T') {
-        method = 'GetTotalApplicationReport';
-        title.text('Total Applications');
-    }
-    else if (flag == 'A') {
-        method = 'GetApprovedApplicationReport';
-        title.text('Approved Applications');
-    }
-    else if (flag == 'R') {
-        method = 'GetRejectedApplicationReport';
-        title.text('Rejected Applications');
-    }
-    else
-        title.text('In Process Applications');
+    var title = $('#dvPTitle');
+    title.text('In Process Applications');
     //table.DataTable().clear().destroy();
     $("#divLoaderApp").show(); $('.rptApp').hide();
 
@@ -268,19 +274,10 @@ function LoadReportApplications(flag) {
             modal.modal(); modal.addClass('show');
             $("#divLoaderApp").hide();
             $('.rptApp').show();
-            //$(".rptApp text:contains('0')").each(function () {
-            //    var text = $(this).text();
-            //    if (text == '0') $(this).hide();
-            //});
-
         },
         success: function (r) {
             if (r != null) {
-                if ($.fn.DataTable.isDataTable('#tbl')) {
-                    table.DataTable().destroy();
-                    thead.empty();
-                    body.empty();
-                }
+
                 var count = 1; var len = r.length;
                 var thr = `<tr>
                             <th>#</th>
@@ -291,8 +288,72 @@ function LoadReportApplications(flag) {
                             <th>Pending With</th>
                             <th>Pending for (No. of Days)</th>
                         </tr>`;
-                if (flag == 'A' || flag == 'R') {
-                    thr = `<tr>
+                thead.html(thr);
+                $.each(r, function (key, value) {
+                    var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
+                    var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
+                    var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
+                    var applydate = formatOnlyDate(value.createdOn);
+                    var tr = '<tr>';
+                    tr += '<td>' + count + '</td>';
+                    tr += '<td>' + value.applicationID + '</td>';
+                    tr += '<td>' + applydate + '</td>';
+                    tr += '<td>' + value.divisionName + '</td>';
+                    tr += '<td>' + status + '</td>';
+                    tr += '<td>' + name + '</td>';
+                    tr += '<td>' + value.pendency + '</td>';
+                    tr += '</tr>';
+                    body.append(tr);
+                    count++;
+                });
+                if ($.fn.DataTable.isDataTable('#tblP')) {
+                    table.DataTable().destroy();
+
+                    BindTable(table);
+                } else {
+
+                    BindTable(table);
+                }
+
+            }
+        },
+        failure: function (r) {
+            alert(r.d);
+        },
+        error: function (r) {
+            alert(r.d);
+        }
+    });
+
+}
+function LoadReportApplicationsA() {
+    var DivisionId = 0;
+    var body = $('#tbA');
+    var table = $("#tblA");
+    var thead = $('#tbhA');
+    var modal = $("#myApprovedModal");
+    modal.hide();
+    thead.empty();
+    body.empty();
+    var method = 'GetApprovedApplicationReport';
+    var title = $('#dvATitle');
+    title.text('Approved Applications');
+    $("#divLoaderApp").show(); $('.rptApp').hide();
+
+    $.ajax({
+        url: "/Home/" + method,
+        type: "POST",
+        data: { divisiondetailId: DivisionId },
+        complete: function (r) {
+            modal.modal(); modal.addClass('show');
+            $("#divLoaderApp").hide();
+            $('.rptApp').show();
+        },
+        success: function (r) {
+            if (r != null) {
+
+                var count = 1; var len = r.length;
+                var thr = `<tr>
                             <th>#</th>
                             <th>Application ID</th>
                             <th>Date Of Application</th>
@@ -300,26 +361,147 @@ function LoadReportApplications(flag) {
                             <th>Status</th>
                             <th>Processed On</th>
                         </tr>`;
-                    table.append(thr);
-                    $.each(r, function (key, value) {
-                        
-                        var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : 'In Process';
-                        var applydate = formatOnlyDate(value.createdOn);
-                        var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
-                        var tr = '<tr>';
-                        tr += '<td>' + count + '</td>';
-                        tr += '<td>' + value.applicationID + '</td>';
-                        tr += '<td>' + applydate + '</td>';
-                        tr += '<td>' + value.divisionName + '</td>';
-                        tr += '<td>' + status + '</td>';
-                        tr += '<td>' + processedOn + '</td>';
-                        tr += '</tr>';
-                        body.append(tr);
-                        count++;
-                    });
+
+                thead.html(thr);
+                $.each(r, function (key, value) {
+
+                    var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : 'In Process';
+                    var applydate = formatOnlyDate(value.createdOn);
+                    var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
+                    var tr = '<tr>';
+                    tr += '<td>' + count + '</td>';
+                    tr += '<td>' + value.applicationID + '</td>';
+                    tr += '<td>' + applydate + '</td>';
+                    tr += '<td>' + value.divisionName + '</td>';
+                    tr += '<td>' + status + '</td>';
+                    tr += '<td>' + processedOn + '</td>';
+                    tr += '</tr>';
+                    body.append(tr);
+                    count++;
+                });
+                if ($.fn.DataTable.isDataTable('#tblA')) {
+                    table.DataTable().destroy();
+
+                    BindTable(table);
+                } else {
+
+                    BindTable(table);
                 }
-                else if (flag == 'T') {
-                    thr = `<tr>
+
+            }
+        },
+        failure: function (r) {
+            alert(r.d);
+        },
+        error: function (r) {
+            alert(r.d);
+        }
+    });
+
+}
+function LoadReportApplicationsR() {
+    var DivisionId = 0;
+    var body = $('#tbR');
+    var table = $("#tblR");
+    var thead = $('#tbhR');
+    var modal = $("#myRejectedModal");
+    modal.hide();
+    thead.empty();
+    body.empty();
+    var method = 'GetRejectedApplicationReport';
+    var title = $('#dvRTitle');
+    title.text('Rejected Applications');
+    $("#divLoaderApp").show(); $('.rptApp').hide();
+
+    $.ajax({
+        url: "/Home/" + method,
+        type: "POST",
+        data: { divisiondetailId: DivisionId },
+        complete: function (r) {
+            modal.modal(); modal.addClass('show');
+            $("#divLoaderApp").hide();
+            $('.rptApp').show();
+        },
+        success: function (r) {
+            if (r != null) {
+
+                var count = 1; var len = r.length;
+                var thr = `<tr>
+                            <th>#</th>
+                            <th>Application ID</th>
+                            <th>Date Of Application</th>
+                            <th>Division</th>
+                            <th>Status</th>
+                            <th>Processed On</th>
+                        </tr>`;
+
+                thead.html(thr);
+                $.each(r, function (key, value) {
+
+                    var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : 'In Process';
+                    var applydate = formatOnlyDate(value.createdOn);
+                    var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
+                    var tr = '<tr>';
+                    tr += '<td>' + count + '</td>';
+                    tr += '<td>' + value.applicationID + '</td>';
+                    tr += '<td>' + applydate + '</td>';
+                    tr += '<td>' + value.divisionName + '</td>';
+                    tr += '<td>' + status + '</td>';
+                    tr += '<td>' + processedOn + '</td>';
+                    tr += '</tr>';
+                    body.append(tr);
+                    count++;
+                });
+                if ($.fn.DataTable.isDataTable('#tblR')) {
+                    table.DataTable().destroy();
+
+                    BindTable(table);
+                } else {
+
+                    BindTable(table);
+                }
+
+            }
+        },
+        failure: function (r) {
+            alert(r.d);
+        },
+        error: function (r) {
+            alert(r.d);
+        }
+    });
+
+}
+function LoadReportApplicationsT() {
+    var DivisionId = 0;
+    var body = $('#tb');
+    var table = $("#tbl");
+    var thead = $('#tbh');
+    var modal = $("#myTotalModal");
+    modal.hide();
+    thead.empty();
+    body.empty();
+    var method = 'GetTotalApplicationReport';
+    var title = $('#dvTitle');
+    title.text('Total Applications');
+    //table.DataTable().clear().destroy();
+    $("#divLoaderApp").show(); $('.rptApp').hide();
+
+    $.ajax({
+        url: "/Home/" + method,
+        type: "POST",
+        data: { divisiondetailId: DivisionId },
+        complete: function (r) {
+            modal.modal(); modal.addClass('show');
+            $("#divLoaderApp").hide();
+            $('.rptApp').show();
+        },
+        success: function (r) {
+            if (r != null) {
+                
+
+                var count = 1; var len = r.length;
+                var thr = `<tr>
                             <th>#</th>
                             <th>Application ID</th>
                             <th>Date Of Application</th>
@@ -329,49 +511,34 @@ function LoadReportApplications(flag) {
                             <th>Pending for (No. of Days)</th>
                             <th>Processed On</th>
                         </tr>`;
-                    table.append(thr);
-                    $.each(r, function (key, value) {
-                        var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
-                        var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
-                        var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
-                        var applydate = formatOnlyDate(value.createdOn);
-                        var tr = '<tr>';
-                        tr += '<td>' + count + '</td>';
-                        tr += '<td>' + value.applicationID + '</td>';
-                        tr += '<td>' + applydate + '</td>';
-                        tr += '<td>' + value.divisionName + '</td>';
-                        tr += '<td>' + status + '</td>';
-                        tr += '<td>' + name + '</td>';
-                        tr += '<td>' + value.pendency + '</td>';
-                        tr += '<td>' + processedOn + '</td>';
-                        tr += '</tr>';
-                        body.append(tr);
-                        count++;
-                    });
-                }
-                else {
-                    table.append(thr);
-                    console.log(JSON.stringify(r))
-                    $.each(r, function (key, value) {
-                        var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel=='0'?'Unprocessed':'In Process';
-                        var name = value.processedLevel == '0' ?'EXECUTIVE ENGINEER':(value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
-                        var applydate = formatOnlyDate(value.createdOn);
-                        var tr = '<tr>';
-                        tr += '<td>' + count + '</td>';
-                        tr += '<td>' + value.applicationID + '</td>';
-                        tr += '<td>' + applydate + '</td>';
-                        tr += '<td>' + value.divisionName + '</td>';
-                        tr += '<td>' + status + '</td>';
-                        tr += '<td>' + name + '</td>';
-                        tr += '<td>' + value.pendency + '</td>';
-                        tr += '</tr>';
-                        body.append(tr);
-                        count++;
-                    });
+                thead.html(thr);
+                $.each(r, function (key, value) {
+                    var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
+                    var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
+                    var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
+                    var applydate = formatOnlyDate(value.createdOn);
+                    var tr = '<tr>';
+                    tr += '<td>' + count + '</td>';
+                    tr += '<td>' + value.applicationID + '</td>';
+                    tr += '<td>' + applydate + '</td>';
+                    tr += '<td>' + value.divisionName + '</td>';
+                    tr += '<td>' + status + '</td>';
+                    tr += '<td>' + name + '</td>';
+                    tr += '<td>' + value.pendency + '</td>';
+                    tr += '<td>' + processedOn + '</td>';
+                    tr += '</tr>';
+                    body.append(tr);
+                    count++;
+                });
+                if ($.fn.DataTable.isDataTable('#tbl')) {
+                    table.DataTable().destroy();
 
+                    BindTable(table);
+                } else {
+
+                    BindTable(table);
                 }
 
-                //BindTable(table);
             }
         },
         failure: function (r) {
