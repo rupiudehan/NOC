@@ -2,7 +2,7 @@
 
 namespace Noc_App.Controllers
 {
-    public class ErrorController : Controller
+    public class ErrorController :Controller
     {
         [Route("Error/{statusCode}")]
         public IActionResult HttpStatusCodeHandler(int statusCode)

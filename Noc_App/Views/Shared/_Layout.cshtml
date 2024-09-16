@@ -1,5 +1,102 @@
-﻿
+﻿@using System.Security.Claims
+@using Noc_App.Models.interfaces
+@inject IRepository<UserRoleDetails> _userRolesRepository;
+@inject IRepository<DivisionDetails> _divisionRepository;
+@inject IRepository<CircleDetails> _circleRepository;
+@inject IRepository<CircleDivisionMapping> _circleDivRepository;
+@inject IRepository<EstablishmentOfficeDetails> _estabOfficeRepository;
+
 @* @inject SignInManager<ApplicationUser> signInManager; *@
+@{
+    var surnameClaim = User.FindFirst(ClaimTypes.Surname);
+    var localityClaim = User.FindFirst(ClaimTypes.Locality);
+    var roleClaim = User.FindFirst(ClaimTypes.Role);
+    string locality = localityClaim != null ? localityClaim.Value : "Locality not found";
+    string surname = surnameClaim != null ? surnameClaim.Value : "Surname not found";
+    string role = roleClaim != null ? roleClaim.Value : "Role not found";
+    var session = ViewContext.HttpContext.Session;
+    List<UserMenuBlockViewModel> menuItems = new List<UserMenuBlockViewModel>();
+
+    string name = User.Identity.Name;
+    string userId = session.GetString("Userid");
+
+    string div = session.GetString("Divisionid");
+    string roleid = session.GetString("RoleId");
+
+    string designation = role;
+
+    var detail = surname.Split(',');
+    foreach (var claim in detail)
+    {
+        var cl = claim.Split('-');
+        DivisionDetails location = new DivisionDetails();
+        var roles = (from d in _userRolesRepository.GetAll().AsEnumerable()
+                     where d.Id.ToString() == cl[1].ToString()
+                     select new UserRoleDetails
+                             {
+                                 Id = d.Id,
+                                 AppRoleName = d.AppRoleName,
+                                 RoleLevel = d.RoleLevel,
+                                 RoleName = d.RoleName
+                             }
+                      ).FirstOrDefault();
+        if (roles.AppRoleName == "CIRCLE OFFICER")
+        {
+            location = (from d in _divisionRepository.GetAll().ToList()
+                        join loc in _circleDivRepository.GetAll().ToList() on d.Id equals loc.DivisionId
+                        join r in _circleRepository.GetAll().ToList() on loc.CircleId equals r.Id
+                        where d.Id.ToString() == cl[0].ToString()
+                        select new DivisionDetails
+                                    {
+                                        Id = d.Id,
+                                        Name = d.Name + " (" + r.Name + ")"
+                                    }).FirstOrDefault();
+
+        }
+        else if (roles.AppRoleName == "EXECUTIVE ENGINEER" || roles.AppRoleName == "JUNIOR ENGINEER" || roles.AppRoleName == "SUB DIVISIONAL OFFICER")
+        {
+            location = (from d in _divisionRepository.GetAll().AsEnumerable()
+                        where d.Id.ToString() == cl[0].ToString()
+                        select new DivisionDetails
+                                {
+                                    Id = d.Id,
+                                    Name = d.Name
+                                }
+                     ).FirstOrDefault();
+        }
+        else
+        {
+            location = (from d in _estabOfficeRepository.GetAll().ToList()
+                        where d.Id.ToString() == cl[0].ToString()
+                        select new DivisionDetails
+                                {
+                                    Id = d.Id,
+                                    Name = d.Name
+                                }
+                     ).FirstOrDefault();
+        }
+       
+
+        UserMenuBlockViewModel obj = new UserMenuBlockViewModel
+                {
+                    Name = name,
+                    Designation = roles.AppRoleName,
+                    Location = location.Name,
+                    UserId = userId,
+                    IsActive = div == location.Id.ToString() && roles.Id.ToString() == roleid,
+                    RoleID = roleid,
+                    DivisionID=location.Id.ToString()
+                };
+        menuItems.Add(obj);
+    }
+
+    // Create menu items and make them available to the layout
+
+    // Pass it to ViewBag or ViewData to be accessed in the layout
+    // ViewBag.MenuItems = menuItems;
+    // var menuItems = ViewBag.MenuItems as IEnumerable<UserMenuBlockViewModel>;
+    
+}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,13 +124,9 @@
     <link href="~/template/css/sb-admin-2.css" rel="stylesheet">
     <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
+    <link href="~/css/custom_profile.css" rel="stylesheet" />
     @* <link href="~/landingpage/assets/css/select2.css" rel="stylesheet" /> *@
-    <style>
-        .boldText{
-            font-weight:bolder;
-        }
-    </style>
+   
     @functions {
         private bool IsLinkActive(string controller, string action)
         {
@@ -174,10 +267,25 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <!-- Nav Item - User Information -->
-                            <li class="nav-item dropdown no-arrow">
+                            <li class="nav-item dropdown no-arrow" style="background-color: #79edc1;line-height: 1.2;">
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">@User.Identity.Name</span>
+                                     <div>
+                                         <table>
+                                             <tr><td>
+                                                    <div><span class="mr-2 d-none d-lg-inline text-gray-900 small" style="font-weight: 800;font-size: medium;">@User.Identity.Name</span></div>
+                                                </td>
+                                            </tr>
+                                            <tr><td>
+                                        <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@role</span></div>
+                                                </td>
+                                            </tr>
+                                            <tr><td>
+                                        <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@locality</span></div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
                                     <img class="img-profile rounded-circle"
                                     src="~/img/undraw_profile.svg">
                                 </a>
@@ -191,12 +299,55 @@
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Settings
-                                </a>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Activity Log
                                 </a> *@
-                                    @* <div class="dropdown-divider"></div> *@
+                                    @if (menuItems != null)
+                                    {
+                                        foreach (var item in menuItems)
+                                        {
+                                                @* <a class="dropdown-item activediv" href="#"> *@
+                                            string cssClass = item.IsActive ? "dropdown-item dropdown-item2 activediv disabled" : "dropdown-item dropdown-item2 inactivediv";
+
+                                            <a class="@cssClass" href="#" onclick="submitForm(this,event)">
+                                                <div>
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <form method="post" id="postDataForm" asp-action="SwitchRole" asp-controller="Account">
+                                                                    <input type="hidden" value="@item.RoleID" id="RoleID" name="RoleID" />
+                                                                    <input type="hidden" value="@item.DivisionID" id="DivisionID" name="DivisionID" />
+                                                                    <input type="hidden" value="@item.UserId" id="EmpID" name="EmpID" />
+                                                                    <input type="hidden" value="@item.Designation" id="Designation" name="Designation" />
+                                                                    <input type="hidden" value="@item.Name" id="EmployeeName" name="EmployeeName" />
+                                                                    <input type="hidden" value="@item.Location" id="DivisionNameN" name="DivisionNameN" />
+                                                                </form>
+                                                                <div>
+                                                                    <span class="mr-2 d-none d-lg-inline text-gray-900 small"><strong>@item.Name </strong></span>
+
+                                           
+
+                                                                 </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@item.Designation</span></div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@item.Location</span></div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="dropdown-divider"></div>
+                                    }
                                     <form method="post" asp-action="logout" asp-controller="account">
                                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -331,6 +482,8 @@
             // $(e).addClass('active');
        }
     </script> *@
+    <script src="~/js/custom_profile.js"></script>
+   
     @if (IsSectionDefined("Scripts"))
     {
         @await RenderSectionAsync("Scripts", required: false)

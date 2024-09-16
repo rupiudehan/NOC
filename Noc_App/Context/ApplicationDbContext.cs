@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Noc_App.Models;
 using Noc_App.Models.ViewModel;
 
@@ -8,6 +9,9 @@ namespace Noc_App.Context
 {
     public class ApplicationDbContext : DbContext
     {
+        public ApplicationDbContext() : base()
+        {
+        }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 

@@ -56,11 +56,11 @@ $(function () {
             type: "POST",
             data: { Email: email, Password: password, Token: token },
             complete: function (r) {
-                ToggleLoadder(false);
+                ToggleLoadder(true);
+                $('#myModal').modal('show');
             },
 
             success: function (response) {
-                console.log(JSON.stringify(response))
                 if (response.success == '1') {
                     //$('#Name').val(response.name);
                     //$('#Designation').val(response.designation);
@@ -70,16 +70,19 @@ $(function () {
                     //$('#REmail').val(response.email);
                     $.each(response.roles, function (key, value) {
                         var tr = '<tr>';
-                        tr += '<td><form action="RedirecToLoginRole" id="loginByRoleForm' + value.id + '" method="post" role="form" class="php-email-form"><input type="hidden" name="Name" id="Name" value="' + response.name + '" /><input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="Designation" id="Designation" value="' + response.designation + '" /><input type="hidden" name="EmpID" id="EmpID" value="' + response.empID + '" />';
+                        // id="loginByRoleForm' + value.id + '"
+                        tr += '<td><form action="RedirecToLoginRole" id="PostForm" name="PostForm" method="post" role="form" class="php-email-form"><input type="hidden" name="Name" id="Name" value="' + response.name + '" /><input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="Designation" id="Designation" value="' + response.designation + '" /><input type="hidden" name="EmpID" id="EmpID" value="' + response.empID + '" />';
                         tr += '<input type="hidden" name="DistrictID" id="DistrictID" value="' + response.districtID + '" /><input type="hidden" name="DivisionID" id="DivisionID" value="' + value.divisionId + '" />';
-                        tr += '<input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" />';
-                        tr += '<input type="hidden" name="RoleID" id="RoleID" value="' + value.id + '"/><input type="hidden" name="role" id="rolename" value="' + value.roleName + '"/><div class="text-center" > <button type="submit" style="width:100%;background-color:#4c9e37" class="btn btn-success btn-user btn-block"><strong>' + value.roleName + '</strong> At ' + value.divisionName +'</button></div></form></td> ';
+                        tr += '<input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="RoleWithOffice" id="RoleWithOffice" value="' + response.roleWithOffice + '" />';
+                        tr += '<input type="hidden" name="DivisionName" id="DivisionName" value="' + response.divisionName + '" />';
+                        tr += '<input type="hidden" name="RoleID" id="RoleID" value="' + value.id + '"/><input type="hidden" name="role" id="rolename" value="' + value.roleName + '"/><div class="text-center" ><label class="btn btn-success btn-user btn-block" style="width:100%;background-color:#4c9e37;cursor:not-allowed">Logging In. Please Wait.....</label> <button type="submit" style="width:100%;background-color:#4c9e37;visibility: hidden;" class="btn btn-success btn-user btn-block"><strong>' + value.roleName + '</strong> At ' + value.divisionName +'</button></div></form></td> ';
                         
                         tr += '</tr>';
                         body.append(tr);
-                        $('.logRe').on('submit', function (event) {
-                            event.preventDefault();
-                        });
+                        //$('.logRe').on('submit', function (event) {
+                        //    event.preventDefault();
+                        //});
+                        document.getElementById('PostForm').submit();
                     });
                     resultProjectMessage.css('display', 'none');
                     //setRecaptchaResponse();
@@ -100,3 +103,10 @@ $(function () {
     });
     
 });
+
+/*<script language='javascript'>*/
+    //document.addEventListener("DOMContentLoaded", function () {
+    //        var vPostForm= document.forms['PostForm'];
+    //vPostForm.submit();
+    //    });
+/*</script>*/

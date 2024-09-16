@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Noc_App.Controllers
 {
     [Authorize(Roles = "Administrator,EXECUTIVE ENGINEER")]
-    public class TehsilBlockController : Controller
+    public class TehsilBlockController :Controller
     {
         private readonly IRepository<TehsilBlockDetails> _repo;
         //private readonly IRepository<SubDivisionDetails> _subDivisionRepo;

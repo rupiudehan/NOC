@@ -15,7 +15,7 @@ using System.Xml.Linq;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 namespace Noc_App.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController :Controller
     {
         private readonly IRepository<DashboardPendencyAll> _pendencyDetailsRepo;
         private readonly IRepository<DashboardPendencyViewModel> _pendencyRepo;

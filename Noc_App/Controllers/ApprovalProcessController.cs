@@ -20,7 +20,7 @@ using System.Collections.Generic;
 
 namespace Noc_App.Controllers
 {
-    public class ApprovalProcessController : Controller
+    public class ApprovalProcessController :Controller
     {
         private readonly IRepository<GrantDetails> _repo;
         //private readonly IRepository<VillageDetails> _villageRpo;

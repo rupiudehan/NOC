@@ -2,8 +2,8 @@
 @using Microsoft.Extensions.Options;
 @inject IOptions<Noc_App.Helpers.GoogleCaptchaConfig> GoogleCaptchaConfig;
 <style>
-    .close-icon:hover{
-        cursor:pointer;
+    .close-icon:hover {
+        cursor: pointer;
     }
 </style>
 @{
@@ -29,19 +29,19 @@
                             <div class="form-group mt-3">
                                 <label asp-for="Email">Username/Email</label>
                                 <input id="loginToken" value="0" type="hidden" asp-for="Token" />
-                               @*  <div id="recaptcha-container"></div> *@
-                                <div class="g-recaptcha"  data-sitekey="@GoogleCaptchaConfig.Value.SiteKey" data-callback="onReCaptchaSuccess" data-size="invisible"></div>
+                                @*  <div id="recaptcha-container"></div> *@
+                                <div class="g-recaptcha" data-sitekey="@GoogleCaptchaConfig.Value.SiteKey" data-callback="onReCaptchaSuccess" data-size="invisible"></div>
                                 @* <div class="g-recaptcha"
-                                     data-sitekey="@GoogleCaptchaConfig.Value.SiteKey"
-                                     data-callback="onReCaptchaSuccess"
-                                     data-size="invisible"></div> *@
+                                data-sitekey="@GoogleCaptchaConfig.Value.SiteKey"
+                                data-callback="onReCaptchaSuccess"
+                                data-size="invisible"></div> *@
                                 <input asp-for="Email" class="form-control form-control-user" id="Email" placeholder="Enter Username/Email Address...">
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
                             <div class="form-group mt-3">
                                 <label asp-for="Password"></label>
                                 <input asp-for="Password" id="Password" id="Password" class="form-control form-control-user" placeholder="Password">
-                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
                             <div class="form-group mt-3">
                                 <input id="showhide" type="checkbox" onclick="myFunction()">
@@ -61,7 +61,7 @@
                         <div class="row">
                             <div asp-validation-summary="All" class="text-danger validateAll"></div>
                         </div>
-                        
+
                         <div class="text-center"><button type="submit" id="login" style="visibility:hidden" class="btn btn-success btn-user btn-block">Login</button></div>
                     </form>
                 </div>
@@ -76,11 +76,11 @@
             <div class="modal-content">
                 @* <form method="post" asp-action="Reject" asp-controller="ApprovalProcess"> *@
                 <div class="modal-header">
-                <input type="hidden" id="id" name="id" />
-                <h5 class="modal-title" id="exampleModalLabel"><label id="dvBranch">Login As</label></h5>
-               @*  <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">×</span></button> *@
-                
+                    <input type="hidden" id="id" name="id" />
+                    <h5 class="modal-title" id="exampleModalLabel"><label id="dvBranch">Login In Progress.....</label></h5>
+                    @*  <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button> *@
+
                 </div>
                 <div class="modal-body" style="max-height: 700px;overflow-y:scroll;">
                     @*         <form action="RedirecToLoginRole" id="loginByRoleForm" method="post" role="form" class="php-email-form">
