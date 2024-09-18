@@ -71,10 +71,10 @@ namespace Noc_App.Controllers
                 string div = "0";
 
                 string role = roleName;// (await GetRoleName(roleName)).AppRoleName;
-                //var user = await _userManager.GetUserAsync(User);
-                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                //// Retrieve the user object
-                //var userDetail = await _userManager.FindByIdAsync(userId);
+                                       //var user = await _userManager.GetUserAsync(User);
+                                       //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                                       //// Retrieve the user object
+                                       //var userDetail = await _userManager.FindByIdAsync(userId);
 
                 //// Retrieve roles associated with the user
                 //var role = (await _userManager.GetRolesAsync(userDetail)).FirstOrDefault().ToUpper();
@@ -82,52 +82,59 @@ namespace Noc_App.Controllers
                 //if (role.ToUpper() == "ADMINISTRATOR") return View();
                 //else
                 //{
-                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
-                    {
-                        divisions = _divisionRepo.GetAll().OrderBy(x=>x.Name).ToList();
-                    }
-                    else if (role == "EXECUTIVE ENGINEER" || role == "CIRCLE OFFICER")
+                if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
                 {
-                    divisions = (from d in _divisionRepo.GetAll() 
-                                     where d.Id == Convert.ToInt32(divisionId)
-                                     select new DivisionDetails
-                                     {
-                                         Id = d.Id,
-                                         Name = d.Name
-                                     }).ToList();
+                    divisions = _divisionRepo.GetAll().OrderBy(x => x.Name).ToList();
+                }
+                else if (role == "EXECUTIVE ENGINEER" || role == "CIRCLE OFFICER")
+                {
+                    divisions = (from d in _divisionRepo.GetAll()
+                                 where d.Id == Convert.ToInt32(divisionId)
+                                 select new DivisionDetails
+                                 {
+                                     Id = d.Id,
+                                     Name = d.Name
+                                 }).ToList();
                     div = divisionId;
-                        //subdivisions = (from  div in _divisionRepo.GetAll()
-                        //                join d in _subDivisionRepo.GetAll() on div.Id equals (d.DivisionId)
-                        //                where div.Id == Convert.ToInt32(divisionId)
-                        //                select new SubDivisionDetails
-                        //                {
-                        //                    Id = d.Id,
-                        //                    Name = d.Name
-                        //                }
-                        //                       ).Distinct().ToList();
-                    }
-                    //else 
-                    //{
-                    //    subdivisions = (from d in _subDivisionRepo.GetAll()
-                    //                    where d.Id == Convert.ToInt32(subdivisionId)
-                    //                    select new SubDivisionDetails
-                    //                    {
-                    //                        Id = d.Id,
-                    //                        Name = d.Name
-                    //                    }
-                    //                           ).Distinct().OrderBy(x => x.Name).ToList();
-                    //    divisions = (from sub in _subDivisionRepo.GetAll()
-                    //                 join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
-                    //                 where d.Id == Convert.ToInt32(subdivisionId)
-                    //                 select new DivisionDetails
-                    //                 {
-                    //                     Id = d.Id,
-                    //                     Name = d.Name
-                    //                 }
-                    //                            ).Distinct().OrderBy(x => x.Name).ToList();
-                    //}
-                    ReportApplicationCountViewModel modelreport = new ReportApplicationCountViewModel();
-                    modelreport =  _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscount", "0", "0", "0", div).FirstOrDefault();
+                    //subdivisions = (from  div in _divisionRepo.GetAll()
+                    //                join d in _subDivisionRepo.GetAll() on div.Id equals (d.DivisionId)
+                    //                where div.Id == Convert.ToInt32(divisionId)
+                    //                select new SubDivisionDetails
+                    //                {
+                    //                    Id = d.Id,
+                    //                    Name = d.Name
+                    //                }
+                    //                       ).Distinct().ToList();
+                }
+                //else 
+                //{
+                //    subdivisions = (from d in _subDivisionRepo.GetAll()
+                //                    where d.Id == Convert.ToInt32(subdivisionId)
+                //                    select new SubDivisionDetails
+                //                    {
+                //                        Id = d.Id,
+                //                        Name = d.Name
+                //                    }
+                //                           ).Distinct().OrderBy(x => x.Name).ToList();
+                //    divisions = (from sub in _subDivisionRepo.GetAll()
+                //                 join d in _divisionRepo.GetAll() on sub.DivisionId equals (d.Id)
+                //                 where d.Id == Convert.ToInt32(subdivisionId)
+                //                 select new DivisionDetails
+                //                 {
+                //                     Id = d.Id,
+                //                     Name = d.Name
+                //                 }
+                //                            ).Distinct().OrderBy(x => x.Name).ToList();
+                //}
+                ReportApplicationCountViewModel modelreport = new ReportApplicationCountViewModel();
+                if (role == "EXECUTIVE ENGINEER" || role == "CIRCLE OFFICER")
+                {
+                    modelreport = _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscountXEN", "0", "0", "0", div).FirstOrDefault();
+                }
+                else if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER HQ" || role == "CHIEF ENGINEER HQ" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
+                {
+                    modelreport = _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscount", "0", "0", "0", div).FirstOrDefault();
+                }
                     //subdivisions = divisions != null && divisions.Count()>0 ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
                     DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
                     {
@@ -604,10 +611,24 @@ namespace Noc_App.Controllers
         {
             try
             {
+                var roleName = LoggedInRoleName();
+                string div = "0";
+
                 string divisionsId = LoggedInDivisionID();
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+                List<ReportApplicationsViewModel> model = new List<ReportApplicationsViewModel>();
 
-                List<ReportApplicationsViewModel> model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapplications",divisionId)).ToList();
+                if (roleName == "EXECUTIVE ENGINEER" || roleName == "CIRCLE OFFICER")
+                {
+                    divisionId = Convert.ToInt32(divisionsId);
+                    model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapplicationsXEN", divisionId)).ToList();
+                }
+                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER HQ" || roleName == "CHIEF ENGINEER HQ" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
+                {
+                    model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapplications", divisionId)).ToList();
+                }
+                    
+
 
                 return Json(model);
 
@@ -625,10 +646,22 @@ namespace Noc_App.Controllers
         {
             try
             {
+                var roleName = LoggedInRoleName();
                 string divisionsId = LoggedInDivisionID();
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+                List<ReportApplicationsViewModel> model = new List<ReportApplicationsViewModel>();
 
-                List<ReportApplicationsViewModel> model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapprovedapplications", divisionId)).ToList();
+                if (roleName == "EXECUTIVE ENGINEER" || roleName == "CIRCLE OFFICER")
+                {
+                    divisionId = Convert.ToInt32(divisionsId);
+                    model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapprovedapplicationsXEN", divisionId)).ToList();
+                }
+                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER HQ" || roleName == "CHIEF ENGINEER HQ" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
+                {
+                    model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapprovedapplications", divisionId)).ToList();
+                }
+
+                
 
                 return Json(model);
 
@@ -646,10 +679,22 @@ namespace Noc_App.Controllers
         {
             try
             {
+                var roleName = LoggedInRoleName();
                 string divisionsId = LoggedInDivisionID();
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+                List<ReportApplicationsViewModel> model = new List<ReportApplicationsViewModel>();
 
-                List<ReportApplicationsViewModel> model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalrejectedapplications",  divisionId)).ToList();
+                if (roleName == "EXECUTIVE ENGINEER" || roleName == "CIRCLE OFFICER")
+                {
+                    divisionId = Convert.ToInt32(divisionsId);
+                    model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalrejectedapplicationsXEN", divisionId)).ToList();
+                }
+                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER HQ" || roleName == "CHIEF ENGINEER HQ" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
+                {
+                    model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalrejectedapplications", divisionId)).ToList();
+                }
+
+                
 
                 return Json(model);
 
@@ -667,10 +712,22 @@ namespace Noc_App.Controllers
         {
             try
             {
+                var roleName = LoggedInRoleName();
                 string divisionsId = LoggedInDivisionID();
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
+                List<ReportApplicationsViewModel> model = new List<ReportApplicationsViewModel>();
 
-                List<ReportApplicationsViewModel> model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalpendingapplications", divisionId)).ToList();
+                if (roleName == "EXECUTIVE ENGINEER" || roleName == "CIRCLE OFFICER")
+                {
+                    divisionId = Convert.ToInt32(divisionsId);
+                    model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalpendingapplicationsXEN", divisionId)).ToList();
+                }
+                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER HQ" || roleName == "CHIEF ENGINEER HQ" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
+                {
+                    model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalpendingapplications", divisionId)).ToList();
+                }
+
+                
 
                 return Json(model);
 
