@@ -213,56 +213,66 @@ namespace Noc_App.Controllers
                             //{
                             //    if (role != "2")
                             //    {
-                            if (role == "8" /*|| role == "10" || role == "128" || role == "6"*/)
+                            if (ro == null)
                             {
-                                RoleDetail = (from rr in LocationRoleDetail
-                                              join r in _circleRepository.GetAll().AsEnumerable() on rr.Location.office_id equals r.Id
-                                              join loc in _circleDivRepository.GetAll() on rr.Location.office_id equals loc.CircleId
-                                              join div in _divisionRepository.GetAll() on loc.DivisionId equals div.Id
-                                              where rr.Roles.Id == Convert.ToInt32(role)
-                                              select new UserRoleDetailsViewModel
-                                              {
-                                                  DivisionId = div.Id,
-                                                  DivisionName = div.Name + " (" + r.Name + ")",
-                                                  AppRoleName = rr.Roles.RoleName,
-                                                  Id = rr.Roles.Id,
-                                                  RoleLevel = rr.Roles.RoleLevel,
-                                                  RoleName = rr.Roles.RoleName
-                                              }
-                                                             ).ToList();
+                                login.Success = "0";
+                                login.Errors = "Invalid user.";
+                                ModelState.AddModelError(string.Empty, login.Errors);
+                                return Json(login);
                             }
-                            else if (role == "60" || role == "67" || role == "7")
+                            else
                             {
+                                if (role == "8" /*|| role == "10" || role == "128" || role == "6"*/)
+                                {
+                                    RoleDetail = (from rr in LocationRoleDetail
+                                                  join r in _circleRepository.GetAll().AsEnumerable() on rr.Location.office_id equals r.Id
+                                                  join loc in _circleDivRepository.GetAll() on rr.Location.office_id equals loc.CircleId
+                                                  join div in _divisionRepository.GetAll() on loc.DivisionId equals div.Id
+                                                  where rr.Roles.Id == Convert.ToInt32(role)
+                                                  select new UserRoleDetailsViewModel
+                                                  {
+                                                      DivisionId = div.Id,
+                                                      DivisionName = div.Name + " (" + r.Name + ")",
+                                                      AppRoleName = rr.Roles.RoleName,
+                                                      Id = rr.Roles.Id,
+                                                      RoleLevel = rr.Roles.RoleLevel,
+                                                      RoleName = rr.Roles.RoleName
+                                                  }
+                                                                 ).ToList();
+                                }
+                                else if (role == "60" || role == "67" || role == "7")
+                                {
 
-                                RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
-                                              join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
-                                              where rr.Roles.Id == Convert.ToInt32(role)
-                                              select new UserRoleDetailsViewModel
-                                              {
-                                                  DivisionId = r.Id,
-                                                  DivisionName = r.Name,
-                                                  AppRoleName = rr.Roles.RoleName,
-                                                  Id = rr.Roles.Id,
-                                                  RoleLevel = rr.Roles.RoleLevel,
-                                                  RoleName = rr.Roles.RoleName
-                                              }
-                                                             ).ToList();
-                            }
-                            else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128")
-                            {
-                                RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
-                                              join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
-                                              where rr.Roles.Id == Convert.ToInt32(role)
-                                              select new UserRoleDetailsViewModel
-                                              {
-                                                  DivisionId = r.Id,
-                                                  DivisionName = r.Name,
-                                                  AppRoleName = rr.Roles.RoleName,
-                                                  Id = rr.Roles.Id,
-                                                  RoleLevel = rr.Roles.RoleLevel,
-                                                  RoleName = rr.Roles.RoleName
-                                              }
-                                                             ).ToList();
+                                    RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                                                  join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                  where rr.Roles.Id == Convert.ToInt32(role)
+                                                  select new UserRoleDetailsViewModel
+                                                  {
+                                                      DivisionId = r.Id,
+                                                      DivisionName = r.Name,
+                                                      AppRoleName = rr.Roles.RoleName,
+                                                      Id = rr.Roles.Id,
+                                                      RoleLevel = rr.Roles.RoleLevel,
+                                                      RoleName = rr.Roles.RoleName
+                                                  }
+                                                                 ).ToList();
+                                }
+                                else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128")
+                                {
+                                    RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
+                                                  join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                  where rr.Roles.Id == Convert.ToInt32(role)
+                                                  select new UserRoleDetailsViewModel
+                                                  {
+                                                      DivisionId = r.Id,
+                                                      DivisionName = r.Name,
+                                                      AppRoleName = rr.Roles.RoleName,
+                                                      Id = rr.Roles.Id,
+                                                      RoleLevel = rr.Roles.RoleLevel,
+                                                      RoleName = rr.Roles.RoleName
+                                                  }
+                                                                 ).ToList();
+                                }
                             }
 
                             //    }
@@ -279,7 +289,7 @@ namespace Noc_App.Controllers
                             login.Success = "1";
                             login.Name = root.user_info.Name;
                             login.RoleID = role;
-                            login.DivisionName = RoleDetail.Take(1).FirstOrDefault().DivisionName;
+                            login.DivisionName = RoleDetail.Count()>0? RoleDetail.Take(1).FirstOrDefault().DivisionName:"";
                             login.RoleWithOffice = divisionRolePairs;
                             return Json(login);
                         }

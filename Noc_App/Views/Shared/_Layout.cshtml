@@ -53,7 +53,7 @@
                                     }).FirstOrDefault();
 
         }
-        else if (roles.AppRoleName == "EXECUTIVE ENGINEER" || roles.AppRoleName == "JUNIOR ENGINEER" || roles.AppRoleName == "SUB DIVISIONAL OFFICER")
+        else if (roles.AppRoleName == "EXECUTIVE ENGINEER" || roles.AppRoleName == "Administrator" || roles.AppRoleName == "JUNIOR ENGINEER" || roles.AppRoleName == "SUB DIVISIONAL OFFICER")
         {
             location = (from d in _divisionRepository.GetAll().AsEnumerable()
                         where d.Id.ToString() == cl[0].ToString()

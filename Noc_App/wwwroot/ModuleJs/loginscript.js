@@ -56,8 +56,12 @@ $(function () {
             type: "POST",
             data: { Email: email, Password: password, Token: token },
             complete: function (r) {
-                ToggleLoadder(true);
-                $('#myModal').modal('show');
+                if ($('#hdnsuccess').val() == '1') {
+                    ToggleLoadder(true);
+                    $('#myModal').modal('show');
+                } else {
+                    $('#myModal').modal('hide');
+                    ToggleLoadder(false); }
             },
 
             success: function (response) {
@@ -88,11 +92,16 @@ $(function () {
                     //setRecaptchaResponse();
                     //resultProjectMessage.html('<div class="alert alert-success">LoggedIn successfully!<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
                     $('#myModal').modal('show');
+                    $('#hdnsuccess').val('1');
                 } else {
+                    $('#hdnsuccess').val('0');
+                    $('#myModal').modal('hide');
+                    ToggleLoadder(false);
                     setRecaptchaResponse();
                     var errors = response.errors;
                     resultProjectMessage.css('display', 'block');
                     resultProjectMessage.html('<div class="alert alert-danger">' + errors + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
+                  
                 }
             },
             error: function () {
