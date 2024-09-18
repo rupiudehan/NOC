@@ -68,6 +68,7 @@ namespace Noc_App.Controllers
 
                 // Retrieve roles associated with the user
                 var roleName = LoggedInRoleName();
+                string div = "0";
 
                 string role = roleName;// (await GetRoleName(roleName)).AppRoleName;
                 //var user = await _userManager.GetUserAsync(User);
@@ -85,8 +86,7 @@ namespace Noc_App.Controllers
                     {
                         divisions = _divisionRepo.GetAll().OrderBy(x=>x.Name).ToList();
                     }
-                    else
-                //else if (role != "SUB DIVISIONAL OFFICER" && role != "JUNIOR ENGINEER")
+                    else if (role == "EXECUTIVE ENGINEER" || role == "CIRCLE OFFICER")
                 {
                     divisions = (from d in _divisionRepo.GetAll() 
                                      where d.Id == Convert.ToInt32(divisionId)
@@ -95,6 +95,7 @@ namespace Noc_App.Controllers
                                          Id = d.Id,
                                          Name = d.Name
                                      }).ToList();
+                    div = divisionId;
                         //subdivisions = (from  div in _divisionRepo.GetAll()
                         //                join d in _subDivisionRepo.GetAll() on div.Id equals (d.DivisionId)
                         //                where div.Id == Convert.ToInt32(divisionId)
@@ -126,7 +127,7 @@ namespace Noc_App.Controllers
                     //                            ).Distinct().OrderBy(x => x.Name).ToList();
                     //}
                     ReportApplicationCountViewModel modelreport = new ReportApplicationCountViewModel();
-                    modelreport =  _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscount", "0", "0", "0", "0").FirstOrDefault();
+                    modelreport =  _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscount", "0", "0", "0", div).FirstOrDefault();
                     //subdivisions = divisions != null && divisions.Count()>0 ? (await _subDivisionRepo.FindAsync(x => x.DivisionId == divisions.FirstOrDefault().Id)).ToList() : null;
                     DashboardDropdownViewModelView model = new DashboardDropdownViewModelView
                     {
