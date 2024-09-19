@@ -214,6 +214,7 @@ function LoadReport(DivisionId, subdivisionId, roleName) {
                 }
                 var count = 1; var len = r.length;
                 $.each(r, function (key, value) {
+                    var pendency = value.pendency < 0 ? '0' : value.pendency;
                     var tr = '<tr>';
                     tr += '<td>' + count + '</td>';
                     // if (count == 1) { $('#dvBranch').text("Branch: " + value.BranchName); $('#dvLevel').text('Level: ' + LevelType); $('#dvRule').text('Under: ' + ActionName); }
@@ -221,7 +222,7 @@ function LoadReport(DivisionId, subdivisionId, roleName) {
                     tr += '<td>' + value.applyDate + '</td>';
                     tr += '<td>' + value.division + '</td>';
                     tr += '<td>' + value.processedToRole + '</td>';
-                    tr += '<td>' + value.pendency + '</td>';
+                    tr += '<td>' + pendency + '</td>';
                     tr += '</tr>';
                     body.append(tr);
                     count++;
@@ -290,10 +291,11 @@ function LoadReportApplicationsP() {
                         </tr>`;
                 thead.html(thr);
                 $.each(r, function (key, value) {
-                    var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
-                    var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
+                    var status =  value.isshortfall == true ?'Reverted to Applicant Due To Discrepency':value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
+                    var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
                     var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
                     var applydate = formatOnlyDate(value.createdOn);
+                    var pendency = value.pendency < 0 ? '0' : value.pendency;
                     var tr = '<tr>';
                     tr += '<td>' + count + '</td>';
                     tr += '<td>' + value.applicationID + '</td>';
@@ -301,7 +303,7 @@ function LoadReportApplicationsP() {
                     tr += '<td>' + value.divisionName + '</td>';
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + name + '</td>';
-                    tr += '<td>' + value.pendency + '</td>';
+                    tr += '<td>' + pendency + '</td>';
                     tr += '</tr>';
                     body.append(tr);
                     count++;
@@ -498,8 +500,7 @@ function LoadReportApplicationsT() {
         },
         success: function (r) {
             if (r != null) {
-                
-
+                console.log(JSON.stringify(r))
                 var count = 1; var len = r.length;
                 var thr = `<tr>
                             <th>#</th>
@@ -513,10 +514,11 @@ function LoadReportApplicationsT() {
                         </tr>`;
                 thead.html(thr);
                 $.each(r, function (key, value) {
-                    var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
-                    var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
+                    var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
+                    var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
                     var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
                     var applydate = formatOnlyDate(value.createdOn);
+                    var pendency = value.pendency < 0 ? '0' : value.pendency;
                     var tr = '<tr>';
                     tr += '<td>' + count + '</td>';
                     tr += '<td>' + value.applicationID + '</td>';
@@ -524,7 +526,7 @@ function LoadReportApplicationsT() {
                     tr += '<td>' + value.divisionName + '</td>';
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + name + '</td>';
-                    tr += '<td>' + value.pendency + '</td>';
+                    tr += '<td>' + pendency + '</td>';
                     tr += '<td>' + processedOn + '</td>';
                     tr += '</tr>';
                     body.append(tr);
