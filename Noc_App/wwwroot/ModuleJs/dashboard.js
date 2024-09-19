@@ -220,6 +220,7 @@ function LoadReport(DivisionId, subdivisionId, roleName) {
                     // if (count == 1) { $('#dvBranch').text("Branch: " + value.BranchName); $('#dvLevel').text('Level: ' + LevelType); $('#dvRule').text('Under: ' + ActionName); }
                     tr += '<td>' + value.applicationID + '</td>';
                     tr += '<td>' + value.applyDate + '</td>';
+                    tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.division + '</td>';
                     tr += '<td>' + value.processedToRole + '</td>';
                     tr += '<td>' + pendency + '</td>';
@@ -284,6 +285,7 @@ function LoadReportApplicationsP() {
                             <th>#</th>
                             <th>Application ID</th>
                             <th>Date Of Application</th>
+                            <th>Project Name</th>
                             <th>Division</th>
                             <th>Status</th>
                             <th>Pending With</th>
@@ -300,6 +302,7 @@ function LoadReportApplicationsP() {
                     tr += '<td>' + count + '</td>';
                     tr += '<td>' + value.applicationID + '</td>';
                     tr += '<td>' + applydate + '</td>';
+                    tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + name + '</td>';
@@ -359,6 +362,7 @@ function LoadReportApplicationsA() {
                             <th>#</th>
                             <th>Application ID</th>
                             <th>Date Of Application</th>
+                            <th>Project Name</th>
                             <th>Division</th>
                             <th>Status</th>
                             <th>Processed On</th>
@@ -374,6 +378,7 @@ function LoadReportApplicationsA() {
                     tr += '<td>' + count + '</td>';
                     tr += '<td>' + value.applicationID + '</td>';
                     tr += '<td>' + applydate + '</td>';
+                    tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + processedOn + '</td>';
@@ -432,6 +437,7 @@ function LoadReportApplicationsR() {
                             <th>#</th>
                             <th>Application ID</th>
                             <th>Date Of Application</th>
+                            <th>Project Name</th>
                             <th>Division</th>
                             <th>Status</th>
                             <th>Processed On</th>
@@ -447,6 +453,7 @@ function LoadReportApplicationsR() {
                     tr += '<td>' + count + '</td>';
                     tr += '<td>' + value.applicationID + '</td>';
                     tr += '<td>' + applydate + '</td>';
+                    tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + processedOn + '</td>';
@@ -506,6 +513,7 @@ function LoadReportApplicationsT() {
                             <th>#</th>
                             <th>Application ID</th>
                             <th>Date Of Application</th>
+                            <th>Project Name</th>
                             <th>Division</th>
                             <th>Status</th>
                             <th>Pending With</th>
@@ -523,6 +531,7 @@ function LoadReportApplicationsT() {
                     tr += '<td>' + count + '</td>';
                     tr += '<td>' + value.applicationID + '</td>';
                     tr += '<td>' + applydate + '</td>';
+                    tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + name + '</td>';
