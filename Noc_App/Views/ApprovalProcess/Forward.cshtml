@@ -15,7 +15,8 @@
                 <h6 class="m-0 font-weight-bold text-primary">Forward</h6>
             </div>
             <div class="card-body">
-                <form class="user" enctype="multipart/form-data" asp-action="Forward" method="post">
+                <div id="divLoader" style="display:none;text-align:center"> <img src="~/images/ajax-loader.gif" alt="Loader" /> </div>
+                <form class="user barcontainer" enctype="multipart/form-data" asp-action="Forward" method="post">
                     @* <input type="hidden" asp-for="Id" /> *@
                     <div class="row">
                         <div class="col-lg-3">
@@ -28,6 +29,10 @@
                         <div class="col-lg-3">
                             <div class="form-group">
                                 <input asp-for="ForwardToRole" type="hidden" id="ForwardToRole" />
+                                <input asp-for="ToLocationId" type="hidden" id="ToLocationId" />
+                                <input asp-for="FromLocationId" type="hidden" id="FromLocationId" />
+                                <input asp-for="LoggedInRole" type="hidden" id="userRole" />
+                                <input type="hidden" id="pageName" value="F" />
                                 <label asp-for="ApplicationID" class="control-label">Application Id</label>
                                 <input asp-for="ApplicationID" readonly class="form-control form-control-user" />
                                 <span asp-validation-for="ApplicationID" class="text-danger"></span>
@@ -150,36 +155,7 @@
                     }
                     }
                     <div class="row">
-                        @* @if (Model.LoggedInRole == "EXECUTIVE ENGINEER" && Model.IsForwarded==false)
-                        {
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label asp-for="SelectedSubDivisionId" class="control-label">Sub-Division</label>
-                                    @if (Model.SubDivisions != null)
-                                    {
-                                        @if (Model.SubDivisions.Count() > 0)
-                                        {
-                                            <select asp-for="SelectedSubDivisionId" asp-items="@Model.SubDivisions" class="form-control">
-                                                <option value="">Select</option>
-                                            </select>
-                                        }
-                                        else
-                                        {
-                                            <select name="SelectedSubDivisionId" disabled class="form-control">
-                                                <option value="">Select</option>
-                                            </select>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <select name="SelectedSubDivisionId" disabled class="form-control">
-                                            <option value="">Select</option>
-                                        </select>
-                                    }
-                                    <span asp-validation-for="SelectedSubDivisionId" class="text-danger"></span>
-                                </div>
-                            </div>
-                        } *@
+                      
                         <div class="col-lg-3">
                             <div class="form-group">
                                 <label asp-for="SelectedOfficerId" class="control-label">Forward To</label>
@@ -208,6 +184,97 @@
                                 <span asp-validation-for="SelectedOfficerId" id="SelectedOfficerIdVal" class="text-danger"></span>
                             </div>
                         </div>
+                      @*   @if (Model.ForwardToRole == "EXECUTIVE ENGINEER")
+                        { *@
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="SelectedDivisionId" class="control-label">Location</label>
+                                    @if (Model.Divisions != null)
+                                    {
+                                        @if (Model.Divisions.Count() > 0)
+                                        {
+                                            <select asp-for="SelectedDivisionId" id="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                    <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                                </div>
+                            </div>
+                       @*  }
+                        else if ((Model.ForwardToRole == "JUNIOR ENGINEER" || Model.ForwardToRole == "SUB DIVISIONAL OFFICER" || Model.ForwardToRole == "CIRCLE OFFICER"))
+                        {
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label asp-for="SelectedDivisionId" class="control-label">Location</label>
+                                    @if (Model.Divisions != null)
+                                    {
+                                        @if (Model.Divisions.Count() > 0)
+                                        {
+                                            <select asp-for="SelectedDivisionId" id="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                    <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        }
+
+                        else if ((Model.ForwardToRole == "DWS,CIRCLE OFFICER"))
+                        {
+                            <div class="col-lg-3" id="dv" style="display:none;">
+                                <div class="form-group">
+                                    <label asp-for="SelectedDivisionId" class="control-label">Location</label>
+                                    @if (Model.Divisions != null)
+                                    {
+                                        @if (Model.Divisions.Count() > 0)
+                                        {
+                                            <select asp-for="SelectedDivisionId" id="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                    <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        } *@
                         @if (Model.IsForwarded == true)
                         {
                             <div class="col-lg-3">
@@ -249,21 +316,75 @@
                     </div>
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="row">
-                        @if (Model.LoggedInRole == "EXECUTIVE ENGINEER" && Model.IsForwarded == false)
+                        @if (Model.ForwardToRole == "EXECUTIVE ENGINEER")
                         {
-                            @* @if (Model.SubDivisions!=null && Model.SubDivisions.Count() > 0)
+                            @if (Model.Officers != null && Model.Officers.Count() > 0)
                             {
-                                <div class="col-lg-6">
+                                @if (Model.Divisions != null && Model.Divisions.Count() > 0)
+                                {
+                                    <div class="col-lg-6">
 
-                                    <button type="submit" class="btn btn-primary btn-user btn-block">Forward</button>
-                                </div>
-                                <div class="col-lg-6">
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">Forward</button>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-lg-6">
+
+                                        <button type="submit" disabled id="btnForward" class="btn btn-primary btn-user btn-block">Forward</button>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-lg-6 offset-lg-3">
                                     <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
                                 </div>
                             }
+                        }
+                        else if ((Model.ForwardToRole == "JUNIOR ENGINEER" || Model.ForwardToRole == "SUB DIVISIONAL OFFICER"))
+                        {
+
+                            @if (Model.Officers != null && Model.Officers.Count() > 0)
+                            {
+                                @if (Model.Divisions != null && Model.Divisions.Count() > 0)
+                                {
+                                    <div class="col-lg-6">
+
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">Forward</button>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                    </div>
+                                 }
+                                else
+                                {
+                                    <div class="col-lg-6">
+
+                                        <button type="submit" disabled id="btnForward" class="btn btn-primary btn-user btn-block">Forward</button>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                    </div>
+                                }
+                            }
                             else
-                            { *@
-                            @if (Model.Officers !=null && Model.Officers.Count() > 0)
+                            {
+                                <div class="col-lg-6 offset-lg-3">
+                                    <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                </div>
+                            }
+
+
+                        }
+                        else{
+                            @if (Model.Officers != null && Model.Officers.Count() > 0)
                             {
                                 <div class="col-lg-6">
 
@@ -279,22 +400,6 @@
                                     <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
                                 </div>
                             }
-                        }
-                        else @if (Model.Officers != null && Model.Officers.Count() > 0)
-                        {
-                            <div class="col-lg-6">
-
-                                <button type="submit" id="forward" class="btn btn-primary btn-user btn-block">Forward</button>
-                            </div>
-                            <div class="col-lg-6">
-                                <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="col-lg-6 offset-lg-3">
-                                <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
-                            </div>
                         }
                     </div>
                 </form>

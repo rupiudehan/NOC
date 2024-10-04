@@ -13,9 +13,9 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Applicant Email")]
         public string ApplicantEmailID { get; set; }
         public string ForwardToRole { get; set; }
-        [Display(Name = "Sub-Division")]
-        public string SelectedSubDivisionId { get; set; }
-        public IEnumerable<SelectListItem> SubDivisions { get; set; }
+        [Display(Name = "Division")]
+        public string SelectedDivisionId { get; set; }
+        public IEnumerable<SelectListItem> Divisions { get; set; }
         [Required]
         [Display(Name = "Officer")]
         public string SelectedOfficerId { get; set; }

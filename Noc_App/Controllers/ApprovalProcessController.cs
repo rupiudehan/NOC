@@ -17,6 +17,7 @@ using System.Text;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Noc_App.Controllers
 {
@@ -211,6 +212,15 @@ namespace Noc_App.Controllers
 
                         return View("NotFound");
                     }
+                    DivisionDetails grantdivision= (from d in _divisionRepo.GetAll()
+                                                    join s in _subDivisionRepo.GetAll() on d.Id equals s.DivisionId
+                                                    where s.Id==grant.SubDivisionId
+                                                    select new DivisionDetails
+                                                    {
+                                                        Id=d.Id,
+                                                        Name=d.Name
+                                                    })
+                                                    .FirstOrDefault();
 
                     string userId = LoggedInUserID();
 
@@ -245,6 +255,8 @@ namespace Noc_App.Controllers
                         ProcessedToUser = "0",
                         ProcessedToName = "Applicant",
                         Remarks = model.Remarks,
+                        FromLocationId=Convert.ToInt32(divisionId),
+                        ToLocationId= grantdivision.Id,
                         RecommendationID = 3
                     };
 
@@ -321,13 +333,18 @@ namespace Noc_App.Controllers
             var users = (await GetOfficer("0", "EXECUTIVE ENGINEER", "0","0","0"));
             if(users!=null && users.Count>0)
                 officerDetail = users.Where(x=>x.UserId!=userId).ToList();
+            var roleName = LoggedInRoleName();
 
+            string role = roleName;
+            List<DivisionDetails> divs = new List<DivisionDetails>();
             GrantFileTransferDetailCreate model = new GrantFileTransferDetailCreate
             {
                 Name = grant.Name,
                 ApplicantEmailID = grantdetail.Grant.ApplicantEmailID,
                 ApplicationID = grantdetail.Grant.ApplicationID,
+                ForwardToRole=role,
                 Officers = officerDetail.Count > 0 ? new SelectList(officerDetail, "UserId", "UserName") : null,
+                Divisions = new SelectList(divs, "Id", "Name"),
                 LocationDetails = "Division: " + grantdetail.division.Name + ", Sub-Division: " + grantdetail.subdiv.Name + ", Tehsil/Block: " + grantdetail.tehsil.Name + ", Village: " + grantdetail.Grant.VillageName + ", Pincode: " + grantdetail.Grant.PinCode,
             };
             return View(model);
@@ -377,6 +394,22 @@ namespace Noc_App.Controllers
                 
                 string username = LoggedInUserName();
                 string designation=LoggedInDesignationName();
+                var roleName = LoggedInRoleName();
+
+                string role = roleName;
+                List<DivisionDetails> UserRoleLocation = await GetOfficerLocations("0", role, model.SelectedOfficerId);
+                if (model.SelectedDivisionId == null || model.SelectedDivisionId == "" || model.SelectedDivisionId == "0")
+                {
+                    model.Divisions = new SelectList(UserRoleLocation, "Id", "Name");
+                    ModelState.AddModelError("", $"Please select division");
+
+                    return View(model);
+                }
+                else
+                {
+
+                    model.Divisions = new SelectList(UserRoleLocation, "Id", "Name", model.SelectedDivisionId);
+                }
                 GrantFileTransferDetails details = new GrantFileTransferDetails {
                     GrantId = grant.Id,
                     FromAuthorityId=userId,
@@ -386,7 +419,9 @@ namespace Noc_App.Controllers
                     FromName=username,
                     FromDesignationName=designation,
                     ToName=userRole.Name,
-                    ToDesignationName=userRole.Designation
+                    FromLocationId= Convert.ToInt32(divisionId),
+                    ToLocationId= Convert.ToInt32(model.SelectedDivisionId),
+                    ToDesignationName =userRole.Designation
                 };
 
 
@@ -409,7 +444,8 @@ namespace Noc_App.Controllers
                 ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
                 return View("NotFound");
             }
-           
+
+            List<DivisionDetails> divs = new List<DivisionDetails>();
             var grantdetail = (from g in _repo.GetAll()
                                join a in _repoApprovalDetail.GetAll() on g.Id equals a.GrantID
                                //join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
@@ -473,6 +509,7 @@ namespace Noc_App.Controllers
                 CurrentOfficer=grantdetail.Approval.ProcessedToUser,
                 ApprovalId=grantdetail.Approval.Id,
                 ForwardToRole="JUNIOR ENGINEER",
+                Divisions = new SelectList(divs, "Id", "Name"),
                 Officers = officerDetail.Count>0 ? new SelectList(officerDetail, "UserId", "UserName") : null,
                 LocationDetails = "Division: " + grantdetail.division.Name + ", Sub-Division: " + grantdetail.subdiv.Name + ", Tehsil/Block: " + grantdetail.tehsil.Name + ", Village: " + grantdetail.Grant.VillageName + ", Pincode: " + grantdetail.Grant.PinCode,
             };
@@ -514,9 +551,9 @@ namespace Noc_App.Controllers
 
                 // Retrieve roles associated with the user
                 var role = LoggedInRoleName();
-                model.SelectedSubDivisionId = "0";
+                //model.SelectedSubDivisionId = "0";
                 GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "F")).FirstOrDefault();
-                List<OfficerResponseViewModel> officers = (await LoadOfficersAsync("JUNIOR ENGINEER",model.SelectedSubDivisionId, "0", "0", "0")).FindAll(x=>x.user_info.EmployeeId==model.SelectedOfficerId);
+                List<OfficerResponseViewModel> officers = (await LoadOfficersAsync("JUNIOR ENGINEER","0", "0", "0", "0")).FindAll(x=>x.user_info.EmployeeId==model.SelectedOfficerId);
                 OfficerDetail userRole = (from u in _userRolesRepository.GetAll().AsEnumerable()
                                 join officer in officers on u.Id.ToString() equals officer.user_info.RoleID
                                 select new OfficerDetail
@@ -566,6 +603,7 @@ namespace Noc_App.Controllers
                 approvalDetail.ProcessedToUser = userRole.EmployeeId;
                 approvalDetail.ProcessedByName = userRole.UserName;
                 approvalDetail.UpdatedOn = DateTime.Now;
+                approvalDetail.FromLocationId = Convert.ToInt32(divisionId);
                 
                 await _repoApprovalDetail.UpdateAsync(approvalDetail);
                 return RedirectToAction("Index");
@@ -753,6 +791,7 @@ namespace Noc_App.Controllers
                 };
                 List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
                 recommendations = _repoRecommendation.GetAll().Where(x=>x.Code!="NA").ToList();
+                List<DivisionDetails> divs = new List<DivisionDetails>();
                 ForwardApplicationViewModel model = (from g in _repo.GetAll()
                                                       //join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
                                                       //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
@@ -777,6 +816,9 @@ namespace Noc_App.Controllers
                                                           IsUnderMasterPlan=g.IsUnderMasterPlan,
                                                           Recommendations = recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
                                                           ConfirmUnderMasterPlan = new SelectList(tautologyDetails, "Value", "Text"),
+                                                          FromLocationId = Convert.ToInt32(LoggedInDivisionID()),
+                                                          ToLocationId = approvalOfficer == null ? Convert.ToInt32(LoggedInDivisionID()) : approvalOfficer.FromLocationId,
+                                                          Divisions = new SelectList(divs, "Id", "Name"),
                                                           Officers = officerDetail!=null?officerDetail.Count()>0? new SelectList(officerDetail, "UserId", "UserName"):null:null,
                                                           LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                                                       }).FirstOrDefault();
@@ -1006,6 +1048,26 @@ namespace Noc_App.Controllers
                 model.IsForwarded = grant.IsForwarded;
                 model.TypeOfWidth = typeofwidth.Id;
                 model.Officers = new SelectList(officerDetails, "UserId", "UserName");
+                string ErrorMessage = string.Empty;
+                model.FromLocationId = Convert.ToInt32(LoggedInDivisionID());
+                model.ToLocationId = approvalOfficer == null ? Convert.ToInt32(LoggedInDivisionID()) : approvalOfficer.FromLocationId;
+                if (forwardedRole == "EXECUTIVE ENGINEER" || forwardedRole == "JUNIOR ENGINEER" || forwardedRole == "SUB DIVISIONAL OFFICER" || forwardedRole == "CIRCLE OFFICER" || forwardedRole == "DWS,CIRCLE OFFICER")
+                {
+                    List<DivisionDetails> UserRoleLocation = await GetOfficerLocations(LoggedInDivisionID(), forwardedRole, model.SelectedOfficerId);
+                    if (model.SelectedDivisionId == null || model.SelectedDivisionId == "" || model.SelectedDivisionId == "0")
+                    {
+                        model.Divisions = new SelectList(UserRoleLocation, "Id", "Name");
+                        ErrorMessage = $"Please select division";
+                        ModelState.AddModelError("", ErrorMessage);
+
+                        return View(model);
+                    }
+                    else
+                    {
+
+                        model.Divisions = new SelectList(UserRoleLocation, "Id", "Name",model.SelectedDivisionId);
+                    }
+                }
                 GrantApprovalDetail approvalDetail = new GrantApprovalDetail
                 {
                     GrantID = grant.Id,
@@ -1019,7 +1081,9 @@ namespace Noc_App.Controllers
                     ProcessedToUser = forwardedUser,
                     ProcessedToName=officerDetail.UserName,                    
                     RecommendationID = role == "EXECUTIVE ENGINEER" && model.SelectedRecommendationId==0?3: model.SelectedRecommendationId,
-                    Remarks=model.Remarks
+                    Remarks=model.Remarks,
+                    FromLocationId= model.FromLocationId,
+                    ToLocationId= Convert.ToInt32(model.SelectedDivisionId)
                 };
                 List<RecommendationDetail> recommendations = new List<RecommendationDetail>();
                 recommendations = _repoRecommendation.GetAll().Where(x => x.Code != "NA").ToList();
@@ -1036,7 +1100,6 @@ namespace Noc_App.Controllers
                     if (!grant.IsUnderMasterPlan) {
                         if (model.SiteConditionReportFile != null && model.CatchmentAreaFile != null && model.DistanceFromCreekFile != null && model.GisOrDwsFile != null && model.CrossSectionOrCalculationFile != null && model.LSectionOfDrainFile != null)
                         {
-                            string ErrorMessage = string.Empty;
 
                             if (model.DrainWidth <= 0)
                             {
@@ -1667,6 +1730,16 @@ namespace Noc_App.Controllers
                 string role = roleName;
                 GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "R")).FirstOrDefault();
                 int rejectionLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
+
+                DivisionDetails grantdivision = (from d in _divisionRepo.GetAll()
+                                                 join s in _subDivisionRepo.GetAll() on d.Id equals s.DivisionId
+                                                 where s.Id == grant.SubDivisionId
+                                                 select new DivisionDetails
+                                                 {
+                                                     Id = d.Id,
+                                                     Name = d.Name
+                                                 })
+                                                .FirstOrDefault();
                 GrantApprovalDetail approvalDetail = new GrantApprovalDetail
                 {
                     GrantID = grant.Id,
@@ -1679,6 +1752,8 @@ namespace Noc_App.Controllers
                     ProcessedToRole = "",
                     ProcessedToUser = "",
                     ProcessedToName = "",
+                    FromLocationId=Convert.ToInt32(divisionId),
+                    ToLocationId= grantdivision.Id,
                     Remarks = model.Remarks,
                     RecommendationID=3
                 };
@@ -1830,8 +1905,18 @@ namespace Noc_App.Controllers
             var roleName = LoggedInRoleName();
 
             string role = roleName;
+            DivisionDetails grantdivision = (from d in _divisionRepo.GetAll()
+                                             join s in _subDivisionRepo.GetAll() on d.Id equals s.DivisionId
+                                             where s.Id == grant.SubDivisionId
+                                             select new DivisionDetails
+                                             {
+                                                 Id = d.Id,
+                                                 Name = d.Name
+                                             })
+                                               .FirstOrDefault();
             GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "A")).FirstOrDefault();
             int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
+           
             GrantApprovalDetail approvalDetail = new GrantApprovalDetail
             {
                 GrantID = grant.Id,
@@ -1843,7 +1928,9 @@ namespace Noc_App.Controllers
                 ProcessLevel = approvalLevel + 1,
                 ProcessedToRole = "",
                 ProcessedToUser = "",
-                RecommendationID=3
+                RecommendationID=3,
+                FromLocationId=Convert.ToInt32(divisionId),
+                ToLocationId=grantdivision.Id
             };
 
             await _repoApprovalDetail.CreateAsync(approvalDetail);
@@ -2583,98 +2670,44 @@ namespace Noc_App.Controllers
             return users;
 
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
-        [Obsolete]
-        //private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole, string subdivisionId, string divisionId)
-        //{
-        //    try
-        //    {
-        //        string baseUrl = "";
-        //        string salt = "";
-        //        string checksum = "";
-        //        string combinedPassword = "";
-        //        //officerRole = "Employee";
-        //        List<LoginResponseViewModel> users = FetchUser();
-        //        //if (subdivisionId != "0")
-        //        //{
-        //        //    subdivisionId = "114";
-        //        //    baseUrl = "https://wrdpbind.com/api/login5.php";
-        //        //    salt = "4RCHhk3cJ6OMGdEf";
-        //        //    checksum = "eUOwFCGMqKvJARC1tU6l4s34";
-        //        //    combinedPassword = officerRole + "|" + subdivisionId + "|" + checksum;
-        //        //}
-        //        //else
-        //        //{
-        //        //    divisionId = "114";
-        //        //    baseUrl = "https://wrdpbind.com/api/login6.php";
-        //        //    salt = "6WCHhk3cJ6OMGdRg";
-        //        //    checksum = "dTOwFCGMqKvJARC1tU6l4sv6";
-        //        //    combinedPassword = officerRole + "|" + divisionId + "|" + checksum;
-        //        //}
+        //[Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        //[Obsolete]
+        private async Task<LoginResponseViewModel> LoadUserDetailById(string userid)
+        {
+            string baseUrl = "https://wrdpbind.com/api/loginv7.php";
+            string salt = "7QCHhk5cJ6OMGfEE";
+            string checksum = "jOOwFCGMqKvJARC1tU6l8r77";
+            string combinedPassword = userid + "|" + checksum;
 
+            string plainText = combinedPassword;
 
-        //        //string plainText = combinedPassword;
+            var keyBytes = new byte[16];
+            var ivBytes = new byte[16];
 
-        //        //var keyBytes = new byte[16];
-        //        //var ivBytes = new byte[16];
+            string key = salt;
+            var keySalt = Encoding.UTF8.GetBytes(key);
+            var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
 
-        //        //string key = salt;
-        //        //var keySalt = Encoding.UTF8.GetBytes(key);
-        //        //var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
+            Array.Copy(pdb.GetBytes(16), keyBytes, 16);
+            Array.Copy(pdb.GetBytes(16), ivBytes, 16);
+            string encryptedString = NCC_encryptHelper(plainText, key, key);
 
-        //        //Array.Copy(pdb.GetBytes(16), keyBytes, 16);
-        //        //Array.Copy(pdb.GetBytes(16), ivBytes, 16);
-        //        //string encryptedString = NCC_encryptHelper(plainText, key, key);
-
-        //        //HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
-        //        //HttpClient client = new HttpClient(handler);
-        //        //client.BaseAddress = new Uri(baseUrl);
-        //        //client.DefaultRequestHeaders.Accept.Clear();
-        //        //client.DefaultRequestHeaders.Add("details", encryptedString);
-        //        //var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
-        //        //string resultContent = "["+tokenResponse1.Content.ReadAsStringAsync().Result.Replace("}{", "},{")+"]";
-        //        //List<OfficerResponseViewModel> list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OfficerResponseViewModel>>(resultContent);
-        //        List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
-        //        //officerRole = (await GetRoleName(officerRole)).RoleName;
-        //        UserRoleDetails officer = (await GetAppRoleName(officerRole));
-        //        officerRole = officer.RoleName;
-        //        List<LoginResponseViewModel> officers = new List<LoginResponseViewModel>();
-
-        //        officers = divisionId == "0" ? users.FindAll(x => x.user_info.Role.Contains(officerRole)) : users.FindAll(x => x.user_info.Role.Contains(officerRole) && x.user_info.DivisionID.ToString() == divisionId);
-        //        //user_info user = officers.user_info;
-        //        //user.Role = officerRole;
-        //        //user.RoleID = officer.Id.ToString();
-        //        foreach (LoginResponseViewModel user in officers)
-        //        {
-
-        //            OfficerResponseViewModel obj = new OfficerResponseViewModel
-        //            {
-        //                msg = "success",
-        //                Status = "200",
-        //                user_info = new officer_info { EmployeeId = user.user_info.EmpID, EmployeeName = user.user_info.Name, UserName = user.user_info.EmailId, email = user.user_info.EmailId, DeesignationName = user.user_info.Designation, DesignationID = user.user_info.DesignationID, DistrictId = user.user_info.DistrictID, DistrictName = user.user_info.District, DivisionID = user.user_info.DivisionID, DivisionName = user.user_info.Division, MobileNo = user.user_info.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.user_info.SubDivisionID, SubdivisionName = user.user_info.SubDivision }
-        //            };
-        //            list.Add(obj);
-        //        }
-        //        if (list.Count > 0)
-        //        {
-        //            if (list.FirstOrDefault().Status == "200")
-        //            {
-        //                //    //OfficerResponseViewModel list3 = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel>(resultContent);
-        //                //    //List<OfficerResponseViewModel> list = new List<OfficerResponseViewModel>();
-        //                //    //list.Add(list3);
-
-        //                return list;
-
-        //            }
-        //        }
-        //        return null;
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        return null;
-        //    }
-        //}
+            HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+            HttpClient client = new HttpClient(handler);
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
+            var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
+            string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
+            if (resultContent.Contains("An error has occurred"))
+            {
+                ModelState.AddModelError(string.Empty, "An error has occurred.");
+                return null;
+            }
+            LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
+            return root;
+            
+        }
         private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole, string subdivisionId, string divisionId, string circleid, string establishmentOfficeId)
         {
             try
@@ -2789,7 +2822,7 @@ namespace Noc_App.Controllers
         private async Task<List<OfficerDetails>> GetOfficerLastForwardedBy(string roleName, string lastForwardedByid)
         {
             try
-            {
+            {                
                 var role = roleName.Split(',');
                 List<OfficerResponseViewModel> officers = new List<OfficerResponseViewModel>();
                 for (int i = 0; i < role.Count(); i++)
@@ -2917,57 +2950,59 @@ namespace Noc_App.Controllers
                     }
                     else if (role[i] == "EXECUTIVE ENGINEER" || role[i] == "JUNIOR ENGINEER" || role[i] == "SUB DIVISIONAL OFFICER")
                     {
-                        var o = (await LoadOfficersAsync(role[i], subDivision, divisionId, circleid, establishmentOfficeId));
-                        var userdetail = (from ofi in o.AsEnumerable()
-                                          from divisId in ofi.user_info.DivisionID.Split(',').Select(id => id.Trim())
-                                          join ofice in _divisionRepo.GetAll().AsEnumerable() on divisId equals ofice.Id.ToString()
-                                          orderby ofi.user_info.UserName
-                                          select new officer_info
-                                          {
-                                              CurrentJoiningDate = ofi.user_info.CurrentJoiningDate,
-                                              DateOfRetirement = ofi.user_info.DateOfRetirement,
-                                              DesignationID = ofi.user_info.DesignationID,
-                                              DeesignationName = ofi.user_info.DeesignationName,
-                                              DistrictId = ofi.user_info.DistrictId,
-                                              DistrictName = ofi.user_info.DistrictName,
-                                              DivisionID = ofi.user_info.DivisionID,
-                                              DivisionName = ofi.user_info.DivisionName,
-                                              email = ofi.user_info.email,
-                                              EmployeeId = ofi.user_info.EmployeeId,
-                                              EmployeeName = ofi.user_info.EmployeeName,
-                                              IntialJoiningDate = ofi.user_info.IntialJoiningDate,
-                                              MobileNo = ofi.user_info.MobileNo,
-                                              RoleID = ofi.user_info.RoleID,
-                                              RoleName = ofi.user_info.RoleName,
-                                              SubdivisionId = ofi.user_info.SubdivisionId,
-                                              SubdivisionName = ofi.user_info.SubdivisionName,
-                                              UserName = ofi.user_info.UserName,
-                                              Status = ofi.user_info.Status
-
-                                          }).GroupBy(x => new
-                                          {
-                                              x.EmployeeId,
-                                              x.EmployeeName,
-                                              x.DesignationID,
-                                              x.DistrictId,
-                                              x.DivisionID,
-                                              x.SubdivisionId
-                                          })
-                                          .Select(g => g.First()).ToList();
                         List<OfficerResponseViewModel> officerDetails = new List<OfficerResponseViewModel>();
-                        foreach (var item in userdetail)
-                        {
-                            OfficerResponseViewModel obj = new OfficerResponseViewModel
+                        var o = (await LoadOfficersAsync(role[i], subDivision, divisionId, circleid, establishmentOfficeId));
+                        
+                            var userdetail = (from ofi in o.AsEnumerable()
+                                              from divisId in ofi.user_info.DivisionID.Split(',').Select(id => id.Trim())
+                                              join ofice in _divisionRepo.GetAll().AsEnumerable() on divisId equals ofice.Id.ToString()
+                                              orderby ofi.user_info.UserName
+                                              select new officer_info
+                                              {
+                                                  CurrentJoiningDate = ofi.user_info.CurrentJoiningDate,
+                                                  DateOfRetirement = ofi.user_info.DateOfRetirement,
+                                                  DesignationID = ofi.user_info.DesignationID,
+                                                  DeesignationName = ofi.user_info.DeesignationName,
+                                                  DistrictId = ofi.user_info.DistrictId,
+                                                  DistrictName = ofi.user_info.DistrictName,
+                                                  DivisionID = ofi.user_info.DivisionID,
+                                                  DivisionName = ofi.user_info.DivisionName,
+                                                  email = ofi.user_info.email,
+                                                  EmployeeId = ofi.user_info.EmployeeId,
+                                                  EmployeeName = ofi.user_info.EmployeeName,
+                                                  IntialJoiningDate = ofi.user_info.IntialJoiningDate,
+                                                  MobileNo = ofi.user_info.MobileNo,
+                                                  RoleID = ofi.user_info.RoleID,
+                                                  RoleName = ofi.user_info.RoleName,
+                                                  SubdivisionId = ofi.user_info.SubdivisionId,
+                                                  SubdivisionName = ofi.user_info.SubdivisionName,
+                                                  UserName = ofi.user_info.UserName,
+                                                  Status = ofi.user_info.Status
+
+                                              }).GroupBy(x => new
+                                              {
+                                                  x.EmployeeId,
+                                                  x.EmployeeName,
+                                                  x.DesignationID,
+                                                  x.DistrictId,
+                                                  x.DivisionID,
+                                                  x.SubdivisionId
+                                              })
+                                              .Select(g => g.First()).ToList();
+                            foreach (var item in userdetail)
                             {
-                                msg = "success",
-                                Status = "200",
-                                user_info = item
-                            };
-                            officerDetails.Add(obj);
-                        }
-                        officer = officerDetails == null ? null : officerDetails.ToList();
-                        if (officer != null)
-                            officers.AddRange(officer);
+                                OfficerResponseViewModel obj = new OfficerResponseViewModel
+                                {
+                                    msg = "success",
+                                    Status = "200",
+                                    user_info = item
+                                };
+                                officerDetails.Add(obj);
+                            }
+                            officer = officerDetails == null ? null : officerDetails.ToList();
+                            if (officer != null)
+                                officers.AddRange(officer);
+                   
                         //officer = o == null ? null : o.ToList();
                         //if (officer != null)
                         //    officers.AddRange(officer);
@@ -3075,6 +3110,179 @@ namespace Noc_App.Controllers
             {
                 return null;
             }
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Obsolete]
+        private async Task<List<DivisionDetails>> GetOfficerLocations(string divisionId, string roleName, string userid)
+        {
+            try
+            {
+                var role = roleName.Split(',');
+                List<DivisionDetails> RoleDetail = new List<DivisionDetails>();
+                for (int i = 0; i < role.Count(); i++)
+                {
+                    LoginResponseViewModel root = await LoadUserDetailById(userid);
+                    if (root.Status == "200")
+                    {
+                        if (role[i] == "EXECUTIVE ENGINEER" || role[i] == "JUNIOR ENGINEER" || role[i] == "SUB DIVISIONAL OFFICER")
+                        {
+                            if (divisionId != "0")
+                            {
+                                var LocationRoleDetail = (from rr in root.user_info.OfficeWiseRoleID
+                                                          join r in _userRolesRepository.GetAll().AsEnumerable() on rr.role equals r.Id
+                                                          join loc in _divisionRepo.GetAll().AsEnumerable() on rr.office_id equals loc.Id
+                                                          where r.AppRoleName == role[i] && loc.Id == Convert.ToInt32(divisionId)
+                                                          select new
+                                                          {
+                                                              Roles = r,
+                                                              Location = rr,
+                                                              Division = loc
+                                                          }
+                                                          ).ToList();
+                                if (LocationRoleDetail.Count > 0)
+                                {
+
+                                    RoleDetail = (from rr in LocationRoleDetail
+                                                  select new DivisionDetails
+                                                  {
+                                                      Id = rr.Division.Id,
+                                                      Name = rr.Division.Name,
+                                                      CreatedBy = rr.Roles.AppRoleName
+                                                  }
+                                                                ).ToList();
+                                }
+                            }
+                            else
+                            {
+                                var LocationRoleDetail = (from rr in root.user_info.OfficeWiseRoleID
+                                                          join r in _userRolesRepository.GetAll().AsEnumerable() on rr.role equals r.Id
+                                                          join loc in _divisionRepo.GetAll().AsEnumerable() on rr.office_id equals loc.Id
+                                                          where r.AppRoleName == role[i]
+                                                          select new
+                                                          {
+                                                              Roles = r,
+                                                              Location = rr,
+                                                              Division = loc
+                                                          }
+                                                           ).ToList();
+                                if (LocationRoleDetail.Count > 0)
+                                {
+
+                                    RoleDetail = (from rr in LocationRoleDetail
+                                                  select new DivisionDetails
+                                                  {
+                                                      Id = rr.Division.Id,
+                                                      Name = rr.Division.Name,
+                                                      CreatedBy = rr.Roles.AppRoleName
+                                                  }
+                                                                ).ToList();
+                                }
+                            }
+
+                        }
+                        else if(role[i] == "CIRCLE OFFICER")
+                        {
+                            var LocationRoleDetail = (from rr in root.user_info.OfficeWiseRoleID
+                                                      join r in _userRolesRepository.GetAll().AsEnumerable() on rr.role equals r.Id
+                                                      join c in _circleDivRepository.GetAll() on rr.office_id equals c.CircleId
+                                                      join loc in _divisionRepo.GetAll() on c.DivisionId equals loc.Id
+                                                      where r.AppRoleName == role[i] && loc.Id == Convert.ToInt32(divisionId)
+                                                      select new
+                                                      {
+                                                          Roles = r,
+                                                          Location = rr,
+                                                          Division = loc
+                                                      }
+                                                          ).ToList();
+                            if (LocationRoleDetail.Count > 0)
+                            {
+
+                                RoleDetail = (from rr in LocationRoleDetail
+                                              select new DivisionDetails
+                                              {
+                                                  Id = rr.Division.Id,
+                                                  Name = rr.Division.Name,
+                                                  CreatedBy = rr.Roles.AppRoleName
+                                              }
+                                                                ).ToList();
+                            }
+                        }
+                        else if (role[i] == "DWS" || role[i] == "EXECUTIVE ENGINEER HQ" || role[i] == "CHIEF ENGINEER HQ" || role[i] == "ADE" || role[i] == "DIRECTOR DRAINAGE" || role[i] == "PRINCIPAL SECRETARY" )
+                        {
+                            var LocationRoleDetail = (from rr in root.user_info.OfficeWiseRoleID
+                                                      join r in _userRolesRepository.GetAll().AsEnumerable() on rr.role equals r.Id
+                                                      join c in _establishOffRepository.GetAll() on rr.office_id equals c.Id
+                                                      where r.AppRoleName == role[i] //&& c.Id == Convert.ToInt32(divisionId)
+                                                      select new
+                                                      {
+                                                          Roles = r,
+                                                          Location = rr,
+                                                          Division = c
+                                                      }
+                                                          ).ToList();
+                            if (LocationRoleDetail.Count > 0)
+                            {
+
+                                RoleDetail = (from rr in LocationRoleDetail
+                                              select new DivisionDetails
+                                              {
+                                                  Id = rr.Division.Id,
+                                                  Name = rr.Division.Name,
+                                                  CreatedBy = rr.Roles.AppRoleName
+                                              }
+                                                                ).ToList();
+                            }
+                        }
+                        else
+                        {
+                            var LocationRoleDetail = (from rr in root.user_info.OfficeWiseRoleID
+                                                      join r in _userRolesRepository.GetAll().AsEnumerable() on rr.role equals r.Id
+                                                      where r.AppRoleName == role[i]
+                                                      select new
+                                                      {
+                                                          Roles = r,
+                                                          Location = rr
+                                                      }
+                                                          ).ToList();
+                            if (LocationRoleDetail.Count > 0)
+                            {
+
+                                RoleDetail = (from rr in LocationRoleDetail
+                                              select new DivisionDetails
+                                              {
+                                                  Id = 0,
+                                                  Name = "",
+                                                  CreatedBy = rr.Roles.AppRoleName
+                                              }
+                                                                 ).ToList();
+                            }
+                        }
+
+
+                    }
+                }
+                return RoleDetail;
+                
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        [HttpPost]
+        [Obsolete]
+        public async Task<IActionResult> GetOfficerLocation(string divisionId, string roleName, string userid)
+        {
+            var filtereddivisions = await GetOfficerLocations(divisionId,roleName,userid);
+            var result = filtereddivisions.Select(div => new
+            {
+                Id = div.Id,
+                Name = div.Name,
+                RoleName = div.CreatedBy // Sending the provided roleName in the JSON
+            });
+            return Json(result);
         }
         private string NCC_encryptHelper(string plainText, string key, string iv)
         {

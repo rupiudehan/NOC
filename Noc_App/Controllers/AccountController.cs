@@ -92,8 +92,8 @@ namespace Noc_App.Controllers
                 }
                 if (ModelState.IsValid)
                 {
-                    //if ((model.Email == "admin"))
-                    if (model.Email != "ExecutiveEngineer" && (model.Email == "xen" || model.Email == "jefaridkot" || model.Email == "sdofaridkot" || model.Email == "jemohali" || model.Email == "sdomohali" || model.Email == "xen2" || model.Email == "xenmohali" || model.Email == "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
+                    if ((model.Email == "admin"))
+                    //if (model.Email != "ExecutiveEngineer" && (model.Email == "xen" || model.Email == "jefaridkot" || model.Email == "sdofaridkot" || model.Email == "jemohali" || model.Email == "sdomohali" || model.Email == "xen2" || model.Email == "xenmohali" || model.Email == "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
                     {
                         LoginResponseViewModel root = FetchUser().Find(x => x.user_info.EmailId == model.Email && model.Password == "123");
                         if (root != null)
@@ -278,7 +278,19 @@ namespace Noc_App.Controllers
                             //    }
                             //}
 
-                            string divisionRolePairs = string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
+                            string divisionRolePairs = "";// string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
+                            foreach (var item in root.user_info.OfficeWiseRoleID)
+                            {
+                                if (item.role != 2)
+                                {
+
+                                    if(divisionRolePairs!="")
+                                    divisionRolePairs = divisionRolePairs + "," + item.office_id + "-" + item.role;
+                                    else
+                                        divisionRolePairs = item.office_id + "-" + item.role;
+                                }
+                            }
+                            
 
                             login.Roles = RoleDetail.Take(1).ToList();
                             login.Designation = root.user_info.Designation;

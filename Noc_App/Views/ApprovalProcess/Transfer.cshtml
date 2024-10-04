@@ -22,6 +22,7 @@
                         <div class="col-lg-3">
                             <div class="form-group">
                                 <input asp-for="ForwardToRole" type="hidden" id="ForwardToRole" />
+                                <input type="hidden" id="pageName" value="T" />
                                 <label asp-for="Name" class="control-label">Project</label>
                                 <input asp-for="Name" readonly class="form-control form-control-user" />
                                 <span asp-validation-for="Name" class="text-danger"></span>
@@ -107,6 +108,33 @@
                                 <span asp-validation-for="SelectedOfficerId" id="SelectedOfficerIdVal" class="text-danger"></span>
                             </div>
                         </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="SelectedDivisionId" class="control-label">Location</label>
+                                @if (Model.Divisions != null)
+                                {
+                                    @if (Model.Divisions.Count() > 0)
+                                    {
+                                        <select asp-for="SelectedDivisionId" id="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                }
+                                else
+                                {
+                                    <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                        <option value="">Select</option>
+                                    </select>
+                                }
+                                <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="row">
@@ -119,13 +147,26 @@
                         }
                         else
                         {
-                            <div class="col-lg-6">
+                            @if (Model.Divisions != null && Model.Divisions.Count() > 0)
+                            {
+                                <div class="col-lg-6">
 
-                                <button type="submit" class="btn btn-primary btn-user btn-block">Transfer</button>
-                            </div>
-                            <div class="col-lg-6">
-                                <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
-                            </div>
+                                    <button type="submit" id="btnForward" class="btn btn-primary btn-user btn-block">Transfer</button>
+                                </div>
+                                <div class="col-lg-6">
+                                    <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-lg-6">
+
+                                    <button type="submit" disabled id="btnForward" class="btn btn-primary btn-user btn-block">Transfer</button>
+                                </div>
+                                <div class="col-lg-6">
+                                    <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                </div>
+                            }
                         }
                     </div>
                 </form>

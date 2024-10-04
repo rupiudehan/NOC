@@ -18,5 +18,7 @@ namespace Noc_App.Models
         public string ToDesignationName { get; set; }
         public string Remarks { get; set; }
         public DateTime TransferedOn { get; set; } = DateTime.Now;
+        public int FromLocationId { get; set; }
+        public int ToLocationId { get; set; }
     }
 }

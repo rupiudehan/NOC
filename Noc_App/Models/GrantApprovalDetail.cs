@@ -26,5 +26,7 @@ namespace Noc_App.Models
         public int RecommendationID { get; set; }
         [ForeignKey(nameof(RecommendationID))]
         public RecommendationDetail RecommendationDetail { get; set; }
+        public int FromLocationId { get; set; }
+        public int ToLocationId { get; set; }
     }
 }

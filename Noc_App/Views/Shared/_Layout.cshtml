@@ -26,68 +26,83 @@
     string designation = role;
 
     var detail = surname.Split(',');
+    int count = 0;
     foreach (var claim in detail)
     {
         var cl = claim.Split('-');
-        DivisionDetails location = new DivisionDetails();
-        var roles = (from d in _userRolesRepository.GetAll().AsEnumerable()
-                     where d.Id.ToString() == cl[1].ToString()
-                     select new UserRoleDetails
+        if(cl.ToList().Count>1){
+            DivisionDetails location = new DivisionDetails();
+            var roles = (from d in _userRolesRepository.GetAll().AsEnumerable()
+                         where d.Id.ToString() == cl[1].ToString()
+                         select new UserRoleDetails
                              {
                                  Id = d.Id,
                                  AppRoleName = d.AppRoleName,
                                  RoleLevel = d.RoleLevel,
                                  RoleName = d.RoleName
                              }
-                      ).FirstOrDefault();
-        if (roles.AppRoleName == "CIRCLE OFFICER")
-        {
-            location = (from d in _divisionRepository.GetAll().ToList()
-                        join loc in _circleDivRepository.GetAll().ToList() on d.Id equals loc.DivisionId
-                        join r in _circleRepository.GetAll().ToList() on loc.CircleId equals r.Id
-                        where d.Id.ToString() == cl[0].ToString()
-                        select new DivisionDetails
-                                    {
-                                        Id = d.Id,
-                                        Name = d.Name + " (" + r.Name + ")"
-                                    }).FirstOrDefault();
+                          ).FirstOrDefault();
+            if (roles != null)
+            {
+                if (roles.AppRoleName == "CIRCLE OFFICER")
+                {
+                    location = (from d in _divisionRepository.GetAll().ToList()
+                                join loc in _circleDivRepository.GetAll().ToList() on d.Id equals loc.DivisionId
+                                join r in _circleRepository.GetAll().ToList() on loc.CircleId equals r.Id
+                                where d.Id.ToString() == cl[0].ToString()
+                                select new DivisionDetails
+                                        {
+                                            Id = d.Id,
+                                            Name = d.Name + " (" + r.Name + ")"
+                                        }).FirstOrDefault();
 
-        }
-        else if (roles.AppRoleName == "EXECUTIVE ENGINEER" || roles.AppRoleName == "Administrator" || roles.AppRoleName == "JUNIOR ENGINEER" || roles.AppRoleName == "SUB DIVISIONAL OFFICER")
-        {
-            location = (from d in _divisionRepository.GetAll().AsEnumerable()
-                        where d.Id.ToString() == cl[0].ToString()
-                        select new DivisionDetails
-                                {
-                                    Id = d.Id,
-                                    Name = d.Name
-                                }
-                     ).FirstOrDefault();
+                }
+                else if (roles.AppRoleName == "EXECUTIVE ENGINEER" || roles.AppRoleName == "Administrator" || roles.AppRoleName == "JUNIOR ENGINEER" || roles.AppRoleName == "SUB DIVISIONAL OFFICER")
+                {
+                    location = (from d in _divisionRepository.GetAll().AsEnumerable()
+                                where d.Id.ToString() == cl[0].ToString()
+                                select new DivisionDetails
+                                        {
+                                            Id = d.Id,
+                                            Name = d.Name
+                                        }
+                             ).FirstOrDefault();
+                }
+                else
+                {
+                    location = (from d in _estabOfficeRepository.GetAll().ToList()
+                                where d.Id.ToString() == cl[0].ToString()
+                                select new DivisionDetails
+                                        {
+                                            Id = d.Id,
+                                            Name = d.Name
+                                        }
+                             ).FirstOrDefault();
+                }
+
+                if (location != null)
+                {
+                    UserMenuBlockViewModel obj = new UserMenuBlockViewModel
+                            {
+                                Name = name,
+                                Designation = roles.AppRoleName,
+                                Location = location.Name,
+                                UserId = userId,
+                                IsActive = div == location.Id.ToString() && roles.Id.ToString() == cl[1],
+                                RoleID = cl[1],
+                                DivisionID = location.Id.ToString()
+                            };
+                    menuItems.Add(obj);
+                }
+            }
+            
         }
         else
         {
-            location = (from d in _estabOfficeRepository.GetAll().ToList()
-                        where d.Id.ToString() == cl[0].ToString()
-                        select new DivisionDetails
-                                {
-                                    Id = d.Id,
-                                    Name = d.Name
-                                }
-                     ).FirstOrDefault();
+            <script>
+                window.location.href = '@Url.Action("Login", "Account")';
+            </script>
         }
-       
-
-        UserMenuBlockViewModel obj = new UserMenuBlockViewModel
-                {
-                    Name = name,
-                    Designation = roles.AppRoleName,
-                    Location = location.Name,
-                    UserId = userId,
-                    IsActive = div == location.Id.ToString() && roles.Id.ToString() == roleid,
-                    RoleID = roleid,
-                    DivisionID=location.Id.ToString()
-                };
-        menuItems.Add(obj);
     }
 
     // Create menu items and make them available to the layout
