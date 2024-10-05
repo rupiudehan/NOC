@@ -563,6 +563,22 @@ namespace Noc_App.Controllers
                                     RoleId=u.Id.ToString(),
                                     UserName = officer.user_info.EmployeeName+"("+ officer.user_info.DeesignationName + ")"
                                 }).FirstOrDefault();
+                List<OfficerDetails> officerDetail = new List<OfficerDetails>();
+                officerDetail = await GetOfficer("0", "JUNIOR ENGINEER", "0", "0", "0");//,SUB DIVISIONAL OFFICER
+                model.Officers = officerDetail.Count > 0 ? new SelectList(officerDetail, "UserId", "UserName") : null;
+                List<DivisionDetails> UserRoleLocation = await GetOfficerLocations(LoggedInDivisionID(), "JUNIOR ENGINEER", model.SelectedOfficerId);
+                if (model.SelectedDivisionId == null || model.SelectedDivisionId == "" || model.SelectedDivisionId == "0")
+                {
+                    model.Divisions = new SelectList(UserRoleLocation, "Id", "Name");
+                    ModelState.AddModelError("", $"Please select division");
+
+                    return View(model);
+                }
+                else
+                {
+
+                    model.Divisions = new SelectList(UserRoleLocation, "Id", "Name", model.SelectedDivisionId);
+                }
                 //var forwardedUser = await _userManager.FindByIdAsync(model.SelectedOfficerId);
                 //var forwardedRole = (await _userManager.GetRolesAsync(forwardedUser)).FirstOrDefault();
                 //int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
@@ -601,9 +617,10 @@ namespace Noc_App.Controllers
                 approvalDetail.ProcessedByRole = role;
                 approvalDetail.ProcessedToRole = userRole.RoleName;
                 approvalDetail.ProcessedToUser = userRole.EmployeeId;
-                approvalDetail.ProcessedByName = userRole.UserName;
+                approvalDetail.ProcessedToName = userRole.UserName;
                 approvalDetail.UpdatedOn = DateTime.Now;
                 approvalDetail.FromLocationId = Convert.ToInt32(divisionId);
+                approvalDetail.ToLocationId = Convert.ToInt32(model.SelectedDivisionId);
                 
                 await _repoApprovalDetail.UpdateAsync(approvalDetail);
                 return RedirectToAction("Index");
@@ -2763,7 +2780,7 @@ namespace Noc_App.Controllers
                             //                                       .Any(id => id.Trim() == circleId)) : establishmentOfficeId != "0" ? list.user_info.FindAll(x => x.RoleName.Split(',').Any(r => r.Trim() == officerRole) && x.DivisionID.Split(',')
                             //                                       .Any(id => id.Trim() == establishmentOfficeId)) : divisionId == "0" ? list.user_info.FindAll(x => x.RoleName.Split(',').Any(r => r.Trim() == officerRole)) : list.user_info.FindAll(x => x.RoleName.Split(',').Any(r => r.Trim() == officerRole) && x.DivisionID.Split(',')
                             //                                       .Any(id => id.Trim() == divisionId));
-                            officers = list.user_info.FindAll(x => x.RoleName.Contains(officerRole));
+                            officers = list.user_info.FindAll(x => x.RoleName.Contains(officerRole) && x.DivisionID != null& x.DivisionID!="");
 
                             foreach (officer_info user in officers)
                             {

@@ -15,7 +15,8 @@
                 <h6 class="m-0 font-weight-bold text-primary">Transfer</h6>
             </div>
             <div class="card-body">
-                <form class="user" asp-action="Transfer" method="post">
+                <div id="divLoader" style="display:none;text-align:center"> <img src="~/images/ajax-loader.gif" alt="Loader" /> </div>
+                <form class="user barcontainer" asp-action="Transfer" method="post">
                     <input type="hidden" asp-for="id" />
                     <input type="hidden" asp-for="ApprovalId" />
                     <div class="row">
