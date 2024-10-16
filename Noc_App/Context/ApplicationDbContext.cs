@@ -56,6 +56,7 @@ namespace Noc_App.Context
             modelBuilder.Entity<DashboardPendencyViewModel>().HasNoKey();
             modelBuilder.Entity<ReportApplicationCountViewModel>().HasNoKey();
             modelBuilder.Entity<ProcessedApplicationsViewModel>().HasNoKey();
+            modelBuilder.Entity<TransferedApplicationsViewModel>().HasNoKey();
             modelBuilder.Entity<ReportApplicationsViewModel>().HasNoKey();
 
             modelBuilder.Entity<EstablishmentOfficeDetails>().HasData(

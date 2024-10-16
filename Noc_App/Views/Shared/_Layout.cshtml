@@ -258,6 +258,16 @@
                 </li>
                 <hr class="sidebar-divider">
             }
+            @if (User.IsInRole("EXECUTIVE ENGINEER"))
+            {
+                <li class="nav-item @(ViewContext.RouteData.Values["controller"].ToString() == "ApprovalProcess" && ViewContext.RouteData.Values["action"].ToString() == "TransferedApplications" ? "active" : "")">
+                    <a class="nav-link" asp-action="TransferedApplications" asp-controller="ApprovalProcess">
+                        <i class="fas fa-fw fa-file"></i>
+                        <span>Transfered Applications</span>
+                    </a>
+                </li>
+                <hr class="sidebar-divider">
+            }
         </ul>
         <!-- End of Sidebar -->
         <!-- Content Wrapper -->

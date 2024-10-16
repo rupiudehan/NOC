@@ -9,7 +9,7 @@ function drawMultSeries() {
     }
     var options = {
         title: 'Pendency Role Wise ',
-        width: 3000,
+        width: 1200,
         height: 700,
         responsive: true,
         hAxis: {
@@ -220,8 +220,9 @@ function LoadReport(DivisionId, subdivisionId, roleName) {
                     // if (count == 1) { $('#dvBranch').text("Branch: " + value.BranchName); $('#dvLevel').text('Level: ' + LevelType); $('#dvRule').text('Under: ' + ActionName); }
                     tr += '<td>' + value.applicationID + '</td>';
                     tr += '<td>' + value.applyDate + '</td>';
-                    tr += '<td>' + value.name + '</td>';
+                    tr += '<td>' + value.projectName + '</td>';
                     tr += '<td>' + value.division + '</td>';
+                    tr += '<td><a href="/Home/ViewApplication/' + value.applicationID +'" class="btn btn-primary" target="_blank">View</a></td>'; 
                     tr += '<td>' + value.processedToRole + '</td>';
                     tr += '<td>' + pendency + '</td>';
                     tr += '</tr>';
@@ -287,6 +288,7 @@ function LoadReportApplicationsP() {
                             <th>Date Of Application</th>
                             <th>Project Name</th>
                             <th>Division</th>
+                            <th>View</th>
                             <th>Status</th>
                             <th>Pending With</th>
                             <th>Pending for (No. of Days)</th>
@@ -304,6 +306,7 @@ function LoadReportApplicationsP() {
                     tr += '<td>' + applydate + '</td>';
                     tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
+                    tr += '<td><a href="/Home/ViewApplication/' + value.applicationID + '" class="btn btn-primary" target="_blank">View</a></td>'; 
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + name + '</td>';
                     tr += '<td>' + pendency + '</td>';
@@ -364,6 +367,7 @@ function LoadReportApplicationsA() {
                             <th>Date Of Application</th>
                             <th>Project Name</th>
                             <th>Division</th>
+                            <th>View</th>
                             <th>Status</th>
                             <th>Processed On</th>
                         </tr>`;
@@ -380,6 +384,7 @@ function LoadReportApplicationsA() {
                     tr += '<td>' + applydate + '</td>';
                     tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
+                    tr += '<td><a href="/Home/ViewApplication/' + value.applicationID + '" class="btn btn-primary" target="_blank">View</a></td>'; 
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + processedOn + '</td>';
                     tr += '</tr>';
@@ -439,6 +444,7 @@ function LoadReportApplicationsR() {
                             <th>Date Of Application</th>
                             <th>Project Name</th>
                             <th>Division</th>
+                            <th>View</th>
                             <th>Status</th>
                             <th>Processed On</th>
                         </tr>`;
@@ -455,6 +461,7 @@ function LoadReportApplicationsR() {
                     tr += '<td>' + applydate + '</td>';
                     tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
+                    tr += '<td><a href="/Home/ViewApplication/' + value.applicationID + '" class="btn btn-primary" target="_blank">View</a></td>'; 
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + processedOn + '</td>';
                     tr += '</tr>';
@@ -507,7 +514,6 @@ function LoadReportApplicationsT() {
         },
         success: function (r) {
             if (r != null) {
-                console.log(JSON.stringify(r))
                 var count = 1; var len = r.length;
                 var thr = `<tr>
                             <th>#</th>
@@ -515,6 +521,7 @@ function LoadReportApplicationsT() {
                             <th>Date Of Application</th>
                             <th>Project Name</th>
                             <th>Division</th>
+                            <th>View</th>
                             <th>Status</th>
                             <th>Pending With</th>
                             <th>Pending for (No. of Days)</th>
@@ -533,6 +540,7 @@ function LoadReportApplicationsT() {
                     tr += '<td>' + applydate + '</td>';
                     tr += '<td>' + value.name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
+                    tr += '<td><a href="/Home/ViewApplication/' + value.applicationID + '" class="btn btn-primary" target="_blank">View</a></td>'; 
                     tr += '<td>' + status + '</td>';
                     tr += '<td>' + name + '</td>';
                     tr += '<td>' + pendency + '</td>';

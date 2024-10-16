@@ -93,6 +93,7 @@ builder.Services.AddScoped<IRepository<CircleDivisionMapping>, Repository<Circle
 builder.Services.AddScoped<IRepository<EstablishmentOfficeDetails>, Repository<EstablishmentOfficeDetails>>();
 builder.Services.AddScoped<IRepository<ProcessedApplicationsViewModel>, Repository<ProcessedApplicationsViewModel>>();
 builder.Services.AddScoped<IRepository<ReportApplicationsViewModel>, Repository<ReportApplicationsViewModel>>();
+builder.Services.AddScoped<IRepository<TransferedApplicationsViewModel>, Repository<TransferedApplicationsViewModel>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

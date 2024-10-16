@@ -4,10 +4,19 @@
     ViewData["Title"] = "Dashboard";
 }
 <style>
+    svg{
+        width:1240px;
+    }
     .dataTables_wrapper .dt-buttons {
         float: initial;
         /* margin-left:5px; */
     }
+    .modal-xlg {
+  width: 90%;
+        margin-top: 1.7rem;
+        min-width: 1200px
+}
+}
 </style>
 <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
 
@@ -176,7 +185,7 @@
 }
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xlg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <input type="hidden" id="id" name="id" />
@@ -194,6 +203,7 @@
                             <th>Date Of Application</th>
                             <th>Project Name</th>
                             <th>Division</th>
+                            <th>View</th>
                             <th>Pending With</th>
                             <th>Delay (No. of Days)</th>
                         </tr>
@@ -210,7 +220,7 @@
 </div>
 <div class="modal fade" id="myTotalModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xlg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <input type="hidden" id="id" name="id" />
@@ -246,7 +256,7 @@
 </div>
 <div class="modal fade" id="myApprovedModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabelA"
      aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xlg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <input type="hidden" id="id" name="id" />
@@ -280,7 +290,7 @@
 </div>
 <div class="modal fade" id="myRejectedModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabelR"
      aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xlg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <input type="hidden" id="id" name="id" />
@@ -314,7 +324,7 @@
 </div>
 <div class="modal fade" id="myPendingModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabelP"
      aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xlg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <input type="hidden" id="id" name="id" />

@@ -1,0 +1,144 @@
+﻿@model IEnumerable<TransferedApplicationsViewModel>;
+@{
+    ViewBag.Title = "Transfered Applications";
+}
+
+<h1 class="h3 mb-4 text-gray-800">Transfered Applications</h1>
+<div class="row">
+
+    <div class="col-lg-12">
+        <div id="divLoader" style="display:none;text-align:center"> <img src="~/images/ajax-loader.gif" alt="Loader" /> </div>
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4 drpd">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Transfered Applications</h6>
+            </div>
+            <div class="card-body">
+                @if (Model != null && Model.Count() > 0)
+                {
+                    @if (User.Identity.IsAuthenticated && (!User.IsInRole("Administrator")))
+                    {
+                        <div class="row">
+                            <div class="table-responsive" id="dvTable">
+                                @{
+                                    int count = 1;
+                                }
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Application Id</th>
+                                            <th>Date of Application</th>
+                                            <th>Project Name</th>
+                                            <th>Location Details</th>
+                                            <th>Transfered To</th>
+                                            <th>Transfered On</th>
+                                            <th>Transfered To Location</th>
+                                            <th>View</th>
+                                            <th>Currently With</th>
+                                            <th>Current Status</th>
+                                            <th>Currently Processed On</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody">
+                                        @foreach (TransferedApplicationsViewModel data in Model)
+                                        {
+                                            <tr>
+                                                <td>@count</td>
+                                                <td>@data.ApplicationID</td>
+                                                <td>@string.Format("{0:dd/MM/yyyy}", data.CreatedOn)</td>
+                                                <td>@data.Name</td>
+                                                <td>@data.LocationDetails </td>
+                                                <td>@data.ProcessedToName  - @data.ProcessedToRole </td>
+                                                <td>@string.Format("{0:dd/MM/yyyy HH:mm tt}", data.ProcessedOn) </td>
+                                                <td>@data.tolocationname</td>
+                                                <td>
+                                                    <a asp-action="ViewTransferedApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
+                                                </td>
+                                                <td>@data.CurrentProcessedToName - @data.CurrentProcessedToRole </td>
+                                                <td>
+                                                    @if (data.isrejected)
+                                                    {
+                                                        @:Rejected
+                                                    }
+                                                    else if (data.isapproved)
+                                                    {
+                                                        @:Certificate Issued
+                                                    }
+                                                    else if (data.isshortfall)
+                                                    {
+                                                        @:Shortfall Reported
+                                                    }
+                                                    @*    else if (data.isshortfallcompleted)
+                                        {
+                                        @:Application Modified for Reported Shortfall
+                                        } *@
+                                                    else if (data.ispending && data.IsForwarded)
+                                                    {
+                                                        @:In Process
+                                                    }
+                                                </td>
+                                                <td>@string.Format("{0:dd/MM/yyyy HH:mm tt}", data.CurrentProcessedOn) </td>
+                                            </tr>
+                                            {
+                                                count = count + 1;
+                                            }
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    @:No Record Found
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            @* <form method="post" asp-action="Reject" asp-controller="ApprovalProcess"> *@
+            <div class="modal-header">
+                <input type="hidden" id="id" name="id" />
+                <h5 class="modal-title" id="exampleModalLabel"><label id="dvBranch">Recommendations</label></h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body" style="max-height: 500px;overflow-y:scroll;">
+                <table class="table table-bordered" id="tblRecommendation" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Application ID</th>
+                            <th>Recommendation</th>
+                            <th>Remarks</th>
+                            <th>Recommended By</th>
+                            <th>Recommended By Designation</th>
+                            <th>Processed To</th>
+                            <th>Processed To Designation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbRecommendation">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>
+                @* <button class="btn btn-danger" type="submit">Reject</button> *@
+                @* <a class="btn btn-primary" asp-action="Logout" asp-controller="Account">Logout</a> *@
+            </div>
+            @* </form> *@
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @* <script src="~/modulejs/approvallist.js"></script> *@
+    <script src="~/modulejs/datatabledownload.js"></script>
+}
