@@ -46,15 +46,35 @@
             {
                 if (roles.AppRoleName == "CIRCLE OFFICER")
                 {
-                    location = (from d in _divisionRepository.GetAll().ToList()
+                    List<UserMenuBlockViewModel> objList = (from d in _divisionRepository.GetAll().ToList()
                                 join loc in _circleDivRepository.GetAll().ToList() on d.Id equals loc.DivisionId
                                 join r in _circleRepository.GetAll().ToList() on loc.CircleId equals r.Id
-                                where d.Id.ToString() == cl[0].ToString()
-                                select new DivisionDetails
+                                where r.Id.ToString() == cl[0].ToString()
+                                        select new UserMenuBlockViewModel
                                         {
-                                            Id = d.Id,
-                                            Name = d.Name + " (" + r.Name + ")"
-                                        }).FirstOrDefault();
+                                            Name = name,
+                                            Designation = roles.AppRoleName,
+                                            Location = d.Name + " (" + r.Name + ")",
+                                            UserId = userId,
+                                            IsActive = div == d.Id.ToString() && roles.Id.ToString() == cl[1],
+                                            RoleID = cl[1],
+                                            DivisionID = d.Id.ToString()
+                                        }).ToList();
+                    foreach (var item in objList)
+                    {
+                        UserMenuBlockViewModel obj = new UserMenuBlockViewModel
+                                {
+                                    Name = item.Name,
+                                    Designation = item.Designation,
+                                    Location = item.Location,
+                                    UserId = item.UserId,
+                                    IsActive = item.IsActive,
+                                    RoleID = item.RoleID,
+                                    DivisionID = item.DivisionID
+                                };
+                        menuItems.Add(obj);
+                    }
+                    
 
                 }
                 else if (roles.AppRoleName == "EXECUTIVE ENGINEER" || roles.AppRoleName == "Administrator" || roles.AppRoleName == "JUNIOR ENGINEER" || roles.AppRoleName == "SUB DIVISIONAL OFFICER")
@@ -67,6 +87,21 @@
                                             Name = d.Name
                                         }
                              ).FirstOrDefault();
+
+                    if (location != null)
+                    {
+                        UserMenuBlockViewModel obj = new UserMenuBlockViewModel
+                                {
+                                    Name = name,
+                                    Designation = roles.AppRoleName,
+                                    Location = location.Name,
+                                    UserId = userId,
+                                    IsActive = div == location.Id.ToString() && roles.Id.ToString() == cl[1],
+                                    RoleID = cl[1],
+                                    DivisionID = location.Id.ToString()
+                                };
+                        menuItems.Add(obj);
+                    }
                 }
                 else
                 {
@@ -78,21 +113,21 @@
                                             Name = d.Name
                                         }
                              ).FirstOrDefault();
-                }
 
-                if (location != null)
-                {
-                    UserMenuBlockViewModel obj = new UserMenuBlockViewModel
-                            {
-                                Name = name,
-                                Designation = roles.AppRoleName,
-                                Location = location.Name,
-                                UserId = userId,
-                                IsActive = div == location.Id.ToString() && roles.Id.ToString() == cl[1],
-                                RoleID = cl[1],
-                                DivisionID = location.Id.ToString()
-                            };
-                    menuItems.Add(obj);
+                    if (location != null)
+                    {
+                        UserMenuBlockViewModel obj = new UserMenuBlockViewModel
+                                {
+                                    Name = name,
+                                    Designation = roles.AppRoleName,
+                                    Location = location.Name,
+                                    UserId = userId,
+                                    IsActive = div == location.Id.ToString() && roles.Id.ToString() == cl[1],
+                                    RoleID = cl[1],
+                                    DivisionID = location.Id.ToString()
+                                };
+                        menuItems.Add(obj);
+                    }
                 }
             }
             
