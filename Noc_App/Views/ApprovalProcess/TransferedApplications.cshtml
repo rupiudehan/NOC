@@ -55,7 +55,15 @@
                                                 <td>
                                                     <a asp-action="ViewTransferedApplication" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-primary">View</a>
                                                 </td>
-                                                <td>@data.CurrentProcessedToName - @data.CurrentProcessedToRole </td>
+                                                <td>
+                                                    @if (data.CurrentProcessedToRole == null || data.CurrentProcessedToRole == "")
+                                                    {
+                                                        @:Executive Engineer
+                                                    }
+                                                    else{
+                                                        @data.CurrentProcessedToName @:- @data.CurrentProcessedToRole
+                                                    }
+                                                </td>
                                                 <td>
                                                     @if (data.isrejected)
                                                     {
@@ -77,8 +85,14 @@
                                                     {
                                                         @:In Process
                                                     }
+                                                    else
+                                                    {
+                                                        @:Unprocessed
+                                                    }
                                                 </td>
-                                                <td>@string.Format("{0:dd/MM/yyyy HH:mm tt}", data.CurrentProcessedOn) </td>
+                                                <td>
+                                                    @string.Format("{0:dd/MM/yyyy HH:mm tt}", data.CurrentProcessedOn)
+                                                    </td>
                                             </tr>
                                             {
                                                 count = count + 1;
