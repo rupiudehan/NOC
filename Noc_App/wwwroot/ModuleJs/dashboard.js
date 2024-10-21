@@ -295,8 +295,11 @@ function LoadReportApplicationsP() {
                         </tr>`;
                 thead.html(thr);
                 $.each(r, function (key, value) {
-                    var status =  value.isshortfall == true ?'Reverted to Applicant Due To Discrepency':value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
-                    var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
+                    var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' && value.isTransfered == '1' ? 'Transfered' : value.processedLevel == '0' && value.isTransfered == '0' ? 'Unprocessed' : 'In Process';
+                    var name = value.processedLevel == '0' ? value.isTransfered == '1' ? 'EXECUTIVE ENGINEER' + (value.toLocation == null ? '' : ' - ' + value.toLocation) : 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole) + (value.toLocation == null ? '' : ' - ' + value.toLocation);
+
+                    //var status =  value.isshortfall == true ?'Reverted to Applicant Due To Discrepency':value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
+                    //var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
                     var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
                     var applydate = formatOnlyDate(value.createdOn);
                     var pendency = value.pendency < 0 ? '0' : value.pendency;
@@ -374,15 +377,17 @@ function LoadReportApplicationsA() {
 
                 thead.html(thr);
                 $.each(r, function (key, value) {
+                    var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' && value.isTransfered == '1' ? 'Transfered' : value.processedLevel == '0' && value.isTransfered == '0' ? 'Unprocessed' : 'In Process';
+                    var name = value.processedLevel == '0' ? value.isTransfered == '1' ? 'EXECUTIVE ENGINEER' + (value.toLocation == null ? '' : ' - ' + value.toLocation) : 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole) + (value.toLocation == null ? '' : ' - ' + value.toLocation);
 
-                    var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : 'In Process';
+                    //var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : 'In Process';
                     var applydate = formatOnlyDate(value.createdOn);
                     var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
                     var tr = '<tr>';
                     tr += '<td>' + count + '</td>';
                     tr += '<td>' + value.applicationID + '</td>';
                     tr += '<td>' + applydate + '</td>';
-                    tr += '<td>' + value.name + '</td>';
+                    tr += '<td>' + name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
                     tr += '<td><a href="/Home/ViewApplication/' + value.applicationID + '" class="btn btn-primary" target="_blank">View</a></td>'; 
                     tr += '<td>' + status + '</td>';
@@ -452,14 +457,17 @@ function LoadReportApplicationsR() {
                 thead.html(thr);
                 $.each(r, function (key, value) {
 
-                    var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : 'In Process';
+                    // var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : 'In Process';
+                    var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' && value.isTransfered == '1' ? 'Transfered' : value.processedLevel == '0' && value.isTransfered == '0' ? 'Unprocessed' : 'In Process';
+                    var name = value.processedLevel == '0' ? value.isTransfered == '1' ? 'EXECUTIVE ENGINEER' + (value.toLocation == null ? '' : ' - ' + value.toLocation) : 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole) + (value.toLocation == null ? '' : ' - ' + value.toLocation);
+
                     var applydate = formatOnlyDate(value.createdOn);
                     var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
                     var tr = '<tr>';
                     tr += '<td>' + count + '</td>';
                     tr += '<td>' + value.applicationID + '</td>';
                     tr += '<td>' + applydate + '</td>';
-                    tr += '<td>' + value.name + '</td>';
+                    tr += '<td>' + name + '</td>';
                     tr += '<td>' + value.divisionName + '</td>';
                     tr += '<td><a href="/Home/ViewApplication/' + value.applicationID + '" class="btn btn-primary" target="_blank">View</a></td>'; 
                     tr += '<td>' + status + '</td>';
@@ -529,8 +537,10 @@ function LoadReportApplicationsT() {
                         </tr>`;
                 thead.html(thr);
                 $.each(r, function (key, value) {
-                    var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
-                    var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
+                    var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' && value.isTransfered == '1' ? 'Transfered' : value.processedLevel == '0' && value.isTransfered == '0' ?  'Unprocessed' : 'In Process';
+                    var name = value.processedLevel == '0' ? value.isTransfered == '1' ? 'EXECUTIVE ENGINEER' + (value.toLocation == null ? '' : ' - ' + value.toLocation) :'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole) + (value.toLocation == null ? '' : ' - ' + value.toLocation);
+                    //var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';
+                    //var name = value.processedLevel == '0' ? 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (value.currentProcessedByRole == null ? '' : value.currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (value.currentProcessedToRole == null ? '' : value.currentProcessedToRole);
                     var processedOn = value.currentProcessedOn == '1970-01-01T05:30:00+05:30' ? '' : formatDate(value.currentProcessedOn);
                     var applydate = formatOnlyDate(value.createdOn);
                     var pendency = value.pendency < 0 ? '0' : value.pendency;

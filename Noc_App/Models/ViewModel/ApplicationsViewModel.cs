@@ -47,5 +47,7 @@ namespace Noc_App.Models.ViewModel
         public string CurrentProcessedToName { get; set; }
         public string CurrentProcessedToRole { get; set; }
         public string DivisionName { get; set; }
+        public string ToLocation { get; set; }
+        public int IsTransfered { get; set; }
     }
 }

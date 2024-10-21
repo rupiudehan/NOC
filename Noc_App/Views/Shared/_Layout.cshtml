@@ -330,7 +330,30 @@
                             <li class="nav-item dropdown no-arrow" style="background-color: #79edc1;line-height: 1.2;">
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                     <div>
+                                    @if (User.Identity.IsAuthenticated && (User.IsInRole("Administrator")))
+                                    {
+                                        <div>
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <div><span class="mr-2 d-none d-lg-inline text-gray-900 small" style="font-weight: 800;font-size: medium;">Administrator</span></div>
+                                                    </td>
+                                                </tr>
+                                                @* <tr>
+                                                    <td>
+                                                        <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@role</span></div>
+                                                    </td>
+                                                </tr> *@
+                                                <tr>
+                                                    <td>
+                                                        <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">Drainage</span></div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    }
+                                    else{
+                                        <div>
                                          <table>
                                              <tr><td>
                                                     <div><span class="mr-2 d-none d-lg-inline text-gray-900 small" style="font-weight: 800;font-size: medium;">@User.Identity.Name</span></div>
@@ -346,6 +369,7 @@
                                             </tr>
                                         </table>
                                     </div>
+                                    }
                                     <img class="img-profile rounded-circle"
                                     src="~/img/undraw_profile.svg">
                                 </a>
@@ -360,53 +384,56 @@
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Settings
                                 </a> *@
-                                    @if (menuItems != null)
+                                    @if (!User.Identity.IsAuthenticated && (User.IsInRole("Administrator")))
                                     {
-                                        foreach (var item in menuItems)
+                                        @if (menuItems != null)
                                         {
+                                            foreach (var item in menuItems)
+                                            {
                                                 @* <a class="dropdown-item activediv" href="#"> *@
-                                            string cssClass = item.IsActive ? "dropdown-item dropdown-item2 activediv disabled" : "dropdown-item dropdown-item2 inactivediv";
+                                                string cssClass = item.IsActive ? "dropdown-item dropdown-item2 activediv disabled" : "dropdown-item dropdown-item2 inactivediv";
 
-                                            <a class="@cssClass" href="#" onclick="submitForm(this,event)">
-                                                <div>
-                                                    <table>
-                                                        <tr>
-                                                            <td>
-                                                                <form method="post" id="postDataForm" asp-action="SwitchRole" asp-controller="Account">
-                                                                    <input type="hidden" value="@item.RoleID" id="RoleID" name="RoleID" />
-                                                                    <input type="hidden" value="@item.DivisionID" id="DivisionID" name="DivisionID" />
-                                                                    <input type="hidden" value="@item.UserId" id="EmpID" name="EmpID" />
-                                                                    <input type="hidden" value="@item.Designation" id="Designation" name="Designation" />
-                                                                    <input type="hidden" value="@item.Name" id="EmployeeName" name="EmployeeName" />
-                                                                    <input type="hidden" value="@item.Location" id="DivisionNameN" name="DivisionNameN" />
-                                                                </form>
-                                                                <div>
-                                                                    <span class="mr-2 d-none d-lg-inline text-gray-900 small"><strong>@item.Name </strong></span>
+                                                <a class="@cssClass" href="#" onclick="submitForm(this,event)">
+                                                    <div>
+                                                        <table>
+                                                            <tr>
+                                                                <td>
+                                                                    <form method="post" id="postDataForm" asp-action="SwitchRole" asp-controller="Account">
+                                                                        <input type="hidden" value="@item.RoleID" id="RoleID" name="RoleID" />
+                                                                        <input type="hidden" value="@item.DivisionID" id="DivisionID" name="DivisionID" />
+                                                                        <input type="hidden" value="@item.UserId" id="EmpID" name="EmpID" />
+                                                                        <input type="hidden" value="@item.Designation" id="Designation" name="Designation" />
+                                                                        <input type="hidden" value="@item.Name" id="EmployeeName" name="EmployeeName" />
+                                                                        <input type="hidden" value="@item.Location" id="DivisionNameN" name="DivisionNameN" />
+                                                                    </form>
+                                                                    <div>
+                                                                        <span class="mr-2 d-none d-lg-inline text-gray-900 small"><strong>@item.Name </strong></span>
 
-                                           
 
-                                                                 </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@item.Designation</span></div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@item.Location</span></div>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </a>
+
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@item.Designation</span></div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <div><span class="mr-2 d-none d-lg-inline text-gray-900 small">@item.Location</span></div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </a>
+                                                <div class="dropdown-divider"></div>
+                                            }
+                                        }
+                                        else
+                                        {
                                             <div class="dropdown-divider"></div>
                                         }
-                                    }
-                                    else
-                                    {
-                                        <div class="dropdown-divider"></div>
                                     }
                                     <form method="post" asp-action="logout" asp-controller="account">
                                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
