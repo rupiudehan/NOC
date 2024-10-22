@@ -110,7 +110,7 @@ namespace Noc_App.Controllers
             _transferedAppDetailsRepo = transferedAppDetailsRepo;
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<ViewResult> Index()
         {
             try
@@ -126,7 +126,7 @@ namespace Noc_App.Controllers
                 role = (await GetAppRoleName(role)).AppRoleName;
                 List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
                 List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
-                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER HQ" || role== "EXECUTIVE ENGINEER HQ" || role== "DIRECTOR DRAINAGE" || role== "DWS" || role== "ADE")
+                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER DRAINAGE" || role== "EXECUTIVE ENGINEER DRAINAGE" || role== "DIRECTOR DRAINAGE" || role== "DWS" || role== "ADE")
                     divisionId = "0";
                 model =await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", divisionId, "'" +role+"'", "'" + userId + "'");
                 var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
@@ -148,7 +148,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<ViewResult> TransferedApplications()
         {
             try
@@ -159,7 +159,7 @@ namespace Noc_App.Controllers
                 var roleName = LoggedInRoleName();
                 string role = roleName;
                 role = (await GetAppRoleName(role)).AppRoleName;
-                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER HQ" || role == "EXECUTIVE ENGINEER HQ" || role == "DIRECTOR DRAINAGE" || role == "DWS" || role == "ADE")
+                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER DRAINAGE" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "DIRECTOR DRAINAGE" || role == "DWS" || role == "ADE")
                     divisionId = "0";
                 List<TransferedApplicationsViewModel> model = new List<TransferedApplicationsViewModel>();
 
@@ -174,7 +174,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<ViewResult> ProcessedApplications()
         {
             try
@@ -185,7 +185,7 @@ namespace Noc_App.Controllers
                 var roleName = LoggedInRoleName();
                 string role = roleName;
                 role = (await GetAppRoleName(role)).AppRoleName;
-                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER HQ" || role == "EXECUTIVE ENGINEER HQ" || role == "DIRECTOR DRAINAGE" || role == "DWS" || role == "ADE")
+                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER DRAINAGE" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "DIRECTOR DRAINAGE" || role == "DWS" || role == "ADE")
                     divisionId = "0";
                 List<ProcessedApplicationsViewModel> model = new List<ProcessedApplicationsViewModel>();
                
@@ -199,7 +199,7 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public IActionResult ShortFall(string id)
         {
@@ -218,7 +218,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ShortFall(GrantApprovalDetailShortfall model)
@@ -323,7 +323,7 @@ namespace Noc_App.Controllers
             }
             return View(model);
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         [Obsolete]
         public async Task<IActionResult> TransferFile(string id)
@@ -546,7 +546,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -662,7 +662,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         [HttpGet]
         public async Task<ViewResult> Forward(string Id)
@@ -786,7 +786,7 @@ namespace Noc_App.Controllers
                         }
                         break;
                     case "CIRCLE OFFICER":
-                        forwardToRole = "EXECUTIVE ENGINEER HQ";
+                        forwardToRole = "EXECUTIVE ENGINEER DRAINAGE";
                         divisionId = "0";
                         break;
                     case "DWS":
@@ -809,11 +809,11 @@ namespace Noc_App.Controllers
                         forwardToRole = "EXECUTIVE ENGINEER";
                         divisionId = "0";
                         break;
-                    case "EXECUTIVE ENGINEER HQ":
-                        forwardToRole = "CHIEF ENGINEER HQ";
+                    case "EXECUTIVE ENGINEER DRAINAGE":
+                        forwardToRole = "CHIEF ENGINEER DRAINAGE";
                         divisionId = "0";
                         break;
-                    case "CHIEF ENGINEER HQ":
+                    case "CHIEF ENGINEER DRAINAGE":
                         forwardToRole = "PRINCIPAL SECRETARY";
                         divisionId = "0";
                         break;
@@ -879,7 +879,7 @@ namespace Noc_App.Controllers
             }
 
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -1001,7 +1001,7 @@ namespace Noc_App.Controllers
                         }
                         break;
                     case "CIRCLE OFFICER":
-                        forwardToRole = "EXECUTIVE ENGINEER HQ";
+                        forwardToRole = "EXECUTIVE ENGINEER DRAINAGE";
                         divisionId = "0";
                         break;
                     case "DWS":
@@ -1025,11 +1025,11 @@ namespace Noc_App.Controllers
                         divisionId = "0";
                         grantid = grant.Id;
                         break;
-                    case "EXECUTIVE ENGINEER HQ":
-                        forwardToRole = "CHIEF ENGINEER HQ";
+                    case "EXECUTIVE ENGINEER DRAINAGE":
+                        forwardToRole = "CHIEF ENGINEER DRAINAGE";
                         divisionId = "0";
                         break;
-                    case "CHIEF ENGINEER HQ":
+                    case "CHIEF ENGINEER DRAINAGE":
                         forwardToRole = "PRINCIPAL SECRETARY";
                         divisionId = "0";
                         break;
@@ -1399,7 +1399,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public ViewResult EditApprovalDocuments(string grantId,long docId,long app)
         {
@@ -1466,7 +1466,7 @@ namespace Noc_App.Controllers
 
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -1718,7 +1718,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public IActionResult Reject(string id)
         {
@@ -1734,7 +1734,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(GrantApprovalDetailReject model)
@@ -1821,7 +1821,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CHIEF ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CHIEF ENGINEER DRAINAGE")]
         [HttpGet]
         public async Task<IActionResult> IssueNOC(string id)
         {
@@ -1879,7 +1879,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CHIEF ENGINEER HQ")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CHIEF ENGINEER DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -2028,7 +2028,7 @@ namespace Noc_App.Controllers
             return PhysicalFile(filePath, mimeType, fileName);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE,Administrator")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE,Administrator")]
         public async Task<IActionResult> ViewApplication(string Id)
         {
             try
@@ -2224,7 +2224,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<IActionResult> ViewProcessedApplication(string Id)
         {
             try
@@ -2437,7 +2437,7 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<IActionResult> ViewTransferedApplication(string Id)
         {
             try
@@ -2743,7 +2743,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         [HttpPost]
         public async Task<IActionResult> GetOfficers(int subdivisionId,string roleName)
@@ -2754,7 +2754,7 @@ namespace Noc_App.Controllers
             return Json(new SelectList(officerDetail, "UserId", "UserName"));
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public IActionResult GetRecommendationDetail(string id)
         {
@@ -2795,7 +2795,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public IActionResult GetRecommendationDetailForOtherThanNA(string id)
         {
@@ -2835,7 +2835,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private List<LoginResponseViewModel> FetchUser()
         {
@@ -2930,7 +2930,7 @@ namespace Noc_App.Controllers
             return users;
 
         }
-        //[Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        //[Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         //[Obsolete]
         private async Task<LoginResponseViewModel> LoadUserDetailById(string userid)
         {
@@ -3050,7 +3050,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DD")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DD")]
         private async Task<UserRoleDetails> GetAppRoleName(string rolename)
         {
             try
@@ -3064,7 +3064,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         private async Task<UserRoleDetails> GetRoleName(string rolename)
         {
             try
@@ -3077,7 +3077,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private async Task<List<OfficerDetails>> GetOfficerLastForwardedBy(string roleName, string lastForwardedByid)
         {
@@ -3135,7 +3135,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private async Task<List<OfficerDetails>> GetOfficer(string divisionId,string roleName,string subDivision,string circleid,string establishmentOfficeId)
         {
@@ -3372,7 +3372,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER HQ,DWS,EXECUTIVE ENGINEER HQ,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private async Task<List<DivisionDetails>> GetOfficerLocations(string divisionId, string roleName, string userid)
         {
@@ -3468,7 +3468,7 @@ namespace Noc_App.Controllers
                                                                 ).ToList();
                             }
                         }
-                        else if (role[i] == "DWS" || role[i] == "EXECUTIVE ENGINEER HQ" || role[i] == "CHIEF ENGINEER HQ" || role[i] == "ADE" || role[i] == "DIRECTOR DRAINAGE" || role[i] == "PRINCIPAL SECRETARY" )
+                        else if (role[i] == "DWS" || role[i] == "EXECUTIVE ENGINEER DRAINAGE" || role[i] == "CHIEF ENGINEER DRAINAGE" || role[i] == "ADE" || role[i] == "DIRECTOR DRAINAGE" || role[i] == "PRINCIPAL SECRETARY" )
                         {
                             var LocationRoleDetail = (from rr in root.user_info.OfficeWiseRoleID
                                                       join r in _userRolesRepository.GetAll().AsEnumerable() on rr.role equals r.Id

@@ -1677,7 +1677,7 @@ namespace NocApp.Migrations
                         new
                         {
                             Id = 10,
-                            AppRoleName = "CHIEF ENGINEER HQ",
+                            AppRoleName = "CHIEF ENGINEER DRAINAGE",
                             RoleLevel = 3,
                             RoleName = "Chief Engineer"
                         },
@@ -1698,7 +1698,7 @@ namespace NocApp.Migrations
                         new
                         {
                             Id = 128,
-                            AppRoleName = "EXECUTIVE ENGINEER HQ",
+                            AppRoleName = "EXECUTIVE ENGINEER DRAINAGE",
                             RoleLevel = 4,
                             RoleName = "XEN HO Drainage"
                         },

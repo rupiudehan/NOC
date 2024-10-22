@@ -777,11 +777,11 @@ namespace NocApp.Migrations
                     { 6, "PRINCIPAL SECRETARY", 2, "Principal Secretary" },
                     { 7, "EXECUTIVE ENGINEER", 7, "Executive Engineer" },
                     { 8, "CIRCLE OFFICER", 6, "Superintending Engineer" },
-                    { 10, "CHIEF ENGINEER HQ", 3, "Chief Engineer" },
+                    { 10, "CHIEF ENGINEER DRAINAGE", 3, "Chief Engineer" },
                     { 60, "JUNIOR ENGINEER", 9, "Junior Engineer" },
                     { 67, "SUB DIVISIONAL OFFICER", 8, "Sub Divisional Officer" },
                     { 83, "DWS", 5, "XEN/DWS" },
-                    { 128, "EXECUTIVE ENGINEER HQ", 4, "XEN HO Drainage" }
+                    { 128, "EXECUTIVE ENGINEER DRAINAGE", 4, "XEN HO Drainage" }
                 });
 
             migrationBuilder.InsertData(

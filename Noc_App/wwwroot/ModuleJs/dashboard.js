@@ -215,7 +215,7 @@ function LoadReport(DivisionId, subdivisionId, roleName) {
                 var count = 1; var len = r.length;
                 $.each(r, function (key, value) {
                     var pendency = value.pendency < 0 ? '0' : value.pendency;
-                    var processedToRole = value.processedToRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.processedToRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.processedToRole;
+                    var processedToRole = value.processedToRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.processedToRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.processedToRole;
                     var tr = '<tr>';
                     tr += '<td>' + count + '</td>';
                     // if (count == 1) { $('#dvBranch').text("Branch: " + value.BranchName); $('#dvLevel').text('Level: ' + LevelType); $('#dvRule').text('Under: ' + ActionName); }
@@ -296,8 +296,8 @@ function LoadReportApplicationsP() {
                         </tr>`;
                 thead.html(thr);
                 $.each(r, function (key, value) {
-                    var currentProcessedByRole = value.currentProcessedByRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedByRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedByRole;
-                    var currentProcessedToRole = value.currentProcessedToRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedToRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedToRole;
+                    var currentProcessedByRole = value.currentProcessedByRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedByRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedByRole;
+                    var currentProcessedToRole = value.currentProcessedToRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedToRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedToRole;
                     var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' && value.isTransfered == '1' ? 'Transfered' : value.processedLevel == '0' && value.isTransfered == '0' ? 'Unprocessed' : 'In Process';
                     var name = value.processedLevel == '0' ? value.isTransfered == '1' ? 'EXECUTIVE ENGINEER' + (value.toLocation == null ? '' : ' - ' + value.toLocation) : 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (currentProcessedByRole == null ? '' : currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (currentProcessedToRole == null ? '' : currentProcessedToRole) + (value.toLocation == null ? '' : ' - ' + value.toLocation);
 
@@ -380,8 +380,8 @@ function LoadReportApplicationsA() {
 
                 thead.html(thr);
                 $.each(r, function (key, value) {
-                    var currentProcessedByRole = value.currentProcessedByRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedByRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedByRole;
-                    var currentProcessedToRole = value.currentProcessedToRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedToRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedToRole;
+                    var currentProcessedByRole = value.currentProcessedByRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedByRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedByRole;
+                    var currentProcessedToRole = value.currentProcessedToRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedToRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedToRole;
                     var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' && value.isTransfered == '1' ? 'Transfered' : value.processedLevel == '0' && value.isTransfered == '0' ? 'Unprocessed' : 'In Process';
                     var name = value.processedLevel == '0' ? value.isTransfered == '1' ? 'EXECUTIVE ENGINEER' + (value.toLocation == null ? '' : ' - ' + value.toLocation) : 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (currentProcessedByRole == null ? '' : currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (currentProcessedToRole == null ? '' : currentProcessedToRole) + (value.toLocation == null ? '' : ' - ' + value.toLocation);
 
@@ -463,8 +463,8 @@ function LoadReportApplicationsR() {
                 $.each(r, function (key, value) {
 
                     // var status = value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : 'In Process';
-                    var currentProcessedByRole = value.currentProcessedByRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedByRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedByRole;
-                    var currentProcessedToRole = value.currentProcessedToRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedToRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedToRole;
+                    var currentProcessedByRole = value.currentProcessedByRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedByRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedByRole;
+                    var currentProcessedToRole = value.currentProcessedToRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedToRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedToRole;
                     var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' && value.isTransfered == '1' ? 'Transfered' : value.processedLevel == '0' && value.isTransfered == '0' ? 'Unprocessed' : 'In Process';
                     var name = value.processedLevel == '0' ? value.isTransfered == '1' ? 'EXECUTIVE ENGINEER' + (value.toLocation == null ? '' : ' - ' + value.toLocation) : 'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (currentProcessedByRole == null ? '' : currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (currentProcessedToRole == null ? '' : currentProcessedToRole) + (value.toLocation == null ? '' : ' - ' + value.toLocation);
 
@@ -544,8 +544,8 @@ function LoadReportApplicationsT() {
                         </tr>`;
                 thead.html(thr);
                 $.each(r, function (key, value) {
-                    var currentProcessedByRole = value.currentProcessedByRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedByRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedByRole;
-                    var currentProcessedToRole = value.currentProcessedToRole == "EXECUTIVE ENGINEER HQ" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedToRole == "CHIEF ENGINEER HQ" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedToRole;
+                    var currentProcessedByRole = value.currentProcessedByRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedByRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedByRole;
+                    var currentProcessedToRole = value.currentProcessedToRole == "EXECUTIVE ENGINEER DRAINAGE" ? "EXECUTIVE ENGINEER DRAINAGE" : value.currentProcessedToRole == "CHIEF ENGINEER DRAINAGE" ? "CHIEF ENGINEER DRAINAGE" : value.currentProcessedToRole;
                     var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' && value.isTransfered == '1' ? 'Transfered' : value.processedLevel == '0' && value.isTransfered == '0' ?  'Unprocessed' : 'In Process';
                     var name = value.processedLevel == '0' ? value.isTransfered == '1' ? 'EXECUTIVE ENGINEER' + (value.toLocation == null ? '' : ' - ' + value.toLocation) :'EXECUTIVE ENGINEER' : value.isshortfall == true ? value.currentProcessedToName : value.currentProcessedToName == 'Applicant' ? (value.currentProcessedByName == null ? '' : value.currentProcessedByName) + ' - ' + (currentProcessedByRole == null ? '' : currentProcessedByRole) : (value.currentProcessedToName == null ? '' : value.currentProcessedToName) + ' - ' + (currentProcessedToRole == null ? '' : currentProcessedToRole) + (value.toLocation == null ? '' : ' - ' + value.toLocation);
                     //var status = value.isshortfall == true ? 'Reverted to Applicant Due To Discrepency' : value.isapproved == true ? 'Certificate Issued' : value.isrejected == true ? 'Rejected' : value.processedLevel == '0' ? 'Unprocessed' : 'In Process';

@@ -174,10 +174,10 @@ namespace Noc_App.Context
 
             modelBuilder.Entity<UserRoleDetails>().HasData(
                 new UserRoleDetails { Id=7,RoleName= "Executive Engineer", AppRoleName= "EXECUTIVE ENGINEER", RoleLevel=7 },
-                new UserRoleDetails { Id = 10, RoleName = "Chief Engineer",AppRoleName= "CHIEF ENGINEER HQ", RoleLevel = 3 },
+                new UserRoleDetails { Id = 10, RoleName = "Chief Engineer",AppRoleName= "CHIEF ENGINEER DRAINAGE", RoleLevel = 3 },
                 new UserRoleDetails { Id =60, RoleName = "Junior Engineer",AppRoleName= "JUNIOR ENGINEER", RoleLevel = 9 },
                 new UserRoleDetails { Id = 67, RoleName = "Sub Divisional Officer",AppRoleName= "SUB DIVISIONAL OFFICER", RoleLevel = 8 },
-                new UserRoleDetails { Id = 128, RoleName = "XEN HO Drainage",AppRoleName= "EXECUTIVE ENGINEER HQ", RoleLevel = 4 },
+                new UserRoleDetails { Id = 128, RoleName = "XEN HO Drainage",AppRoleName= "EXECUTIVE ENGINEER DRAINAGE", RoleLevel = 4 },
                 new UserRoleDetails { Id = 83, RoleName = "XEN/DWS",AppRoleName="DWS", RoleLevel = 5 },
                 new UserRoleDetails { Id = 6, RoleName = "Principal Secretary", AppRoleName = "PRINCIPAL SECRETARY", RoleLevel = 2 },
                 new UserRoleDetails { Id = 8, RoleName = "Superintending Engineer", AppRoleName = "CIRCLE OFFICER", RoleLevel = 6 },
