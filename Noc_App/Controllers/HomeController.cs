@@ -421,19 +421,19 @@ namespace Noc_App.Controllers
                     case "CHIEF ENGINEER HQ":
                         list.Add(new object[]
                         {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER DRAINAGE"
                         });
                         break;
                 case "PRINCIPAL SECRETARY":
                     list.Add(new object[]
                     {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ","CHIEF ENGINEER HQ"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER DRAINAGE","CHIEF ENGINEER DRAINAGE"
                     });
                     break;
                 default:
                         list.Add(new object[]
                         {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER HQ","CHIEF ENGINEER HQ","PRINCIPAL SECRETARY"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER DRAINAGE","CHIEF ENGINEER DRAINAGE","PRINCIPAL SECRETARY"
                         }); break;
                 }
 
@@ -549,7 +549,10 @@ namespace Noc_App.Controllers
                 divisionsId = roleName == "EXECUTIVE ENGINEER" || roleName == "CIRCLE OFFICER" ? LoggedInDivisionID() : divisiondetailId;
                 roleName = (await GetAppRoleName(roleName)).RoleName;
                 //roleName = (await GetRoleName(roleName)).AppRoleName;
-
+                if (role == "EXECUTIVE ENGINEER DRAINAGE")
+                    role = "EXECUTIVE ENGINEER HQ";
+                if (role == "CHIEF ENGINEER DRAINAGE")
+                    role = "CHIEF ENGINEER HQ";
                 int divisionId = divisiondetailId != null ? Convert.ToInt32(divisiondetailId) : 0;
                 int subdivisionId = 0;// subdivisiondetailId != null ? Convert.ToInt32(subdivisiondetailId) : 0;
                 //if (roleName != null && roleName.ToUpper() == "ADMINISTRATOR")
