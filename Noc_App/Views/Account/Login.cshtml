@@ -1,6 +1,7 @@
 ﻿@model LoginViewModel;
 @using Microsoft.Extensions.Options;
 @inject IOptions<Noc_App.Helpers.GoogleCaptchaConfig> GoogleCaptchaConfig;
+@inject IOptions<Noc_App.Helpers.PasswordEncryption> PasswordEncryptConfig;
 <style>
     .close-icon:hover {
         cursor: pointer;
@@ -109,6 +110,8 @@
 
 </main>
 @section Scripts {
+       
+
     <script src="https://www.google.com/recaptcha/api.js?render=@GoogleCaptchaConfig.Value.SiteKey"></script>
     <script>
         grecaptcha.ready(function () {
@@ -137,6 +140,20 @@
             } else {
                 x.type = "password";
             }
+        }
+
+
+        function encryptPassword(password)
+        {
+           const secretKey = '@PasswordEncryptConfig.Value.SecretKey';
+           var key = CryptoJS.enc.Utf8.parse('@PasswordEncryptConfig.Value.SecretKey');
+           // Encrypt the password using the secret key
+            const encryptedPassword = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(password), key, {
+
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+           });
+           return encryptedPassword.toString();
         }
     </script>
     <script src="~/modulejs/loginscript.js"></script>

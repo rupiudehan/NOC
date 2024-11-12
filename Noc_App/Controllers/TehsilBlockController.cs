@@ -230,7 +230,6 @@ namespace Noc_App.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var obj = await _repo.GetByIdAsync(id);

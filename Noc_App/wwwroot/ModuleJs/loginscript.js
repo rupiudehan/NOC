@@ -37,8 +37,35 @@ function ToggleLoadder(isVisible) {
     }
 }
 
+function encryptData(password){
+    $.ajax({
+        url: "/Account/EncryptedPass",
+        type: "GET",
+        data: { password: password },
+        async: true,
+        success: function (data) {
+            alert('d');
+            alert(JSON.stringify(data));
+        },
+        failure: function (f) {
+            alert(f);
+        },
+        error: function (e) {
+            alert('Error ' + e);
+        }
+    });
+}
 
 $(function () {
+    $('#Password').on('change', function () {
+        var pass = $(this).val();
+        //encryptData(pass);
+        const encryptedPassword = encryptPassword(pass);
+
+        // Now `encryptedPasswordBase64` contains the encrypted password as a Base64 string
+        
+        $(this).val(encryptedPassword);
+    });
 
     $('#loginForm').on('submit', function (event) {
         event.preventDefault();

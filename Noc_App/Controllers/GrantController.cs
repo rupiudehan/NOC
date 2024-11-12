@@ -21,6 +21,8 @@ using Noc_App.PaymentUtilities;
 using static Noc_App.Models.IFMSPayment.DepartmentModel;
 using System.Text;
 using System.Net;
+using Noc_App.Models.IFMSPayment;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Noc_App.Controllers
 {
@@ -53,6 +55,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<MasterPlanDetails> _masterPlanDetailsRepository;
         private readonly IRepository<ChallanDetails> _repoChallanDetails;
         private readonly IConfiguration _configuration;
+        private readonly IRepository<GrantPaymentDetails> _repoPayment;
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
@@ -64,7 +67,7 @@ namespace Noc_App.Controllers
             IRepository<GrantApprovalDetail> repoApprovalDetail, IWebHostEnvironment hostEnvironment, IRepository<SiteUnitMaster> repoSiteUnitMaster
             , ICalculations calculations, IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<MasterPlanDetails> masterPlanDetailsRepository
             , IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<GrantApprovalMaster> repoApprovalMaster, IRepository<ChallanDetails> repoChallanDetails
-            , IRepository<DaysCheckMaster> repoDaysCheckMaster, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster)
+            , IRepository<DaysCheckMaster> repoDaysCheckMaster, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster, IRepository<GrantPaymentDetails> repoPayment)
         {
             //_villageRpo = villageRepo;
             _tehsilBlockRepo = tehsilBlockRepo;
@@ -94,6 +97,7 @@ namespace Noc_App.Controllers
             _masterPlanDetailsRepository = masterPlanDetailsRepository;
             _repoChallanDetails = repoChallanDetails;
             _configuration = configuration;
+            _repoPayment = repoPayment;
         }
 
         [AllowAnonymous]
@@ -284,7 +288,7 @@ namespace Noc_App.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Search(string searchString)
+        public async Task<IActionResult> Search(string searchString)
         {
             if (searchString != null && searchString.Trim() != "")
             {
@@ -356,10 +360,34 @@ namespace Noc_App.Controllers
                             dateTime = null
                         };
                         PaymentStatusDetailViewModel result1 =  ChallanVerify(cHeader);
+                        string decodedDate= obj.Decrypt(result1.encData);
+                        ClientResponse response = Newtonsoft.Json.JsonConvert.DeserializeObject<ClientResponse>(decodedDate);
+
                         if (result1 != null)
                         {
                             if (result1.statusCode != null)
                             {
+                                if (result.Payment.receiptNo == null && result1.statusCode.ToUpper() == "SC300")
+                                {
+                                    var dataResponse = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == result.Payment.deptRefNo )).FirstOrDefault();
+                                    dataResponse.RequestStatus = "Successful";
+                                    dataResponse.receiptNo = response.challandata.receiptNo;
+
+                                    GrantPaymentDetails payment = new GrantPaymentDetails
+                                    {
+                                        deptRefNo = dataResponse.deptRefNo,
+                                        GrantID = model.GrantId,
+                                        PayerEmail = dataResponse.emailId,
+                                        PayerName = dataResponse.payerName,
+                                        PaymentOrderId = response.challandata.receiptNo,
+                                        TotalAmount = Convert.ToDecimal(dataResponse.totalAmt),
+                                        CreatedOn = DateTime.Now
+
+                                    };
+                                    await _repoPayment.CreateAsync(payment);
+                                    await _repoChallanDetails.UpdateAsync(dataResponse);
+                                }
+                                
                                 if (result1.statusCode.ToUpper() == "SC300")
                                 {
                                     model.ApplicationStatus = "Paid";
@@ -2019,6 +2047,7 @@ namespace Noc_App.Controllers
         [Obsolete]
         [HttpPost("uploadaddressproof")]
         [AllowAnonymous]
+        
         public async Task<IActionResult> ModifyAddressDetail([FromForm] GrantAddressViewModelPostEdit model)
         {
             try
@@ -2197,6 +2226,7 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        
         public async Task<IActionResult> ModifyAreaDetail(GrantKhasraViewModelEdit model)
         {
             try
@@ -2474,6 +2504,7 @@ namespace Noc_App.Controllers
         [Obsolete]
         [HttpPost("uploadapplicant")]
         [AllowAnonymous]
+        
         public async Task<IActionResult> ModifyApplicantDetail(GrantApplicantViewModelPostEdit model)
         {
             try
@@ -2611,6 +2642,7 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        
         public async Task<IActionResult> ModifyOwnerDetail(GrantOwnersViewModelEdit model)
         {
             try
@@ -2844,6 +2876,7 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        
         public IActionResult GetSubDivisions(int divisionId)
         {
             var subDivision = _subDivisionRepo.GetAll().OrderBy(x => x.Name);
@@ -2853,6 +2886,7 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        
         public IActionResult GetTehsilBlocks(int divisionId)
         {
             var tehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.DivisiontId == divisionId).OrderBy(x => x.Name).ToList();
@@ -2877,6 +2911,7 @@ namespace Noc_App.Controllers
         //}
         [HttpPost]
         [AllowAnonymous]
+        
         public async Task<IActionResult> GetUnitsDetail(int unitId)
         {
             var obj = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == unitId);

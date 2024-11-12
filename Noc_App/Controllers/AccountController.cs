@@ -32,13 +32,14 @@ namespace Noc_App.Controllers
         private readonly IRepository<CircleDivisionMapping> _circleDivRepository;
         private readonly IRepository<EstablishmentOfficeDetails> _estabOfficeRepository;
         private readonly GoogleCaptchaService _googleCaptchaService;
+        private readonly PasswordEncryptionService _passwordService;
 
         //private readonly IRepository<DrainDetails> _drainRepo;
 
         public AccountController(GoogleCaptchaService googleCaptchaService, IRepository<DivisionDetails> divisionRepository, 
             IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, /*IRepository<VillageDetails> villageRepository, */
             IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository, IRepository<CircleDetails> circleRepository
-            , IRepository<CircleDivisionMapping> circleDivRepository, IRepository<EstablishmentOfficeDetails> estabOfficeRepository)
+            , IRepository<CircleDivisionMapping> circleDivRepository, IRepository<EstablishmentOfficeDetails> estabOfficeRepository, PasswordEncryptionService passwordService)
         {
             _divisionRepository = divisionRepository;
             _subDivisionRepository = subDivisionRepository;
@@ -50,18 +51,19 @@ namespace Noc_App.Controllers
             _circleRepository = circleRepository;
             _circleDivRepository = circleDivRepository;
             _estabOfficeRepository = estabOfficeRepository;
-
+            _passwordService = passwordService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var storedCookies = Request.Cookies.Keys;
             foreach (var cookies in storedCookies)
             {
                 Response.Cookies.Delete(cookies);
             }
+            HttpContext.Session.Clear();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("login", "account");
         }
 
@@ -76,10 +78,12 @@ namespace Noc_App.Controllers
         [HttpPost]
         [Obsolete]
         [AllowAnonymous]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string ReturnUrl)
         {
             LoginRoleViewModel login = new LoginRoleViewModel();
-            login.Name = model.Email; login.Password = model.Password; login.Token = model.Token;
+            string password=_passwordService.DecryptPassword(model.Password);
+            login.Name = model.Email; login.Token = model.Token;
             try
             {
                 var googlereCaptchaResponse = _googleCaptchaService.VerifyreCaptcha(model.Token);
@@ -95,7 +99,7 @@ namespace Noc_App.Controllers
                     if ((model.Email == "admin"))
                     //if (model.Email != "ExecutiveEngineer" && (model.Email == "xen" || model.Email == "jefaridkot" || model.Email == "sdofaridkot" || model.Email == "jemohali" || model.Email == "sdomohali" || model.Email == "xen2" || model.Email == "xenmohali" || model.Email == "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
                     {
-                        LoginResponseViewModel root = FetchUser().Find(x => x.user_info.EmailId == model.Email && model.Password == "123");
+                        LoginResponseViewModel root = FetchUser().Find(x => x.user_info.EmailId == model.Email && password == "123");
                         if (root != null)
                         {
                             var LocationRoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
@@ -155,7 +159,7 @@ namespace Noc_App.Controllers
                         string baseUrl = "https://wrdpbind.com/api/user_login.php";
                         string salt = "8QCHhk3cJ6OMGfEW";
                         string checksum = "zUOwFCGMqKvJARC1tU6l4r24";
-                        string combinedPassword = model.Email + "|" + model.Password + "|" + checksum;
+                        string combinedPassword = model.Email + "|" + password + "|" + checksum;
 
                         string plainText = combinedPassword;
 
@@ -592,6 +596,22 @@ namespace Noc_App.Controllers
             users.Add(o17);
             return users;
 
+        }
+
+        
+        private string EncryptedPass(string password)
+        {
+            try
+            {
+                string encryp=_passwordService.EncryptPassword(password);
+                
+                return encryp;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }
