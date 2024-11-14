@@ -1,8 +1,10 @@
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Noc_App.Context;
 using Noc_App.Helpers;
+using Noc_App.Middleware;
 using Noc_App.Models;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.Repository;
@@ -11,17 +13,35 @@ using Noc_App.UtilityService;
 using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureHttpsDefaults(httpsOptions =>
+    {
+        // Set the TLS protocols to only allow TLS 1.2 and 1.3
+        httpsOptions.SslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13;
+    });
+});
+
+// Disable the X-Powered-By header
+builder.Services.Configure<IISOptions>(options =>
+{
+    options.ForwardClientCertificate = false;  // Optional, if using client certificates
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(option =>
     {
-        option.ExpireTimeSpan = TimeSpan.FromMinutes(60 * 1);
+        option.ExpireTimeSpan = TimeSpan.FromMinutes(1);
         //option.LoginPath = "/Account/Login";
-        option.LoginPath = "/Account/Verify";
-        option.AccessDeniedPath = "/Account/Verify";
-        //option.AccessDeniedPath = "/Account/Login";
+        option.LoginPath = "/Account/Login";
+        //option.AccessDeniedPath = "/Account/Verify";
+        option.AccessDeniedPath = "/Account/Login";
+        option.SlidingExpiration = true;
+        option.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Ensures cookies are sent only over HTTPS
     });
 builder.Services.AddAuthorization();
 
@@ -96,6 +116,7 @@ builder.Services.AddScoped<IRepository<EstablishmentOfficeDetails>, Repository<E
 builder.Services.AddScoped<IRepository<ProcessedApplicationsViewModel>, Repository<ProcessedApplicationsViewModel>>();
 builder.Services.AddScoped<IRepository<ReportApplicationsViewModel>, Repository<ReportApplicationsViewModel>>();
 builder.Services.AddScoped<IRepository<TransferedApplicationsViewModel>, Repository<TransferedApplicationsViewModel>>();
+builder.Services.AddScoped<IRepository<UserSessionDetails>, Repository<UserSessionDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -121,7 +142,29 @@ if (!app.Environment.IsDevelopment())
 else
 {
     app.UseStatusCodePagesWithRedirects("/Error/{0}");
+    app.UseHsts(); // Enable HSTS in production
 }
+
+// Add the X-Content-Type-Options header to prevent MIME type sniffing
+app.Use((context, next) =>
+{
+    // Strict Transport Security (HSTS)
+    context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
+
+    // Content Security Policy (CSP)
+    //context.Response.Headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' https://example.com; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'; object-src 'none'; media-src 'self'; connect-src 'self'";
+
+    // Prevent Clickjacking
+    context.Response.Headers["X-Frame-Options"] = "DENY"; // or "SAMEORIGIN"
+
+    // Enable XSS protection in browsers
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+
+    // Prevent MIME type sniffing
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    return next();
+});
+//app.UseHttpsRedirection(); // Redirect HTTP to HTTPS
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -129,13 +172,47 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();
+app.UseMiddleware<SessionValidationMiddleware>(); // Add custom session validation
+app.UseMiddleware<IpBindingMiddleware>(); // Register IP Binding Middleware
+app.UseMiddleware<SessionExpiryMiddleware>();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.UseCookiePolicy();
+// Enforce the Content Security Policy header
+//app.Use(async (context, next) =>
+//{
+//    context.Response.Headers.Add("Content-Security-Policy",
+//        "default-src 'self'; " +
+//        "script-src 'self' 'sha256-xyz123' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com; " +
+//        "style-src 'self' 'sha256-abc456' 'sha256-tBDRz+h5TwaRZiRUjI+KLkSeHJw/FQBW2qY/I2NjUzQ=' https://fonts.googleapis.com http://49.50.66.74;  " +
+//        "img-src 'self' data: https://trusted-images.example.com; " +
+//        "font-src 'self' https://fonts.gstatic.com; " +
+//        "connect-src 'self' https://api.example.com http://localhost:44322 http://localhost:44132; " +
+//        "object-src 'none'; " +
+//        "base-uri 'self'; " +
+//        "form-action 'self'; " +
+//        "frame-ancestors 'none'; " +
+//        "child-src 'none'");
 
+//    await next();
+//});
+// Middleware to remove the X-Powered-By header
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Remove("X-Powered-By");  // Remove X-Powered-By header
+    await next();
+});
+// Middleware to add Cache-Control headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    context.Response.Headers["Pragma"] = "no-cache";  // For HTTP/1.0 compatibility
+    context.Response.Headers["Expires"] = "0";  // Ensure content is not cached
+    await next();
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Grant}/{action=Create}/{id?}");

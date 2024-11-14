@@ -48,6 +48,7 @@ namespace Noc_App.Context
         public DbSet<CircleDetails> CircleDetails { get; set; }
         public DbSet<CircleDivisionMapping> CircleDivisionMapping { get; set; }
         public DbSet<EstablishmentOfficeDetails> EstablishmentOfficeDetails { get; set; }
+        public DbSet<UserSessionDetails> UserSessionDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

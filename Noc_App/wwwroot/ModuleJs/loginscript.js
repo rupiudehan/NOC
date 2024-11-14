@@ -99,22 +99,27 @@ $(function () {
                     //$('#DistrictID').val(response.districtID);
                     //$('#DivisionID').val(response.divisionID);
                     //$('#REmail').val(response.email);
-                    $.each(response.roles, function (key, value) {
-                        var tr = '<tr>';
-                        // id="loginByRoleForm' + value.id + '"
-                        tr += '<td><form action="RedirecToLoginRole" id="PostForm" name="PostForm" method="post" role="form" class="php-email-form"><input type="hidden" name="Name" id="Name" value="' + response.name + '" /><input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="Designation" id="Designation" value="' + response.designation + '" /><input type="hidden" name="EmpID" id="EmpID" value="' + response.empID + '" />';
-                        tr += '<input type="hidden" name="DistrictID" id="DistrictID" value="' + response.districtID + '" /><input type="hidden" name="DivisionID" id="DivisionID" value="' + value.divisionId + '" />';
-                        tr += '<input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="RoleWithOffice" id="RoleWithOffice" value="' + response.roleWithOffice + '" />';
-                        tr += '<input type="hidden" name="DivisionName" id="DivisionName" value="' + response.divisionName + '" />';
-                        tr += '<input type="hidden" name="RoleID" id="RoleID" value="' + value.id + '"/><input type="hidden" name="role" id="rolename" value="' + value.roleName + '"/><div class="text-center" ><label class="btn btn-success btn-user btn-block" style="width:100%;background-color:#4c9e37;cursor:not-allowed">Logging In. Please Wait.....</label> <button type="submit" style="width:100%;background-color:#4c9e37;visibility: hidden;" class="btn btn-success btn-user btn-block"><strong>' + value.roleName + '</strong> At ' + value.divisionName +'</button></div></form></td> ';
+                    var tr = '<tr>';
+                    tr += '<td><form action="RedirecToLoginRole" id="PostForm" name="PostForm" method="post" role="form" class="php-email-form"><input type="hidden" name="EncData" id="EncData" value="' + response.encData + '" /><div class="text-center" ><label class="btn btn-success btn-user btn-block" style="width:100%;background-color:#4c9e37;cursor:not-allowed">Logging In. Please Wait.....</label> <button type="submit" style="width:100%;background-color:#4c9e37;visibility: hidden;" class="btn btn-success btn-user btn-block"><strong>Send</button></div></form></td>';
+                    tr += '</tr>';
+                    body.append(tr);
+                    document.getElementById('PostForm').submit();
+                    //$.each(response.roles, function (key, value) {
+                    //    var tr = '<tr>';
+                    //    // id="loginByRoleForm' + value.id + '"
+                    //    tr += '<td><form action="RedirecToLoginRole" id="PostForm" name="PostForm" method="post" role="form" class="php-email-form"><input type="hidden" name="Name" id="Name" value="' + response.name + '" /><input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="Designation" id="Designation" value="' + response.designation + '" /><input type="hidden" name="EmpID" id="EmpID" value="' + response.empID + '" />';
+                    //    tr += '<input type="hidden" name="DistrictID" id="DistrictID" value="' + response.districtID + '" /><input type="hidden" name="DivisionID" id="DivisionID" value="' + value.divisionId + '" />';
+                    //    tr += '<input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="RoleWithOffice" id="RoleWithOffice" value="' + response.roleWithOffice + '" />';
+                    //    tr += '<input type="hidden" name="DivisionName" id="DivisionName" value="' + response.divisionName + '" />';
+                    //    tr += '<input type="hidden" name="RoleID" id="RoleID" value="' + value.id + '"/><input type="hidden" name="role" id="rolename" value="' + value.roleName + '"/><div class="text-center" ><label class="btn btn-success btn-user btn-block" style="width:100%;background-color:#4c9e37;cursor:not-allowed">Logging In. Please Wait.....</label> <button type="submit" style="width:100%;background-color:#4c9e37;visibility: hidden;" class="btn btn-success btn-user btn-block"><strong>' + value.roleName + '</strong> At ' + value.divisionName +'</button></div></form></td> ';
                         
-                        tr += '</tr>';
-                        body.append(tr);
-                        //$('.logRe').on('submit', function (event) {
-                        //    event.preventDefault();
-                        //});
-                        document.getElementById('PostForm').submit();
-                    });
+                    //    tr += '</tr>';
+                    //    body.append(tr);
+                    //    //$('.logRe').on('submit', function (event) {
+                    //    //    event.preventDefault();
+                    //    //});
+                    //    document.getElementById('PostForm').submit();
+                    //});
                     resultProjectMessage.css('display', 'none');
                     //setRecaptchaResponse();
                     //resultProjectMessage.html('<div class="alert alert-success">LoggedIn successfully!<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');

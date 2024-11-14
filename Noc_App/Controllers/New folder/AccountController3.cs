@@ -16,20 +16,16 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using Newtonsoft.Json;
-using Noc_App.PaymentUtilities;
-using static Noc_App.Models.IFMSPayment.DepartmentModel;
-using Microsoft.AspNetCore.Http;
 
 namespace Noc_App.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController3 : Controller
     {
         //private readonly IRepository<VillageDetails> _villageRepository;
         private readonly IEmailService _emailService;
-        //private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepository;
-        //private readonly IRepository<SubDivisionDetails> _subDivisionRepository;
+        private readonly IRepository<TehsilBlockDetails> _tehsilBlockRepository;
+        private readonly IRepository<SubDivisionDetails> _subDivisionRepository;
         private readonly IRepository<DivisionDetails> _divisionRepository;
         private readonly IRepository<UserRoleDetails> _userRolesRepository;
         private readonly IRepository<CircleDetails> _circleRepository;
@@ -37,19 +33,17 @@ namespace Noc_App.Controllers
         private readonly IRepository<EstablishmentOfficeDetails> _estabOfficeRepository;
         private readonly GoogleCaptchaService _googleCaptchaService;
         private readonly PasswordEncryptionService _passwordService;
-        private readonly IConfiguration _configuration;
-        private readonly IRepository<UserSessionDetails> _userSessionnRepository;
 
         //private readonly IRepository<DrainDetails> _drainRepo;
 
-        public AccountController(GoogleCaptchaService googleCaptchaService, IRepository<DivisionDetails> divisionRepository,
-            /*IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, IRepository<VillageDetails> villageRepository, */
-            IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository, IRepository<CircleDetails> circleRepository, IRepository<UserSessionDetails> userSessionnRepository
-            , IRepository<CircleDivisionMapping> circleDivRepository, IRepository<EstablishmentOfficeDetails> estabOfficeRepository, PasswordEncryptionService passwordService, IConfiguration configuration)
+        public AccountController3(GoogleCaptchaService googleCaptchaService, IRepository<DivisionDetails> divisionRepository, 
+            IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, /*IRepository<VillageDetails> villageRepository, */
+            IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository, IRepository<CircleDetails> circleRepository
+            , IRepository<CircleDivisionMapping> circleDivRepository, IRepository<EstablishmentOfficeDetails> estabOfficeRepository, PasswordEncryptionService passwordService)
         {
             _divisionRepository = divisionRepository;
-            //_subDivisionRepository = subDivisionRepository;
-            //_tehsilBlockRepository = tehsilBlockRepository;
+            _subDivisionRepository = subDivisionRepository;
+            _tehsilBlockRepository = tehsilBlockRepository;
             //_villageRepository = villageRepository;
             _userRolesRepository = userRolesRepository;
             _googleCaptchaService = googleCaptchaService;
@@ -58,8 +52,6 @@ namespace Noc_App.Controllers
             _circleDivRepository = circleDivRepository;
             _estabOfficeRepository = estabOfficeRepository;
             _passwordService = passwordService;
-            _configuration = configuration;
-            _userSessionnRepository=userSessionnRepository;
         }
 
         [HttpPost]
@@ -90,30 +82,17 @@ namespace Noc_App.Controllers
         public async Task<IActionResult> Login(LoginViewModel model, string ReturnUrl)
         {
             LoginRoleViewModel login = new LoginRoleViewModel();
-            LoginEncViewModel loginEncViewModel = new LoginEncViewModel();
-            string password = _passwordService.DecryptPassword(model.Password);
+            string password=_passwordService.DecryptPassword(model.Password);
             login.Name = model.Email; login.Token = model.Token;
             try
             {
-
-                IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
-                    _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
-                    _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
-                    _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
-                    , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
-                    , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
-
-                string ChecksumKey = settings.ChecksumKey;
-                string edKey = settings.edKey;
-                string edIV = settings.edIV;
-
                 var googlereCaptchaResponse = _googleCaptchaService.VerifyreCaptcha(model.Token);
-                loginEncViewModel.Success = "0";
+                login.Success = "0";
                 if (!googlereCaptchaResponse.Result.success && googlereCaptchaResponse.Result.score <= 0.5)
                 {
-                    loginEncViewModel.Errors = "You are not human. Please the refresh page.";
-                    ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                    return Json(loginEncViewModel);
+                    login.Errors = "You are not human. Please the refresh page.";
+                    ModelState.AddModelError(string.Empty, login.Errors);
+                    return Json(login);
                 }
                 if (ModelState.IsValid)
                 {
@@ -143,22 +122,22 @@ namespace Noc_App.Controllers
 
                             var role = ro == null ? "0" : ro.roleId;
                             List<UserRoleDetailsViewModel> RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
-                                                                         join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                                join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
                                                                          //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
                                                                          //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
                                                                          where rr.Roles.Id == Convert.ToInt32(role)
                                                                          select new UserRoleDetailsViewModel
-                                                                         {
-                                                                             DivisionId = r.Id,
-                                                                             DivisionName = r.Name,
-                                                                             AppRoleName = rr.Roles.RoleName,
-                                                                             Id = rr.Roles.Id,
-                                                                             RoleLevel = rr.Roles.RoleLevel,
-                                                                             RoleName = rr.Roles.RoleName
-                                                                         }
+                                                                {
+                                                                    DivisionId = r.Id,
+                                                                    DivisionName = r.Name,
+                                                                    AppRoleName = rr.Roles.RoleName,
+                                                                    Id = rr.Roles.Id,
+                                                                    RoleLevel = rr.Roles.RoleLevel,
+                                                                    RoleName = rr.Roles.RoleName
+                                                                }
                                                                  ).ToList();
 
-                            string divisionRolePairs = string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
+                            string divisionRolePairs = string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));       
 
                             login.Roles = RoleDetail.Take(1).ToList();
                             login.Designation = root.user_info.Designation;
@@ -166,19 +145,13 @@ namespace Noc_App.Controllers
                             login.DistrictID = root.user_info.DistrictID.ToString();
                             login.EmployeeName = root.user_info.EmployeeName;
                             login.EmpID = root.user_info.EmpID;
-                            loginEncViewModel.Success = "1";
+                            login.Success = "1";
                             login.Name = root.user_info.Name;
                             login.RoleID = role;
                             login.RoleWithOffice = divisionRolePairs;
                             login.DivisionName = RoleDetail.Take(1).FirstOrDefault().DivisionName;
-                            string json = JsonConvert.SerializeObject(login);
 
-                            IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
-                            string encData = obj.Encrypt(json);
-                            loginEncViewModel.EncData = encData;
-                            loginEncViewModel.Success = "1";
-
-                            return Json(loginEncViewModel);
+                            return Json(login);
                         }
                     }
                     else
@@ -210,9 +183,9 @@ namespace Noc_App.Controllers
                         string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
                         if (resultContent.Contains("An error has occurred"))
                         {
-                            loginEncViewModel.Errors = "An error has occurred.";
-                            ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                            return Json(loginEncViewModel);
+                            login.Errors = "An error has occurred.";
+                            ModelState.AddModelError(string.Empty, login.Errors);
+                            return Json(login);
                         }
                         LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
 
@@ -235,10 +208,10 @@ namespace Noc_App.Controllers
                                       join nr in roles on rol.Id.ToString() equals nr
                                       select new
                                       {
-                                          roleId = rol.Id.ToString()
+                                          roleId=rol.Id.ToString()
                                       }).FirstOrDefault();
-
-                            var role = ro == null ? "0" : ro.roleId;
+                                
+                            var role = ro==null?"0": ro.roleId;
 
                             //foreach (string role in roles)
                             //{
@@ -246,10 +219,10 @@ namespace Noc_App.Controllers
                             //    {
                             if (ro == null)
                             {
-                                loginEncViewModel.Success = "0";
-                                loginEncViewModel.Errors = "Invalid user.";
-                                ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                                return Json(loginEncViewModel);
+                                login.Success = "0";
+                                login.Errors = "Invalid user.";
+                                ModelState.AddModelError(string.Empty, login.Errors);
+                                return Json(login);
                             }
                             else
                             {
@@ -315,13 +288,13 @@ namespace Noc_App.Controllers
                                 if (item.role != 2)
                                 {
 
-                                    if (divisionRolePairs != "")
-                                        divisionRolePairs = divisionRolePairs + "," + item.office_id + "-" + item.role;
+                                    if(divisionRolePairs!="")
+                                    divisionRolePairs = divisionRolePairs + "," + item.office_id + "-" + item.role;
                                     else
                                         divisionRolePairs = item.office_id + "-" + item.role;
                                 }
                             }
-
+                            
 
                             login.Roles = RoleDetail.Take(1).ToList();
                             login.Designation = root.user_info.Designation;
@@ -329,32 +302,26 @@ namespace Noc_App.Controllers
                             login.DistrictID = root.user_info.DistrictID.ToString();
                             login.EmployeeName = root.user_info.EmployeeName;
                             login.EmpID = root.user_info.EmpID;
+                            login.Success = "1";
                             login.Name = root.user_info.Name;
                             login.RoleID = role;
-                            login.DivisionName = RoleDetail.Count() > 0 ? RoleDetail.Take(1).FirstOrDefault().DivisionName : "";
+                            login.DivisionName = RoleDetail.Count()>0? RoleDetail.Take(1).FirstOrDefault().DivisionName:"";
                             login.RoleWithOffice = divisionRolePairs;
-                            string json = JsonConvert.SerializeObject(login);
-
-                            IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
-                            string encData = obj.Encrypt(json);
-                            loginEncViewModel.EncData = encData;
-                            loginEncViewModel.Success = "1";
-
-                            return Json(loginEncViewModel);
+                            return Json(login);
                         }
                     }
 
                     ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
 
                 }
-                loginEncViewModel.Errors = "Invalid Login Attempt";
+                login.Errors = "Invalid Login Attempt";
             }
             catch (Exception ex)
             {
-                loginEncViewModel.Errors = "An error occured while doing login attempt";
+                login.Errors = "An error occured while doing login attempt";
                 ModelState.AddModelError(string.Empty, "Token has expired now. Please refresh the page.");
             }
-            return Json(loginEncViewModel);
+            return Json(login);
         }
 
         //[HttpGet]
@@ -384,62 +351,12 @@ namespace Noc_App.Controllers
         [HttpPost]
         [Obsolete]
         [AllowAnonymous]
-        public async Task<IActionResult> RedirecToLoginRole(/*LoginRoleViewModel model*/LoginEncViewModel model2, string ReturnUrl)
+        public async Task<IActionResult> RedirecToLoginRole(LoginRoleViewModel model, string ReturnUrl)
         {
             try
             {
-
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                HttpContext.Session.Clear(); // Rotate session ID
-
-                // Set session data
-                HttpContext.Session.SetString("DeviceId", DeviceIdHelper.GenerateDeviceId(HttpContext));
-                HttpContext.Session.SetString("UserIp", HttpContext.Connection.RemoteIpAddress?.ToString());
-
-                IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
-                 _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
-                 _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
-                 _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
-                 , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
-                 , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
-
-                IFMS_EncrDecr obj = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
-                string decodedDate = obj.Decrypt(model2.EncData);
-
-                LoginRoleViewModel model = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginRoleViewModel>(decodedDate);
-
                 if (model != null)
                 {
-                    // Generate a session ID and store it
-                    var sessionId = SessionHelper.GenerateSessionId(HttpContext);
-                    DateTime loginTime = DateTime.Now;
-
-                    var hrms = model.EmpID; // Fetch user HRMS or unique identifier here
-
-                    // Store session details in the database
-                    var userSession = new UserSessionDetails
-                    {
-                        Id = Guid.NewGuid(),
-                        Hrms = hrms,
-                        LastSessionId = sessionId,
-                        LastLoginTime = loginTime
-                    };
-
-                    //List<UserSessionDetails> sessionDetail = _userSessionnRepository.GetAll()
-                    //                                         .Where(u => u.Hrms == hrms && u.LastSessionId== sessionId)
-                    //                                         .OrderByDescending(u => u.LastLoginTime)
-                    //                                         .ToList();
-                    //if (sessionDetail.Count > 0) { 
-                        
-                    //}
-                    //else
-                    //{
-                        // Save to the database
-                        await _userSessionnRepository.CreateAsync(userSession);
-                    //}
-                    HttpContext.Session.SetString("SessionId", sessionId);
-                    HttpContext.Session.SetString("SessionTime", loginTime.ToString());
-
                     string role = "";
                     UserRoleDetails RoleDetail = (await _userRolesRepository.FindAsync(x => model.RoleID == x.Id.ToString())).FirstOrDefault();
                     if (RoleDetail != null)
@@ -449,21 +366,20 @@ namespace Noc_App.Controllers
                     List<Claim> claims = new List<Claim>();
                     claims.Add(new Claim(ClaimTypes.NameIdentifier, model.Name));
                     //claims.Add(new Claim(ClaimTypes.Name, model.EmployeeName+" ("+model.Name+"-"+model.Designation+")"));
-                    claims.Add(new Claim(ClaimTypes.Name, model.EmployeeName + " (" + model.Name + ")"));
+                    claims.Add(new Claim(ClaimTypes.Name, model.EmployeeName + " (" + model.Name+ ")"));
                     claims.Add(new Claim(ClaimTypes.Role, role));
                     claims.Add(new Claim(ClaimTypes.Surname, model.RoleWithOffice));
                     claims.Add(new Claim(ClaimTypes.Locality, model.DivisionName));
                     //claims.Add(new Claim(ClaimTypes.Role, "Dev"));
                     ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     ClaimsPrincipal principal = new ClaimsPrincipal(identity);
-
                     await HttpContext.SignInAsync(principal);
                     HttpContext.Session.SetString("Username", model.Name);
                     HttpContext.Session.SetString("Empname", model.EmployeeName);
                     HttpContext.Session.SetString("Designation", model.Designation);
                     HttpContext.Session.SetString("Userid", model.EmpID);
                     HttpContext.Session.SetString("Districtid", model.DistrictID.ToString());
-                    HttpContext.Session.SetString("Divisionid", model.Roles.FirstOrDefault().DivisionId.ToString());
+                    HttpContext.Session.SetString("Divisionid", model.DivisionID.ToString());
                     HttpContext.Session.SetString("RoleId", model.RoleID.ToString());
                     HttpContext.Session.SetString("RoleWithOffice", model.RoleWithOffice);
                     //HttpContext.Session.SetString("SubDivisionid", root.user_info.SubDivisionID.ToString());
@@ -481,13 +397,13 @@ namespace Noc_App.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
                 }
-                return View(model2);
+                return View(model);
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
             }
-            return View(model2);
+            return View(model);
 
         }
         [HttpPost]
@@ -546,11 +462,11 @@ namespace Noc_App.Controllers
                     //ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     //ClaimsPrincipal principal = new ClaimsPrincipal(identity);
                     //await HttpContext.SignInAsync(principal);
-                    // HttpContext.Session.SetString("Username", model.Name);
+                   // HttpContext.Session.SetString("Username", model.Name);
                     //HttpContext.Session.SetString("Empname", model.EmployeeName);
                     HttpContext.Session.SetString("Designation", model.Designation);
-                    // HttpContext.Session.SetString("Userid", model.EmpID);
-                    // HttpContext.Session.SetString("Districtid", model.DistrictID.ToString());
+                   // HttpContext.Session.SetString("Userid", model.EmpID);
+                   // HttpContext.Session.SetString("Districtid", model.DistrictID.ToString());
                     HttpContext.Session.SetString("Divisionid", model.DivisionID.ToString());
                     HttpContext.Session.SetString("RoleId", model.RoleID.ToString());
                     //HttpContext.Session.SetString("RoleWithOffice", model.RoleWithOffice);
@@ -626,23 +542,23 @@ namespace Noc_App.Controllers
             user_info user_info15 = new user_info();
             user_info user_info16 = new user_info();
             user_info user_info17 = new user_info();
-            user_info1 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 10 }, new OfficeWiseRolesIds { office_id = 33, role = 60 } }, Name = "Junior Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info2 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 67 } }, Name = "Sub Divisional Officer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info3 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 8 } }, Name = "Superintending Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 33.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 29, District = "Faridkot", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info4 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 83 } }, Name = "XEN/DWS", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN/DWS", RoleID = 83.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "dws", EmpID = "126", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info5 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 128 } }, Name = "XEN HO Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN HO Drainage", RoleID = 128.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "eehq", EmpID = "122", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info6 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 10 } }, Name = "Chief Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 10.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info7 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 6 } }, Name = "Principal Secretary", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 6.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info8 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 90 } }, Name = "ADE", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info9 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 35 } }, Name = "Director Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info10 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 63, role = 1 } }, Name = "Administrator", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 63.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info11 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 7 } }, Name = "ExecutiveEngineer", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "xen", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info12 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 33, role = 7 } }, Name = "XEN Faridkot", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info13 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 34, role = 7 } }, Name = "XEN Mohali", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 34.ToString(), Division = "\"Executive Engineer SAS Nagar Drainage-cum-Mining & Geology Division, WRD Punjab\"", DistrictID = 19, District = "Mohali", EmailId = "xenmohali", EmpID = "15321", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info14 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 34, role = 60 } }, Name = "Junior Engineer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 34.ToString(), Division = "Mohali", DistrictID = 29, District = "Mohali", EmailId = "jemohali", EmpID = "1231", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info15 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 34, role = 67 } }, Name = "Sub Divisional Officer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 34.ToString(), Division = "test", DistrictID = 29, District = "Mohali", EmailId = "sdomohali", EmpID = "1242", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info16 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 33, role = 60 } }, Name = "Junior Engineer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Mohali", EmailId = "jefaridkot", EmpID = "1233", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info17 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 33, role = 67 }, new OfficeWiseRolesIds { office_id = 63, role = 60 } }, Name = "Sub Divisional Officer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Faridkot", EmailId = "sdofaridkot", EmpID = "1243", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info1 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 10 }, new OfficeWiseRolesIds { office_id = 33, role = 60 }}, Name = "Junior Engineer",EmployeeName="N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info2 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=67}} ,Name = "Sub Divisional Officer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info3 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=8}} ,Name = "Superintending Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 33.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 29, District = "Faridkot", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info4 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=83}} ,Name = "XEN/DWS", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN/DWS", RoleID = 83.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "dws", EmpID = "126", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info5 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=128}} ,Name = "XEN HO Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN HO Drainage", RoleID = 128.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "eehq", EmpID = "122", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info6 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=10}} ,Name = "Chief Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 10.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info7 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=6}} ,Name = "Principal Secretary", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 6.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info8 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=90}} ,Name = "ADE", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info9 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=35}} ,Name = "Director Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info10 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 63, role = 1 }} ,Name = "Administrator", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 63.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info11 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=7}} ,Name = "ExecutiveEngineer", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "xen", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info12 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=33,role=7}} ,Name = "XEN Faridkot", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info13 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=34,role=7}} ,Name = "XEN Mohali", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 34.ToString(), Division = "\"Executive Engineer SAS Nagar Drainage-cum-Mining & Geology Division, WRD Punjab\"", DistrictID = 19, District = "Mohali", EmailId = "xenmohali", EmpID = "15321", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info14 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=34,role=60}} ,Name = "Junior Engineer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 34.ToString(), Division = "Mohali", DistrictID = 29, District = "Mohali", EmailId = "jemohali", EmpID = "1231", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info15 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=34,role=67}} ,Name = "Sub Divisional Officer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 34.ToString(), Division = "test", DistrictID = 29, District = "Mohali", EmailId = "sdomohali", EmpID = "1242", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info16 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=33,role=60}} ,Name = "Junior Engineer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Mohali", EmailId = "jefaridkot", EmpID = "1233", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info17 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 33, role = 67 }, new OfficeWiseRolesIds { office_id = 63, role = 60 }}, Name = "Sub Divisional Officer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Faridkot", EmailId = "sdofaridkot", EmpID = "1243", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
             LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
             LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
@@ -682,13 +598,13 @@ namespace Noc_App.Controllers
 
         }
 
-
+        
         private string EncryptedPass(string password)
         {
             try
             {
-                string encryp = _passwordService.EncryptPassword(password);
-
+                string encryp=_passwordService.EncryptPassword(password);
+                
                 return encryp;
 
             }
