@@ -12,7 +12,7 @@ using Noc_App.Models.ViewModel;
 using Noc_App.UtilityService;
 using Rotativa.AspNetCore;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); 
 
 //builder.WebHost.ConfigureKestrel(options =>
 //{
