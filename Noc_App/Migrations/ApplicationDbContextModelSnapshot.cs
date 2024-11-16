@@ -2095,26 +2095,6 @@ namespace NocApp.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Noc_App.Models.UserSessionDetails", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Hrms")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LastLoginTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastSessionId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserSessionDetails");
-                });
-
             modelBuilder.Entity("Noc_App.Models.ViewModel.DashboardPendencyViewModel", b =>
                 {
                     b.Property<string>("ApplicationID")
@@ -2467,9 +2447,6 @@ namespace NocApp.Migrations
                     b.Property<int>("IsRecommended")
                         .HasColumnType("integer");
 
-                    b.Property<int>("IsTransfered")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsUnderMasterPlan")
                         .HasColumnType("boolean");
 
@@ -2524,9 +2501,6 @@ namespace NocApp.Migrations
                     b.Property<int>("ProjectTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ToLocation")
-                        .HasColumnType("text");
-
                     b.Property<int>("VillageID")
                         .HasColumnType("integer");
 
@@ -2549,140 +2523,6 @@ namespace NocApp.Migrations
                         .HasColumnType("boolean");
 
                     b.ToTable("ReportApplicationsViewModel");
-                });
-
-            modelBuilder.Entity("Noc_App.Models.ViewModel.TransferedApplicationsViewModel", b =>
-                {
-                    b.Property<string>("ApplicantEmailID")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApplicantName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApplicationID")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CertificateFilePath")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CurrentProcessedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CurrentProcessedByName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CurrentProcessedByRole")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CurrentProcessedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CurrentProcessedToName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CurrentProcessedToRole")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CurrentProcessedToUser")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Hadbast")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsForwarded")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("IsRecommended")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsShortFall")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsUnderMasterPlan")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("LocationDetails")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("NocNumber")
-                        .HasColumnType("text");
-
-                    b.Property<int>("NocPermissionTypeID")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("NocTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("OtherProjectTypeDetail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PlotNo")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("PreviousDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ProcessedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProcessedByName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProcessedByRole")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ProcessedLevel")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("ProcessedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ProcessedToName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProcessedToRole")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProcessedToUser")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ProjectTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("VillageID")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("VillageName")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("isapproved")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("ispending")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("isrejected")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("isshortfall")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("isshortfallcompleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("tolocationname")
-                        .HasColumnType("text");
-
-                    b.ToTable("TransferedApplicationsViewModel");
                 });
 
             modelBuilder.Entity("Noc_App.Models.CircleDivisionMapping", b =>

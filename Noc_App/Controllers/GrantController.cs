@@ -56,6 +56,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<ChallanDetails> _repoChallanDetails;
         private readonly IConfiguration _configuration;
         private readonly IRepository<GrantPaymentDetails> _repoPayment;
+
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
@@ -92,8 +93,8 @@ namespace Noc_App.Controllers
             _grantrejectionRepository = grantrejectionRepository;
             _grantsectionRepository = grantsectionRepository;
             _repoApprovalMaster = repoApprovalMaster;
-            _repoDaysCheckMaster=repoDaysCheckMaster;
-            _repoPlanSanctionAuthtoryMaster=repoPlanSanctionAuthtoryMaster;
+            _repoDaysCheckMaster = repoDaysCheckMaster;
+            _repoPlanSanctionAuthtoryMaster = repoPlanSanctionAuthtoryMaster;
             _masterPlanDetailsRepository = masterPlanDetailsRepository;
             _repoChallanDetails = repoChallanDetails;
             _configuration = configuration;
@@ -304,15 +305,15 @@ namespace Noc_App.Controllers
                                  ApplicationID = g.ApplicationID,
                                  IsApproved = g.IsApproved,
                                  CreatedOn = string.Format("{0:dd/MM/yyyy}", g.CreatedOn),
-                                 ApplicationStatus = payment != null? payment.deptRefNo != "0" ? "Paid" : "Pending": "Pending",
-                                 GrantId=g.Id,
-                                 TransId= payment != null && payment.deptRefNo != "0" ? payment.deptRefNo : "0",
-                                 ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification" 
-                                 :  g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Applicant updated modifications. Now Pending With " + approval.ProcessedByName 
-                                 : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant" 
-                                 : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : g.IsRejected ? "Rejected":"UnProcessed" : g.IsRejected ? "Rejected":"UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan?"Exemption Letter Issued":"NOC Issued" : g.IsRejected ? "Rejected": "UnProcessed",
+                                 ApplicationStatus = payment != null ? payment.deptRefNo != "0" ? "Paid" : "Pending" : "Pending",
+                                 GrantId = g.Id,
+                                 TransId = payment != null && payment.deptRefNo != "0" ? payment.deptRefNo : "0",
+                                 ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification"
+                                 : g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Applicant updated modifications. Now Pending With " + approval.ProcessedByName
+                                 : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant"
+                                 : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : g.IsRejected ? "Rejected" : "UnProcessed" : g.IsRejected ? "Rejected" : "UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan ? "Exemption Letter Issued" : "NOC Issued" : g.IsRejected ? "Rejected" : "UnProcessed",
                                  CertificateFilePath = g.CertificateFilePath,
-                                 IsUnderMasterPlan=g.IsUnderMasterPlan
+                                 IsUnderMasterPlan = g.IsUnderMasterPlan
                              }
                          ).FirstOrDefault();
                 //if (model.ApplicationStatus != "Pending")
@@ -359,8 +360,8 @@ namespace Noc_App.Controllers
                             integratingAgency = settings.IntegratingAgency,
                             dateTime = null
                         };
-                        PaymentStatusDetailViewModel result1 =  ChallanVerify(cHeader);
-                        string decodedDate= obj.Decrypt(result1.encData);
+                        PaymentStatusDetailViewModel result1 = ChallanVerify(cHeader);
+                        string decodedDate = obj.Decrypt(result1.encData);
                         ClientResponse response = Newtonsoft.Json.JsonConvert.DeserializeObject<ClientResponse>(decodedDate);
 
                         if (result1 != null)
@@ -369,7 +370,7 @@ namespace Noc_App.Controllers
                             {
                                 if (result.Payment.receiptNo == null && result1.statusCode.ToUpper() == "SC300")
                                 {
-                                    var dataResponse = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == result.Payment.deptRefNo )).FirstOrDefault();
+                                    var dataResponse = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == result.Payment.deptRefNo)).FirstOrDefault();
                                     dataResponse.RequestStatus = "Successful";
                                     dataResponse.receiptNo = response.challandata.receiptNo;
 
@@ -387,7 +388,7 @@ namespace Noc_App.Controllers
                                     await _repoPayment.CreateAsync(payment);
                                     await _repoChallanDetails.UpdateAsync(dataResponse);
                                 }
-                                
+
                                 if (result1.statusCode.ToUpper() == "SC300")
                                 {
                                     model.ApplicationStatus = "Paid";
@@ -434,7 +435,7 @@ namespace Noc_App.Controllers
                                 }
                                 else
                                 {
-                                    model.ApplicationStatus = result1.msg+". Cannot fetch payment details.";  //Status null or empty
+                                    model.ApplicationStatus = result1.msg + ". Cannot fetch payment details.";  //Status null or empty
                                 }
                             }
                         }
@@ -2047,7 +2048,6 @@ namespace Noc_App.Controllers
         [Obsolete]
         [HttpPost("uploadaddressproof")]
         [AllowAnonymous]
-        
         public async Task<IActionResult> ModifyAddressDetail([FromForm] GrantAddressViewModelPostEdit model)
         {
             try
@@ -2226,7 +2226,6 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        
         public async Task<IActionResult> ModifyAreaDetail(GrantKhasraViewModelEdit model)
         {
             try
@@ -2504,7 +2503,6 @@ namespace Noc_App.Controllers
         [Obsolete]
         [HttpPost("uploadapplicant")]
         [AllowAnonymous]
-        
         public async Task<IActionResult> ModifyApplicantDetail(GrantApplicantViewModelPostEdit model)
         {
             try
@@ -2642,7 +2640,6 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        
         public async Task<IActionResult> ModifyOwnerDetail(GrantOwnersViewModelEdit model)
         {
             try
@@ -2876,7 +2873,6 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        
         public IActionResult GetSubDivisions(int divisionId)
         {
             var subDivision = _subDivisionRepo.GetAll().OrderBy(x => x.Name);
@@ -2886,7 +2882,6 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        
         public IActionResult GetTehsilBlocks(int divisionId)
         {
             var tehsilBlock = _tehsilBlockRepo.GetAll().Where(c => c.DivisiontId == divisionId).OrderBy(x => x.Name).ToList();
@@ -2911,7 +2906,6 @@ namespace Noc_App.Controllers
         //}
         [HttpPost]
         [AllowAnonymous]
-        
         public async Task<IActionResult> GetUnitsDetail(int unitId)
         {
             var obj = await _repoSiteUnitMaster.FindAsync(x => x.SiteAreaUnitId == unitId);

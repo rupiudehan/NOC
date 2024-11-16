@@ -118,7 +118,7 @@
 
         public class ClientChallanResponse
         {
-            public string receiptNo { get; set;}
+            public string receiptNo { get; set; }
             public string deptRefNo { get; set; }
             public string clientId { get; set; }
             public string challanDate { get; set; }
