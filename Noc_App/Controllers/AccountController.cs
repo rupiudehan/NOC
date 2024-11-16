@@ -386,8 +386,8 @@ namespace Noc_App.Controllers
             try
             {
 
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                HttpContext.Session.Clear(); // Rotate session ID
+                //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                //HttpContext.Session.Clear(); // Rotate session ID
 
                 // Set session data
                 HttpContext.Session.SetString("DeviceId", DeviceIdHelper.GenerateDeviceId(HttpContext));
