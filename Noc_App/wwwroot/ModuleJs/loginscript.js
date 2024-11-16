@@ -37,24 +37,6 @@ function ToggleLoadder(isVisible) {
     }
 }
 
-function encryptData(password){
-    $.ajax({
-        url: "/Account/EncryptedPass",
-        type: "GET",
-        data: { password: password },
-        async: true,
-        success: function (data) {
-            alert('d');
-            alert(JSON.stringify(data));
-        },
-        failure: function (f) {
-            alert(f);
-        },
-        error: function (e) {
-            alert('Error ' + e);
-        }
-    });
-}
 
 $(function () {
     $('#Password').on('change', function () {
@@ -63,7 +45,7 @@ $(function () {
         const encryptedPassword = encryptPassword(pass);
 
         // Now `encryptedPasswordBase64` contains the encrypted password as a Base64 string
-        
+
         $(this).val(encryptedPassword);
     });
 
@@ -88,7 +70,8 @@ $(function () {
                     $('#myModal').modal('show');
                 } else {
                     $('#myModal').modal('hide');
-                    ToggleLoadder(false); }
+                    ToggleLoadder(false);
+                }
             },
 
             success: function (response) {
@@ -112,7 +95,7 @@ $(function () {
                     //    tr += '<input type="hidden" name="EmployeeName" id="EmployeeName" value="' + response.employeeName + '" /><input type="hidden" name="RoleWithOffice" id="RoleWithOffice" value="' + response.roleWithOffice + '" />';
                     //    tr += '<input type="hidden" name="DivisionName" id="DivisionName" value="' + response.divisionName + '" />';
                     //    tr += '<input type="hidden" name="RoleID" id="RoleID" value="' + value.id + '"/><input type="hidden" name="role" id="rolename" value="' + value.roleName + '"/><div class="text-center" ><label class="btn btn-success btn-user btn-block" style="width:100%;background-color:#4c9e37;cursor:not-allowed">Logging In. Please Wait.....</label> <button type="submit" style="width:100%;background-color:#4c9e37;visibility: hidden;" class="btn btn-success btn-user btn-block"><strong>' + value.roleName + '</strong> At ' + value.divisionName +'</button></div></form></td> ';
-                        
+
                     //    tr += '</tr>';
                     //    body.append(tr);
                     //    //$('.logRe').on('submit', function (event) {
@@ -133,7 +116,7 @@ $(function () {
                     var errors = response.errors;
                     resultProjectMessage.css('display', 'block');
                     resultProjectMessage.html('<div class="alert alert-danger">' + errors + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
-                  
+
                 }
             },
             error: function () {
