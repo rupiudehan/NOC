@@ -168,7 +168,7 @@ app.UseRouting();
 app.UseSession();
 app.UseMiddleware<SessionValidationMiddleware>(); // Add custom session validation
 app.UseMiddleware<IpBindingMiddleware>(); // Register IP Binding Middleware
-//app.UseMiddleware<SessionExpiryMiddleware>();
+app.UseMiddleware<SessionExpiryMiddleware>();
 
 app.UseAuthentication();
 
