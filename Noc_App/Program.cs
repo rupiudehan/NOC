@@ -141,7 +141,7 @@ if (!app.Environment.IsDevelopment())
 else
 {
     app.UseStatusCodePagesWithRedirects("/Error/{0}");
-    // app.UseHsts(); // Enable HSTS in production
+    app.UseHsts(); // Enable HSTS in production
 }
 
 // Add the X-Content-Type-Options header to prevent MIME type sniffing
