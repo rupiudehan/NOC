@@ -174,6 +174,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCookiePolicy();
+
 //// Enforce the Content Security Policy header
 ////app.Use(async (context, next) =>
 ////{
@@ -192,20 +193,21 @@ app.UseCookiePolicy();
 
 ////    await next();
 ////});
+///
 // Middleware to remove the X-Powered-By header
-//app.Use(async (context, next) =>
-//{
-//    context.Response.Headers.Remove("X-Powered-By");  // Remove X-Powered-By header
-//    await next();
-//});
-//// Middleware to add Cache-Control headers
-//app.Use(async (context, next) =>
-//{
-//    context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-//    context.Response.Headers["Pragma"] = "no-cache";  // For HTTP/1.0 compatibility
-//    context.Response.Headers["Expires"] = "0";  // Ensure content is not cached
-//    await next();
-//});
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Remove("X-Powered-By");  // Remove X-Powered-By header
+    await next();
+});
+// Middleware to add Cache-Control headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    context.Response.Headers["Pragma"] = "no-cache";  // For HTTP/1.0 compatibility
+    context.Response.Headers["Expires"] = "0";  // Ensure content is not cached
+    await next();
+});
 
 app.MapControllerRoute(
     name: "default",
