@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Noc_App.Context;
 using Noc_App.Helpers;
+using Noc_App.Middleware;
 using Noc_App.Models;
 using Noc_App.Models.interfaces;
 using Noc_App.Models.Repository;
@@ -165,8 +166,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();
-//app.UseMiddleware<SessionValidationMiddleware>(); // Add custom session validation
-//app.UseMiddleware<IpBindingMiddleware>(); // Register IP Binding Middleware
+app.UseMiddleware<SessionValidationMiddleware>(); // Add custom session validation
+app.UseMiddleware<IpBindingMiddleware>(); // Register IP Binding Middleware
 //app.UseMiddleware<SessionExpiryMiddleware>();
 
 app.UseAuthentication();
