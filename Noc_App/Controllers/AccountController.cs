@@ -63,15 +63,74 @@ namespace Noc_App.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            var storedCookies = Request.Cookies.Keys;
-            foreach (var cookies in storedCookies)
+            // Clear all cookies
+            foreach (var cookie in Request.Cookies.Keys)
             {
-                Response.Cookies.Delete(cookies);
+                // Expire each cookie by setting an expiration in the past
+                Response.Cookies.Append(cookie, "", new CookieOptions
+                {
+                    Expires = DateTime.UtcNow.AddDays(-1),
+                    Path = "/", // Ensure this matches the cookie's path
+                    HttpOnly = true, // Ensure this matches the cookie's HttpOnly flag
+                    Secure = true // Ensure this matches the cookie's Secure flag (only for HTTPS)
+                });
+
+                // Special handling for Antiforgery, Cookies, and Session cookies
+                if (cookie.StartsWith(".AspNetCore.Antiforgery"))
+                {
+                    // Expire the Antiforgery cookie
+                    Response.Cookies.Append(cookie, "", new CookieOptions
+                    {
+                        Expires = DateTime.UtcNow.AddDays(-1),
+                        Path = "/",
+                        HttpOnly = true,
+                        Secure = true
+                    });
+                }
+                else if (cookie.StartsWith(".AspNetCore.Cookies"))
+                {
+                    // Expire the Authentication and Session cookies
+                    Response.Cookies.Append(cookie, "", new CookieOptions
+                    {
+                        Expires = DateTime.UtcNow.AddDays(-1),
+                        Path = "/",
+                        HttpOnly = true,
+                        Secure = true
+                    });
+                }
+                else if (cookie.StartsWith(".AspNetCore.Session"))
+                {
+                    // Expire the Authentication and Session cookies
+                    Response.Cookies.Append(cookie, "", new CookieOptions
+                    {
+                        Expires = DateTime.UtcNow.AddDays(-1),
+                        Path = "/",
+                        HttpOnly = true,
+                        Secure = true
+                    });
+                }
             }
+
+            // Clear session data
             HttpContext.Session.Clear();
+
+            // Expire the session cookie explicitly (this may not be necessary, as the session cookie is tied to the session)
+            Response.Cookies.Append(".AspNetCore.Session", "", new CookieOptions
+            {
+                Expires = DateTime.UtcNow.AddDays(-1),
+                Path = "/",
+                HttpOnly = true,
+                Secure = true
+            });
+
+
+            // Sign out the user from the authentication system
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("login", "account");
+
+            // Redirect to login page
+            return RedirectToAction("Login", "Account");
         }
+
 
         [HttpGet]
         [AllowAnonymous]
@@ -86,6 +145,56 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string ReturnUrl)
         {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear(); // Rotate session ID
+                                         // Regenerate session ID by clearing cookies
+            foreach (var cookie in Request.Cookies.Keys)
+            {
+                // Expire each cookie by setting an expiration in the past
+                Response.Cookies.Append(cookie, "", new CookieOptions
+                {
+                    Expires = DateTime.UtcNow.AddDays(-1),
+                    Path = "/", // Ensure this matches the cookie's path
+                    HttpOnly = true, // Ensure this matches the cookie's HttpOnly flag
+                    Secure = true // Ensure this matches the cookie's Secure flag (only for HTTPS)
+                });
+
+                // Special handling for Antiforgery, Cookies, and Session cookies
+                if (cookie.StartsWith(".AspNetCore.Antiforgery"))
+                {
+                    // Expire the Antiforgery cookie
+                    Response.Cookies.Append(cookie, "", new CookieOptions
+                    {
+                        Expires = DateTime.UtcNow.AddDays(-1),
+                        Path = "/",
+                        HttpOnly = true,
+                        Secure = true
+                    });
+                }
+                else if (cookie.StartsWith(".AspNetCore.Cookies"))
+                {
+                    // Expire the Authentication and Session cookies
+                    Response.Cookies.Append(cookie, "", new CookieOptions
+                    {
+                        Expires = DateTime.UtcNow.AddDays(-1),
+                        Path = "/",
+                        HttpOnly = true,
+                        Secure = true
+                    });
+                }
+                else if (cookie.StartsWith(".AspNetCore.Session"))
+                {
+                    // Expire the Authentication and Session cookies
+                    Response.Cookies.Append(cookie, "", new CookieOptions
+                    {
+                        Expires = DateTime.UtcNow.AddDays(-1),
+                        Path = "/",
+                        HttpOnly = true,
+                        Secure = true
+                    });
+                }
+            }
+
             LoginRoleViewModel login = new LoginRoleViewModel();
             LoginEncViewModel loginEncViewModel = new LoginEncViewModel();
             string password = _passwordService.DecryptPassword(model.Password);

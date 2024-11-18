@@ -8,12 +8,12 @@
     return false;
 }
 
-$(document).ready(function () {
-    $(document).on("contextmenu", function (e) {
-        e.preventDefault();
-        alert("Right-click is disabled.");
-    });
-});
+//$(document).ready(function () {
+//    $(document).on("contextmenu", function (e) {
+//        e.preventDefault();
+//        alert("Right-click is disabled.");
+//    });
+//});
 
 $(document).keydown(function (e) {
     // "C" key

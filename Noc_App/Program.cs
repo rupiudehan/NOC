@@ -122,7 +122,7 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(5);
     options.Cookie.HttpOnly = true;
-    //options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Strict;
     options.Cookie.IsEssential = true;
 });
@@ -147,6 +147,9 @@ else
 // Add the X-Content-Type-Options header to prevent MIME type sniffing
 app.Use((context, next) =>
 {
+    context.Response.Headers.Remove("Server");
+    //Middleware to remove the X - Powered - By header
+    context.Response.Headers.Remove("X-Powered-By");  // Remove X-Powered-By header
     // Strict Transport Security (HSTS)
     context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
     // Content Security Policy (CSP)
@@ -162,6 +165,8 @@ app.Use((context, next) =>
     "base-uri 'self'; " +
     "form-action 'self'; " +
     "frame-ancestors 'none'; " +
+    //"frame-src 'none'; " +
+    //"object-src 'none;'"+
     "child-src 'self' https://www.google.com;");
 
     // Prevent Clickjacking
@@ -208,12 +213,7 @@ app.UseCookiePolicy();
 ////    await next();
 ////});
 ///
-// Middleware to remove the X-Powered-By header
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.Remove("X-Powered-By");  // Remove X-Powered-By header
-    await next();
-});
+
 // Middleware to add Cache-Control headers
 app.Use(async (context, next) =>
 {
