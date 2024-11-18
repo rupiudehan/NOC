@@ -12,13 +12,18 @@ using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
+builder.WebHost.ConfigureKestrel(options => 
+{ 
+    options.ConfigureHttpsDefaults(httpsOptions => 
+    { 
+        // Set the TLS protocols to only allow TLS 1.2 and 1.3 
+        httpsOptions.SslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13; 
+    });  
+}); 
+// Disable the X-Powered-By header
+builder.Services.Configure<IISOptions>(options =>
 {
-    options.ConfigureHttpsDefaults(httpsOptions =>
-    {
-        // Set the TLS protocols to only allow TLS 1.2 and 1.3
-        httpsOptions.SslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13;
-    });
+    options.ForwardClientCertificate = false;  // Optional, if using client certificates
 });
 
 // Add services to the container.
@@ -35,11 +40,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         option.SlidingExpiration = true;
         //option.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Ensures cookies are sent only over HTTPS
     });
-//// Disable the X-Powered-By header
-//builder.Services.Configure<IISOptions>(options =>
-//{
-//    options.ForwardClientCertificate = false;  // Optional, if using client certificates
-//});
 builder.Services.AddAuthorization();
 
 //Register
@@ -144,20 +144,20 @@ else
 }
 
 // Add the X-Content-Type-Options header to prevent MIME type sniffing
-//app.Use((context, next) =>
-//{
-//    // Strict Transport Security (HSTS)
-//    context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
-//    // Content Security Policy (CSP)
-//    //context.Response.Headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' https://example.com; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'; object-src 'none'; media-src 'self'; connect-src 'self'";
-//    // Prevent Clickjacking
-//    context.Response.Headers["X-Frame-Options"] = "DENY"; // or "SAMEORIGIN"
-//    // Enable XSS protection in browsers
-//    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
-//    // Prevent MIME type sniffing
-//    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-//    return next();
-//});
+app.Use((context, next) =>
+{
+    // Strict Transport Security (HSTS)
+    context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
+    // Content Security Policy (CSP)
+    //context.Response.Headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' https://example.com; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'; object-src 'none'; media-src 'self'; connect-src 'self'";
+    // Prevent Clickjacking
+    context.Response.Headers["X-Frame-Options"] = "DENY"; // or "SAMEORIGIN"
+    // Enable XSS protection in browsers
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    // Prevent MIME type sniffing
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    return next();
+});
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
