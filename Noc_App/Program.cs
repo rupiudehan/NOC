@@ -150,7 +150,20 @@ app.Use((context, next) =>
     // Strict Transport Security (HSTS)
     context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
     // Content Security Policy (CSP)
-    //context.Response.Headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' https://example.com; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'; object-src 'none'; media-src 'self'; connect-src 'self'";
+    //context.Response.Headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'sha256-xyz123' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'; object-src 'none'; media-src 'self'; connect-src 'self'";
+    context.Response.Headers.Add("Content-Security-Policy",
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "img-src 'self' data: https://trusted-images.example.com; " +
+    "font-src 'self' https://fonts.gstatic.com data:; " +
+    "connect-src 'self' https://api.example.com http://49.50.66.74 http://localhost:44322 http://localhost:44132 ws://localhost:15178; " +
+    "object-src 'none'; " +
+    "base-uri 'self'; " +
+    "form-action 'self'; " +
+    "frame-ancestors 'none'; " +
+    "child-src 'self' https://www.google.com;");
+
     // Prevent Clickjacking
     context.Response.Headers["X-Frame-Options"] = "DENY"; // or "SAMEORIGIN"
     // Enable XSS protection in browsers
