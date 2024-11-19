@@ -143,6 +143,14 @@
                                                         <th>Reject</th>
                                                     }
                                                 }
+                                                else
+                                                {
+                                                    @if (arry[0].Any(x => x.TotalArea > 25))
+                                                    {
+                                                        <th>Issue</th>
+                                                        <th>Reject</th>
+                                                    }
+                                                }
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -636,6 +644,29 @@
                                                                 }
                                                             }
                                                         }
+                                                    }
+                                                    else
+                                                    {
+                                                        @if (arry[0].Any(x => x.TotalArea >25))
+                                                        {
+                                                            @if (data.TotalArea > 25)
+                                                            {
+                                                                <td>
+                                                                    <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Exemption Letter</a>
+
+                                                                </td>
+                                                                <td>
+                                                                    <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td><td></td>
+                                                            }
+                                                        }
+                                                        
+                                                        
                                                     }
                                                 </tr>
                                                 count = count + 1;
