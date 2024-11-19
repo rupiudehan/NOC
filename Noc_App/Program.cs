@@ -33,7 +33,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(option =>
     {
-        option.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+        option.ExpireTimeSpan = TimeSpan.FromMinutes(15);
         option.LoginPath = "/Account/Login";
         //option.LoginPath = "/Account/Verify";
         //option.AccessDeniedPath = "/Account/Verify";
