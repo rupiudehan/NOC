@@ -157,7 +157,7 @@ app.Use((context, next) =>
     context.Response.Headers.Add("Content-Security-Policy",
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com https://cdn.datatables.net https://code.highcharts.com/highcharts.js https://code.highcharts.com/modules/exporting.js https://code.highcharts.com/modules/export-data.js https://code.highcharts.com/modules/accessibility.js; " +
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://www.gstatic.com; " +
     "img-src 'self' data: http://localhost:5126/ApprovalProcess/Download http://49.50.66.74/ApprovalProcess/Download; " +
     "font-src 'self' https://fonts.gstatic.com data:; " +
     "connect-src 'self' https://api.example.com http://49.50.66.74 http://localhost:44322 http://localhost:44132 ws://localhost:15178 ws://localhost:44352; " +
