@@ -337,115 +337,143 @@ namespace Noc_App.Controllers
                                                                   ).ToList();
                             List<UserRoleDetailsViewModel> RoleDetail = new List<UserRoleDetailsViewModel>();
                             List<string> roles = root.user_info.RoleID.Split(',').ToList();
-                            var ro = (from rol in _userRolesRepository.GetAll().AsEnumerable()
-                                      join nr in roles on rol.Id.ToString() equals nr
-                                      select new
-                                      {
-                                          roleId = rol.Id.ToString()
-                                      }).FirstOrDefault();
-
-                            var role = ro == null ? "0" : ro.roleId;
-
-                            //foreach (string role in roles)
-                            //{
-                            //    if (role != "2")
-                            //    {
-                            if (ro == null)
+                            int cnt = 1;
+                            foreach (var role1 in roles)
                             {
-                                loginEncViewModel.Success = "0";
-                                loginEncViewModel.Errors = "Invalid user.";
-                                ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                                return Json(loginEncViewModel);
-                            }
-                            else
-                            {
-                                if (role == "8" /*|| role == "10" || role == "128" || role == "6"*/)
-                                {
-                                    RoleDetail = (from rr in LocationRoleDetail
-                                                  join r in _circleRepository.GetAll().AsEnumerable() on rr.Location.office_id equals r.Id
-                                                  join loc in _circleDivRepository.GetAll() on rr.Location.office_id equals loc.CircleId
-                                                  join div in _divisionRepository.GetAll() on loc.DivisionId equals div.Id
-                                                  where rr.Roles.Id == Convert.ToInt32(role)
-                                                  select new UserRoleDetailsViewModel
-                                                  {
-                                                      DivisionId = div.Id,
-                                                      DivisionName = div.Name + " (" + r.Name + ")",
-                                                      AppRoleName = rr.Roles.RoleName,
-                                                      Id = rr.Roles.Id,
-                                                      RoleLevel = rr.Roles.RoleLevel,
-                                                      RoleName = rr.Roles.RoleName
-                                                  }
-                                                                 ).ToList();
-                                }
-                                else if (role == "60" || role == "67" || role == "7")
-                                {
+                                var ro = (from rol in _userRolesRepository.GetAll().AsEnumerable()
+                                          join nr in roles on rol.Id.ToString() equals nr
+                                          where nr== role1
+                                          select new
+                                          {
+                                              roleId = rol.Id.ToString()
+                                          }).FirstOrDefault();
 
-                                    RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
-                                                  join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
-                                                  where rr.Roles.Id == Convert.ToInt32(role)
-                                                  select new UserRoleDetailsViewModel
-                                                  {
-                                                      DivisionId = r.Id,
-                                                      DivisionName = r.Name,
-                                                      AppRoleName = rr.Roles.RoleName,
-                                                      Id = rr.Roles.Id,
-                                                      RoleLevel = rr.Roles.RoleLevel,
-                                                      RoleName = rr.Roles.RoleName
-                                                  }
-                                                                 ).ToList();
-                                }
-                                else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128")
+                                var role = ro == null ? "0" : ro.roleId;
+
+                                //foreach (string role in roles)
+                                //{
+                                //    if (role != "2")
+                                //    {
+                                if (ro == null)
                                 {
-                                    RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
-                                                  join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
-                                                  where rr.Roles.Id == Convert.ToInt32(role)
-                                                  select new UserRoleDetailsViewModel
-                                                  {
-                                                      DivisionId = r.Id,
-                                                      DivisionName = r.Name,
-                                                      AppRoleName = rr.Roles.RoleName,
-                                                      Id = rr.Roles.Id,
-                                                      RoleLevel = rr.Roles.RoleLevel,
-                                                      RoleName = rr.Roles.RoleName
-                                                  }
-                                                                 ).ToList();
-                                }
-                            }
-
-                            //    }
-                            //}
-
-                            string divisionRolePairs = "";// string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
-                            foreach (var item in root.user_info.OfficeWiseRoleID)
-                            {
-                                if (item.role != 2)
-                                {
-
-                                    if (divisionRolePairs != "")
-                                        divisionRolePairs = divisionRolePairs + "," + item.office_id + "-" + item.role;
+                                    if (cnt == roles.Count)
+                                    {
+                                        loginEncViewModel.Success = "0";
+                                        loginEncViewModel.Errors = "Invalid user.";
+                                        ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                                        return Json(loginEncViewModel);
+                                    }
                                     else
-                                        divisionRolePairs = item.office_id + "-" + item.role;
+                                    {
+                                        cnt++;
+                                        continue;
+                                    }
                                 }
+                                else
+                                {
+                                    if (role == "8" /*|| role == "10" || role == "128" || role == "6"*/)
+                                    {
+                                        RoleDetail = (from rr in LocationRoleDetail
+                                                      join r in _circleRepository.GetAll().AsEnumerable() on rr.Location.office_id equals r.Id
+                                                      join loc in _circleDivRepository.GetAll() on rr.Location.office_id equals loc.CircleId
+                                                      join div in _divisionRepository.GetAll() on loc.DivisionId equals div.Id
+                                                      where rr.Roles.Id == Convert.ToInt32(role)
+                                                      select new UserRoleDetailsViewModel
+                                                      {
+                                                          DivisionId = div.Id,
+                                                          DivisionName = div.Name + " (" + r.Name + ")",
+                                                          AppRoleName = rr.Roles.RoleName,
+                                                          Id = rr.Roles.Id,
+                                                          RoleLevel = rr.Roles.RoleLevel,
+                                                          RoleName = rr.Roles.RoleName
+                                                      }
+                                                                     ).ToList();
+                                        if (RoleDetail.Count == 0)
+                                        {
+                                            continue;
+
+                                        }
+                                    }
+                                    else if (role == "60" || role == "67" || role == "7")
+                                    {
+
+                                        RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                                                      join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                      where rr.Roles.Id == Convert.ToInt32(role)
+                                                      select new UserRoleDetailsViewModel
+                                                      {
+                                                          DivisionId = r.Id,
+                                                          DivisionName = r.Name,
+                                                          AppRoleName = rr.Roles.RoleName,
+                                                          Id = rr.Roles.Id,
+                                                          RoleLevel = rr.Roles.RoleLevel,
+                                                          RoleName = rr.Roles.RoleName
+                                                      }
+                                                                     ).ToList();
+                                        if (RoleDetail.Count== 0)
+                                        {
+                                            continue;
+
+                                        }
+                                    }
+                                    else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128")
+                                    {
+                                        RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
+                                                      join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                      where rr.Roles.Id == Convert.ToInt32(role)
+                                                      select new UserRoleDetailsViewModel
+                                                      {
+                                                          DivisionId = r.Id,
+                                                          DivisionName = r.Name,
+                                                          AppRoleName = rr.Roles.RoleName,
+                                                          Id = rr.Roles.Id,
+                                                          RoleLevel = rr.Roles.RoleLevel,
+                                                          RoleName = rr.Roles.RoleName
+                                                      }
+                                                                     ).ToList();
+                                        if (RoleDetail.Count == 0)
+                                        {
+                                            continue;
+
+                                        }
+                                    }
+                                }
+
+                                //    }
+                                //}
+
+                                string divisionRolePairs = "";// string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
+                                foreach (var item in root.user_info.OfficeWiseRoleID)
+                                {
+                                    if (item.role != 2)
+                                    {
+
+                                        if (divisionRolePairs != "")
+                                            divisionRolePairs = divisionRolePairs + "," + item.office_id + "-" + item.role;
+                                        else
+                                            divisionRolePairs = item.office_id + "-" + item.role;
+                                    }
+                                }
+
+
+                                login.Roles = RoleDetail.Take(1).ToList();
+                                login.Designation = root.user_info.Designation;
+                                //login.DivisionID = root.user_info.DivisionID.ToString();
+                                login.DistrictID = root.user_info.DistrictID.ToString();
+                                login.EmployeeName = root.user_info.EmployeeName;
+                                login.EmpID = root.user_info.EmpID;
+                                login.Name = root.user_info.Name;
+                                login.RoleID = role;
+                                login.DivisionName = RoleDetail.Count() > 0 ? RoleDetail.Take(1).FirstOrDefault().DivisionName : "";
+                                login.RoleWithOffice = divisionRolePairs;
+                                string json = JsonConvert.SerializeObject(login);
+
+                                IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                                string encData = obj.Encrypt(json);
+                                loginEncViewModel.EncData = encData;
+                                loginEncViewModel.Success = "1";
+                                break;
                             }
-
-
-                            login.Roles = RoleDetail.Take(1).ToList();
-                            login.Designation = root.user_info.Designation;
-                            //login.DivisionID = root.user_info.DivisionID.ToString();
-                            login.DistrictID = root.user_info.DistrictID.ToString();
-                            login.EmployeeName = root.user_info.EmployeeName;
-                            login.EmpID = root.user_info.EmpID;
-                            login.Name = root.user_info.Name;
-                            login.RoleID = role;
-                            login.DivisionName = RoleDetail.Count() > 0 ? RoleDetail.Take(1).FirstOrDefault().DivisionName : "";
-                            login.RoleWithOffice = divisionRolePairs;
-                            string json = JsonConvert.SerializeObject(login);
-
-                            IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
-                            string encData = obj.Encrypt(json);
-                            loginEncViewModel.EncData = encData;
-                            loginEncViewModel.Success = "1";
-
                             return Json(loginEncViewModel);
                         }
                     }

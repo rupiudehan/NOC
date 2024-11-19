@@ -20,8 +20,8 @@ namespace Noc_App.Middleware
         {
 
             // Allow unrestricted access to login and register pages
-            if (context.Request.Path.StartsWithSegments("/") || context.Request.Path.StartsWithSegments("/Account/Login") || context.Request.Path.StartsWithSegments("/Account/RedirecToLoginRole")
-                || context.Request.Path.StartsWithSegments("/Grant/Create") || context.Request.Path.StartsWithSegments("/Grant/TrackStatus") || context.Request.Path.StartsWithSegments("/Grant/UserDownload") || context.Request.Path.StartsWithSegments("/Grant/Modify"))
+            if (context.Request.Path.StartsWithSegments("/") || context.Request.Path.StartsWithSegments("/Account") || context.Request.Path.StartsWithSegments("/Payment")
+                || context.Request.Path.StartsWithSegments("/Grant"))
             {
                 await _next(context);
                 return;

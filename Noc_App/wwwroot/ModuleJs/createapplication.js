@@ -586,6 +586,7 @@ $(document).ready(function () {
     });
     $("#SelectedDivisionId").change(function () {
         var divisionId = $(this).val();
+
         $.ajax({
             url: "/Grant/GetSubDivisions",
             type: "POST",
