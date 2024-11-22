@@ -517,7 +517,6 @@ function LoadReportApplicationsT() {
     title.text('Total Applications');
     //table.DataTable().clear().destroy();
     $("#divLoaderApp").show(); $('.rptApp').hide();
-
     $.ajax({
         url: "/Home/" + method,
         type: "POST",
@@ -588,7 +587,6 @@ function LoadReportApplicationsT() {
     });
 
 }
-
 function formatDate(dateString) {
     // Create a new Date object from the input string
     var date = new Date(dateString);
