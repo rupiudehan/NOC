@@ -39,21 +39,28 @@ function ToggleLoadder(isVisible) {
 
 
 $(function () {
-    $('#Password').on('change', function () {
-        var pass = $(this).val();
-        //encryptData(pass);
-        const encryptedPassword = encryptPassword(pass);
+    //$('#Password').on('change', function () {
+    //    var pass = $(this).val();
+    //    //encryptData(pass);
+    //    const encryptedPassword = encryptPassword(pass);
 
-        // Now `encryptedPasswordBase64` contains the encrypted password as a Base64 string
+    //    // Now `encryptedPasswordBase64` contains the encrypted password as a Base64 string
 
-        $(this).val(encryptedPassword);
-    });
+    //    $(this).val(encryptedPassword);
+    //});
 
     $('#loginForm').on('submit', function (event) {
         event.preventDefault();
         ToggleLoadder(true);
         var email = $('#Email').val();
         var password = $('#Password').val();
+        //encryptData(pass);
+        const encryptedPassword = encryptPassword(password);
+
+        // Now `encryptedPasswordBase64` contains the encrypted password as a Base64 string
+
+        $('#Password').val(encryptedPassword);
+        password = encryptedPassword;
         var token = $('#loginToken').val();
         var module = 'login';
         var resultProjectMessage = $('#result' + module + 'Message');
