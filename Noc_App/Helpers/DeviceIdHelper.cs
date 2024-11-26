@@ -5,7 +5,8 @@
         public static string GenerateDeviceId(HttpContext context)
         {
             var userAgent = context.Request.Headers["User-Agent"].ToString();
-            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(userAgent));
+            var deviceId = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(userAgent));
+            return deviceId;
         }
     }
 

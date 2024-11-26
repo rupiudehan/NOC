@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Newtonsoft.Json;
 using Noc_App.PaymentUtilities;
+using System.Security.Policy;
 
 namespace Noc_App.Controllers
 {
@@ -37,12 +38,14 @@ namespace Noc_App.Controllers
         private readonly PasswordEncryptionService _passwordService;
         private readonly IConfiguration _configuration;
         private readonly IRepository<UserSessionDetails> _userSessionnRepository;
+        private readonly ITokenService _tokenService;
+
 
         //private readonly IRepository<DrainDetails> _drainRepo;
 
         public AccountController(GoogleCaptchaService googleCaptchaService, IRepository<DivisionDetails> divisionRepository, 
             IRepository<SubDivisionDetails> subDivisionRepository, IRepository<TehsilBlockDetails> tehsilBlockRepository, /*IRepository<VillageDetails> villageRepository, */
-            IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository, IRepository<CircleDetails> circleRepository, IRepository<UserSessionDetails> userSessionnRepository
+            IEmailService emailService, IRepository<UserRoleDetails> userRolesRepository, IRepository<CircleDetails> circleRepository, IRepository<UserSessionDetails> userSessionnRepository, ITokenService tokenService
             , IRepository<CircleDivisionMapping> circleDivRepository, IRepository<EstablishmentOfficeDetails> estabOfficeRepository, PasswordEncryptionService passwordService, IConfiguration configuration)
         {
             _divisionRepository = divisionRepository;
@@ -58,6 +61,7 @@ namespace Noc_App.Controllers
             _passwordService = passwordService;
             _configuration = configuration;
             _userSessionnRepository = userSessionnRepository;
+            _tokenService = tokenService;
         }
 
         [HttpPost]
@@ -110,7 +114,12 @@ namespace Noc_App.Controllers
                     });
                 }
             }
-
+            // Invalidate the session token
+            var token = HttpContext.Session.GetString("SessionToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                _tokenService.InvalidateToken(token);
+            }
             // Clear session data
             HttpContext.Session.Clear();
 
@@ -220,6 +229,16 @@ namespace Noc_App.Controllers
                     loginEncViewModel.Errors = "You are not human. Please the refresh page.";
                     ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
                     return Json(loginEncViewModel);
+                }
+                var token = HttpContext.Session.GetString("SessionToken");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    if (!_tokenService.ValidateToken(token))
+                    {
+                        loginEncViewModel.Errors = "Invalid or expired session.";
+                        ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                        return Json(loginEncViewModel);
+                    }
                 }
                 if (ModelState.IsValid)
                 {
@@ -530,6 +549,9 @@ namespace Noc_App.Controllers
                 HttpContext.Session.SetString("DeviceId", DeviceIdHelper.GenerateDeviceId(HttpContext));
                 HttpContext.Session.SetString("UserIp", HttpContext.Connection.RemoteIpAddress?.ToString());
 
+                string token = _tokenService.GenerateToken();
+                HttpContext.Session.SetString("SessionToken", token);
+
                 IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
                  _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
                  _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
@@ -631,6 +653,20 @@ namespace Noc_App.Controllers
         {
             try
             {
+                var tokenOld = HttpContext.Session.GetString("SessionToken");
+                if (!string.IsNullOrEmpty(tokenOld))
+                {
+                    if (!_tokenService.ValidateToken(tokenOld))
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid attempt to switch role");
+                        //return View(model);
+                        return RedirectToAction("Login", "Account");
+                    }
+                }
+
+                string token = _tokenService.GenerateToken();
+                HttpContext.Session.SetString("SessionToken", token);
+
                 if (model != null)
                 {
                     string role = "";
@@ -697,15 +733,17 @@ namespace Noc_App.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid attempt to switch role");
+                    ModelState.AddModelError(string.Empty, "Invalid attempt to switch role"); 
                 }
-                return View(model);
+                //return View(model);
+                return RedirectToAction("Login", "Account");
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "An error occored while switching role");
             }
-            return View(model);
+            //return View(model);
+            return RedirectToAction("Login", "Account");
         }
 
         private string NCC_encryptHelper(string plainText, string key, string iv)

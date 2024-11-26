@@ -66,6 +66,8 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod();
         });
 });
+
+builder.Services.AddSingleton<ITokenService, TokenService>(); // Register the token service for token management
 builder.Services.Configure<GoogleCaptchaConfig>(builder.Configuration.GetSection("reCaptcha"));
 builder.Services.Configure<IFMS_PaymentConfig>(builder.Configuration.GetSection("IFMSPayOptions"));
 builder.Services.Configure<PasswordEncryption>(builder.Configuration.GetSection("aesEncrypt"));
@@ -156,7 +158,7 @@ app.Use((context, next) =>
     //context.Response.Headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'sha256-xyz123' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'; object-src 'none'; media-src 'self'; connect-src 'self'";
     context.Response.Headers.Add("Content-Security-Policy",
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com https://cdn.datatables.net https://code.highcharts.com/highcharts.js https://code.highcharts.com/modules/exporting.js https://code.highcharts.com/modules/export-data.js https://code.highcharts.com/modules/accessibility.js https://ifmstg.punjab.gov.in https://ifms.punjab.gov.in https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js https://code.jquery.com/jquery-3.6.0.min.js; " +
+    "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com https://cdn.datatables.net https://code.highcharts.com/highcharts.js https://code.highcharts.com/modules/exporting.js https://code.highcharts.com/modules/export-data.js https://code.highcharts.com/modules/accessibility.js https://ifmstg.punjab.gov.in https://ifms.punjab.gov.in https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js https://code.jquery.com/jquery-3.6.0.min.js http://localhost:51061 ws://localhost:51061; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://www.gstatic.com https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css; " +
     "img-src 'self' data: http://localhost:5126/ApprovalProcess/Download http://49.50.66.74/ApprovalProcess/Download http://49.50.66.74/lib http://49.50.66.74/img http://49.50.66.74/images http://49.50.66.74/LandingPage/assets/img http://49.50.66.74/LandingPage/assets2/img https://ifms.punjab.gov.in; " +
     "font-src 'self' https://fonts.gstatic.com data:; " +
@@ -187,6 +189,7 @@ app.UseSession();
 app.UseMiddleware<SessionValidationMiddleware>(); // Add custom session validation
 app.UseMiddleware<IpBindingMiddleware>(); // Register IP Binding Middleware
 app.UseMiddleware<SessionExpiryMiddleware>();
+//app.UseMiddleware<SessionTokenMiddleware>(); // Add the session token validation middleware
 
 app.UseAuthentication();
 
