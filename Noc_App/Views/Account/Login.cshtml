@@ -12,6 +12,7 @@
     // Layout = "~/Views/Account/_AccountLayout.cshtml";
     Layout = "~/Views/HomeLanding/_HomeLayout.cshtml";
     string returnedUrl = ViewData["returnedUrl"] as string;
+    string ses = ViewBag.S;
 }
 <main id="main">
     <section id="contact" class="contact">
@@ -29,6 +30,7 @@
                         <div class="row">
                             <div class="form-group mt-3">
                                 <label asp-for="Email">Username/Email</label>
+                                <input id="ss" value="@ses" type="hidden" />
                                 <input id="loginToken" value="0" type="hidden" asp-for="Token" />
                                 @*  <div id="recaptcha-container"></div> *@
                                 <div class="g-recaptcha" data-sitekey="@GoogleCaptchaConfig.Value.SiteKey" data-callback="onReCaptchaSuccess" data-size="invisible"></div>

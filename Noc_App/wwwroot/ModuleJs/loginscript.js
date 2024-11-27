@@ -54,13 +54,16 @@ $(function () {
         ToggleLoadder(true);
         var email = $('#Email').val();
         var password = $('#Password').val();
+        var s = $('#ss').val();
         //encryptData(pass);
         const encryptedPassword = encryptPassword(password);
+        const str = encryptedPassword + '|' + email + '|' + s;
+        const encryptedPassword2 = encryptPassword(str);
 
         // Now `encryptedPasswordBase64` contains the encrypted password as a Base64 string
 
-        $('#Password').val(encryptedPassword);
-        password = encryptedPassword;
+        $('#Password').val(encryptedPassword2);
+        password = encryptedPassword2;
         var token = $('#loginToken').val();
         var module = 'login';
         var resultProjectMessage = $('#result' + module + 'Message');

@@ -146,6 +146,28 @@ namespace Noc_App.Controllers
         public IActionResult Login(string ReturnUrl)
         {
             ViewData["returnedUrl"] = ReturnUrl;
+            string token = _tokenService.GenerateToken();
+            HttpContext.Session.SetString("Ses", token);
+
+            IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
+                _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
+                _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
+                _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
+                , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
+                , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+
+            SessionViewModel ses = new SessionViewModel();
+            ses.Token=token;
+            string ChecksumKey = settings.ChecksumKey;
+            string edKey = settings.edKey;
+            string edIV = settings.edIV;
+
+            string json = JsonConvert.SerializeObject(ses);
+
+            IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+            string encData = obj.Encrypt(json);
+            ViewBag.S = encData;
+
             return View();
         }
 
@@ -154,69 +176,57 @@ namespace Noc_App.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string ReturnUrl)
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            HttpContext.Session.Clear(); // Rotate session ID
-                                         // Regenerate session ID by clearing cookies
-            foreach (var cookie in Request.Cookies.Keys)
-            {
-                // Expire each cookie by setting an expiration in the past
-                Response.Cookies.Append(cookie, "", new CookieOptions
-                {
-                    Expires = DateTime.UtcNow.AddDays(-1),
-                    Path = "/", // Ensure this matches the cookie's path
-                    HttpOnly = true, // Ensure this matches the cookie's HttpOnly flag
-                    Secure = true // Ensure this matches the cookie's Secure flag (only for HTTPS)
-                });
-
-                // Special handling for Antiforgery, Cookies, and Session cookies
-                if (cookie.StartsWith(".AspNetCore.Antiforgery"))
-                {
-                    // Expire the Antiforgery cookie
-                    Response.Cookies.Append(cookie, "", new CookieOptions
-                    {
-                        Expires = DateTime.UtcNow.AddDays(-1),
-                        Path = "/",
-                        HttpOnly = true,
-                        Secure = true
-                    });
-                }
-                else if (cookie.StartsWith(".AspNetCore.Cookies"))
-                {
-                    // Expire the Authentication and Session cookies
-                    Response.Cookies.Append(cookie, "", new CookieOptions
-                    {
-                        Expires = DateTime.UtcNow.AddDays(-1),
-                        Path = "/",
-                        HttpOnly = true,
-                        Secure = true
-                    });
-                }
-                else if (cookie.StartsWith(".AspNetCore.Session"))
-                {
-                    // Expire the Authentication and Session cookies
-                    Response.Cookies.Append(cookie, "", new CookieOptions
-                    {
-                        Expires = DateTime.UtcNow.AddDays(-1),
-                        Path = "/",
-                        HttpOnly = true,
-                        Secure = true
-                    });
-                }
-            }
-
-            LoginRoleViewModel login = new LoginRoleViewModel();
             LoginEncViewModel loginEncViewModel = new LoginEncViewModel();
-            string password = _passwordService.DecryptPassword(model.Password);
-            login.Name = model.Email; login.Token = model.Token;
             try
             {
+                loginEncViewModel.Success = "0";
+            LoginRoleViewModel login = new LoginRoleViewModel();
+            string password1 = _passwordService.DecryptPassword(model.Password);
+            var str = password1.Split('|');
+            string password = _passwordService.DecryptPassword(str[0]); 
 
-                IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
-                    _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
-                    _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
-                    _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
-                    , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
-                    , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+            if (model.Email != str[1])
+            {
+                loginEncViewModel.Errors = "Invalid login attempt.";
+                ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                return Json(loginEncViewModel);
+            }
+            
+            login.Name = model.Email; login.Token = model.Token;
+
+            IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
+                 _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
+                 _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
+                 _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
+                 , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
+                 , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+
+            IFMS_EncrDecr objEnc = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
+            string decodedDate = objEnc.Decrypt(str[2]);
+
+            SessionViewModel session = Newtonsoft.Json.JsonConvert.DeserializeObject<SessionViewModel>(decodedDate);
+              string originalSession =  HttpContext.Session.GetString("Ses");
+
+                if (session.Token != originalSession)
+                {
+                    loginEncViewModel.Errors = "Invalid login attempt.";
+                    ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                    return Json(loginEncViewModel);
+                }
+                else
+                {
+                    var sessionDetails=_userSessionnRepository.GetAll().Where(x => x.Hrms == model.Email).FirstOrDefault();
+                    if (sessionDetails != null)
+                    {
+                        if (sessionDetails.LastSessionId == session.Token)
+                        {
+                            loginEncViewModel.Errors = "Invalid login attempt.";
+                            ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                            return Json(loginEncViewModel);
+                        }
+                    }
+                }
+
 
                 string ChecksumKey = settings.ChecksumKey;
                 string edKey = settings.edKey;
@@ -510,30 +520,6 @@ namespace Noc_App.Controllers
             return Json(loginEncViewModel);
         }
 
-        //[HttpGet]
-        //[Obsolete]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> RedirecToLoginRole(LoginRoleViewModel model)
-        //{
-        //    try
-        //    {
-        //        if (model != null)
-        //        { 
-
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-        //        }
-        //        return View(model);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-        //    }
-        //    return View(model);
-        //}
-
         [HttpPost]
         [Obsolete]
         [AllowAnonymous]
@@ -549,7 +535,7 @@ namespace Noc_App.Controllers
                 HttpContext.Session.SetString("DeviceId", DeviceIdHelper.GenerateDeviceId(HttpContext));
                 HttpContext.Session.SetString("UserIp", HttpContext.Connection.RemoteIpAddress?.ToString());
 
-                string token = _tokenService.GenerateToken();
+                string token = HttpContext.Session.GetString("Ses");
                 HttpContext.Session.SetString("SessionToken", token);
 
                 IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
@@ -567,31 +553,45 @@ namespace Noc_App.Controllers
                 if (model != null)
                 {
                     // Generate a session ID and store it
-                    var sessionId = SessionHelper.GenerateSessionId(HttpContext);
+                    var sessionId = HttpContext.Session.GetString("Ses");
                     DateTime loginTime = DateTime.Now;
 
-                    var hrms = model.EmpID; // Fetch user HRMS or unique identifier here
+                    var EmpID = model.EmpID; // Fetch user HRMS or unique identifier here
+                    var hrms = model.Name;
+                   UserSessionDetails res= _userSessionnRepository.GetAll().Where(x=>x.Hrms==hrms).FirstOrDefault();
 
-                    // Store session details in the database
-                    var userSession = new UserSessionDetails
+                    if (res == null)
                     {
-                        Id = Guid.NewGuid(),
-                        Hrms = hrms,
-                        LastSessionId = sessionId,
-                        LastLoginTime = loginTime
-                    };
 
-                    //List<UserSessionDetails> sessionDetail = _userSessionnRepository.GetAll()
-                    //                                         .Where(u => u.Hrms == hrms && u.LastSessionId== sessionId)
-                    //                                         .OrderByDescending(u => u.LastLoginTime)
-                    //                                         .ToList();
-                    //if (sessionDetail.Count > 0) { 
 
-                    //}
-                    //else
-                    //{
-                    // Save to the database
-                    await _userSessionnRepository.CreateAsync(userSession);
+                        // Store session details in the database
+                        var userSession = new UserSessionDetails
+                        {
+                            Id = Guid.NewGuid(),
+                            Hrms = hrms,
+                            EmpId=EmpID,
+                            LastSessionId = sessionId,
+                            LastLoginTime = loginTime
+                        };
+
+                        //List<UserSessionDetails> sessionDetail = _userSessionnRepository.GetAll()
+                        //                                         .Where(u => u.Hrms == hrms && u.LastSessionId== sessionId)
+                        //                                         .OrderByDescending(u => u.LastLoginTime)
+                        //                                         .ToList();
+                        //if (sessionDetail.Count > 0) { 
+
+                        //}
+                        //else
+                        //{
+                        // Save to the database
+                        await _userSessionnRepository.CreateAsync(userSession);
+                    }
+                    else
+                    {
+                        res.LastSessionId= sessionId;
+                        res.LastLoginTime= loginTime;
+                        await _userSessionnRepository.UpdateAsync(res);
+                    }
                     //}
                     HttpContext.Session.SetString("SessionId", sessionId);
                     HttpContext.Session.SetString("SessionTime", loginTime.ToString());
