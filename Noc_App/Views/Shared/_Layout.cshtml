@@ -11,9 +11,11 @@
     var surnameClaim = User.FindFirst(ClaimTypes.Surname);
     var localityClaim = User.FindFirst(ClaimTypes.Locality);
     var roleClaim = User.FindFirst(ClaimTypes.Role);
+    var countClaim = User.FindFirst(ClaimTypes.Country);
     string locality = localityClaim != null ? localityClaim.Value : "Locality not found";
     string surname = surnameClaim != null ? surnameClaim.Value : "Surname not found";
     string role = roleClaim != null ? roleClaim.Value : "Role not found";
+    string cont = countClaim != null ? countClaim.Value : "Country not found";
     var session = ViewContext.HttpContext.Session;
     List<UserMenuBlockViewModel> menuItems = new List<UserMenuBlockViewModel>();
 
@@ -399,6 +401,7 @@
                                                             <tr>
                                                                 <td>
                                                                     <form method="post" id="postDataForm" asp-action="SwitchRole" asp-controller="Account">
+                                                                        <input type="hidden" value="@cont" id="SessionId" name="SessionId" />
                                                                         <input type="hidden" value="@item.RoleID" id="RoleID" name="RoleID" />
                                                                         <input type="hidden" value="@item.DivisionID" id="DivisionID" name="DivisionID" />
                                                                         <input type="hidden" value="@item.UserId" id="EmpID" name="EmpID" />

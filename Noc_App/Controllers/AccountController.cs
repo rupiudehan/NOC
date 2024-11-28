@@ -19,6 +19,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using Newtonsoft.Json;
 using Noc_App.PaymentUtilities;
 using System.Security.Policy;
+using System;
 
 namespace Noc_App.Controllers
 {
@@ -333,13 +334,22 @@ namespace Noc_App.Controllers
                             login.RoleID = role;
                             login.RoleWithOffice = divisionRolePairs;
                             login.DivisionName = RoleDetail.Take(1).FirstOrDefault().DivisionName;
+                            token = _tokenService.GenerateToken();
+                            ses.Token = token;
+
+                            string jsonSession = JsonConvert.SerializeObject(ses);
+
+                            IFMS_EncrDecr objSession = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                            string encDataSession = objSession.Encrypt(jsonSession);
+                            login.SessionId= encDataSession;
+
+                            HttpContext.Session.SetString("Ses", token);
                             string json2 = JsonConvert.SerializeObject(login);
 
                             IFMS_EncrDecr obj2 = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
                             string encData2 = obj2.Encrypt(json2);
                             loginEncViewModel.EncData = encData2;
                             loginEncViewModel.Success = "1";
-                            HttpContext.Session.SetString("Ses", token);
                             ViewBag.S = encData;
                             loginEncViewModel.ss = encData;
 
@@ -531,13 +541,21 @@ namespace Noc_App.Controllers
                                 login.RoleID = role;
                                 login.DivisionName = RoleDetail.Count() > 0 ? RoleDetail.Take(1).FirstOrDefault().DivisionName : "";
                                 login.RoleWithOffice = divisionRolePairs;
+                                token = _tokenService.GenerateToken();
+                                ses.Token=token;
+                                string jsonSession = JsonConvert.SerializeObject(ses);
+
+                                IFMS_EncrDecr objSession = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                                string encDataSession = objSession.Encrypt(jsonSession);
+                                login.SessionId = encDataSession;
+
+                                HttpContext.Session.SetString("Ses", token);
                                 string json2 = JsonConvert.SerializeObject(login);
 
                                 IFMS_EncrDecr obj2 = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
                                 string encData2 = obj2.Encrypt(json2);
                                 loginEncViewModel.EncData = encData2;
                                 loginEncViewModel.Success = "1";
-                                HttpContext.Session.SetString("Ses", token);
                                 ViewBag.S = encData;
                                 loginEncViewModel.ss = encData;
                                 break;
@@ -579,6 +597,7 @@ namespace Noc_App.Controllers
 
                 string token = HttpContext.Session.GetString("Ses");
                 //HttpContext.Session.SetString("SessionToken", token);
+                string tokenSession = _tokenService.GenerateToken();
 
                 IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
                  _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
@@ -588,9 +607,37 @@ namespace Noc_App.Controllers
                  , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
 
                 IFMS_EncrDecr obj = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
+
+
+                string ChecksumKey = settings.ChecksumKey;
+                string edKey = settings.edKey;
+                string edIV = settings.edIV;
+
+                SessionViewModel ses = new SessionViewModel();
+                ses.Token = token;
+
+                string json = JsonConvert.SerializeObject(ses);
+
+                IFMS_EncrDecr objSes = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                string encDataSes = objSes.Encrypt(json);
+
                 string decodedDate = obj.Decrypt(model2.EncData);
 
                 LoginRoleViewModel model = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginRoleViewModel>(decodedDate);
+
+                string decodedSession = obj.Decrypt(model.SessionId);
+
+                SessionViewModel session = Newtonsoft.Json.JsonConvert.DeserializeObject<SessionViewModel>(decodedSession);
+
+                string originalSession = HttpContext.Session.GetString("Ses");
+
+                if (session.Token != originalSession)
+                {
+
+                    HttpContext.Session.SetString("Ses", tokenSession);
+                    ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+                    return RedirectToAction("Login", "Account");
+                }
 
                 if (model != null)
                 {
@@ -651,6 +698,7 @@ namespace Noc_App.Controllers
                     claims.Add(new Claim(ClaimTypes.Role, role));
                     claims.Add(new Claim(ClaimTypes.Surname, model.RoleWithOffice));
                     claims.Add(new Claim(ClaimTypes.Locality, model.DivisionName));
+                    claims.Add(new Claim(ClaimTypes.Country, encDataSes));
                     //claims.Add(new Claim(ClaimTypes.Role, "Dev"));
                     ClaimsIdentity identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     ClaimsPrincipal principal = new ClaimsPrincipal(identity);
@@ -709,6 +757,45 @@ namespace Noc_App.Controllers
                 //string token = _tokenService.GenerateToken();
                 //HttpContext.Session.SetString("SessionToken", token);
 
+                string token = HttpContext.Session.GetString("Ses");
+                //HttpContext.Session.SetString("SessionToken", token);
+                string tokenSession = _tokenService.GenerateToken();
+
+                IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
+                 _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
+                 _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
+                 _configuration["IFMSPayOptions:edKey"], _configuration["IFMSPayOptions:edIV"], _configuration["IFMSPayOptions:ddoCode"]
+                 , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
+                 , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
+
+                IFMS_EncrDecr obj = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
+
+
+                string ChecksumKey = settings.ChecksumKey;
+                string edKey = settings.edKey;
+                string edIV = settings.edIV;
+
+                SessionViewModel ses = new SessionViewModel();
+                ses.Token = tokenSession;
+
+                string json = JsonConvert.SerializeObject(ses);
+
+                IFMS_EncrDecr objSes = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                string encDataSes = objSes.Encrypt(json);
+
+                string decodedSession = obj.Decrypt(model.SessionId);
+
+                SessionViewModel session = Newtonsoft.Json.JsonConvert.DeserializeObject<SessionViewModel>(decodedSession);
+
+                string originalSession = HttpContext.Session.GetString("Ses");
+
+                if (session.Token != originalSession)
+                {
+
+                    //HttpContext.Session.SetString("Ses", tokenSession);
+                    ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+                    return RedirectToAction("Login", "Account");
+                }
                 if (model != null)
                 {
                     string role = "";

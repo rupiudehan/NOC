@@ -8,5 +8,6 @@
         public string Designation { get; set; }
         public string EmployeeName { get; set; }
         public string DivisionNameN { get; set; }
+        public string SessionId { get; set; }
     }
 }

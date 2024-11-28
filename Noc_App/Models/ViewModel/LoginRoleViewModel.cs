@@ -16,5 +16,6 @@
         public string Success { get; set; }
         public string Errors { get; set; }
         public List<UserRoleDetailsViewModel> Roles { get; set; }
+        public string SessionId { get; set; }
     }
 }
