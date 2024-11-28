@@ -8,6 +8,7 @@
 @inject IRepository<CircleDetails> _circleRepository;
 @inject IRepository<CircleDivisionMapping> _circleDivRepository;
 @inject IRepository<EstablishmentOfficeDetails> _estabOfficeRepository;
+@inject IConfiguration _configuration;
 
 @* @inject SignInManager<ApplicationUser> signInManager; *@
 @{
@@ -33,9 +34,10 @@
     var detail = surname.Split(',');
     int count = 0;
 
-    string ChecksumKey = TempData["ChecksumKey"].ToString();
-    string edKey = TempData["edKey"].ToString();
-    string edIV = TempData["edIV"].ToString();
+    string ChecksumKey = _configuration["IFMSPayOptions:ChecksumKey"].ToString();
+    string edKey = _configuration["IFMSPayOptions:edKey"].ToString();
+    string edIV = _configuration["IFMSPayOptions:edIV"].ToString();
+    
 
 
     IFMS_EncrDecr objSes = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);

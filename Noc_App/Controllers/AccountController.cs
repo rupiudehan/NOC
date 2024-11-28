@@ -194,9 +194,6 @@ namespace Noc_App.Controllers
             string ChecksumKey = settings.ChecksumKey;
             string edKey = settings.edKey;
             string edIV = settings.edIV;
-            ViewBag.ChecksumKey = ChecksumKey;
-            ViewBag.edKey = edKey;
-            ViewBag.edIV = edIV;
 
             SessionViewModel ses = new SessionViewModel();
             ses.Token = token;
@@ -616,9 +613,6 @@ namespace Noc_App.Controllers
                 string ChecksumKey = settings.ChecksumKey;
                 string edKey = settings.edKey;
                 string edIV = settings.edIV;
-                TempData["ChecksumKey"] = ChecksumKey;
-                TempData["edKey"] = edKey;
-                TempData["edIV"] = edIV;
 
                 SessionViewModel ses = new SessionViewModel();
                 ses.Token = token;
@@ -781,9 +775,6 @@ namespace Noc_App.Controllers
                 string ChecksumKey = settings.ChecksumKey;
                 string edKey = settings.edKey;
                 string edIV = settings.edIV;
-                TempData["ChecksumKey"] = ChecksumKey;
-                TempData["edKey"] = edKey;
-                TempData["edIV"] = edIV;
 
                 SessionViewModel ses = new SessionViewModel();
                 ses.Token = tokenSession;
