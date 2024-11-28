@@ -4,10 +4,10 @@
     {
         public string RoleID { get; set; }
         public string DivisionID { get; set; }
-        public string EmpID { get; set; }
+        public string UserId { get; set; }
         public string Designation { get; set; }
-        public string EmployeeName { get; set; }
-        public string DivisionNameN { get; set; }
+        public string Name { get; set; }
+        public string Location { get; set; }
         public string SessionId { get; set; }
     }
 }

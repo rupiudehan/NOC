@@ -1,14 +1,11 @@
 ﻿namespace Noc_App.Models.ViewModel
 {
-    public class UserMenuBlockViewModel
+    public class UserSessionMenuViewModel
     {
-        public string UserId { get; set; }
+        public string EcnData { get; set; }
         public string Name { get; set; }
         public string Designation { get; set; }
         public string Location { get; set; }
         public bool IsActive { get; set; }
-        public string RoleID { get; set; }
-        public string DivisionID { get; set; }
-        public string SessionId { get; set; }
     }
 }

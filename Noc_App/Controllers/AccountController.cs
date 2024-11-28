@@ -189,11 +189,14 @@ namespace Noc_App.Controllers
                  , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
 
             IFMS_EncrDecr objEnc = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
-
+            
 
             string ChecksumKey = settings.ChecksumKey;
             string edKey = settings.edKey;
             string edIV = settings.edIV;
+            ViewBag.ChecksumKey = ChecksumKey;
+            ViewBag.edKey = edKey;
+            ViewBag.edIV = edIV;
 
             SessionViewModel ses = new SessionViewModel();
             ses.Token = token;
@@ -542,6 +545,7 @@ namespace Noc_App.Controllers
                                 login.DivisionName = RoleDetail.Count() > 0 ? RoleDetail.Take(1).FirstOrDefault().DivisionName : "";
                                 login.RoleWithOffice = divisionRolePairs;
                                 token = _tokenService.GenerateToken();
+
                                 ses.Token=token;
                                 string jsonSession = JsonConvert.SerializeObject(ses);
 
@@ -612,6 +616,9 @@ namespace Noc_App.Controllers
                 string ChecksumKey = settings.ChecksumKey;
                 string edKey = settings.edKey;
                 string edIV = settings.edIV;
+                TempData["ChecksumKey"] = ChecksumKey;
+                TempData["edKey"] = edKey;
+                TempData["edIV"] = edIV;
 
                 SessionViewModel ses = new SessionViewModel();
                 ses.Token = token;
@@ -739,7 +746,7 @@ namespace Noc_App.Controllers
         [HttpPost]
         [Obsolete]
         [AllowAnonymous]
-        public async Task<IActionResult> SwitchRole(SwitchRoleViewModel model)
+        public async Task<IActionResult> SwitchRole(SwitchRoleSessionViewModel m)
         {
             try
             {
@@ -760,7 +767,7 @@ namespace Noc_App.Controllers
                 string token = HttpContext.Session.GetString("Ses");
                 //HttpContext.Session.SetString("SessionToken", token);
                 string tokenSession = _tokenService.GenerateToken();
-
+                HttpContext.Session.SetString("Ses", token);
                 IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
                  _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
                  _configuration["IFMSPayOptions:clientId"], _configuration["IFMSPayOptions:ChecksumKey"],
@@ -774,6 +781,9 @@ namespace Noc_App.Controllers
                 string ChecksumKey = settings.ChecksumKey;
                 string edKey = settings.edKey;
                 string edIV = settings.edIV;
+                TempData["ChecksumKey"] = ChecksumKey;
+                TempData["edKey"] = edKey;
+                TempData["edIV"] = edIV;
 
                 SessionViewModel ses = new SessionViewModel();
                 ses.Token = tokenSession;
@@ -782,6 +792,10 @@ namespace Noc_App.Controllers
 
                 IFMS_EncrDecr objSes = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
                 string encDataSes = objSes.Encrypt(json);
+
+                string decodedData = objSes.Decrypt(m.EncData);
+
+                SwitchRoleViewModel model = Newtonsoft.Json.JsonConvert.DeserializeObject<SwitchRoleViewModel>(decodedData);
 
                 string decodedSession = obj.Decrypt(model.SessionId);
 
@@ -825,9 +839,10 @@ namespace Noc_App.Controllers
                         currentUserClaims.Remove(localityClaim);
                     }
                     // Add updated claims
-                    currentUserClaims.Add(new Claim(ClaimTypes.Name, model.EmployeeName));
+                    currentUserClaims.Add(new Claim(ClaimTypes.Name, model.Name));
                     currentUserClaims.Add(new Claim(ClaimTypes.Role, role));
-                    currentUserClaims.Add(new Claim(ClaimTypes.Locality, model.DivisionNameN));
+                    currentUserClaims.Add(new Claim(ClaimTypes.Locality, model.Location));
+                    currentUserClaims.Add(new Claim(ClaimTypes.Country, encDataSes));
 
                     // Create a new identity with updated claims
                     var identity = new ClaimsIdentity(currentUserClaims, CookieAuthenticationDefaults.AuthenticationScheme);
