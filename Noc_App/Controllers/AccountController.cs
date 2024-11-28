@@ -114,12 +114,12 @@ namespace Noc_App.Controllers
                     });
                 }
             }
-            // Invalidate the session token
-            var token = HttpContext.Session.GetString("SessionToken");
-            if (!string.IsNullOrEmpty(token))
-            {
-                _tokenService.InvalidateToken(token);
-            }
+            //// Invalidate the session token
+            //var token = HttpContext.Session.GetString("SessionToken");
+            //if (!string.IsNullOrEmpty(token))
+            //{
+            //    _tokenService.InvalidateToken(token);
+            //}
             // Clear session data
             HttpContext.Session.Clear();
 
@@ -240,16 +240,19 @@ namespace Noc_App.Controllers
                     ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
                     return Json(loginEncViewModel);
                 }
-                var token = HttpContext.Session.GetString("SessionToken");
-                if (!string.IsNullOrEmpty(token))
-                {
-                    if (!_tokenService.ValidateToken(token))
-                    {
-                        loginEncViewModel.Errors = "Invalid or expired session.";
-                        ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                        return Json(loginEncViewModel);
-                    }
-                }
+                //var token = HttpContext.Session.GetString("SessionToken");
+                //if (!string.IsNullOrEmpty(token))
+                //{
+                //    if (!_tokenService.ValidateToken(token))
+                //    {
+                //        loginEncViewModel.Errors = "Invalid or expired session.";
+                //        ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                //        return Json(loginEncViewModel);
+                //    }
+                //}
+
+                HttpContext.Session.Clear();
+
                 if (ModelState.IsValid)
                 {
                     if ((model.Email == "admin"))
@@ -536,7 +539,7 @@ namespace Noc_App.Controllers
                 HttpContext.Session.SetString("UserIp", HttpContext.Connection.RemoteIpAddress?.ToString());
 
                 string token = HttpContext.Session.GetString("Ses");
-                HttpContext.Session.SetString("SessionToken", token);
+                //HttpContext.Session.SetString("SessionToken", token);
 
                 IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
                  _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
@@ -593,8 +596,8 @@ namespace Noc_App.Controllers
                         await _userSessionnRepository.UpdateAsync(res);
                     }
                     //}
-                    HttpContext.Session.SetString("SessionId", sessionId);
-                    HttpContext.Session.SetString("SessionTime", loginTime.ToString());
+                    //HttpContext.Session.SetString("SessionId", sessionId);
+                    //HttpContext.Session.SetString("SessionTime", loginTime.ToString());
 
                     string role = "";
                     UserRoleDetails RoleDetail = (await _userRolesRepository.FindAsync(x => model.RoleID == x.Id.ToString())).FirstOrDefault();
@@ -653,19 +656,19 @@ namespace Noc_App.Controllers
         {
             try
             {
-                var tokenOld = HttpContext.Session.GetString("SessionToken");
-                if (!string.IsNullOrEmpty(tokenOld))
-                {
-                    if (!_tokenService.ValidateToken(tokenOld))
-                    {
-                        ModelState.AddModelError(string.Empty, "Invalid attempt to switch role");
-                        //return View(model);
-                        return RedirectToAction("Login", "Account");
-                    }
-                }
+                //var tokenOld = HttpContext.Session.GetString("SessionToken");
+                //if (!string.IsNullOrEmpty(tokenOld))
+                //{
+                //    if (!_tokenService.ValidateToken(tokenOld))
+                //    {
+                //        ModelState.AddModelError(string.Empty, "Invalid attempt to switch role");
+                //        //return View(model);
+                //        return RedirectToAction("Login", "Account");
+                //    }
+                //}
 
-                string token = _tokenService.GenerateToken();
-                HttpContext.Session.SetString("SessionToken", token);
+                //string token = _tokenService.GenerateToken();
+                //HttpContext.Session.SetString("SessionToken", token);
 
                 if (model != null)
                 {

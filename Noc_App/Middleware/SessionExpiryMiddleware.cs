@@ -10,12 +10,12 @@ namespace Noc_App.Middleware
 
         //private readonly IRepository<UserSessionDetails> _userSessionnRepository;
         private readonly RequestDelegate _next;
-        private readonly ITokenService _tokenService;
+        //private readonly ITokenService _tokenService;
 
-        public SessionExpiryMiddleware(RequestDelegate next, ITokenService tokenService/*, IRepository<UserSessionDetails> userSessionnRepository*/)
+        public SessionExpiryMiddleware(RequestDelegate next/*, ITokenService tokenService, IRepository<UserSessionDetails> userSessionnRepository*/)
         {
             _next = next ?? throw new ArgumentNullException(nameof(next));
-            _tokenService = tokenService;
+            //_tokenService = tokenService;
             //_userSessionnRepository = userSessionnRepository ?? throw new ArgumentNullException(nameof(userSessionnRepository));
         }
 
@@ -56,20 +56,20 @@ namespace Noc_App.Middleware
                 // For example, reset session timeout on each request to prevent expiry
             
 
-            var token = context.Session.GetString("SessionToken");
+           // var token = context.Session.GetString("SessionToken");
 
-            // Validate the token
-            if (!string.IsNullOrEmpty(token) && _tokenService.ValidateToken(token))
-            {
-                // Token is valid, rotate the token
-                _tokenService.RotateToken(context);
-            }
-            else
-            {
-                context.Session.Clear();
-                context.Response.Redirect("/Account/Login");
-                return;
-            }
+            //// Validate the token
+            //if (!string.IsNullOrEmpty(token) && _tokenService.ValidateToken(token))
+            //{
+            //    // Token is valid, rotate the token
+            //    _tokenService.RotateToken(context);
+            //}
+            //else
+            //{
+            //    context.Session.Clear();
+            //    context.Response.Redirect("/Account/Login");
+            //    return;
+            //}
                 //// Get session information from HttpContext session
                 //var storedSessionId = context.Session.GetString("SessionId");
                 //var hrms = context.Session.GetString("Userid");
