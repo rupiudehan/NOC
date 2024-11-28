@@ -62,7 +62,7 @@ $(function () {
 
         // Now `encryptedPasswordBase64` contains the encrypted password as a Base64 string
 
-        $('#Password').val(encryptedPassword2);
+        //$('#Password').val(encryptedPassword2);
         password = encryptedPassword2;
         var token = $('#loginToken').val();
         var module = 'login';
