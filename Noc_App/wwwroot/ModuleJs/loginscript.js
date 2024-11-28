@@ -128,6 +128,7 @@ $(function () {
                     resultProjectMessage.html('<div class="alert alert-danger">' + errors + '<span class="close-icon" style="float:right" onclick="toggleValue(\'' + module + '\')">&times;</span></div>');
 
                 }
+                $('#ss').val(response.ss);
             },
             error: function () {
                 resultProjectMessage.css('display', 'block');

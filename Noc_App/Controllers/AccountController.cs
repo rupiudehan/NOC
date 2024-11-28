@@ -177,22 +177,8 @@ namespace Noc_App.Controllers
         public async Task<IActionResult> Login(LoginViewModel model, string ReturnUrl)
         {
             LoginEncViewModel loginEncViewModel = new LoginEncViewModel();
-            try
-            {
-                loginEncViewModel.Success = "0";
-            LoginRoleViewModel login = new LoginRoleViewModel();
-            string password1 = _passwordService.DecryptPassword(model.Password);
-            var str = password1.Split('|');
-            string password = _passwordService.DecryptPassword(str[0]); 
 
-            if (model.Email != str[1])
-            {
-                loginEncViewModel.Errors = "Invalid login attempt.";
-                ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                return Json(loginEncViewModel);
-            }
-            
-            login.Name = model.Email; login.Token = model.Token;
+            string token = _tokenService.GenerateToken();
 
             IFMS_PaymentConfig settings = new IFMS_PaymentConfig(_configuration["IFMSPayOptions:IpAddress"],
                  _configuration["IFMSPayOptions:IntegratingAgency"], _configuration["IFMSPayOptions:clientSecret"],
@@ -202,6 +188,39 @@ namespace Noc_App.Controllers
                  , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
 
             IFMS_EncrDecr objEnc = new IFMS_EncrDecr(settings.ChecksumKey, settings.edKey, settings.edIV);
+
+
+            string ChecksumKey = settings.ChecksumKey;
+            string edKey = settings.edKey;
+            string edIV = settings.edIV;
+
+            SessionViewModel ses = new SessionViewModel();
+            ses.Token = token;
+
+            string json = JsonConvert.SerializeObject(ses);
+
+            IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+            string encData = obj.Encrypt(json);
+            try
+            {
+
+                loginEncViewModel.Success = "0";
+            LoginRoleViewModel login = new LoginRoleViewModel();
+            string password1 = _passwordService.DecryptPassword(model.Password);
+            var str = password1.Split('|');
+            string password = _passwordService.DecryptPassword(str[0]); 
+
+            if (model.Email != str[1])
+                {
+                    HttpContext.Session.SetString("Ses", token);
+                    ViewBag.S = encData;
+                    loginEncViewModel.ss = encData;
+                    loginEncViewModel.Errors = "Invalid login attempt.";
+                ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                return Json(loginEncViewModel);
+            }
+            
+            login.Name = model.Email; login.Token = model.Token;
             string decodedDate = objEnc.Decrypt(str[2]);
 
             SessionViewModel session = Newtonsoft.Json.JsonConvert.DeserializeObject<SessionViewModel>(decodedDate);
@@ -209,6 +228,9 @@ namespace Noc_App.Controllers
 
                 if (session.Token != originalSession)
                 {
+                    HttpContext.Session.SetString("Ses", token);
+                    ViewBag.S = encData;
+                    loginEncViewModel.ss = encData;
                     loginEncViewModel.Errors = "Invalid login attempt.";
                     ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
                     return Json(loginEncViewModel);
@@ -220,6 +242,9 @@ namespace Noc_App.Controllers
                     {
                         if (sessionDetails.LastSessionId == session.Token)
                         {
+                            HttpContext.Session.SetString("Ses", token);
+                            ViewBag.S = encData;
+                            loginEncViewModel.ss = encData;
                             loginEncViewModel.Errors = "Invalid login attempt.";
                             ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
                             return Json(loginEncViewModel);
@@ -228,14 +253,13 @@ namespace Noc_App.Controllers
                 }
 
 
-                string ChecksumKey = settings.ChecksumKey;
-                string edKey = settings.edKey;
-                string edIV = settings.edIV;
-
                 var googlereCaptchaResponse = _googleCaptchaService.VerifyreCaptcha(model.Token);
                 loginEncViewModel.Success = "0";
                 if (!googlereCaptchaResponse.Result.success && googlereCaptchaResponse.Result.score <= 0.5)
                 {
+                    HttpContext.Session.SetString("Ses", token);
+                    ViewBag.S = encData;
+                    loginEncViewModel.ss = encData;
                     loginEncViewModel.Errors = "You are not human. Please the refresh page.";
                     ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
                     return Json(loginEncViewModel);
@@ -309,12 +333,15 @@ namespace Noc_App.Controllers
                             login.RoleID = role;
                             login.RoleWithOffice = divisionRolePairs;
                             login.DivisionName = RoleDetail.Take(1).FirstOrDefault().DivisionName;
-                            string json = JsonConvert.SerializeObject(login);
+                            string json2 = JsonConvert.SerializeObject(login);
 
-                            IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
-                            string encData = obj.Encrypt(json);
-                            loginEncViewModel.EncData = encData;
+                            IFMS_EncrDecr obj2 = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                            string encData2 = obj2.Encrypt(json2);
+                            loginEncViewModel.EncData = encData2;
                             loginEncViewModel.Success = "1";
+                            HttpContext.Session.SetString("Ses", token);
+                            ViewBag.S = encData;
+                            loginEncViewModel.ss = encData;
 
                             return Json(loginEncViewModel);
                         }
@@ -348,6 +375,9 @@ namespace Noc_App.Controllers
                         string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
                         if (resultContent.Contains("An error has occurred"))
                         {
+                            HttpContext.Session.SetString("Ses", token);
+                            ViewBag.S = encData;
+                            loginEncViewModel.ss = encData;
                             loginEncViewModel.Errors = "An error has occurred.";
                             ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
                             return Json(loginEncViewModel);
@@ -390,6 +420,9 @@ namespace Noc_App.Controllers
                                 {
                                     if (cnt == roles.Count)
                                     {
+                                        HttpContext.Session.SetString("Ses", token);
+                                        ViewBag.S = encData;
+                                        loginEncViewModel.ss = encData;
                                         loginEncViewModel.Success = "0";
                                         loginEncViewModel.Errors = "Invalid user.";
                                         ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
@@ -498,12 +531,15 @@ namespace Noc_App.Controllers
                                 login.RoleID = role;
                                 login.DivisionName = RoleDetail.Count() > 0 ? RoleDetail.Take(1).FirstOrDefault().DivisionName : "";
                                 login.RoleWithOffice = divisionRolePairs;
-                                string json = JsonConvert.SerializeObject(login);
+                                string json2 = JsonConvert.SerializeObject(login);
 
-                                IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
-                                string encData = obj.Encrypt(json);
-                                loginEncViewModel.EncData = encData;
+                                IFMS_EncrDecr obj2 = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                                string encData2 = obj2.Encrypt(json2);
+                                loginEncViewModel.EncData = encData2;
                                 loginEncViewModel.Success = "1";
+                                HttpContext.Session.SetString("Ses", token);
+                                ViewBag.S = encData;
+                                loginEncViewModel.ss = encData;
                                 break;
                             }
                             return Json(loginEncViewModel);
@@ -520,6 +556,9 @@ namespace Noc_App.Controllers
                 loginEncViewModel.Errors = "An error occured while doing login attempt";
                 ModelState.AddModelError(string.Empty, "Token has expired now. Please refresh the page.");
             }
+            HttpContext.Session.SetString("Ses", token);
+            ViewBag.S = encData;
+            loginEncViewModel.ss = encData;
             return Json(loginEncViewModel);
         }
 
