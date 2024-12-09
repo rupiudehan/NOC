@@ -731,7 +731,7 @@ namespace Noc_App.Controllers
                     Name = model.ApplicantName,
                     Email = model.ApplicantEmailID,
                     Address = "Tehsil/Block:" + tehsil.Name + ", Village:" + model.VillageName,
-                    Amount = TotalPayment,    //Later
+                    Amount = 1.0,//TotalPayment,    //Later
                     GrantId = model.Id,
                     ApplicationId = Id,
                     Hadbast = model.Hadbast,
@@ -1244,7 +1244,7 @@ namespace Noc_App.Controllers
                                             MobileNo = model.Owners.FirstOrDefault().MobileNo,
                                             Email = model.ApplicantEmailID,
                                             Address = "Tehsil/Block:" + detail.Tehsil.Name + ",Village:" + model.Villagename,
-                                            Amount = TotalPayment,    //Later
+                                            Amount = 1.0,//TotalPayment,    //Later
                                             GrantId = grantid,
                                             ApplicationId = model.ApplicationID,
                                             DistrictId = subs.District.LGD_ID.ToString(),
