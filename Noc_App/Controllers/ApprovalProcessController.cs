@@ -1904,8 +1904,9 @@ namespace Noc_App.Controllers
                 int certificateValidation = AllowedCheckExtensions(model.CertificateFile);
                 if (certificateValidation == 0)
                 {   
-                if(model.IsUnderMasterPlan) ErrorMessage = $"Invalid exemption letter file type. Please upload a PDF file only";
-                else ErrorMessage = $"Invalid certificate file type. Please upload a PDF file only";
+                //if(model.IsUnderMasterPlan) ErrorMessage = $"Invalid NOC file type. Please upload a PDF file only";
+                //else 
+                    ErrorMessage = $"Invalid certificate file type. Please upload a PDF file only";
                     ModelState.AddModelError("", ErrorMessage);
 
                     return View(model);
@@ -1913,9 +1914,9 @@ namespace Noc_App.Controllers
                 }
                 else if (certificateValidation == 2)
                 {
-                if(model.IsUnderMasterPlan)
-                    ErrorMessage = "Exemption Letter field is required";
-                else
+                //if(model.IsUnderMasterPlan)
+                //    ErrorMessage = "Certificate field is required";
+                //else
                     ErrorMessage = "Certificate field is required";
                 ModelState.AddModelError("", ErrorMessage);
                     return View(model);
@@ -1923,9 +1924,9 @@ namespace Noc_App.Controllers
 
                 if (!AllowedFileSize(model.CertificateFile))
                 {
-                    if(model.IsUnderMasterPlan)
-                    ErrorMessage = "Exemption Letter size exceeds the allowed limit of 4MB";
-                else
+                //    if(model.IsUnderMasterPlan)
+                //    ErrorMessage = "NOC size exceeds the allowed limit of 4MB";
+                //else
                     ErrorMessage = "Certificate size exceeds the allowed limit of 4MB";
                 ModelState.AddModelError("", ErrorMessage);
                     return View(model);

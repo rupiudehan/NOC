@@ -160,9 +160,9 @@ app.Use((context, next) =>
     "default-src 'self'; " +
     "script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com https://cdn.datatables.net https://code.highcharts.com/highcharts.js https://code.highcharts.com/modules/exporting.js https://code.highcharts.com/modules/export-data.js https://code.highcharts.com/modules/accessibility.js https://ifmstg.punjab.gov.in https://ifms.punjab.gov.in https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js https://code.jquery.com/jquery-3.6.0.min.js http://localhost:51061 ws://localhost:51061; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://www.gstatic.com https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css; " +
-    "img-src 'self' data: http://localhost:5126/ApprovalProcess/Download http://49.50.66.74/ApprovalProcess/Download http://49.50.66.74/lib http://49.50.66.74/img http://49.50.66.74/images http://49.50.66.74/LandingPage/assets/img http://49.50.66.74/LandingPage/assets2/img https://ifms.punjab.gov.in; " +
+    "img-src 'self' data: http://localhost:5126/ApprovalProcess/Download http://10.43.250.243/ApprovalProcess/Download http://10.43.250.243/lib http://10.43.250.243/img http://10.43.250.243/images http://10.43.250.243/LandingPage/assets/img http://10.43.250.243/LandingPage/assets2/img https://ifms.punjab.gov.in; " +
     "font-src 'self' https://fonts.gstatic.com data:; " +
-    "connect-src 'self' https://api.example.com http://49.50.66.74 http://localhost:44322 http://localhost:44132 ws://localhost:15178 ws://localhost:44352 wss://localhost:44300 http://localhost:62280 ws://localhost:62280 wss://localhost:44374/Noc_App/ ws://localhost:44374/Noc_App/ http://localhost:50159 ws://localhost:50159; " +
+    "connect-src 'self' https://api.example.com http://10.43.250.243 http://localhost:44322 http://localhost:44132 ws://localhost:15178 ws://localhost:44352 wss://localhost:44300 http://localhost:62280 ws://localhost:62280 wss://localhost:44374/Noc_App/ ws://localhost:44374/Noc_App/ http://localhost:50159 ws://localhost:50159; " +
     "object-src 'none'; " +
     "base-uri 'self'; " +
     "form-action 'self' https://ifmstg.punjab.gov.in https://ifms.punjab.gov.in; " +
@@ -203,7 +203,7 @@ app.UseCookiePolicy();
 ////    context.Response.Headers.Add("Content-Security-Policy",
 ////        "default-src 'self'; " +
 ////        "script-src 'self' 'sha256-xyz123' https://fonts.googleapis.com https://www.google.com https://cdnjs.cloudflare.com https://www.gstatic.com; " +
-////        "style-src 'self' 'sha256-abc456' 'sha256-tBDRz+h5TwaRZiRUjI+KLkSeHJw/FQBW2qY/I2NjUzQ=' https://fonts.googleapis.com http://49.50.66.74;  " +
+////        "style-src 'self' 'sha256-abc456' 'sha256-tBDRz+h5TwaRZiRUjI+KLkSeHJw/FQBW2qY/I2NjUzQ=' https://fonts.googleapis.com http://10.43.250.243;  " +
 ////        "img-src 'self' data: https://trusted-images.example.com; " +
 ////        "font-src 'self' https://fonts.gstatic.com; " +
 ////        "connect-src 'self' https://api.example.com http://localhost:44322 http://localhost:44132; " +

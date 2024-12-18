@@ -250,7 +250,7 @@ namespace Noc_App.Helpers
                     <div>
                         <p>Dear {applicantName},</p>
                         
-                        <p>Congratulations! 🎉 Exemption Letter with ID <b>{applicationID}</b> has been issued.</p><p>You can download the letter from track status.</p>
+                        <p>Congratulations! 🎉 NOC with ID <b>{applicationID}</b> has been issued.</p><p>You can download the letter from track status.</p>
                         
                         <p>
                             <b>Note :- ""This is auto generated email, do not reply to this email.""</b>

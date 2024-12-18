@@ -311,7 +311,7 @@ namespace Noc_App.Controllers
                                  ApprovalStatus = g.IsForwarded == false && g.IsShortFall == true && g.IsShortFallCompleted == false && g.IsRejected == false ? "Reverted to applicant for modification"
                                  : g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Applicant updated modifications. Now Pending With " + approval.ProcessedByName
                                  : g.IsForwarded == true && g.IsShortFall == false && g.IsShortFallCompleted == true && g.IsRejected == false ? "Application modified by applicant"
-                                 : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : g.IsRejected ? "Rejected" : "UnProcessed" : g.IsRejected ? "Rejected" : "UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan ? "Exemption Letter Issued" : "NOC Issued" : g.IsRejected ? "Rejected" : "UnProcessed",
+                                 : g.IsPending == true ? g.IsRejected ? "Rejected" : g.IsForwarded ? approval != null ? "Pending With " + approval.ProcessedToRole : g.IsRejected ? "Rejected" : "UnProcessed" : g.IsRejected ? "Rejected" : "UnProcessed" : g.IsApproved ? g.IsUnderMasterPlan ? "NOC Issued" : "NOC Issued" : g.IsRejected ? "Rejected" : "UnProcessed",
                                  CertificateFilePath = g.CertificateFilePath,
                                  IsUnderMasterPlan = g.IsUnderMasterPlan
                              }

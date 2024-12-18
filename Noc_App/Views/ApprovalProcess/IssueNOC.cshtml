@@ -1,10 +1,10 @@
 ﻿@model IssueNocViewModelCreate
 @{
-    ViewBag.Title = Model.IsUnderMasterPlan?"Issue Exemption Letter": "Issue NOC";
+    ViewBag.Title = Model.IsUnderMasterPlan?"Issue NOC": "Issue NOC";
 }
 @if (Model.IsUnderMasterPlan)
 {
-    <h1 class="h3 mb-4 text-gray-800">Issue Exemption Letter</h1>
+    <h1 class="h3 mb-4 text-gray-800">Issue NOC</h1>
 }
 else
 {
@@ -20,7 +20,7 @@ else
             <div class="card-header py-3">
                 @if (Model.IsUnderMasterPlan)
                 {
-                    <h6 class="m-0 font-weight-bold text-primary">Issue Exemption Letter</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Issue NOC</h6>
                 }
                 else
                 {
@@ -57,7 +57,7 @@ else
                             <div class="form-group">
                                 @if (Model.IsUnderMasterPlan)
                                 {
-                                    <label asp-for="CertificateFile" class="control-label">Upload Exemption Letter</label>
+                                    <label asp-for="CertificateFile" class="control-label">Upload NOC</label>
                                 }else{
                                 <label asp-for="CertificateFile" class="control-label">Upload Certificate</label>
                                 }
