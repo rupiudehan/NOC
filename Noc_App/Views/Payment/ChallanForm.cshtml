@@ -1,14 +1,31 @@
-﻿@{
+﻿@using System.IO.Compression;
+@{
     ViewBag.Title = "Challan";
     Layout = "";
     TempData["Message"] = ViewBag.HtmlContent;
     ViewBag.HtmlContent = TempData["Message"];
+    string code = ViewBag.HtmlContent;
+
+    byte[] decodedData = Convert.FromBase64String(code); // Decode Base64
+                                                         // Decompress the data
+    byte[] decompressedData;
+    using (var compressedStream = new MemoryStream(decodedData))
+    {
+        using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+        {
+            using (var resultStream = new MemoryStream())
+            {
+                gzipStream.CopyTo(resultStream);
+                decompressedData = resultStream.ToArray();
+            }
+        }
+    }
+    string originalData = System.Text.Encoding.UTF8.GetString(decompressedData); // Convert to original string
 }
 <div asp-validation-summary="All" class="text-danger"></div>
 
     <div>
-
-        @Html.Raw(ViewBag.HtmlContent)
+    @Html.Raw(originalData)
 
     </div>
    @*  <style>

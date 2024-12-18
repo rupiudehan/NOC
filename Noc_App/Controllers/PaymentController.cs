@@ -16,6 +16,7 @@ using HttpMethod = System.Net.Http.HttpMethod;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.IO.Compression;
 
 namespace Noc_App.Controllers
 {
@@ -230,10 +231,11 @@ namespace Noc_App.Controllers
         public IActionResult ChallanForm()
         {
             ViewBag.HtmlContent = TempData["Message"] as string;
-            TempData["Message"] = TempData["Message"];
+            //TempData["Message"] = TempData["Message"];
             return View();
         }
         [HttpPost]
+        [Obsolete]
         public async Task<IActionResult> ChallanFormPost(IFMSHeader data)
         {
             try
@@ -265,7 +267,13 @@ namespace Noc_App.Controllers
                         var url = "DistOptions.url = vdir + \"Server/SelectTel?DistCode=\" + $(\"#DistrictCode\").val()";
                         var actual = "DistOptions.url = \"/Payment/TrpSarthi?DistCode=\" + $(\"#DistrictCode\").val()";
 
-                        TempData["Message"] = (content.Replace(url, actual)).Replace("<input type='hidden' name='DeptCode' value='WAS'/>", "<input type='hidden' name='DeptCode' value='WAS'/>@TempData.Keep()");
+                        //TempData["Message"] 
+                        string formdata = (content.Replace(url, actual)).Replace("<input type='hidden' name='DeptCode' value='WAS'/>", "<input type='hidden' name='DeptCode' value='WAS'/>@TempData.Keep()");
+                        
+                        byte[] compressedData = CompressData(System.Text.Encoding.UTF8.GetBytes(formdata));
+                        string encData = Convert.ToBase64String(compressedData);
+                        TempData["Message"] = encData;
+
                         return RedirectToAction("ChallanForm", "Payment");
                     }
                 }
@@ -279,6 +287,33 @@ namespace Noc_App.Controllers
             {
                 ModelState.AddModelError("", ex.Message);
                 return View();
+            }
+        }
+        private byte[] CompressData(byte[] data)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+                {
+                    gzipStream.Write(data, 0, data.Length); // Write the input data into the GZipStream
+                }
+                return memoryStream.ToArray(); // Get the compressed data from the memory stream
+            }
+        }
+
+        // New DecompressData method
+        private byte[] DecompressData(byte[] compressedData)
+        {
+            using (var compressedStream = new MemoryStream(compressedData))
+            {
+                using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+                {
+                    using (var resultStream = new MemoryStream())
+                    {
+                        gzipStream.CopyTo(resultStream);
+                        return resultStream.ToArray();
+                    }
+                }
             }
         }
         [HttpGet]
