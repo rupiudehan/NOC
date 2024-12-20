@@ -88,8 +88,10 @@ namespace Noc_App.Controllers
                         add3 = _paymentRequest.Address,
                         add4 = "",
                         add5 = "",
-                        sURL = scheme+"://" + d + Url.Action("succesfulURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),
-                        fURL = scheme + "://" + d + Url.Action("failureURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),//"?failureURL",
+                        sURL = //scheme+
+                        "https://" + d + Url.Action("succesfulURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),
+                        fURL = //scheme + 
+                        "https://" + d + Url.Action("failureURL", "Payment"/*, new { id = _paymentRequest.ApplicationId }*/).Replace("https://ifmstg.punjab.gov.in/", d),//"?failureURL",
 
                         payee_info = new PayeeInfo()
                         {
