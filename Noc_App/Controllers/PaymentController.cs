@@ -654,7 +654,8 @@ namespace Noc_App.Controllers
                     MaxTimeout = -1,
                 };
                 var client2 = new RestClient(options2);
-                var request2 = new RestRequest("https://ifmstg.punjab.gov.in/eRctDeptInt/TrpSarthi/SelectTel?DistCode=" + DistCode, Method.Post);
+                string url = _configuration["IFMSPayOptions:replace"].ToString();
+                var request2 = new RestRequest(url+"/TrpSarthi/SelectTel?DistCode=" + DistCode, Method.Post);
                 RestResponse response2 = await client2.ExecuteAsync(request2);
                 List<tehsildetailViewModel> ResponseData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<tehsildetailViewModel>>(response2.Content);
 

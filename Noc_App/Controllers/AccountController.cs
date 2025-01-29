@@ -206,28 +206,12 @@ namespace Noc_App.Controllers
             {
 
                 loginEncViewModel.Success = "0";
-            LoginRoleViewModel login = new LoginRoleViewModel();
-            string password1 = _passwordService.DecryptPassword(model.Password);
-            var str = password1.Split('|');
-            string password = _passwordService.DecryptPassword(str[0]); 
+                LoginRoleViewModel login = new LoginRoleViewModel();
+                string password = _passwordService.DecryptPassword(model.Password);
+                var str = password.Split('|');
+                password = _passwordService.DecryptPassword(str[0]);
 
-            if (model.Email != str[1])
-                {
-                    HttpContext.Session.SetString("Ses", token);
-                    ViewBag.S = encData;
-                    loginEncViewModel.ss = encData;
-                    loginEncViewModel.Errors = "Invalid login attempt.";
-                ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                return Json(loginEncViewModel);
-            }
-            
-            login.Name = model.Email; login.Token = model.Token;
-            string decodedDate = objEnc.Decrypt(str[2]);
-
-            SessionViewModel session = Newtonsoft.Json.JsonConvert.DeserializeObject<SessionViewModel>(decodedDate);
-              string originalSession =  HttpContext.Session.GetString("Ses");
-
-                if (session.Token != originalSession)
+                if (model.Email != str[1])
                 {
                     HttpContext.Session.SetString("Ses", token);
                     ViewBag.S = encData;
@@ -236,14 +220,31 @@ namespace Noc_App.Controllers
                     ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
                     return Json(loginEncViewModel);
                 }
+
+                login.Name = model.Email; login.Token = model.Token;
+                string decodedDate = objEnc.Decrypt(str[2]);
+
+                SessionViewModel session = Newtonsoft.Json.JsonConvert.DeserializeObject<SessionViewModel>(decodedDate);
+                string originalSession = HttpContext.Session.GetString("Ses");
+                HttpContext.Session.SetString("Ses", token);
+
+                if (session.Token != originalSession)
+                {
+                    //HttpContext.Session.SetString("Ses", token);
+                    ViewBag.S = encData;
+                    loginEncViewModel.ss = encData;
+                    loginEncViewModel.Errors = "Invalid login attempt.";
+                    ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                    return Json(loginEncViewModel);
+                }
                 else
                 {
-                    var sessionDetails=_userSessionnRepository.GetAll().Where(x => x.Hrms == model.Email).FirstOrDefault();
+                    var sessionDetails = _userSessionnRepository.GetAll().FirstOrDefault(x => x.Hrms == model.Email);
                     if (sessionDetails != null)
                     {
                         if (sessionDetails.LastSessionId == session.Token)
                         {
-                            HttpContext.Session.SetString("Ses", token);
+                            //HttpContext.Session.SetString("Ses", token);
                             ViewBag.S = encData;
                             loginEncViewModel.ss = encData;
                             loginEncViewModel.Errors = "Invalid login attempt.";
@@ -256,15 +257,26 @@ namespace Noc_App.Controllers
 
                 var googlereCaptchaResponse = _googleCaptchaService.VerifyreCaptcha(model.Token);
                 loginEncViewModel.Success = "0";
-                if (!googlereCaptchaResponse.Result.success && googlereCaptchaResponse.Result.score <= 0.5)
+                try
                 {
-                    HttpContext.Session.SetString("Ses", token);
-                    ViewBag.S = encData;
-                    loginEncViewModel.ss = encData;
-                    loginEncViewModel.Errors = "You are not human. Please the refresh page.";
-                    ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                    return Json(loginEncViewModel);
+                    if (!googlereCaptchaResponse.Result.success && googlereCaptchaResponse.Result.score <= 0.5)
+                    {
+                        //HttpContext.Session.SetString("Ses", token);
+                        ViewBag.S = encData;
+                        loginEncViewModel.ss = encData;
+                        loginEncViewModel.Errors = "You are not human. Please the refresh page.";
+                        ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                        return Json(loginEncViewModel);
+
+                    }
+
                 }
+                catch (Exception ex)
+                {
+                    loginEncViewModel.Errors = ex.InnerException.InnerException.Message;// "Captcha is not allowed from the server";//"An error occured while doing login attempt";
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+
                 //var token = HttpContext.Session.GetString("SessionToken");
                 //if (!string.IsNullOrEmpty(token))
                 //{
@@ -277,273 +289,68 @@ namespace Noc_App.Controllers
                 //}
 
                 HttpContext.Session.Clear();
-
-                if (ModelState.IsValid)
-                {
-                    if ((model.Email == "admin"))
-                    //if (model.Email != "ExecutiveEngineer" && (model.Email == "xen" || model.Email == "jefaridkot" || model.Email == "sdofaridkot" || model.Email == "jemohali" || model.Email == "sdomohali" || model.Email == "xen2" || model.Email == "xenmohali" || model.Email == "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
+                string testjson = JsonConvert.SerializeObject(model);
+                //if (ModelState.IsValid)
+                if (model.Email!=null && model.Token != null && model.Password != null){
+                    if (model.Email.Trim() != "" && model.Token.Trim() != "" && model.Password.Trim() != "")
                     {
-                        LoginResponseViewModel root = FetchUser().Find(x => x.user_info.EmailId == model.Email && password == "123");
-                        if (root != null)
+                        if ((model.Email == "admin"))
+                        //if (model.Email != "ExecutiveEngineer" && (model.Email == "xen" || model.Email == "jefaridkot" || model.Email == "sdofaridkot" || model.Email == "jemohali" || model.Email == "sdomohali" || model.Email == "xen2" || model.Email == "xenmohali" || model.Email == "juniorengineer" || model.Email == "sdo" || model.Email == "co" || model.Email == "dws" || model.Email == "eehq" || model.Email == "cehq" || model.Email == "ps" || model.Email == "ade" || model.Email == "dd" || model.Email == "admin"))
                         {
-                            var LocationRoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
-                                                      join rr in root.user_info.OfficeWiseRoleID on r.Id equals rr.role
-                                                      //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
-                                                      //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
-                                                      select new
-                                                      {
-                                                          Roles = r,
-                                                          Location = rr
-                                                      }
-                                                                 ).ToList();
-                            List<string> roles = root.user_info.RoleID.Split(',').ToList();
-                            var ro = (from rol in _userRolesRepository.GetAll().AsEnumerable()
-                                      join nr in roles on rol.Id.ToString() equals nr
-                                      select new
-                                      {
-                                          roleId = rol.Id.ToString()
-                                      }).FirstOrDefault();
-
-                            var role = ro == null ? "0" : ro.roleId;
-                            List<UserRoleDetailsViewModel> RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
-                                                                         join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
-                                                                         //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
-                                                                         //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
-                                                                         where rr.Roles.Id == Convert.ToInt32(role)
-                                                                         select new UserRoleDetailsViewModel
-                                                                         {
-                                                                             DivisionId = r.Id,
-                                                                             DivisionName = r.Name,
-                                                                             AppRoleName = rr.Roles.RoleName,
-                                                                             Id = rr.Roles.Id,
-                                                                             RoleLevel = rr.Roles.RoleLevel,
-                                                                             RoleName = rr.Roles.RoleName
-                                                                         }
-                                                                 ).ToList();
-
-                            string divisionRolePairs = string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
-
-                            login.Roles = RoleDetail.Take(1).ToList();
-                            login.Designation = root.user_info.Designation;
-                            login.DivisionID = root.user_info.DivisionID.ToString();
-                            login.DistrictID = root.user_info.DistrictID.ToString();
-                            login.EmployeeName = root.user_info.EmployeeName;
-                            login.EmpID = root.user_info.EmpID;
-                            loginEncViewModel.Success = "1";
-                            login.Name = root.user_info.Name;
-                            login.RoleID = role;
-                            login.RoleWithOffice = divisionRolePairs;
-                            login.DivisionName = RoleDetail.Take(1).FirstOrDefault().DivisionName;
-                            token = _tokenService.GenerateToken();
-                            ses.Token = token;
-
-                            string jsonSession = JsonConvert.SerializeObject(ses);
-
-                            IFMS_EncrDecr objSession = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
-                            string encDataSession = objSession.Encrypt(jsonSession);
-                            login.SessionId= encDataSession;
-
-                            HttpContext.Session.SetString("Ses", token);
-                            string json2 = JsonConvert.SerializeObject(login);
-
-                            IFMS_EncrDecr obj2 = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
-                            string encData2 = obj2.Encrypt(json2);
-                            loginEncViewModel.EncData = encData2;
-                            loginEncViewModel.Success = "1";
-                            ViewBag.S = encData;
-                            loginEncViewModel.ss = encData;
-
-                            return Json(loginEncViewModel);
-                        }
-                    }
-                    else
-                    {
-                        string baseUrl = "https://wrdpbind.com/api/user_login.php";
-                        string salt = "8QCHhk3cJ6OMGfEW";
-                        string checksum = "zUOwFCGMqKvJARC1tU6l4r24";
-                        string combinedPassword = model.Email + "|" + password + "|" + checksum;
-
-                        string plainText = combinedPassword;
-
-                        var keyBytes = new byte[16];
-                        var ivBytes = new byte[16];
-
-                        string key = salt;
-                        var keySalt = Encoding.UTF8.GetBytes(key);
-                        var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
-
-                        Array.Copy(pdb.GetBytes(16), keyBytes, 16);
-                        Array.Copy(pdb.GetBytes(16), ivBytes, 16);
-                        string encryptedString = NCC_encryptHelper(plainText, key, key);
-
-                        HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
-                        HttpClient client = new HttpClient(handler);
-                        client.BaseAddress = new Uri(baseUrl);
-                        client.DefaultRequestHeaders.Accept.Clear();
-                        client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
-                        var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
-                        string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
-                        if (resultContent.Contains("An error has occurred"))
-                        {
-                            HttpContext.Session.SetString("Ses", token);
-                            ViewBag.S = encData;
-                            loginEncViewModel.ss = encData;
-                            loginEncViewModel.Errors = "An error has occurred.";
-                            ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                            return Json(loginEncViewModel);
-                        }
-                        LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
-
-                        if (root.Status == "200")
-                        {
-                            var LocationRoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
-                                                      join rr in root.user_info.OfficeWiseRoleID on r.Id equals rr.role
-                                                      //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
-                                                      //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
-                                                      select new
-                                                      {
-                                                          Roles = r,
-                                                          Location = rr,
-                                                          //Division=loc
-                                                      }
-                                                                  ).ToList();
-                            List<UserRoleDetailsViewModel> RoleDetail = new List<UserRoleDetailsViewModel>();
-                            List<string> roles = root.user_info.RoleID.Split(',').ToList();
-                            int cnt = 1;
-                            foreach (var role1 in roles)
+                            LoginResponseViewModel root = FetchUser().Find(x => x.user_info.EmailId == model.Email && password == "123");
+                            if (root != null)
                             {
+                                var LocationRoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
+                                                          join rr in root.user_info.OfficeWiseRoleID on r.Id equals rr.role
+                                                          //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                                                          //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                                                          select new
+                                                          {
+                                                              Roles = r,
+                                                              Location = rr
+                                                          }
+                                                                     ).ToList();
+                                List<string> roles = root.user_info.RoleID.Split(',').ToList();
                                 var ro = (from rol in _userRolesRepository.GetAll().AsEnumerable()
                                           join nr in roles on rol.Id.ToString() equals nr
-                                          where nr== role1
                                           select new
                                           {
                                               roleId = rol.Id.ToString()
                                           }).FirstOrDefault();
 
                                 var role = ro == null ? "0" : ro.roleId;
-
-                                //foreach (string role in roles)
-                                //{
-                                //    if (role != "2")
-                                //    {
-                                if (ro == null)
-                                {
-                                    if (cnt == roles.Count)
-                                    {
-                                        HttpContext.Session.SetString("Ses", token);
-                                        ViewBag.S = encData;
-                                        loginEncViewModel.ss = encData;
-                                        loginEncViewModel.Success = "0";
-                                        loginEncViewModel.Errors = "Invalid user.";
-                                        ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
-                                        return Json(loginEncViewModel);
-                                    }
-                                    else
-                                    {
-                                        cnt++;
-                                        continue;
-                                    }
-                                }
-                                else
-                                {
-                                    if (role == "8" /*|| role == "10" || role == "128" || role == "6"*/)
-                                    {
-                                        RoleDetail = (from rr in LocationRoleDetail
-                                                      join r in _circleRepository.GetAll().AsEnumerable() on rr.Location.office_id equals r.Id
-                                                      join loc in _circleDivRepository.GetAll() on rr.Location.office_id equals loc.CircleId
-                                                      join div in _divisionRepository.GetAll() on loc.DivisionId equals div.Id
-                                                      where rr.Roles.Id == Convert.ToInt32(role)
-                                                      select new UserRoleDetailsViewModel
-                                                      {
-                                                          DivisionId = div.Id,
-                                                          DivisionName = div.Name + " (" + r.Name + ")",
-                                                          AppRoleName = rr.Roles.RoleName,
-                                                          Id = rr.Roles.Id,
-                                                          RoleLevel = rr.Roles.RoleLevel,
-                                                          RoleName = rr.Roles.RoleName
-                                                      }
+                                List<UserRoleDetailsViewModel> RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                                                                             join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                                             //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                                                                             //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                                                                             where rr.Roles.Id == Convert.ToInt32(role)
+                                                                             select new UserRoleDetailsViewModel
+                                                                             {
+                                                                                 DivisionId = r.Id,
+                                                                                 DivisionName = r.Name,
+                                                                                 AppRoleName = rr.Roles.RoleName,
+                                                                                 Id = rr.Roles.Id,
+                                                                                 RoleLevel = rr.Roles.RoleLevel,
+                                                                                 RoleName = rr.Roles.RoleName
+                                                                             }
                                                                      ).ToList();
-                                        if (RoleDetail.Count == 0)
-                                        {
-                                            continue;
 
-                                        }
-                                    }
-                                    else if (role == "60" || role == "67" || role == "7")
-                                    {
-
-                                        RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
-                                                      join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
-                                                      where rr.Roles.Id == Convert.ToInt32(role)
-                                                      select new UserRoleDetailsViewModel
-                                                      {
-                                                          DivisionId = r.Id,
-                                                          DivisionName = r.Name,
-                                                          AppRoleName = rr.Roles.RoleName,
-                                                          Id = rr.Roles.Id,
-                                                          RoleLevel = rr.Roles.RoleLevel,
-                                                          RoleName = rr.Roles.RoleName
-                                                      }
-                                                                     ).ToList();
-                                        if (RoleDetail.Count== 0)
-                                        {
-                                            continue;
-
-                                        }
-                                    }
-                                    else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128")
-                                    {
-                                        RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
-                                                      join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
-                                                      where rr.Roles.Id == Convert.ToInt32(role)
-                                                      select new UserRoleDetailsViewModel
-                                                      {
-                                                          DivisionId = r.Id,
-                                                          DivisionName = r.Name,
-                                                          AppRoleName = rr.Roles.RoleName,
-                                                          Id = rr.Roles.Id,
-                                                          RoleLevel = rr.Roles.RoleLevel,
-                                                          RoleName = rr.Roles.RoleName
-                                                      }
-                                                                     ).ToList();
-                                        if (RoleDetail.Count == 0)
-                                        {
-                                            continue;
-
-                                        }
-                                    }
-                                }
-
-                                //    }
-                                //}
-
-                                string divisionRolePairs = "";// string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
-                                foreach (var item in root.user_info.OfficeWiseRoleID)
-                                {
-                                    if (item.role != 2)
-                                    {
-
-                                        if (divisionRolePairs != "")
-                                            divisionRolePairs = divisionRolePairs + "," + item.office_id + "-" + item.role;
-                                        else
-                                            divisionRolePairs = item.office_id + "-" + item.role;
-                                    }
-                                }
-
+                                string divisionRolePairs = string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
 
                                 login.Roles = RoleDetail.Take(1).ToList();
                                 login.Designation = root.user_info.Designation;
-                                //login.DivisionID = root.user_info.DivisionID.ToString();
+                                login.DivisionID = root.user_info.DivisionID.ToString();
                                 login.DistrictID = root.user_info.DistrictID.ToString();
                                 login.EmployeeName = root.user_info.EmployeeName;
                                 login.EmpID = root.user_info.EmpID;
+                                loginEncViewModel.Success = "1";
                                 login.Name = root.user_info.Name;
                                 login.RoleID = role;
-                                login.DivisionName = RoleDetail.Count() > 0 ? RoleDetail.Take(1).FirstOrDefault().DivisionName : "";
                                 login.RoleWithOffice = divisionRolePairs;
+                                login.DivisionName = RoleDetail.Take(1).FirstOrDefault().DivisionName;
                                 token = _tokenService.GenerateToken();
+                                ses.Token = token;
 
-                                ses.Token=token;
                                 string jsonSession = JsonConvert.SerializeObject(ses);
 
                                 IFMS_EncrDecr objSession = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
@@ -559,21 +366,253 @@ namespace Noc_App.Controllers
                                 loginEncViewModel.Success = "1";
                                 ViewBag.S = encData;
                                 loginEncViewModel.ss = encData;
-                                break;
+
+                                return Json(loginEncViewModel);
                             }
-                            return Json(loginEncViewModel);
                         }
+                        else
+                        {
+                            string baseUrl = "https://wrdpbind.com/api/user_login.php";
+                            string salt = "8QCHhk3cJ6OMGfEW";
+                            string checksum = "zUOwFCGMqKvJARC1tU6l4r24";
+                            string combinedPassword = model.Email + "|" + password + "|" + checksum;
+
+                            string plainText = combinedPassword;
+
+                            var keyBytes = new byte[16];
+                            var ivBytes = new byte[16];
+
+                            string key = salt;
+                            var keySalt = Encoding.UTF8.GetBytes(key);
+                            var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
+
+                            Array.Copy(pdb.GetBytes(16), keyBytes, 16);
+                            Array.Copy(pdb.GetBytes(16), ivBytes, 16);
+                            string encryptedString = NCC_encryptHelper(plainText, key, key);
+
+                            HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+                            HttpClient client = new HttpClient(handler);
+                            client.BaseAddress = new Uri(baseUrl);
+                            client.DefaultRequestHeaders.Accept.Clear();
+                            client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
+                            var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
+                            string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
+                            if (resultContent.Contains("An error has occurred"))
+                            {
+                                //HttpContext.Session.SetString("Ses", token);
+                                ViewBag.S = encData;
+                                loginEncViewModel.ss = encData;
+                                loginEncViewModel.Errors = "An error has occurred.";
+                                ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                                return Json(loginEncViewModel);
+                            }
+                            LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
+
+                            if (root.Status == "200")
+                            {
+                                var LocationRoleDetail = (from r in _userRolesRepository.GetAll().AsEnumerable()
+                                                          join rr in root.user_info.OfficeWiseRoleID on r.Id equals rr.role
+                                                          //join loc in _divisionRepository.GetAll() on rr.office_id equals loc.Id
+                                                          //where root.user_info.Role.ToString().Contains(r.RoleName.ToString())
+                                                          select new
+                                                          {
+                                                              Roles = r,
+                                                              Location = rr,
+                                                              //Division=loc
+                                                          }
+                                                                      ).ToList();
+                                List<UserRoleDetailsViewModel> RoleDetail = new List<UserRoleDetailsViewModel>();
+                                List<string> roles = root.user_info.RoleID.Split(',').ToList();
+                                int cnt = 1;
+                                foreach (var role1 in roles)
+                                {
+                                    var ro = (from rol in _userRolesRepository.GetAll().AsEnumerable()
+                                              join nr in roles on rol.Id.ToString() equals nr
+                                              where nr == role1
+                                              select new
+                                              {
+                                                  roleId = rol.Id.ToString()
+                                              }).FirstOrDefault();
+
+                                    var role = ro == null ? "0" : ro.roleId;
+
+                                    //foreach (string role in roles)
+                                    //{
+                                    //    if (role != "2")
+                                    //    {
+                                    if (ro == null)
+                                    {
+                                        if (cnt == roles.Count)
+                                        {
+                                            //HttpContext.Session.SetString("Ses", token);
+                                            ViewBag.S = encData;
+                                            loginEncViewModel.ss = encData;
+                                            loginEncViewModel.Success = "0";
+                                            loginEncViewModel.Errors = "Invalid user.";
+                                            ModelState.AddModelError(string.Empty, loginEncViewModel.Errors);
+                                            return Json(loginEncViewModel);
+                                        }
+                                        else
+                                        {
+                                            cnt++;
+                                            continue;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (role == "8" /*|| role == "10" || role == "128" || role == "6"*/)
+                                        {
+                                            RoleDetail = (from rr in LocationRoleDetail
+                                                          join r in _circleRepository.GetAll().AsEnumerable() on rr.Location.office_id equals r.Id
+                                                          join loc in _circleDivRepository.GetAll() on rr.Location.office_id equals loc.CircleId
+                                                          join div in _divisionRepository.GetAll() on loc.DivisionId equals div.Id
+                                                          where rr.Roles.Id == Convert.ToInt32(role)
+                                                          select new UserRoleDetailsViewModel
+                                                          {
+                                                              DivisionId = div.Id,
+                                                              DivisionName = div.Name + " (" + r.Name + ")",
+                                                              AppRoleName = rr.Roles.RoleName,
+                                                              Id = rr.Roles.Id,
+                                                              RoleLevel = rr.Roles.RoleLevel,
+                                                              RoleName = rr.Roles.RoleName
+                                                          }
+                                                                         ).ToList();
+                                            if (RoleDetail.Count == 0)
+                                            {
+                                                continue;
+
+                                            }
+                                        }
+                                        else if (role == "60" || role == "67" || role == "7")
+                                        {
+
+                                            RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()
+                                                          join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                          where rr.Roles.Id == Convert.ToInt32(role)
+                                                          select new UserRoleDetailsViewModel
+                                                          {
+                                                              DivisionId = r.Id,
+                                                              DivisionName = r.Name,
+                                                              AppRoleName = rr.Roles.RoleName,
+                                                              Id = rr.Roles.Id,
+                                                              RoleLevel = rr.Roles.RoleLevel,
+                                                              RoleName = rr.Roles.RoleName
+                                                          }
+                                                                         ).ToList();
+                                            if (RoleDetail.Count == 0)
+                                            {
+                                                continue;
+
+                                            }
+                                        }
+                                        else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128")
+                                        {
+                                            RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
+                                                          join rr in LocationRoleDetail on r.Id equals rr.Location.office_id
+                                                          where rr.Roles.Id == Convert.ToInt32(role)
+                                                          select new UserRoleDetailsViewModel
+                                                          {
+                                                              DivisionId = r.Id,
+                                                              DivisionName = r.Name,
+                                                              AppRoleName = rr.Roles.RoleName,
+                                                              Id = rr.Roles.Id,
+                                                              RoleLevel = rr.Roles.RoleLevel,
+                                                              RoleName = rr.Roles.RoleName
+                                                          }
+                                                                         ).ToList();
+                                            if (RoleDetail.Count == 0)
+                                            {
+                                                continue;
+
+                                            }
+                                        }
+                                    }
+
+                                    //    }
+                                    //}
+
+                                    string divisionRolePairs = "";// string.Join(",", RoleDetail.Select(x => x.DivisionId + "-" + x.Id));
+                                    foreach (var item in root.user_info.OfficeWiseRoleID)
+                                    {
+                                        if (item.role != 2)
+                                        {
+
+                                            if (divisionRolePairs != "")
+                                                divisionRolePairs = divisionRolePairs + "," + item.office_id + "-" + item.role;
+                                            else
+                                                divisionRolePairs = item.office_id + "-" + item.role;
+                                        }
+                                    }
+
+
+                                    login.Roles = RoleDetail.Take(1).ToList();
+                                    login.Designation = root.user_info.Designation;
+                                    //login.DivisionID = root.user_info.DivisionID.ToString();
+                                    login.DistrictID = root.user_info.DistrictID.ToString();
+                                    login.EmployeeName = root.user_info.EmployeeName;
+                                    login.EmpID = root.user_info.EmpID;
+                                    login.Name = root.user_info.Name;
+                                    login.RoleID = role;
+                                    login.DivisionName = RoleDetail.Count() > 0 ? RoleDetail.Take(1).FirstOrDefault().DivisionName : "";
+                                    login.RoleWithOffice = divisionRolePairs;
+                                    token = _tokenService.GenerateToken();
+
+                                    ses.Token = token;
+                                    string jsonSession = JsonConvert.SerializeObject(ses);
+
+                                    IFMS_EncrDecr objSession = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                                    string encDataSession = objSession.Encrypt(jsonSession);
+                                    login.SessionId = encDataSession;
+
+                                    HttpContext.Session.SetString("Ses", token);
+                                    string json2 = JsonConvert.SerializeObject(login);
+
+                                    IFMS_EncrDecr obj2 = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
+                                    string encData2 = obj2.Encrypt(json2);
+                                    loginEncViewModel.EncData = encData2;
+                                    loginEncViewModel.Success = "1";
+                                    ViewBag.S = encData;
+                                    loginEncViewModel.ss = encData;
+                                    break;
+                                }
+                                return Json(loginEncViewModel);
+                            }
+                        }
+
+                        ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
+
                     }
-
-                    ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
-
                 }
-                loginEncViewModel.Errors = "Invalid Login Attempt";
+                loginEncViewModel.Errors = "All Fields Are Required To Fill";
+                //if (ModelState.IsValid)
+                //    loginEncViewModel.Errors = testjson+" "+"Invalid Login Attempt2";
+                //else
+                //{
+
+                //    //var errors = ModelState
+                //    //    .Where(ms => ms.Value.Errors.Count > 0) // Only fields with errors
+                //    //    .ToDictionary(
+                //    //        ms => ms.Key,                        // Field name
+                //    //        ms => ms.Value.Errors.Select(e => e.ErrorMessage).ToArray() // Error messages
+                //    //    );
+
+                //    //return BadRequest(new { Errors = errors }); // Return as JSON response
+
+                //    loginEncViewModel.Errors = ModelState.Values.Where(v => v.Errors.Count > 0).SelectMany(v=>v.Errors).FirstOrDefault().ErrorMessage;
+                //        //string.Join(
+                //        //                            "\n",
+                //        //                            ModelState.Values
+                //        //                                .Where(v => v.Errors.Count > 0) // Fields with errors
+                //        //                                .SelectMany(v => v.Errors)      // Select all errors
+                //        //                                .Select(e => e.ErrorMessage)    // Extract error messages
+                //        //                        );
+                //}
             }
             catch (Exception ex)
             {
-                loginEncViewModel.Errors = "An error occured while doing login attempt";
-                ModelState.AddModelError(string.Empty, "Token has expired now. Please refresh the page.");
+                loginEncViewModel.Errors = ex.InnerException.InnerException.Message;//"An error occured while doing login attempt";
+                ModelState.AddModelError(string.Empty, ex.InnerException.InnerException.Message);
+                    //"Token has expired now. Please refresh the page.");
             }
             HttpContext.Session.SetString("Ses", token);
             ViewBag.S = encData;
