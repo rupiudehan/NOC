@@ -1177,8 +1177,18 @@ namespace Noc_App.Controllers
                                 await _repo.UpdateAsync(obj);
                                 //if (msg == "success")
                                 //{
-                                var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID,model.IsUnderMasterPlan));
-                                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+                                //var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID, model.IsUnderMasterPlan));
+                                //_emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+                                try
+                                {
+                                    var emailModel = new EmailModel(model.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessage(model.ApplicantName, model.ApplicationID, model.IsUnderMasterPlan));
+                                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+                                }
+                                catch (Exception exp)
+                                {
+                                    ModelState.AddModelError(string.Empty, exp.Message);
+                                }
+
                                 if (!model.IsUnderMasterPlan)
                                 {
                                     double TotalPayment = 0;

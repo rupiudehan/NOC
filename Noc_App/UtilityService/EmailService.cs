@@ -2,6 +2,8 @@
 using MimeKit;
 using MailKit.Net.Smtp;
 using Noc_App.Models;
+using MailKit.Security;
+using System.Security.Authentication;
 
 namespace Noc_App.UtilityService
 {
@@ -53,7 +55,14 @@ namespace Noc_App.UtilityService
             {
                 try
                 {
-                    client.Connect(_config["EmailSettings:SmtpServer"], Convert.ToInt32(_config["EmailSettings:Port"]), true);
+                    client.CheckCertificateRevocation = false;
+                    // Allow SSLv3.0 and all versions of TLS
+                    client.SslProtocols = SslProtocols.Ssl3 | SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12 | SslProtocols.Tls13;
+                    client.Connect(_config["EmailSettings:SmtpServer"],
+                       Convert.ToInt32(_config["EmailSettings:Port"]),
+                       SecureSocketOptions.Auto);
+
+                    //client.Connect(_config["EmailSettings:SmtpServer"], Convert.ToInt32(_config["EmailSettings:Port"]), true);
                     client.Authenticate(_config["EmailSettings:From"], _config["EmailSettings:Password"]);
                     client.Send(emailMessage);
 
