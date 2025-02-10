@@ -57,7 +57,7 @@ namespace Noc_App.UtilityService
                 {
                     client.CheckCertificateRevocation = false;
                     // Allow SSLv3.0 and all versions of TLS
-                    client.SslProtocols = SslProtocols.Ssl3 | SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12 | SslProtocols.Tls13;
+                    //client.SslProtocols = SslProtocols.Ssl3 | SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12 | SslProtocols.Tls13;
                     client.Connect(_config["EmailSettings:SmtpServer"],
                        Convert.ToInt32(_config["EmailSettings:Port"]),
                        SecureSocketOptions.Auto);

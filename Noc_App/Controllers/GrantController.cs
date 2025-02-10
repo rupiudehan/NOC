@@ -1170,7 +1170,9 @@ namespace Noc_App.Controllers
                                 var idproof = fileUploadeSave(model.IDProofPhoto, uniqueIDProofFileName);
                                 var addressproof = fileUploadeSave(model.AddressProofPhoto, uniqueAddressProofFileName);
                                 var authletter = fileUploadeSave(model.AuthorizationLetterPhoto, uniqueAuthLetterFileName);
+                                var layout = fileUploadeSave(model.LayoutPlanFilePhoto, uniqueLayoutPlanFileName);
                                 var kml = fileUploadeSave(model.KMLFile, uniqueKmlFileName);
+                                var farad = fileUploadeSave(model.FaradFilePoto, uniqueFaradFileName);
                                 obj.Owners = ownerList;
                                 if (model.IsUnderMasterPlan == false)
                                     obj.Khasras = khasraList;
