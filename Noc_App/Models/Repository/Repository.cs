@@ -21,6 +21,21 @@ namespace Noc_App.Models.Repository
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _dbSet = _context.Set<T>();
         }
+        public async Task<int> CreateWithReturnAsync(T obj)
+        {
+            try
+            {
+                await _dbSet.AddAsync(obj);
+                
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+            finally { _context.Dispose(); }
+
+        }
         public async Task CreateAsync(T obj)
         {
             try
@@ -168,6 +183,20 @@ namespace Noc_App.Models.Repository
             catch (Exception ex)
             {
                 throw;
+            }
+            finally { _context.Dispose(); }
+        }
+
+        public async Task<int> UpdateWithReturnAsync(T entity)
+        {
+            try
+            {
+                _context.Entry(entity).State = EntityState.Modified;
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return -1;
             }
             finally { _context.Dispose(); }
         }

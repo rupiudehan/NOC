@@ -49,6 +49,7 @@ namespace Noc_App.Models.ViewModel
         public bool IsUnderMasterPlan { get; set; }
         public string LastForwardedByName { get; set; }
         public string ProcessedToName { get; set; }
+        public bool IsPartiallyApproved { get; set; }
         //[Display(Name = "Sub-Division")]
         //public string SelectedSubDivisionId { get; set; }
         //public IEnumerable<SelectListItem> SubDivisions { get; set; }

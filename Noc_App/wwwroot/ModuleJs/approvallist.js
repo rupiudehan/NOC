@@ -147,7 +147,7 @@ function SetValueNA(id) {
     });
 
 }
-$(document).ready(function () {
+$(function () {
     if ($('.table tbody tr').length > 0) {
         $('.table').DataTable();
     }

@@ -52,6 +52,7 @@ namespace Noc_App.Controllers
                     , _configuration["IFMSPayOptions:companyName"], _configuration["IFMSPayOptions:deptCode"], _configuration["IFMSPayOptions:payLocCode"]
                     , _configuration["IFMSPayOptions:trsyPaymentHead"], _configuration["IFMSPayOptions:PostUrl"], _configuration["IFMSPayOptions:headerClientId"]);
 
+                int istest = Convert.ToInt16(_configuration["Testing"].ToString());
                 string ChecksumKey = settings.ChecksumKey;
                 string edKey = settings.edKey;
                 string edIV = settings.edIV;
@@ -71,7 +72,7 @@ namespace Noc_App.Controllers
                     challandata = new Challandata()
                     {
                         deptRefNo = transactionId,
-                        receiptNo = "",
+                        receiptNo = istest==0?"": transactionId,
                         clientId = settings.clientId,
                         challanDate = DateTime.Now.ToString("yyyy-MM-ddT00:00:00"),
                         expiryDate = DateTime.Now.ToString("yyyy-MM-ddT00:00:00"),
@@ -167,8 +168,20 @@ namespace Noc_App.Controllers
                 };
                 await _repoChallanDetails.CreateAsync(data);
                 cHeader.ChallanId = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == objPayment.challandata.deptRefNo)).FirstOrDefault().Id;
-                ViewBag.HtmlStr = PreparePOSTForm("ChallanFormPost", encData, cHeader, _paymentRequest.ApplicationId);
-                return View(cHeader);
+                if (istest == 1) {
+                    Checkdata cHeaderR = new Checkdata();
+                    cHeaderR.clientId = settings.headerClientId;
+                    cHeaderR.clientSecret = settings.clientSecret;
+                    cHeaderR.transactionID = transactionId;
+                    cHeaderR.ipAddress = settings.IpAddress;
+                    cHeaderR.integratingAgency = settings.IntegratingAgency;
+                    cHeaderR.encData = encData;
+                    succesfulURL(cHeaderR);
+                }
+                else {
+                    ViewBag.HtmlStr = PreparePOSTForm("ChallanFormPost", encData, cHeader, _paymentRequest.ApplicationId);
+                    return View(cHeader);
+                }
                 //
                 // hrmsView pay = new hrmsView();
                 //pay.encdata = encData;
@@ -433,62 +446,102 @@ namespace Noc_App.Controllers
             IFMS_EncrDecr obj = new IFMS_EncrDecr(ChecksumKey, edKey, edIV);
             var detail = obj.Decrypt(model.encData);
             ifms_dataRes ResponseData = Newtonsoft.Json.JsonConvert.DeserializeObject<ifms_dataRes>(detail);
-            var challanDetail = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == ResponseData.challandata.deptRefNo /*&& x.RequestStatus == "Fresh Request"*/)).FirstOrDefault();
+            var challanDetail = (_repoChallanDetails.Find(x => x.deptRefNo == ResponseData.challandata.deptRefNo /*&& x.RequestStatus == "Fresh Request"*/)).FirstOrDefault();
 
-            string id = challanDetail.ApplicationId;
-            if (ResponseData.challandata.bank_Res.status.ToLower() == "failure")
+            try
             {
-                challanDetail.RequestStatus = "Failed";
-                challanDetail.receiptNo = ResponseData.challandata.receiptNo;
-                await _repoChallanDetails.UpdateAsync(challanDetail);
-                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
-                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
 
-                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
-            }
-            else if (ResponseData.challandata.bank_Res.status.ToLower() == "pending")
-            {
-                challanDetail.RequestStatus = "Pending";
-                challanDetail.receiptNo = ResponseData.challandata.receiptNo;
-                await _repoChallanDetails.UpdateAsync(challanDetail);
-                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentPending(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt), challanDetail.receiptNo));
-                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
 
-                return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
-            }
-            else if (ResponseData.challandata.bank_Res.status.ToLower() == "success")
-            {
-                challanDetail.RequestStatus = "Successful";
-                challanDetail.receiptNo = ResponseData.challandata.receiptNo;
-                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
-                GrantPaymentDetails payment = new GrantPaymentDetails
+
+                string id = challanDetail.ApplicationId;
+                int istest = Convert.ToInt16(_configuration["Testing"].ToString());
+                if (istest == 1)
                 {
-                    deptRefNo = challanDetail.deptRefNo,
-                    GrantID = grant.Id,
-                    PayerEmail = challanDetail.emailId,
-                    PayerName = challanDetail.payerName,
-                    PaymentOrderId = ResponseData.challandata.receiptNo,
-                    TotalAmount = Convert.ToDecimal(challanDetail.totalAmt),
-                    CreatedOn = DateTime.Now
+                    BankRes bank = new BankRes();
+                    bank.BankRefNo = ResponseData.challandata.deptRefNo;
+                    bank.CIN = "123";
+                    bank.dateOfPay = DateTime.Now.ToString();
+                    bank.status = "success";
+                    bank.desc = "test";
+                    ResponseData.challandata.bank_Res = bank;
+                    ResponseData.challandata.receiptNo = ResponseData.challandata.deptRefNo;
+                }
+                if (ResponseData.challandata.bank_Res.status.ToLower() == "failure")
+                {
+                    challanDetail.RequestStatus = "Failed";
+                    challanDetail.receiptNo = ResponseData.challandata.receiptNo;
+                    await _repoChallanDetails.UpdateAsync(challanDetail);
+                    GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
 
-                };
-                await _repoPayment.CreateAsync(payment);
-                await _repoChallanDetails.UpdateAsync(challanDetail);
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt),challanDetail.receiptNo));
-                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
-                return RedirectToAction("Index", "Grant", new { Id = id });
+                    return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                }
+                else if (ResponseData.challandata.bank_Res.status.ToLower() == "pending")
+                {
+                    challanDetail.RequestStatus = "Pending";
+                    challanDetail.receiptNo = ResponseData.challandata.receiptNo;
+                    await _repoChallanDetails.UpdateAsync(challanDetail);
+                    GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentPending(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt), challanDetail.receiptNo));
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
+                    return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                }
+                else if (ResponseData.challandata.bank_Res.status.ToLower() == "success")
+                {
+                    challanDetail.RequestStatus = "Successful";
+                    challanDetail.receiptNo = ResponseData.challandata.receiptNo;
+                    GrantDetails grant = ( _repo.Find(x => x.ApplicationID == id)).FirstOrDefault();
+                    GrantPaymentDetails payment = new GrantPaymentDetails
+                    {
+                        deptRefNo = challanDetail.deptRefNo,
+                        GrantID = grant.Id,
+                        PayerEmail = challanDetail.emailId,
+                        PayerName = challanDetail.payerName,
+                        PaymentOrderId = ResponseData.challandata.receiptNo,
+                        TotalAmount = Convert.ToDecimal(challanDetail.totalAmt),
+                        CreatedOn = DateTime.Now
+
+                    };
+                    if (grant != null)
+                    {
+                        int res=await _repoPayment.CreateWithReturnAsync(payment);
+                        if (res >0)
+                        {
+                            int ures=await _repoChallanDetails.UpdateWithReturnAsync(challanDetail);
+                            if (ures >0)
+                            {
+                                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt), challanDetail.receiptNo));
+                                int r = _emailService.SendEmail2(emailModel, "Department of Water Resources, Punjab");
+                                return RedirectToAction("Index", "Grant", new { Id = id });
+                            }
+                        }
+                    }
+                        //challanDetail.RequestStatus = ResponseData.challandata.bank_Res.status;
+                        //challanDetail.receiptNo = ResponseData.challandata.receiptNo;
+                        //await _repoChallanDetails.UpdateAsync(challanDetail);
+                        //GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                        var emailModelF = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                        _emailService.SendEmail(emailModelF, "Department of Water Resources, Punjab");
+
+                        return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                   
+                }
+                else
+                {
+                    challanDetail.RequestStatus = ResponseData.challandata.bank_Res.status;
+                    challanDetail.receiptNo = ResponseData.challandata.receiptNo;
+                    await _repoChallanDetails.UpdateAsync(challanDetail);
+                    GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
+                    return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
+                }
             }
-            else 
+            catch (Exception ex)
             {
-                challanDetail.RequestStatus = ResponseData.challandata.bank_Res.status;
-                challanDetail.receiptNo = ResponseData.challandata.receiptNo;
-                await _repoChallanDetails.UpdateAsync(challanDetail);
-                GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
-                var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPaymentFailure(grant.ApplicantName, grant.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt)));
-                _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
-
                 return RedirectToAction("Failed", new { id = challanDetail.ApplicationId });
             }
         }
@@ -579,6 +632,8 @@ namespace Noc_App.Controllers
                 if (id != null)
                 {
                     var challanDetail = (await _repoChallanDetails.FindAsync(x => x.ApplicationId == id && (x.RequestStatus == "Fresh Request" || x.RequestStatus=="Failed"))).FirstOrDefault();
+                    if(challanDetail==null)
+                    challanDetail = (await _repoChallanDetails.FindAsync(x => x.ApplicationId == id && (x.RequestStatus == "Successful"))).FirstOrDefault();
 
                     GrantDetails obj = (await _repo.FindAsync(x => x.ApplicationID.ToLower() == id.ToLower())).FirstOrDefault();
                     if (obj != null)
@@ -613,9 +668,24 @@ namespace Noc_App.Controllers
                                 OrderId = objPyment.PaymentOrderId,
                                 Message = "Payment is successful"
                             };
-                            challanDetail.RequestStatus = "Successful";
-                            challanDetail.receiptNo = objPyment.PaymentOrderId;
-                            await _repoChallanDetails.UpdateAsync(challanDetail);
+                            if (challanDetail.RequestStatus != "Successful")
+                            {
+                                challanDetail.RequestStatus = "Successful";
+                                challanDetail.receiptNo = objPyment.PaymentOrderId;
+                                int res = await _repoChallanDetails.UpdateWithReturnAsync(challanDetail);
+                                if (res > 0)
+                                {
+                                    var emailModel = new EmailModel(obj.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(obj.ApplicantName, obj.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt), challanDetail.receiptNo));
+                                    int r = _emailService.SendEmail2(emailModel, "Department of Water Resources, Punjab");
+                                    return RedirectToAction("Index", "Grant", new { Id = id });
+                                }
+                            }
+                            else
+                            {
+                                //var emailModel = new EmailModel(obj.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForGrantMessageWithPayment(obj.ApplicantName, obj.ApplicationID, challanDetail.deptRefNo, Convert.ToDecimal(challanDetail.totalAmt), challanDetail.receiptNo));
+                                //int r = _emailService.SendEmail2(emailModel, "Department of Water Resources, Punjab");
+                                return RedirectToAction("Index", "Grant", new { Id = id });
+                            }
                             return View(model);
                         }
                     }

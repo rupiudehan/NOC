@@ -360,88 +360,116 @@ namespace Noc_App.Controllers
                             integratingAgency = settings.IntegratingAgency,
                             dateTime = null
                         };
-                        PaymentStatusDetailViewModel result1 = ChallanVerify(cHeader);
-                        string decodedDate = obj.Decrypt(result1.encData);
-                        ClientResponse response = Newtonsoft.Json.JsonConvert.DeserializeObject<ClientResponse>(decodedDate);
-
-                        if (result1 != null)
+                        int istest = Convert.ToInt16(_configuration["Testing"].ToString());
+                        if (istest == 1)
                         {
-                            if (result1.statusCode != null)
+                            if (result.Payment.receiptNo == null)
                             {
-                                if (result.Payment.receiptNo == null && result1.statusCode.ToUpper() == "SC300")
-                                {
-                                    var dataResponse = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == result.Payment.deptRefNo)).FirstOrDefault();
-                                    dataResponse.RequestStatus = "Successful";
-                                    dataResponse.receiptNo = response.challandata.receiptNo;
+                                var dataResponse = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == result.Payment.deptRefNo)).FirstOrDefault();
+                                dataResponse.RequestStatus = "Successful";
+                                dataResponse.receiptNo = result.Payment.deptRefNo;
 
-                                    GrantPaymentDetails payment = new GrantPaymentDetails
-                                    {
-                                        deptRefNo = dataResponse.deptRefNo,
-                                        GrantID = model.GrantId,
-                                        PayerEmail = dataResponse.emailId,
-                                        PayerName = dataResponse.payerName,
-                                        PaymentOrderId = response.challandata.receiptNo,
-                                        TotalAmount = Convert.ToDecimal(dataResponse.totalAmt),
-                                        CreatedOn = DateTime.Now
+                                GrantPaymentDetails payment = new GrantPaymentDetails
+                                {
+                                    deptRefNo = dataResponse.deptRefNo,
+                                    GrantID = model.GrantId,
+                                    PayerEmail = dataResponse.emailId,
+                                    PayerName = dataResponse.payerName,
+                                    PaymentOrderId = result.Payment.deptRefNo,
+                                    TotalAmount = Convert.ToDecimal(dataResponse.totalAmt),
+                                    CreatedOn = DateTime.Now
 
-                                    };
-                                    await _repoPayment.CreateAsync(payment);
-                                    await _repoChallanDetails.UpdateAsync(dataResponse);
-                                }
-
-                                if (result1.statusCode.ToUpper() == "SC300")
-                                {
-                                    model.ApplicationStatus = "Paid";
-                                }
-                                else if (result1.statusCode.ToUpper() == "SC310")
-                                {
-                                    model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";    //Sent To Payment Gateway
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC301")
-                                {
-                                    model.ApplicationStatus = "Failed"; //Authentication Failed
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC302")
-                                {
-                                    model.ApplicationStatus = "Failed"; //Payment Failed At Bank End
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC303")
-                                {
-                                    model.ApplicationStatus = "Failed"; //Transaction ID does not exist //Verification Not Completed
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC304")
-                                {
-                                    model.ApplicationStatus = "Failed";  //Duplicate deptRefNo number
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC305")
-                                {
-                                    model.ApplicationStatus = "Failed";  //CheckSum Mismatched
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC306")
-                                {
-                                    model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";    //exception occurred update in DB
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC307")
-                                {
-                                    model.ApplicationStatus = "Failed";  //Validation Failed    //Failed again pay
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC308")
-                                {
-                                    model.ApplicationStatus = "Pending (corporate banking, NEFT/RTGS) with Transaction ID:" + model.TransId + ". Please check payment status after some time."; //Status pending (corporate banking, NEFT/RTGS)
-                                }
-                                else if (result1.statusCode.ToUpper() == "EC309")
-                                {
-                                    model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";  //Status null or empty
-                                }
-                                else
-                                {
-                                    model.ApplicationStatus = result1.msg + ". Cannot fetch payment details.";  //Status null or empty
-                                }
+                                };
+                                await _repoPayment.CreateAsync(payment);
+                                await _repoChallanDetails.UpdateAsync(dataResponse);
+                                model.ApplicationStatus = "Paid";
                             }
                         }
                         else
                         {
-                            model.ApplicationStatus = "Failed"; //Authentication Failed
+                            PaymentStatusDetailViewModel result1 = ChallanVerify(cHeader);
+                            string decodedDate = obj.Decrypt(result1.encData);
+                            ClientResponse response = Newtonsoft.Json.JsonConvert.DeserializeObject<ClientResponse>(decodedDate);
+
+                            if (result1 != null)
+                            {
+                                if (result1.statusCode != null)
+                                {
+                                    if (result.Payment.receiptNo == null && result1.statusCode.ToUpper() == "SC300")
+                                    {
+                                        var dataResponse = (await _repoChallanDetails.FindAsync(x => x.deptRefNo == result.Payment.deptRefNo)).FirstOrDefault();
+                                        dataResponse.RequestStatus = "Successful";
+                                        dataResponse.receiptNo = response.challandata.receiptNo;
+
+                                        GrantPaymentDetails payment = new GrantPaymentDetails
+                                        {
+                                            deptRefNo = dataResponse.deptRefNo,
+                                            GrantID = model.GrantId,
+                                            PayerEmail = dataResponse.emailId,
+                                            PayerName = dataResponse.payerName,
+                                            PaymentOrderId = response.challandata.receiptNo,
+                                            TotalAmount = Convert.ToDecimal(dataResponse.totalAmt),
+                                            CreatedOn = DateTime.Now
+
+                                        };
+                                        await _repoPayment.CreateAsync(payment);
+                                        await _repoChallanDetails.UpdateAsync(dataResponse);
+                                    }
+
+                                    if (result1.statusCode.ToUpper() == "SC300")
+                                    {
+                                        model.ApplicationStatus = "Paid";
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "SC310")
+                                    {
+                                        model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";    //Sent To Payment Gateway
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC301")
+                                    {
+                                        model.ApplicationStatus = "Failed"; //Authentication Failed
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC302")
+                                    {
+                                        model.ApplicationStatus = "Failed"; //Payment Failed At Bank End
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC303")
+                                    {
+                                        model.ApplicationStatus = "Failed"; //Transaction ID does not exist //Verification Not Completed
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC304")
+                                    {
+                                        model.ApplicationStatus = "Failed";  //Duplicate deptRefNo number
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC305")
+                                    {
+                                        model.ApplicationStatus = "Failed";  //CheckSum Mismatched
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC306")
+                                    {
+                                        model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";    //exception occurred update in DB
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC307")
+                                    {
+                                        model.ApplicationStatus = "Failed";  //Validation Failed    //Failed again pay
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC308")
+                                    {
+                                        model.ApplicationStatus = "Pending (corporate banking, NEFT/RTGS) with Transaction ID:" + model.TransId + ". Please check payment status after some time."; //Status pending (corporate banking, NEFT/RTGS)
+                                    }
+                                    else if (result1.statusCode.ToUpper() == "EC309")
+                                    {
+                                        model.ApplicationStatus = "Pending At Branch with Transaction ID:" + model.TransId + ". Please check payment status after some time.";  //Status null or empty
+                                    }
+                                    else
+                                    {
+                                        model.ApplicationStatus = result1.msg + ". Cannot fetch payment details.";  //Status null or empty
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                model.ApplicationStatus = "Failed"; //Authentication Failed
+                            }
                         }
                     }
                 }
@@ -1366,6 +1394,7 @@ namespace Noc_App.Controllers
                                  Division = d
                              }
                          ).FirstOrDefault();
+                if(grant!=null)
                 if (!grant.Grant.IsUnderMasterPlan)
                 {
                     var grant2 = (from g in _repo.GetAll()
@@ -2511,7 +2540,6 @@ namespace Noc_App.Controllers
             }
             return Json(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
         }
-
         [Obsolete]
         [HttpPost("uploadapplicant")]
         [AllowAnonymous]

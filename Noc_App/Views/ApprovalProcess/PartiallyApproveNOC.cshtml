@@ -1,0 +1,172 @@
+﻿@model PartiallyApproveViewModelCreate
+@{
+    ViewBag.Title = Model.IsUnderMasterPlan ? "Approve NOC" : "Approve NOC";
+}
+@* @if (Model.IsUnderMasterPlan)
+{ *@
+<h1 class="h3 mb-4 text-gray-800">Approve NOC</h1>
+@* }
+else
+{
+    <h1 class="h3 mb-4 text-gray-800">Issue NOC</h1>
+} *@
+
+<div class="row">
+
+    <div class="col-lg-12">
+
+        <!-- Circle Buttons -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                @* @if (Model.IsUnderMasterPlan)
+                { *@
+                    <h6 class="m-0 font-weight-bold text-primary">Approve NOC</h6>
+                @* }
+                else
+                {
+                    <h6 class="m-0 font-weight-bold text-primary">Issue NOC</h6>
+                } *@
+            </div>
+            <div class="card-body">
+                <form class="user" asp-action="PartiallyApproveNOC" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <input asp-for="ForwardToRole" type="hidden" id="ForwardToRole" />
+                                <input asp-for="ToLocationId" type="hidden" id="ToLocationId" />
+                                <input asp-for="FromLocationId" type="hidden" id="FromLocationId" />
+                                <input asp-for="LoggedInRole" type="hidden" id="userRole" />
+                                <input type="hidden" id="pageName" value="F" />
+                                <input type="hidden" asp-for="IsUnderMasterPlan" />
+                                <label asp-for="Name" class="control-label">Project</label>
+                                <input asp-for="Name" readonly class="form-control form-control-user" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="ApplicationID" class="control-label">Application Id</label>
+                                <input asp-for="ApplicationID" readonly class="form-control form-control-user" />
+                                <span asp-validation-for="ApplicationID" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="LocationDetails" class="control-label">Location</label>
+                                <input asp-for="LocationDetails" readonly class="form-control form-control-user" />
+                                <span asp-validation-for="LocationDetails" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="SelectedOfficerId" class="control-label">Document Uploaded By</label>
+                                @if (Model.Officers != null)
+                                {
+                                    @if (Model.Officers.Count() > 0)
+                                    {
+                                        <select asp-for="SelectedOfficerId" id="SelectedOfficerId" asp-items="@Model.Officers" class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <select name="SelectedOfficerId" disabled id="SelectedOfficerId" class="form-control">
+                                            <option value="">No Officer</option>
+                                        </select>
+                                    }
+
+                                }
+                                else
+                                {
+                                    <select name="SelectedOfficerId" id="SelectedOfficerId" disabled class="form-control">
+                                        <option value="">No Officer</option>
+                                    </select>
+                                }
+                                <span asp-validation-for="SelectedOfficerId" id="SelectedOfficerIdVal" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="SelectedDivisionId" class="control-label">Location</label>
+                                @if (Model.Divisions != null)
+                                {
+                                    @if (Model.Divisions.Count() > 0)
+                                    {
+                                        <select asp-for="SelectedDivisionId" id="SelectedDivisionId" asp-items="@Model.Divisions" class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                    }
+                                }
+                                else
+                                {
+                                    <select name="SelectedDivisionId" id="SelectedDivisionId" disabled class="form-control">
+                                        <option value="">Select</option>
+                                    </select>
+                                }
+                                <span asp-validation-for="SelectedDivisionId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label asp-for="Remarks" class="control-label"></label>
+                                <textarea asp-for="Remarks" placeholder="Remarks" class="form-control" cols="3" rows="2"></textarea>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="row">
+                        @if (Model.Officers != null && Model.Officers.Count() > 0)
+                        {
+                            @if (Model.Divisions != null && Model.Divisions.Count() > 0)
+                            {
+                                <div class="col-lg-6">
+
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">Approve</button>
+                                </div>
+                                <div class="col-lg-6">
+                                    <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-lg-6">
+
+                                    <button type="submit" disabled id="btnForward" class="btn btn-primary btn-user btn-block">Approve</button>
+                                </div>
+                                <div class="col-lg-6">
+                                    <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-lg-6 offset-lg-3">
+                                <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
+                            </div>
+                        }
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+
+</div>
+
+@section Scripts {
+    <script src="~/modulejs/appforwardscript.js"></script>
+}

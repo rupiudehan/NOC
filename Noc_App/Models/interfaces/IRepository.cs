@@ -10,6 +10,8 @@ namespace Noc_App.Models.interfaces
         T GetById(int id);
         Task<T> GetBylongIdAsync(long id);
         IQueryable<T> GetAll();
+        Task<int> CreateWithReturnAsync(T obj);
+        Task<int> UpdateWithReturnAsync(T entity);
         Task CreateAsync(T entity);
         Task UpdateAsync(T entity);
         void Update(T entity);

@@ -88,5 +88,9 @@ namespace Noc_App.Models
         public int? MasterPlanId { get; set; }
         [ForeignKey(nameof(MasterPlanId))]
         public MasterPlanDetails MasterPlanDetails { get; set; }
+        public bool IsPartiallyApproved { get; set; }
+        public DateTime PartiallyApprovedOn { get; set; }
+        public string PartiallyApprovedByRole { get; set; }
+        public string PartiallyApprovedBy { get; set; }
     }
 }

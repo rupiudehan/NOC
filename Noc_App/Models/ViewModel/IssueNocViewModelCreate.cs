@@ -14,5 +14,8 @@ namespace Noc_App.Models.ViewModel
         [Display(Name = "Upload Certificate")]
         public IFormFile CertificateFile { get; set; }
         public bool IsUnderMasterPlan { get; set; }
+        public bool IsPartiallyApproved { get; set; }
+        public string PreviousRemarks { get; set; }
+        public string PreviosAuthorityRole { get; set; }
     }
 }

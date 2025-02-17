@@ -1,4 +1,4 @@
-﻿function populateDropdown(data, dropdownId,page) {
+﻿function populateDropdown(data, dropdownId, page) {
     var dropdown = $("#Selected" + dropdownId);
     dropdown.removeAttr("disabled");
     $('#btnForward').removeAttr('disabled');
@@ -30,17 +30,19 @@ $(document).ready(function () {
                     //ForwardToRole = $('#ForwardToRole').val();
                     division = $('#ToLocationId').val();
             }
+            var app = $('#ApplicationID').val();
+           
             $("#divLoader").show(); $('.barcontainer').hide();
-                $.ajax({
-                    url: "/ApprovalProcess/GetOfficerLocation",
+            $.ajax({
+                url: "/ApprovalProcess/GetOfficerLocation",
                     type: "POST",
-                    data: { divisionId: division, roleName: role, userid: userid },
+                    data: { divisionId: division, roleName: role, userid: userid, appId: app },
                     complete: function (r) {
                         $("#divLoader").hide();
                         $('.barcontainer').show();
                     },
                     success: function (data) {//roleName
-                        
+
                         //if (role == 'DWS,CIRCLE OFFICER') {
                         //    $.each(data, function (key, value) {
                         //        if (value.roleName == 'DWS') {
@@ -52,7 +54,7 @@ $(document).ready(function () {
                         //            populateDropdown(data, "DivisionId", $('#pageName').val());
                         //        }
                         //    });
-                            
+
                         //} else {
                             populateDropdown(data, "DivisionId", $('#pageName').val());
                         //}

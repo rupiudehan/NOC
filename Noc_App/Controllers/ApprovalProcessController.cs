@@ -60,6 +60,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<EstablishmentOfficeDetails> _establishOffRepository;
         private readonly IRepository<ProcessedApplicationsViewModel> _processedAppDetailsRepo;
         private readonly IRepository<TransferedApplicationsViewModel> _transferedAppDetailsRepo;
+        private readonly IConfiguration _configuration;
 
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
@@ -72,7 +73,7 @@ namespace Noc_App.Controllers
             , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<DrainWidthTypeDetails> drainwidthRepository
             , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster
             , IRepository<GrantFileTransferDetails> grantFileTransferRepository, IRepository<CircleDivisionMapping> circleDivRepository, IRepository<TransferedApplicationsViewModel> transferedAppDetailsRepo
-            , IRepository<EstablishmentOfficeDetails> establishOffRepository, IRepository<ProcessedApplicationsViewModel> processedAppDetailsRepo)
+            , IRepository<EstablishmentOfficeDetails> establishOffRepository, IRepository<ProcessedApplicationsViewModel> processedAppDetailsRepo, IConfiguration configuration)
         {
             _repo = repo;
             //_villageRpo = villageRepo;
@@ -108,9 +109,10 @@ namespace Noc_App.Controllers
             _establishOffRepository = establishOffRepository;
             _processedAppDetailsRepo = processedAppDetailsRepo;
             _transferedAppDetailsRepo = transferedAppDetailsRepo;
+            _configuration = configuration;
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<ViewResult> Index()
         {
             try
@@ -126,7 +128,7 @@ namespace Noc_App.Controllers
                 role = (await GetAppRoleName(role)).AppRoleName;
                 List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
                 List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
-                if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER DRAINAGE" || role== "EXECUTIVE ENGINEER DRAINAGE" || role== "DIRECTOR DRAINAGE" || role== "DWS" || role== "ADE")
+                if (role == "PRINCIPAL SECRETARY" || role == "MINISTER" || role == "CHIEF ENGINEER DRAINAGE" || role== "EXECUTIVE ENGINEER DRAINAGE" || role== "DIRECTOR DRAINAGE" || role== "DWS" || role== "ADE")
                     divisionId = "0";
                 model =await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", divisionId, "'" +role+"'", "'" + userId + "'");
                 var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
@@ -148,7 +150,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<ViewResult> TransferedApplications()
         {
             try
@@ -174,7 +176,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<ViewResult> ProcessedApplications()
         {
             try
@@ -199,7 +201,7 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public IActionResult ShortFall(string id)
         {
@@ -218,7 +220,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ShortFall(GrantApprovalDetailShortfall model)
@@ -323,7 +325,7 @@ namespace Noc_App.Controllers
             }
             return View(model);
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         [Obsolete]
         public async Task<IActionResult> TransferFile(string id)
@@ -427,7 +429,7 @@ namespace Noc_App.Controllers
                 var roleName = LoggedInRoleName();
 
                 string role = roleName;
-                List<DivisionDetails> UserRoleLocation = await GetOfficerLocations("0", role, model.SelectedOfficerId);
+                List<DivisionDetails> UserRoleLocation = await GetOfficerLocations("0", role, model.SelectedOfficerId,model.ApplicationID);
                 if (model.SelectedDivisionId == null || model.SelectedDivisionId == "" || model.SelectedDivisionId == "0")
                 {
                     model.Divisions = new SelectList(UserRoleLocation, "Id", "Name");
@@ -546,7 +548,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -596,7 +598,7 @@ namespace Noc_App.Controllers
                 List<OfficerDetails> officerDetail = new List<OfficerDetails>();
                 officerDetail = await GetOfficer("0", "JUNIOR ENGINEER", "0", "0", "0");//,SUB DIVISIONAL OFFICER
                 model.Officers = officerDetail.Count > 0 ? new SelectList(officerDetail, "UserId", "UserName") : null;
-                List<DivisionDetails> UserRoleLocation = await GetOfficerLocations(LoggedInDivisionID(), "JUNIOR ENGINEER", model.SelectedOfficerId);
+                List<DivisionDetails> UserRoleLocation = await GetOfficerLocations(LoggedInDivisionID(), "JUNIOR ENGINEER", model.SelectedOfficerId,model.ApplicationID);
                 if (model.SelectedDivisionId == null || model.SelectedDivisionId == "" || model.SelectedDivisionId == "0")
                 {
                     model.Divisions = new SelectList(UserRoleLocation, "Id", "Name");
@@ -662,7 +664,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         [HttpGet]
         public async Task<ViewResult> Forward(string Id)
@@ -678,6 +680,11 @@ namespace Noc_App.Controllers
 
                     return View("NotFound");
                 }
+
+                //int grantDivisionId = (from s in _subDivisionRepo.GetAll()
+                //                      where s.Id == grant.SubDivisionId
+                //                      select new {division=s.DivisionId}
+                //                     ).FirstOrDefault().division;
 
                 GrantApprovalDetail approval=(from a in _repoApprovalDetail.GetAll() where a.GrantID==grant.Id orderby a.Id descending select a).FirstOrDefault();
                 
@@ -817,12 +824,16 @@ namespace Noc_App.Controllers
                         forwardToRole = "PRINCIPAL SECRETARY";
                         divisionId = "0";
                         break;
+                    case "PRINCIPAL SECRETARY":
+                        forwardToRole = "MINISTER";
+                        divisionId = "0";
+                        break;
                     default:
                         forwardToRole = "JUNIOR ENGINEER"; break;
                 }
                 GrantApprovalDetail approvalOfficer = new GrantApprovalDetail();
                 //if (forwardToRole == "EXECUTIVE ENGINEER")
-                    approvalOfficer = (from a in _repoApprovalDetail.GetAll() where a.GrantID == grant.Id && a.ProcessedByRole==forwardToRole orderby a.ProcessedOn descending select a).FirstOrDefault();
+                approvalOfficer = null;// (from a in _repoApprovalDetail.GetAll() where a.GrantID == grant.Id && a.ProcessedByRole==forwardToRole orderby a.ProcessedOn descending select a).FirstOrDefault();
                 //UserRoleDetails userRoleDetails =  (await GetAppRoleName(forwardToRole));
 
                 //officerDetail = await GetOfficer(divisionId, userRoleDetails.RoleName,"0"); 
@@ -879,7 +890,7 @@ namespace Noc_App.Controllers
             }
 
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -1033,6 +1044,10 @@ namespace Noc_App.Controllers
                         forwardToRole = "PRINCIPAL SECRETARY";
                         divisionId = "0";
                         break;
+                    case "PRINCIPAL SECRETARY":
+                        forwardToRole = "MINISTER";
+                        divisionId = "0";
+                        break;
                     default:
                         forwardToRole = "JUNIOR ENGINEER"; break;
                 }
@@ -1053,7 +1068,7 @@ namespace Noc_App.Controllers
                 List<OfficerDetails> officerDetails = new List<OfficerDetails>();
                 GrantApprovalDetail approvalOfficer = new GrantApprovalDetail();
                 //if (forwardToRole == "EXECUTIVE ENGINEER")
-                approvalOfficer = (from a in _repoApprovalDetail.GetAll() where a.GrantID == grant.Id && a.ProcessedByRole == forwardToRole orderby a.ProcessedOn descending select a).FirstOrDefault();
+                //approvalOfficer = (from a in _repoApprovalDetail.GetAll() where a.GrantID == grant.Id && a.ProcessedByRole == forwardToRole orderby a.ProcessedOn descending select a).FirstOrDefault();
                 if (approvalOfficer == null)
                 {
                     officerDetails = await GetOfficer(divisionId, forwardToRole, "0", circleIdd, estabOfficeid);
@@ -1100,7 +1115,7 @@ namespace Noc_App.Controllers
                 model.ToLocationId = approvalOfficer == null ? Convert.ToInt32(LoggedInDivisionID()) : approvalOfficer.FromLocationId;
                 if (forwardedRole == "EXECUTIVE ENGINEER" || forwardedRole == "JUNIOR ENGINEER" || forwardedRole == "SUB DIVISIONAL OFFICER" || forwardedRole == "CIRCLE OFFICER" || forwardedRole == "DWS,CIRCLE OFFICER")
                 {
-                    List<DivisionDetails> UserRoleLocation = await GetOfficerLocations(LoggedInDivisionID(), forwardedRole, model.SelectedOfficerId);
+                    List<DivisionDetails> UserRoleLocation = await GetOfficerLocations(LoggedInDivisionID(), forwardedRole, model.SelectedOfficerId,grant.ApplicationID);
                     if (model.SelectedDivisionId == null || model.SelectedDivisionId == "" || model.SelectedDivisionId == "0")
                     {
                         model.Divisions = new SelectList(UserRoleLocation, "Id", "Name");
@@ -1399,7 +1414,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public ViewResult EditApprovalDocuments(string grantId,long docId,long app)
         {
@@ -1466,7 +1481,7 @@ namespace Noc_App.Controllers
 
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -1718,7 +1733,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpGet]
         public IActionResult Reject(string id)
         {
@@ -1734,7 +1749,7 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(GrantApprovalDetailReject model)
@@ -1821,7 +1836,183 @@ namespace Noc_App.Controllers
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CHIEF ENGINEER DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CHIEF ENGINEER DRAINAGE")]
+        [HttpGet]
+        public async Task<IActionResult> PartiallyApproveNOC(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+                return View("NotFound");
+            }
+
+            GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == id)).FirstOrDefault();
+
+            if (grant == null)
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {id} cannot be found";
+
+                return View("NotFound");
+            }
+            PartiallyApproveViewModelCreate model = new PartiallyApproveViewModelCreate();
+            string forwardToRole = "EXECUTIVE ENGINEER DRAINAGE";
+            var roleName = LoggedInRoleName();
+
+            string divisionId = LoggedInDivisionID();
+            List<DivisionDetails> divs = new List<DivisionDetails>();
+            List<OfficerDetails> officerDetail = new List<OfficerDetails>();
+            officerDetail = (await GetOfficer(divisionId, forwardToRole, "0", "0", "0")).Distinct().ToList();
+            if (grant.IsUnderMasterPlan)
+            {
+                model = (from g in _repo.GetAll()
+                         join pay in _masterPlanDetailsRepository.GetAll() on g.MasterPlanId equals pay.Id
+                         //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                         join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
+                         join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
+                         join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
+                         where g.ApplicationID == id
+                         select new PartiallyApproveViewModelCreate
+                         {
+                             Id = g.Id,
+                             Name = g.Name,
+                             ApplicationID = g.ApplicationID,
+                             IsUnderMasterPlan = g.IsUnderMasterPlan,
+                             ForwardToRole = forwardToRole,
+                             LoggedInRole = roleName,
+                             FromLocationId = Convert.ToInt32(LoggedInDivisionID()),
+                             ToLocationId = Convert.ToInt32(LoggedInDivisionID()),
+Divisions = new SelectList(divs, "Id", "Name"),
+                             Officers = officerDetail != null ? officerDetail.Count() > 0 ? new SelectList(officerDetail, "UserId", "UserName") : null : null,
+                             LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
+                         }).FirstOrDefault();
+            }
+            else
+            {
+                model = (from g in _repo.GetAll()
+                         join pay in _repoPayment.GetAll() on g.Id equals pay.GrantID
+                         //join v in _villageRpo.GetAll() on g.VillageID equals v.Id
+                         join t in _tehsilBlockRepo.GetAll() on g.TehsilID equals t.Id
+                         join sub in _subDivisionRepo.GetAll() on g.SubDivisionId equals sub.Id
+                         join div in _divisionRepo.GetAll() on sub.DivisionId equals div.Id
+                         where g.ApplicationID == id
+                         select new PartiallyApproveViewModelCreate
+                         {
+                             Id = g.Id,
+                             Name = g.Name,
+                             ApplicationID = g.ApplicationID,
+                             IsUnderMasterPlan = g.IsUnderMasterPlan,
+                             ForwardToRole = forwardToRole,
+                             LoggedInRole = roleName,
+                             FromLocationId = Convert.ToInt32(LoggedInDivisionID()),
+                             ToLocationId = Convert.ToInt32(LoggedInDivisionID()),
+                             Divisions = new SelectList(divs, "Id", "Name"),
+                             Officers = officerDetail != null ? officerDetail.Count() > 0 ? new SelectList(officerDetail, "UserId", "UserName") : null : null,
+                             LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
+                         }).FirstOrDefault();
+            }
+            return View(model);
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CHIEF ENGINEER DRAINAGE")]
+        [HttpPost]
+        [Obsolete]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PartiallyApproveNOC(PartiallyApproveViewModelCreate model)
+        {
+            if (string.IsNullOrEmpty(model.ApplicationID))
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {model.ApplicationID} cannot be found";
+                return View("NotFound");
+            }
+
+            GrantDetails grant = (await _repo.FindAsync(x => x.ApplicationID == model.ApplicationID)).FirstOrDefault();
+
+            if (grant == null)
+            {
+                ViewBag.ErrorMessage = $"Grant with Application Id = {model.ApplicationID} cannot be found";
+
+                return View("NotFound");
+            }
+
+            string ErrorMessage = string.Empty;            
+
+            string userId = LoggedInUserID();
+
+            string divisionId = LoggedInDivisionID();
+
+            string subdivisionId = LoggedInSubDivisionID();
+
+            string username = LoggedInUserName();
+
+            string designation = LoggedInDesignationName();
+
+            // Retrieve roles associated with the user
+            var roleName = LoggedInRoleName();
+
+            string role = roleName;
+            DivisionDetails grantdivision = (from d in _divisionRepo.GetAll()
+                                             join s in _subDivisionRepo.GetAll() on d.Id equals s.DivisionId
+                                             where s.Id == grant.SubDivisionId
+                                             select new DivisionDetails
+                                             {
+                                                 Id = d.Id,
+                                                 Name = d.Name
+                                             })
+                                               .FirstOrDefault();
+            GrantApprovalMaster master = (await _repoApprovalMaster.FindAsync(x => x.Code == "A")).FirstOrDefault();
+            int approvalLevel = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id && x.ApprovalID == master.Id)).Count();
+            var recommendations = _repoRecommendation.Find(x => x.Code == "A").FirstOrDefault();
+            string forwardToRole = "EXECUTIVE ENGINEER DRAINAGE";
+
+            List<OfficerDetails> officerDetail = new List<OfficerDetails>();
+            officerDetail = (await GetOfficer("0", forwardToRole, "0", "0", divisionId));
+            model.Officers = new SelectList(officerDetail, "UserId", "UserName", model.SelectedOfficerId);
+            List<DivisionDetails> UserRoleLocation = await GetOfficerLocations(LoggedInDivisionID(), forwardToRole, model.SelectedOfficerId, grant.ApplicationID);
+            model.Divisions = new SelectList(UserRoleLocation, "Id", "Name", model.SelectedDivisionId);
+                if (model.SelectedDivisionId == null || model.SelectedDivisionId == "" || model.SelectedDivisionId == "0")
+                {
+                model.Divisions = new SelectList(UserRoleLocation, "Id", "Name");
+                ModelState.AddModelError("", $"Please select division");
+
+                    return View(model);
+                }
+                model.Divisions = new SelectList(UserRoleLocation, "Id", "Name", model.SelectedDivisionId);
+               
+                    GrantApprovalDetail approvalDetail = new GrantApprovalDetail
+                    {
+                        GrantID = grant.Id,
+                        ApprovalID = master.Id,
+                        ProcessedBy = userId,
+                        ProcessedOn = DateTime.Now,
+                        ProcessedByRole = role,
+                        ProcessedByName = username + "(" + designation + ")",
+                        ProcessLevel = approvalLevel + 1,
+                        ProcessedToRole = forwardToRole,
+                        ProcessedToUser = model.SelectedOfficerId,
+                        RecommendationID = recommendations.Id,
+                        FromLocationId = Convert.ToInt32(divisionId),
+                        ToLocationId = Convert.ToInt32(model.SelectedDivisionId),
+                        Remarks=model.Remarks
+                    };
+
+                    await _repoApprovalDetail.CreateAsync(approvalDetail);
+                    //_repoApprovalDetail.
+                    grant.IsForwarded = false;
+                    grant.ProcessLevel = approvalDetail.ProcessLevel;
+                    grant.IsPending = false;
+                    grant.IsPartiallyApproved = true;
+                    grant.PartiallyApprovedByRole = role;
+                    grant.PartiallyApprovedBy = userId;
+                    grant.PartiallyApprovedOn = DateTime.Now;
+                    await _repo.UpdateAsync(grant);
+
+                    var emailModel = new EmailModel(grant.ApplicantEmailID, "Grant Application Status", EmailBody.EmailStringBodyForIssue(grant.ApplicantName, grant.ApplicationID, "", grant.IsUnderMasterPlan));
+                    _emailService.SendEmail(emailModel, "Department of Water Resources, Punjab");
+
+                    return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,EXECUTIVE ENGINEER DRAINAGE,CHIEF ENGINEER DRAINAGE")]
         [HttpGet]
         public async Task<IActionResult> IssueNOC(string id)
         {
@@ -1839,6 +2030,7 @@ namespace Noc_App.Controllers
 
                 return View("NotFound");
             }
+            var approval = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id)).OrderBy(x => x.Id).LastOrDefault();
             IssueNocViewModelCreate model = new IssueNocViewModelCreate();
             if (grant.IsUnderMasterPlan)
             {
@@ -1855,6 +2047,9 @@ namespace Noc_App.Controllers
                              Name = g.Name,
                              ApplicationID = g.ApplicationID,
                              IsUnderMasterPlan = g.IsUnderMasterPlan,
+                             IsPartiallyApproved=grant.IsPartiallyApproved,
+                             PreviousRemarks= grant.IsPartiallyApproved?approval.Remarks:"",
+                             PreviosAuthorityRole = grant.IsPartiallyApproved ? approval.ProcessedByRole : "",
                              LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                          }).FirstOrDefault();
             }
@@ -1873,13 +2068,16 @@ namespace Noc_App.Controllers
                              Name = g.Name,
                              ApplicationID = g.ApplicationID,
                              IsUnderMasterPlan = g.IsUnderMasterPlan,
+                             IsPartiallyApproved = grant.IsPartiallyApproved,
+                             PreviousRemarks = grant.IsPartiallyApproved ? approval.Remarks : "",
+                             PreviosAuthorityRole= grant.IsPartiallyApproved ?approval.ProcessedByRole :"",
                              LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                          }).FirstOrDefault();
             }
             return View(model);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CHIEF ENGINEER DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,EXECUTIVE ENGINEER DRAINAGE,CHIEF ENGINEER DRAINAGE")]
         [HttpPost]
         [Obsolete]
         [ValidateAntiForgeryToken]
@@ -2029,7 +2227,7 @@ namespace Noc_App.Controllers
             return PhysicalFile(filePath, mimeType, fileName);
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE,Administrator")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE,Administrator")]
         public async Task<IActionResult> ViewApplication(string Id)
         {
             try
@@ -2225,7 +2423,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<IActionResult> ViewProcessedApplication(string Id)
         {
             try
@@ -2438,7 +2636,7 @@ namespace Noc_App.Controllers
                 return View();
             }
         }
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         public async Task<IActionResult> ViewTransferedApplication(string Id)
         {
             try
@@ -2744,7 +2942,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         [HttpPost]
         public async Task<IActionResult> GetOfficers(int subdivisionId,string roleName)
@@ -2755,7 +2953,7 @@ namespace Noc_App.Controllers
             return Json(new SelectList(officerDetail, "UserId", "UserName"));
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public IActionResult GetRecommendationDetail(string id)
         {
@@ -2796,7 +2994,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public IActionResult GetRecommendationDetailForOtherThanNA(string id)
         {
@@ -2836,155 +3034,242 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
-        [Obsolete]
-        private List<LoginResponseViewModel> FetchUser()
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        private OfficerResponseViewModel1 FetchUser()
         {
-            List<LoginResponseViewModel> users = new List<LoginResponseViewModel>();
-            user_info user_info1 = new user_info();
-            user_info user_info2 = new user_info();
-            user_info user_info3 = new user_info();
-            user_info user_info4 = new user_info();
-            user_info user_info5 = new user_info();
-            user_info user_info6 = new user_info();
-            user_info user_info7 = new user_info();
-            user_info user_info8 = new user_info();
-            user_info user_info11 = new user_info();
-            user_info user_info9 = new user_info();
-            user_info user_info10 = new user_info();
-            user_info user_info12 = new user_info();
-            user_info user_info13 = new user_info();
-            user_info user_info14 = new user_info();
-            user_info user_info15 = new user_info();
-            user_info user_info16 = new user_info();
-            user_info user_info17 = new user_info();
-            //user_info1 = new user_info { Name = "Junior Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info2 = new user_info { Name = "Sub Divisional Officer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info3 = new user_info { Name = "Superintending Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info4 = new user_info { Name = "XEN/DWS", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN/DWS", RoleID = 83.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "dws", EmpID = "126", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info5 = new user_info { Name = "XEN HO Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN HO Drainage", RoleID = 128.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "eehq", EmpID = "122", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info6 = new user_info { Name = "Chief Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 10.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info7 = new user_info { Name = "Principal Secretary", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 6.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info8 = new user_info { Name = "ADE", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info9 = new user_info { Name = "Director Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info10 = new user_info { Name = "Administrator", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 63.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info11 = new user_info { Name = "ExecutiveEngineer", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "xen", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info12 = new user_info { Name = "XEN Faridkot", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info13 = new user_info { Name = "XEN Mohali", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 34.ToString(), Division = "\"Executive Engineer SAS Nagar Drainage-cum-Mining & Geology Division, WRD Punjab\"", DistrictID = 19, District = "Mohali", EmailId = "xenmohali", EmpID = "15321", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info14 = new user_info { Name = "Junior Engineer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 34.ToString(), Division = "Mohali", DistrictID = 29, District = "Mohali", EmailId = "jemohali", EmpID = "1231", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info15 = new user_info { Name = "Sub Divisional Officer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 34.ToString(), Division = "test", DistrictID = 29, District = "Mohali", EmailId = "sdomohali", EmpID = "1242", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info16 = new user_info { Name = "Junior Engineer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Mohali", EmailId = "jefaridkot", EmpID = "1233", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info17 = new user_info { Name = "Sub Divisional Officer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Faridkot", EmailId = "sdofaridkot", EmpID = "1243", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            //user_info17 = new user_info { Name = "Sub Divisional Officer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Faridkot", EmailId = "sdofaridkot", EmpID = "1243", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info1 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 10 }, new OfficeWiseRolesIds { office_id = 33, role = 60 } }, Name = "Junior Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info2 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 67 } }, Name = "Sub Divisional Officer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "sdo", EmpID = "124", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info3 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 8 } }, Name = "Superintending Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Superintending Engineer", RoleID = 8.ToString(), DivisionID = 33.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 29, District = "Faridkot", EmailId = "co", EmpID = "125", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info4 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 83 } }, Name = "XEN/DWS", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN/DWS", RoleID = 83.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "dws", EmpID = "126", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info5 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 128 } }, Name = "XEN HO Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "XEN HO Drainage", RoleID = 128.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "eehq", EmpID = "122", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info6 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 10 } }, Name = "Chief Engineer", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer", RoleID = 10.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "cehq", EmpID = "128", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info7 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 6 } }, Name = "Principal Secretary", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Principal Secretary", RoleID = 6.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "ps", EmpID = "129", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info8 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 90 } }, Name = "ADE", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "ADE/DWS", RoleID = 90.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "ade", EmpID = "130", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info9 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 35 } }, Name = "Director Drainage", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Director Drainage", RoleID = 35.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Amritsar", EmailId = "dd", EmpID = "131", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info10 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 63, role = 1 } }, Name = "Administrator", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 63.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info11 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 7 } }, Name = "ExecutiveEngineer", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "xen", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info12 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 33, role = 7 } }, Name = "XEN Faridkot", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info13 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 34, role = 7 } }, Name = "XEN Mohali", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 34.ToString(), Division = "\"Executive Engineer SAS Nagar Drainage-cum-Mining & Geology Division, WRD Punjab\"", DistrictID = 19, District = "Mohali", EmailId = "xenmohali", EmpID = "15321", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info14 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 34, role = 60 } }, Name = "Junior Engineer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 34.ToString(), Division = "Mohali", DistrictID = 29, District = "Mohali", EmailId = "jemohali", EmpID = "1231", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info15 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 34, role = 67 } }, Name = "Sub Divisional Officer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 34.ToString(), Division = "test", DistrictID = 29, District = "Mohali", EmailId = "sdomohali", EmpID = "1242", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info16 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 33, role = 60 } }, Name = "Junior Engineer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Mohali", EmailId = "jefaridkot", EmpID = "1233", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
-            user_info17 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 33, role = 67 }, new OfficeWiseRolesIds { office_id = 63, role = 60 } }, Name = "Sub Divisional Officer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Faridkot", EmailId = "sdofaridkot", EmpID = "1243", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            OfficerResponseViewModel1 user_info = new OfficerResponseViewModel1();
+            List<officer_info> users = new List<officer_info>();
+            officer_info user_info1 = new officer_info();
+            officer_info user_info2 = new officer_info();
+            officer_info user_info3 = new officer_info();
+            officer_info user_info4 = new officer_info();
+            officer_info user_info5 = new officer_info();
+            officer_info user_info6 = new officer_info();
+            officer_info user_info7 = new officer_info();
+            officer_info user_info8 = new officer_info();
+            officer_info user_info9 = new officer_info();
+            officer_info user_info10 = new officer_info();
+            officer_info user_info11 = new officer_info();
+            officer_info user_info12 = new officer_info();
+            //user_info1 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 10 }, new OfficeWiseRolesIds { office_id = 33, role = 60 }}, Name = "Junior Engineer",EmployeeName="N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
 
-            LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
-            LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
-            LoginResponseViewModel o3 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info3 };
-            LoginResponseViewModel o4 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info4 };
-            LoginResponseViewModel o5 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info5 };
-            LoginResponseViewModel o6 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info6 };
-            LoginResponseViewModel o7 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info7 };
-            LoginResponseViewModel o8 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info8 };
-            LoginResponseViewModel o11 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info11 };
-            LoginResponseViewModel o9 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info9 };
-            LoginResponseViewModel o10 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info10 };
-            LoginResponseViewModel o12 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info12 };
-            LoginResponseViewModel o13 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info13 };
-            LoginResponseViewModel o14 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info14 };
-            LoginResponseViewModel o15 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info15 };
-            LoginResponseViewModel o16 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info16 };
-            LoginResponseViewModel o17 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info17 };
-            users.Add(o1);
-            users.Add(o2);
-            users.Add(o3);
-            users.Add(o4);
-            users.Add(o5);
-            users.Add(o6);
-            users.Add(o7);
-            users.Add(o8);
-            users.Add(o11);
-            users.Add(o9);
-            users.Add(o10);
-            users.Add(o12);
-            users.Add(o13);
-            users.Add(o14);
-            users.Add(o15);
-            users.Add(o16);
-            users.Add(o17);
-            return users;
+            user_info1 = new officer_info
+            {
+                EmployeeName = "Junior Engineer",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee,Junior Engineer",
+                RoleID = "2,60",
+                DivisionID = "27",
+                DivisionName = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab, Chief Engineer Bbmb Nangal, Bbmb Nangal",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "je",
+                EmployeeId = "124",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info2 = new officer_info
+            {
+                EmployeeName = "Executive Engineer",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, DDO, Executive Engineer",
+                RoleID = "3,2,7",
+                DivisionID = "168,161,27",
+                DivisionName = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab, Chief Engineer Bbmb Nangal, Bbmb Nangal",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "xen",
+                EmployeeId = "123",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info12 = new officer_info
+            {
+                EmployeeName = "Sub Divisional Officer",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee,  Sub Divisional Officer",
+                RoleID = "2,67",
+                DivisionID = "27",
+                DivisionName = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "sdo",
+                EmployeeId = "125",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info3 = new officer_info
+            {
+                EmployeeName = "Superintending Engineer",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, Superintending Engineer",
+                RoleID = "2,8",
+                DivisionID = "209",
+                DivisionName = "Superintending Engineer Ropar  Drainage-cum-Mining & Geology Circle, WRD Punjab",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "se",
+                EmployeeId = "126",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info4 = new officer_info
+            {
+                EmployeeName = "XEN/DWS",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, XEN/DWS",
+                RoleID = "2,83",
+                DivisionID = "37",
+                DivisionName = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "dws",
+                EmployeeId = "127",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info5 = new officer_info
+            {
+                EmployeeName = "XEN HO Drainage",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, XEN HO Drainage",
+                RoleID = "2,128",
+                DivisionID = "37",
+                DivisionName = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "xenho",
+                EmployeeId = "128",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info6 = new officer_info
+            {
+                EmployeeName = "Chief Engineer",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, Chief Engineer",
+                RoleID = "2,10",
+                DivisionID = "37",
+                DivisionName = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "ce",
+                EmployeeId = "129",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info7 = new officer_info
+            {
+                EmployeeName = "ADE",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, ADE/DWS",
+                RoleID = "2,90",
+                DivisionID = "37",
+                DivisionName = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "ade",
+                EmployeeId = "134",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info8 = new officer_info
+            {
+                EmployeeName = "Director Drainage",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, Director Drainage",
+                RoleID = "2,35",
+                DivisionID = "37",
+                DivisionName = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "dd",
+                EmployeeId = "130",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info9 = new officer_info
+            {   
+                EmployeeName = "Principal Secretary",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, Principal Secretary",
+                RoleID = "2,6",
+                DivisionID = "37",
+                DivisionName = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "ps",
+                EmployeeId = "131",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            user_info10 = new officer_info { EmployeeName = "N", DeesignationName = "xyz", DesignationID = 1, RoleName = "Administrator", RoleID = 1.ToString(), DivisionID = 63.ToString(), DivisionName = "test", DistrictId = 22, DistrictName = "Amritsar", email = "admin", EmployeeId = "132", MobileNo = "231221234", SubdivisionName = "", SubdivisionId = 0 };
+            user_info11 = new officer_info
+            {               
+                EmployeeName = "Minister",
+                DeesignationName = "xyz",
+                DesignationID = 8,
+                RoleName = "Employee, Minister(WR)",
+                RoleID = "2,114",
+                DivisionID = "37",
+                DivisionName = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictId = 20,
+                DistrictName = "Rupnagar",
+                email = "minister",
+                EmployeeId = "133",
+                MobileNo = "231221234",
+                SubdivisionName = "",
+                SubdivisionId = 0
+            };
+            users.Add(user_info1);
+            users.Add(user_info2);
+            users.Add(user_info3);
+            users.Add(user_info4);
+            users.Add(user_info5);
+            users.Add(user_info6);
+            users.Add(user_info7);
+            users.Add(user_info8);
+            users.Add(user_info9);
+            users.Add(user_info10);
+            users.Add(user_info11);
+            users.Add(user_info12);
+            user_info.user_info = users;
+            user_info.Status = "200";
+            return user_info;
 
         }
-        //[Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        //[Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         //[Obsolete]
         private async Task<LoginResponseViewModel> LoadUserDetailById(string userid)
         {
-            string baseUrl = "https://wrdpbind.com/api/loginv7.php";
-            string salt = "7QCHhk5cJ6OMGfEE";
-            string checksum = "jOOwFCGMqKvJARC1tU6l8r77";
-            string combinedPassword = userid + "|" + checksum;
+            //int istest = Convert.ToInt16(_configuration["Testing"].ToString());
+            //if (istest == 0)
+            //{
+                string baseUrl = "https://wrdpbind.com/api/loginv7.php";
+                string salt = "7QCHhk5cJ6OMGfEE";
+                string checksum = "jOOwFCGMqKvJARC1tU6l8r77";
+                string combinedPassword = userid + "|" + checksum;
 
-            string plainText = combinedPassword;
-
-            var keyBytes = new byte[16];
-            var ivBytes = new byte[16];
-
-            string key = salt;
-            var keySalt = Encoding.UTF8.GetBytes(key);
-            var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
-
-            Array.Copy(pdb.GetBytes(16), keyBytes, 16);
-            Array.Copy(pdb.GetBytes(16), ivBytes, 16);
-            string encryptedString = NCC_encryptHelper(plainText, key, key);
-
-            HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
-            HttpClient client = new HttpClient(handler);
-            client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
-            var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
-            string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
-            if (resultContent.Contains("An error has occurred"))
-            {
-                ModelState.AddModelError(string.Empty, "An error has occurred.");
-                return null;
-            }
-            LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
-            return root;
-            
-        }
-        private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole, string subdivisionId, string divisionId, string circleid, string establishmentOfficeId)
-        {
-            try
-            {
-                string baseUrl = "";
-                string salt = "";
-                string checksum = "";
-                string combinedPassword = "";
-                string circleId = circleid;
-                
-                UserRoleDetails officer = (await GetAppRoleName(officerRole));
-                officerRole = officer.RoleName;
-                baseUrl = "https://wrdpbind.com/api/login6.php";
-                salt = "6WCHhk3cJ6OMGdRg";
-                checksum = "dTOwFCGMqKvJARC1tU6l4sv6";
-                combinedPassword = officerRole + "|" + divisionId + "|" + checksum;
                 string plainText = combinedPassword;
 
                 var keyBytes = new byte[16];
@@ -3002,46 +3287,519 @@ namespace Noc_App.Controllers
                 HttpClient client = new HttpClient(handler);
                 client.BaseAddress = new Uri(baseUrl);
                 client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("details", encryptedString);
+                client.DefaultRequestHeaders.Add("HASHEDDATA", encryptedString);
                 var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
-                string resultContent = //"[" + 
-                    tokenResponse1.Content.ReadAsStringAsync().Result;//.Replace("}{", "},{") + "]";
-                OfficerResponseViewModel1 list = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel1>(resultContent);
-                if (list.Status == "400")
+                string resultContent = tokenResponse1.Content.ReadAsStringAsync().Result;
+                if (resultContent.Contains("An error has occurred"))
                 {
+                    ModelState.AddModelError(string.Empty, "An error has occurred.");
                     return null;
                 }
-                else
-                {
-                    if (list != null)
+                LoginResponseViewModel root = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginResponseViewModel>(resultContent);
+                return root;
+            //}
+            //else
+            //{
+            //    var list = await FetchUserLogin();
+            //    LoginResponseViewModel root = list.FirstOrDefault(x => x.user_info.EmpID == userid);
+            //    return root;
+            //}
+        }
+        private async Task<List<LoginResponseViewModel>> FetchUserLogin()
+        {
+            List<LoginResponseViewModel> users = new List<LoginResponseViewModel>();
+            user_info user_info1 = new user_info();
+            user_info user_info2 = new user_info();
+            user_info user_info3 = new user_info();
+            user_info user_info4 = new user_info();
+            user_info user_info5 = new user_info();
+            user_info user_info6 = new user_info();
+            user_info user_info7 = new user_info();
+            user_info user_info8 = new user_info();
+            user_info user_info9 = new user_info();
+            user_info user_info10 = new user_info();
+            user_info user_info11 = new user_info();
+            user_info user_info12 = new user_info();
+            user_info user_info13 = new user_info();
+            user_info user_info14 = new user_info();
+            user_info user_info15 = new user_info();
+            user_info user_info16 = new user_info();
+            user_info user_info17 = new user_info();
+            //user_info1 =  new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 54, role = 10 }, new OfficeWiseRolesIds { office_id = 33, role = 60 }}, Name = "Junior Engineer",EmployeeName="N", Designation = "xyz", DesignationID = 1, Role = "Chief Engineer,Junior Engineer", RoleID = "10,60", DivisionID = 54.ToString(), Division = "Executive Engineer Shri Muktsar Sahib Drainage-cum-Mining &amp; Geology Division, WRD, Punjab", DistrictID = 22, District = "Mukatsar", EmailId = "juniorengineer", EmpID = "123", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+
+            user_info1 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
                     {
-                        if (list.Status == "200")
+                        new OfficeWiseRolesIds { office_id = 27, role = 60 },
+                        new OfficeWiseRolesIds { office_id = 27, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab", role_name = "Junior Engineer" },
+                        new OfficeWiseRolesNames { office_name = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab", role_name = "Employee" }
+                    },
+                Name = "Junior Engineer",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee,Junior Engineer",
+                RoleID = "2,60",
+                DivisionID = "27",
+                Division = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab, Chief Engineer Bbmb Nangal, Bbmb Nangal",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "je",
+                EmpID = "124",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info2 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 168, role = 3 },
+                        new OfficeWiseRolesIds { office_id = 168, role = 7 },
+                        new OfficeWiseRolesIds { office_id = 161, role = 3 },
+                        new OfficeWiseRolesIds { office_id = 161, role = 7 },
+                        new OfficeWiseRolesIds { office_id = 27, role = 3 },
+                        new OfficeWiseRolesIds { office_id = 27, role = 7 },
+                        new OfficeWiseRolesIds { office_id = 27, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "Bbmb Nangal", role_name = "DDO" },
+                        new OfficeWiseRolesNames { office_name = "Bbmb Nangal", role_name = "Executive Engineer" },
+                        new OfficeWiseRolesNames { office_name = "Chief Engineer Bbmb Nangal", role_name = "DDO" },
+                        new OfficeWiseRolesNames { office_name = "Chief Engineer Bbmb Nangal", role_name = "Executive Engineer" },
+                        new OfficeWiseRolesNames { office_name = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab", role_name = "DDO" },
+                        new OfficeWiseRolesNames { office_name = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab", role_name = "Executive Engineer" },
+                        new OfficeWiseRolesNames { office_name = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab", role_name = "Employee" }
+                    },
+                Name = "Executive Engineer",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, DDO, Executive Engineer",
+                RoleID = "3,2,7",
+                DivisionID = "168,161,27",
+                Division = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab, Chief Engineer Bbmb Nangal, Bbmb Nangal",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "xen",
+                EmpID = "123",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info12 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 27, role = 67 },
+                        new OfficeWiseRolesIds { office_id = 27, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab", role_name = "Sub Divisional Officer" },
+                        new OfficeWiseRolesNames { office_name = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab", role_name = "Employee" }
+                    },
+                Name = "Sub Divisional Officer",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee,  Sub Divisional Officer",
+                RoleID = "2,67",
+                DivisionID = "27",
+                Division = "Executive Engineer Sh Anandpur Sahib Drainage cum Mining and Geology Division WRD Punjab",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "sdo",
+                EmpID = "125",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info3 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 209, role = 8 },
+                        new OfficeWiseRolesIds { office_id = 209, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "Superintending Engineer Ropar  Drainage-cum-Mining & Geology Circle, WRD Punjab", role_name = "Superintending Engineer" },
+                        new OfficeWiseRolesNames { office_name = "Superintending Engineer Ropar  Drainage-cum-Mining & Geology Circle, WRD Punjab", role_name = "Employee" }
+                    },
+                Name = "Superintending Engineer",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, Superintending Engineer",
+                RoleID = "2,8",
+                DivisionID = "209",
+                Division = "Superintending Engineer Ropar  Drainage-cum-Mining & Geology Circle, WRD Punjab",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "se",
+                EmpID = "126",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info4 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 37, role = 83 },
+                        new OfficeWiseRolesIds { office_id = 37, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "XEN/DWS" },
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Employee" }
+                    },
+                Name = "XEN/DWS",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, XEN/DWS",
+                RoleID = "2,83",
+                DivisionID = "37",
+                Division = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "dws",
+                EmpID = "127",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info5 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 37, role = 128 },
+                        new OfficeWiseRolesIds { office_id = 37, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "XEN HO Drainage" },
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Employee" }
+                    },
+                Name = "XEN HO Drainage",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, XEN HO Drainage",
+                RoleID = "2,128",
+                DivisionID = "37",
+                Division = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "xenho",
+                EmpID = "128",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info6 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 37, role = 10 },
+                        new OfficeWiseRolesIds { office_id = 37, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Chief Engineer" },
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Employee" }
+                    },
+                Name = "Chief Engineer",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, Chief Engineer",
+                RoleID = "2,10",
+                DivisionID = "37",
+                Division = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "ce",
+                EmpID = "129",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info7 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 37, role = 90 },
+                        new OfficeWiseRolesIds { office_id = 37, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "ADE/DWS" },
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Employee" }
+                    },
+                Name = "ADE",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, ADE/DWS",
+                RoleID = "2,90",
+                DivisionID = "37",
+                Division = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "ade",
+                EmpID = "134",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info8 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 37, role = 35 },
+                        new OfficeWiseRolesIds { office_id = 37, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Director Drainage" },
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Employee" }
+                    },
+                Name = "Director Drainage",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, Director Drainage",
+                RoleID = "2,35",
+                DivisionID = "37",
+                Division = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "dd",
+                EmpID = "130",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info9 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 37, role = 6 },
+                        new OfficeWiseRolesIds { office_id = 37, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Principal Secretary" },
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Employee" }
+                    },
+                Name = "Principal Secretary",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, Principal Secretary",
+                RoleID = "2,6",
+                DivisionID = "37",
+                Division = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "ps",
+                EmpID = "131",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            user_info10 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 63, role = 1 } }, Name = "Administrator", EmployeeName = "N", Designation = "xyz", DesignationID = 1, Role = "Administrator", RoleID = 1.ToString(), DivisionID = 63.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "admin", EmpID = "132", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            user_info11 = new user_info
+            {
+                OfficeWiseRoleID = new List<OfficeWiseRolesIds>
+                    {
+                        new OfficeWiseRolesIds { office_id = 37, role = 114 },
+                        new OfficeWiseRolesIds { office_id = 37, role = 2 }
+                    },
+                OfficeWiseRoleName = new List<OfficeWiseRolesNames>
+                    {
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Minister(WR)" },
+                        new OfficeWiseRolesNames { office_name = "CHIEF ENGINEER DESIGN CHANDIGARH", role_name = "Employee" }
+                    },
+                Name = "Minister",
+                EmployeeName = "N",
+                Designation = "xyz",
+                DesignationID = 8,
+                Role = "Employee, Minister(WR)",
+                RoleID = "2,114",
+                DivisionID = "37",
+                Division = "CHIEF ENGINEER DESIGN CHANDIGARH",
+                DistrictID = 20,
+                District = "Rupnagar",
+                EmailId = "minister",
+                EmpID = "133",
+                MobileNo = "231221234",
+                SubDivision = "",
+                SubDivisionID = 0
+            };
+            //user_info11 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=54,role=7}} ,Name = "ExecutiveEngineer", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 54.ToString(), Division = "test", DistrictID = 22, District = "Amritsar", EmailId = "xen", EmpID = "15319", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            //user_info12 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=33,role=7}} ,Name = "XEN Faridkot", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 33.ToString(), Division = "test", DistrictID = 29, District = "Faridkot", EmailId = "xen2", EmpID = "15320", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            //user_info13 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=34,role=7}} ,Name = "XEN Mohali", EmployeeName = "N", Designation = "EXECUTIVE ENGINEER", DesignationID = 8, Role = "Executive Engineer", RoleID = 7.ToString(), DivisionID = 34.ToString(), Division = "\"Executive Engineer SAS Nagar Drainage-cum-Mining & Geology Division, WRD Punjab\"", DistrictID = 19, District = "Mohali", EmailId = "xenmohali", EmpID = "15321", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            //user_info14 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=34,role=60}} ,Name = "Junior Engineer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 34.ToString(), Division = "Mohali", DistrictID = 29, District = "Mohali", EmailId = "jemohali", EmpID = "1231", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            //user_info15 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=34,role=67}} ,Name = "Sub Divisional Officer Mohali", EmployeeName = "N", Designation = "xyz Mohali", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 34.ToString(), Division = "test", DistrictID = 29, District = "Mohali", EmailId = "sdomohali", EmpID = "1242", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            //user_info16 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id=33,role=60}} ,Name = "Junior Engineer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Junior Engineer", RoleID = "60", DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Mohali", EmailId = "jefaridkot", EmpID = "1233", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+            //user_info17 = new user_info { OfficeWiseRoleID = new List<OfficeWiseRolesIds> { new OfficeWiseRolesIds { office_id = 33, role = 67 }, new OfficeWiseRolesIds { office_id = 63, role = 60 }}, Name = "Sub Divisional Officer Faridkot", EmployeeName = "N", Designation = "xyz Faridkot", DesignationID = 1, Role = "Sub Divisional Officer", RoleID = 67.ToString(), DivisionID = 33.ToString(), Division = "Faridkot", DistrictID = 29, District = "Faridkot", EmailId = "sdofaridkot", EmpID = "1243", MobileNo = "231221234", SubDivision = "", SubDivisionID = 0 };
+
+            LoginResponseViewModel o1 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info1 };
+            LoginResponseViewModel o2 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info2 };
+            LoginResponseViewModel o3 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info3 };
+            LoginResponseViewModel o4 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info4 };
+            LoginResponseViewModel o5 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info5 };
+            LoginResponseViewModel o6 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info6 };
+            LoginResponseViewModel o7 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info7 };
+            LoginResponseViewModel o8 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info8 };
+            LoginResponseViewModel o9 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info9 };
+            LoginResponseViewModel o10 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info10 };
+            LoginResponseViewModel o11 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info11 };
+            LoginResponseViewModel o12 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info12 };
+            //LoginResponseViewModel o13 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info13 };
+            //LoginResponseViewModel o14 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info14 };
+            //LoginResponseViewModel o15 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info15 };
+            //LoginResponseViewModel o16 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info16 };
+            //LoginResponseViewModel o17 = new LoginResponseViewModel { msg = "success", Status = "200", user_info = user_info17 };
+            users.Add(o1);
+            users.Add(o2);
+            users.Add(o3);
+            users.Add(o4);
+            users.Add(o5);
+            users.Add(o6);
+            users.Add(o7);
+            users.Add(o8);
+            users.Add(o9);
+            users.Add(o10);
+            users.Add(o11);
+            users.Add(o12);
+            //users.Add(o13);
+            //users.Add(o14);
+            //users.Add(o15);
+            //users.Add(o16);
+            //users.Add(o17);
+            return users;
+
+        }
+        private async Task<List<OfficerResponseViewModel>> LoadOfficersAsync(string officerRole, string subdivisionId, string divisionId, string circleid, string establishmentOfficeId)
+        {
+            try
+            {
+                //int istest = Convert.ToInt16(_configuration["Testing"].ToString());
+                //if (istest == 0)
+                //{
+                    string baseUrl = "";
+                    string salt = "";
+                    string checksum = "";
+                    string combinedPassword = "";
+                    string circleId = circleid;
+
+                    UserRoleDetails officer = (await GetAppRoleName(officerRole));
+                    officerRole = officer.RoleName;
+                    baseUrl = "https://wrdpbind.com/api/login6.php";
+                    salt = "6WCHhk3cJ6OMGdRg";
+                    checksum = "dTOwFCGMqKvJARC1tU6l4sv6";
+                    combinedPassword = officerRole + "|" + divisionId + "|" + checksum;
+                    string plainText = combinedPassword;
+
+                    var keyBytes = new byte[16];
+                    var ivBytes = new byte[16];
+
+                    string key = salt;
+                    var keySalt = Encoding.UTF8.GetBytes(key);
+                    var pdb = new Rfc2898DeriveBytes(keySalt, keySalt, 1000);
+
+                    Array.Copy(pdb.GetBytes(16), keyBytes, 16);
+                    Array.Copy(pdb.GetBytes(16), ivBytes, 16);
+                    string encryptedString = NCC_encryptHelper(plainText, key, key);
+
+                    HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
+                    HttpClient client = new HttpClient(handler);
+                    client.BaseAddress = new Uri(baseUrl);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Add("details", encryptedString);
+                    var tokenResponse1 = await client.GetAsync(client.BaseAddress.ToString());
+                    string resultContent = //"[" + 
+                        tokenResponse1.Content.ReadAsStringAsync().Result;//.Replace("}{", "},{") + "]";
+                    OfficerResponseViewModel1 list = Newtonsoft.Json.JsonConvert.DeserializeObject<OfficerResponseViewModel1>(resultContent);
+                    if (list.Status == "400")
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        if (list != null)
                         {
-                            List<OfficerResponseViewModel> listOfficers = new List<OfficerResponseViewModel>();
-                            List<officer_info> officers = new List<officer_info>();
-
-                            //officers = circleId !="0"? list.user_info.FindAll(x => x.RoleName.Split(',').Any(r => r.Trim() == officerRole) && x.DivisionID.Split(',')
-                            //                                       .Any(id => id.Trim() == circleId)) : establishmentOfficeId != "0" ? list.user_info.FindAll(x => x.RoleName.Split(',').Any(r => r.Trim() == officerRole) && x.DivisionID.Split(',')
-                            //                                       .Any(id => id.Trim() == establishmentOfficeId)) : divisionId == "0" ? list.user_info.FindAll(x => x.RoleName.Split(',').Any(r => r.Trim() == officerRole)) : list.user_info.FindAll(x => x.RoleName.Split(',').Any(r => r.Trim() == officerRole) && x.DivisionID.Split(',')
-                            //                                       .Any(id => id.Trim() == divisionId));
-                            officers = list.user_info.FindAll(x => x.RoleName.Contains(officerRole) && x.DivisionID != null& x.DivisionID!="");
-
-                            foreach (officer_info user in officers)
+                            if (list.Status == "200")
                             {
+                                List<OfficerResponseViewModel> listOfficers = new List<OfficerResponseViewModel>();
+                                List<officer_info> officers = new List<officer_info>();
 
-                                OfficerResponseViewModel obj = new OfficerResponseViewModel
+                                officers = list.user_info.FindAll(x => x.RoleName.Contains(officerRole) && x.DivisionID != null & x.DivisionID != "");
+
+                                foreach (officer_info user in officers)
                                 {
-                                    msg = "success",
-                                    Status = "200",
-                                    user_info = new officer_info { UserName = user.UserName, EmployeeId = user.EmployeeId, EmployeeName = user.EmployeeName, email = user.email, DeesignationName = user.DeesignationName, DesignationID = user.DesignationID, DistrictId = user.DistrictId, DistrictName = user.DistrictName, DivisionID = user.DivisionID, DivisionName = user.DivisionName, MobileNo = user.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.SubdivisionId, SubdivisionName = user.SubdivisionName }
-                                };
-                                listOfficers.Add(obj);
-                            }
-                            return listOfficers;
 
+                                    OfficerResponseViewModel obj = new OfficerResponseViewModel
+                                    {
+                                        msg = "success",
+                                        Status = "200",
+                                        user_info = new officer_info { UserName = user.UserName, EmployeeId = user.EmployeeId, EmployeeName = user.EmployeeName, email = user.email, DeesignationName = user.DeesignationName, DesignationID = user.DesignationID, DistrictId = user.DistrictId, DistrictName = user.DistrictName, DivisionID = user.DivisionID, DivisionName = user.DivisionName, MobileNo = user.MobileNo, RoleID = officer.Id.ToString(), RoleName = officerRole, SubdivisionId = user.SubdivisionId, SubdivisionName = user.SubdivisionName }
+                                    };
+                                    listOfficers.Add(obj);
+                                }
+                                return listOfficers;
+
+                            }
                         }
                     }
-                }
+                //}
+                //else
+                //{
+                //    OfficerResponseViewModel1 list = FetchUser();
+                //    if (list.Status == "400")
+                //    {
+                //        return null;
+                //    }
+                //    else
+                //    {
+                //        if (list != null)
+                //        {
+                //            if (list.Status == "200")
+                //            {
+                //                List<OfficerResponseViewModel> listOfficers = new List<OfficerResponseViewModel>();
+                //                List<officer_info> officers = new List<officer_info>();
+                //                officerRole = (await GetAppRoleName(officerRole)).RoleName;
+                //                string roleid = (await GetRoleName(officerRole)).Id.ToString();
+                //                officers = list.user_info.FindAll(x => x.RoleName.Contains(officerRole) && x.DivisionID != null & x.DivisionID != "");
+
+                //                foreach (officer_info user in officers)
+                //                {
+
+                //                    OfficerResponseViewModel obj = new OfficerResponseViewModel
+                //                    {
+                //                        msg = "success",
+                //                        Status = "200",
+                //                        user_info = new officer_info { UserName = user.UserName, EmployeeId = user.EmployeeId, EmployeeName = user.EmployeeName, email = user.email, DeesignationName = user.DeesignationName, DesignationID = user.DesignationID, DistrictId = user.DistrictId, DistrictName = user.DistrictName, DivisionID = user.DivisionID, DivisionName = user.DivisionName, MobileNo = user.MobileNo, RoleID = roleid, RoleName = officerRole, SubdivisionId = user.SubdivisionId, SubdivisionName = user.SubdivisionName }
+                //                    };
+                //                    listOfficers.Add(obj);
+                //                }
+                //                return listOfficers;
+
+                //            }
+                //        }
+                //    }
+                //}
                 return null;
             }
 
@@ -3051,7 +3809,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DD")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DD")]
         private async Task<UserRoleDetails> GetAppRoleName(string rolename)
         {
             try
@@ -3065,7 +3823,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         private async Task<UserRoleDetails> GetRoleName(string rolename)
         {
             try
@@ -3078,7 +3836,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private async Task<List<OfficerDetails>> GetOfficerLastForwardedBy(string roleName, string lastForwardedByid)
         {
@@ -3136,7 +3894,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
         private async Task<List<OfficerDetails>> GetOfficer(string divisionId,string roleName,string subDivision,string circleid,string establishmentOfficeId)
         {
@@ -3373,14 +4131,23 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
         [Obsolete]
-        private async Task<List<DivisionDetails>> GetOfficerLocations(string divisionId, string roleName, string userid)
+        private async Task<List<DivisionDetails>> GetOfficerLocations(string divisionId, string roleName, string userid, string appId="")
         {
             try
             {
                 var role = roleName.Split(',');
                 List<DivisionDetails> RoleDetail = new List<DivisionDetails>();
+
+                var loggedInRoleName = LoggedInRoleName();
+
+                if (loggedInRoleName == "DIRECTOR DRAINAGE")
+                {
+                    GrantApprovalDetail approval = (from a in _repoApprovalDetail.GetAll() join g in _repo.GetAll() on a.GrantID equals (g.Id) where g.ApplicationID == appId orderby a.Id ascending select a).FirstOrDefault();
+                    divisionId = approval.FromLocationId.ToString();
+                }
+
                 for (int i = 0; i < role.Count(); i++)
                 {
                     LoginResponseViewModel root = await LoadUserDetailById(userid);
@@ -3534,9 +4301,9 @@ namespace Noc_App.Controllers
 
         [HttpPost]
         [Obsolete]
-        public async Task<IActionResult> GetOfficerLocation(string divisionId, string roleName, string userid)
+        public async Task<IActionResult> GetOfficerLocation(string divisionId, string roleName, string userid, string appId)
         {
-            var filtereddivisions = await GetOfficerLocations(divisionId,roleName,userid);
+            var filtereddivisions = await GetOfficerLocations(divisionId,roleName,userid, appId);
             var result = filtereddivisions.Select(div => new
             {
                 Id = div.Id,
