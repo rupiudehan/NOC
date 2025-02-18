@@ -13,5 +13,6 @@
         public string EXECUTIVE_ENGINEER_HQ { get; set; }
         public string CHIEF_ENGINEER_HQ { get; set; }
         public string PRINCIPAL_SECRETARY { get; set; }
+        public string MINISTER { get; set; }
     }
 }

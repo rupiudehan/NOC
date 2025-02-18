@@ -295,7 +295,7 @@ namespace Noc_App.Controllers
                 DivisionDetails divisions = new DivisionDetails();
             //if (divisionId == 0)
             {
-                if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "CHIEF ENGINEER DRAINAGE" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
+                if (role == "PRINCIPAL SECRETARY" || role == "MINISTER" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "CHIEF ENGINEER DRAINAGE" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
                 {
                     if (divisionId != 0)
                     {
@@ -430,10 +430,17 @@ namespace Noc_App.Controllers
                         "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER DRAINAGE","CHIEF ENGINEER DRAINAGE"
                     });
                     break;
+
+                case "MINISTER":
+                    list.Add(new object[]
+                    {
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER DRAINAGE","CHIEF ENGINEER DRAINAGE","PRINCIPAL SECRETARY"
+                    });
+                    break;
                 default:
                         list.Add(new object[]
                         {
-                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER DRAINAGE","CHIEF ENGINEER DRAINAGE","PRINCIPAL SECRETARY"
+                        "Division","JUNIOR ENGINEER","SUB DIVISIONAL OFFICER","EXECUTIVE ENGINEER","DWS","ADE","DIRECTOR DRAINAGE","CIRCLE OFFICER","EXECUTIVE ENGINEER DRAINAGE","CHIEF ENGINEER DRAINAGE","PRINCIPAL SECRETARY","MINISTER"
                         }); break;
                 }
 
@@ -507,13 +514,19 @@ namespace Noc_App.Controllers
                         item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
                         ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ)
                         }); break;
-                        break;
+                    case "MINISTER":
+                        list.Add(new object[]
+                                {
+                                item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
+                                ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),
+                                   Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ), Convert.ToInt32(item.PRINCIPAL_SECRETARY)
+                                }); break;
                     default:
                             list.Add(new object[]
                                {
                                 item.Division,Convert.ToInt32(item.JUNIOR_ENGINEER),Convert.ToInt32(item.SUB_DIVISIONAL_OFFICER), Convert.ToInt32(item.EXECUTIVE_ENGINEER)
                                 ,Convert.ToInt32(item.dws),Convert.ToInt32(item.ADE),Convert.ToInt32(item.DIRECTOR_DRAINAGE),Convert.ToInt32(item.CIRCLE_OFFICER),
-                                   Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ), Convert.ToInt32(item.PRINCIPAL_SECRETARY)
+                                   Convert.ToInt32(item.EXECUTIVE_ENGINEER_HQ), Convert.ToInt32(item.CHIEF_ENGINEER_HQ), Convert.ToInt32(item.PRINCIPAL_SECRETARY),Convert.ToInt32(item.MINISTER)
                                }); break;
                     }
                 }
@@ -561,7 +574,7 @@ namespace Noc_App.Controllers
                     DivisionDetails divisions = new DivisionDetails();
                 //if (divisionId == 0)
                 {
-                    if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "CHIEF ENGINEER DRAINAGE" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE")
+                    if (role == "PRINCIPAL SECRETARY" || role == "MINISTER" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "CHIEF ENGINEER DRAINAGE" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE")
                     {
                         if (divisionId != 0)
                         {
@@ -678,7 +691,7 @@ namespace Noc_App.Controllers
                     divisionId = Convert.ToInt32(divisionsId);
                     model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapplicationsXEN", divisionId)).ToList();
                 }
-                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER DRAINAGE" || roleName == "CHIEF ENGINEER DRAINAGE" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
+                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "MINISTER" || roleName == "EXECUTIVE ENGINEER DRAINAGE" || roleName == "CHIEF ENGINEER DRAINAGE" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
                 {
                     model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapplications", divisionId)).ToList();
                 }
@@ -711,7 +724,7 @@ namespace Noc_App.Controllers
                     divisionId = Convert.ToInt32(divisionsId);
                     model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapprovedapplicationsXEN", divisionId)).ToList();
                 }
-                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER DRAINAGE" || roleName == "CHIEF ENGINEER DRAINAGE" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
+                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "MINISTER" || roleName == "EXECUTIVE ENGINEER DRAINAGE" || roleName == "CHIEF ENGINEER DRAINAGE" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
                 {
                     model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalapprovedapplications", divisionId)).ToList();
                 }
@@ -744,7 +757,7 @@ namespace Noc_App.Controllers
                     divisionId = Convert.ToInt32(divisionsId);
                     model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalrejectedapplicationsXEN", divisionId)).ToList();
                 }
-                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER DRAINAGE" || roleName == "CHIEF ENGINEER DRAINAGE" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
+                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "MINISTER" || roleName == "EXECUTIVE ENGINEER DRAINAGE" || roleName == "CHIEF ENGINEER DRAINAGE" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
                 {
                     model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalrejectedapplications", divisionId)).ToList();
                 }
@@ -777,7 +790,7 @@ namespace Noc_App.Controllers
                     divisionId = Convert.ToInt32(divisionsId);
                     model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalpendingapplicationsXEN", divisionId)).ToList();
                 }
-                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "EXECUTIVE ENGINEER DRAINAGE" || roleName == "CHIEF ENGINEER DRAINAGE" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
+                else if (roleName == "PRINCIPAL SECRETARY" || roleName == "MINISTER" || roleName == "EXECUTIVE ENGINEER DRAINAGE" || roleName == "CHIEF ENGINEER DRAINAGE" || roleName == "DWS" || roleName == "ADE" || roleName == "DIRECTOR DRAINAGE" || roleName.ToUpper() == "ADMINISTRATOR")
                 {
                     model = (await _grantReportTotalAppDetailsRepo.ExecuteStoredProcedureAsync<ReportApplicationsViewModel>("gettotalpendingapplications", divisionId)).ToList();
                 }
