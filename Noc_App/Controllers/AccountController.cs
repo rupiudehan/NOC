@@ -659,7 +659,7 @@ namespace Noc_App.Controllers
 
                                             }
                                         }
-                                        else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128")
+                                        else if (role == "6" || role == "35" || role == "10" || role == "10" || role == "117" || role == "83" || role == "90" || role == "128" || role == "114")
                                         {
                                             RoleDetail = (from r in _estabOfficeRepository.GetAll().AsEnumerable()
                                                           join rr in LocationRoleDetail on r.Id equals rr.Location.office_id

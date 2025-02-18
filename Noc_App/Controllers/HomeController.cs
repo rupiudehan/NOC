@@ -108,7 +108,7 @@ namespace Noc_App.Controllers
             _grantPaymentRepo = grantPaymentRepo;
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         public IActionResult Index()
         {
             try
@@ -137,7 +137,7 @@ namespace Noc_App.Controllers
                 //if (role.ToUpper() == "ADMINISTRATOR") return View();
                 //else
                 //{
-                if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "CHIEF ENGINEER DRAINAGE" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
+                if (role == "PRINCIPAL SECRETARY" || role == "MINISTER" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "CHIEF ENGINEER DRAINAGE" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
                 {
                     divisions = _divisionRepo.GetAll().OrderBy(x => x.Name).ToList();
                 }
@@ -186,7 +186,7 @@ namespace Noc_App.Controllers
                 {
                     modelreport = _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscountXEN", "0", "0", "0", div).FirstOrDefault();
                 }
-                else if (role == "PRINCIPAL SECRETARY" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "CHIEF ENGINEER DRAINAGE" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
+                else if (role == "PRINCIPAL SECRETARY" || role == "MINISTER" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "CHIEF ENGINEER DRAINAGE" || role == "DWS" || role == "ADE" || role == "DIRECTOR DRAINAGE" || role.ToUpper() == "ADMINISTRATOR")
                 {
                     modelreport = _grantReportAppCountDetailsRepo.ExecuteStoredProcedure<ReportApplicationCountViewModel>("reportapplicationscount", "0", "0", "0", div).FirstOrDefault();
                 }
@@ -216,7 +216,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         public IActionResult ApplicationStatus()
         {
             try
@@ -254,7 +254,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public IActionResult GetSubDivisions(int divisionId)
         {
@@ -264,7 +264,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public async Task<IActionResult> GetRoleLevel(string divisiondetailId, string subdivisiondetailId, string role)
         {
@@ -521,7 +521,7 @@ namespace Noc_App.Controllers
             //}
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         private async Task<UserRoleDetails> GetAppRoleName(string rolename)
         {
             try
@@ -534,7 +534,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public async Task<IActionResult> GetRoleLevelPendencyReport(string divisiondetailId, string subdivisiondetailId, string role)
         {
@@ -660,7 +660,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public async Task<IActionResult> GetTotalApplicationReport(string divisiondetailId)
         {
@@ -695,7 +695,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public async Task<IActionResult> GetApprovedApplicationReport(string divisiondetailId)
         {
@@ -728,7 +728,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public async Task<IActionResult> GetRejectedApplicationReport(string divisiondetailId)
         {
@@ -761,7 +761,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         [HttpPost]
         public async Task<IActionResult> GetPendingApplicationReport(string divisiondetailId)
         {
@@ -795,7 +795,7 @@ namespace Noc_App.Controllers
         }
 
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,Administrator,DWS,EXECUTIVE ENGINEER DRAINAGE,ADE,DIRECTOR DRAINAGE")]
         private async Task<UserRoleDetails> GetRoleName(string rolename)
         {
             try
@@ -808,7 +808,7 @@ namespace Noc_App.Controllers
             }
         }
 
-        [Authorize(Roles = "PRINCIPAL SECRETARY,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE,Administrator")]
+        [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE,Administrator")]
         public async Task<IActionResult> ViewApplication(string Id)
         {
             try

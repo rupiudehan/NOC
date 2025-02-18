@@ -1066,16 +1066,16 @@ namespace Noc_App.Controllers
                 }
                 else forwardrole = forwardToRole;// (await GetAppRoleName(forwardToRole)).RoleName;
                 List<OfficerDetails> officerDetails = new List<OfficerDetails>();
-                GrantApprovalDetail approvalOfficer = new GrantApprovalDetail();
+                //GrantApprovalDetail approvalOfficer = new GrantApprovalDetail();
                 //if (forwardToRole == "EXECUTIVE ENGINEER")
                 //approvalOfficer = (from a in _repoApprovalDetail.GetAll() where a.GrantID == grant.Id && a.ProcessedByRole == forwardToRole orderby a.ProcessedOn descending select a).FirstOrDefault();
-                if (approvalOfficer == null)
-                {
+                //if (approvalOfficer == null)
+                //{
                     officerDetails = await GetOfficer(divisionId, forwardToRole, "0", circleIdd, estabOfficeid);
-                }
-                else {
-                    officerDetails = (await GetOfficerLastForwardedBy(forwardToRole, approvalOfficer.ProcessedBy));
-                }
+                //}
+                //else {
+                //    officerDetails = (await GetOfficerLastForwardedBy(forwardToRole, approvalOfficer.ProcessedBy));
+                //}
 
                 if (forwardToRole=="JUNIOR ENGINEER")
                 {
@@ -1112,7 +1112,7 @@ namespace Noc_App.Controllers
                 model.Officers = new SelectList(officerDetails, "UserId", "UserName");
                 string ErrorMessage = string.Empty;
                 model.FromLocationId = Convert.ToInt32(LoggedInDivisionID());
-                model.ToLocationId = approvalOfficer == null ? Convert.ToInt32(LoggedInDivisionID()) : approvalOfficer.FromLocationId;
+                model.ToLocationId = Convert.ToInt32(LoggedInDivisionID());
                 if (forwardedRole == "EXECUTIVE ENGINEER" || forwardedRole == "JUNIOR ENGINEER" || forwardedRole == "SUB DIVISIONAL OFFICER" || forwardedRole == "CIRCLE OFFICER" || forwardedRole == "DWS,CIRCLE OFFICER")
                 {
                     List<DivisionDetails> UserRoleLocation = await GetOfficerLocations(LoggedInDivisionID(), forwardedRole, model.SelectedOfficerId,grant.ApplicationID);
@@ -4236,7 +4236,7 @@ Divisions = new SelectList(divs, "Id", "Name"),
                                                                 ).ToList();
                             }
                         }
-                        else if (role[i] == "DWS" || role[i] == "EXECUTIVE ENGINEER DRAINAGE" || role[i] == "CHIEF ENGINEER DRAINAGE" || role[i] == "ADE" || role[i] == "DIRECTOR DRAINAGE" || role[i] == "PRINCIPAL SECRETARY" )
+                        else if (role[i] == "DWS" || role[i] == "EXECUTIVE ENGINEER DRAINAGE" || role[i] == "MINISTER" || role[i] == "CHIEF ENGINEER DRAINAGE" || role[i] == "ADE" || role[i] == "DIRECTOR DRAINAGE" || role[i] == "PRINCIPAL SECRETARY" )
                         {
                             var LocationRoleDetail = (from rr in root.user_info.OfficeWiseRoleID
                                                       join r in _userRolesRepository.GetAll().AsEnumerable() on rr.role equals r.Id
