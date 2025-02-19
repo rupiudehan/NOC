@@ -1,14 +1,14 @@
 ﻿@model IssueNocViewModelCreate
 @{
-    ViewBag.Title = Model.IsUnderMasterPlan?"Issue NOC": "Issue NOC";
+    ViewBag.Title = Model.IsSiteWithin150m ? "Issue NOC" : "Upload Exemption Letter";
 }
-@if (Model.IsUnderMasterPlan)
+@if (Model.IsSiteWithin150m)
 {
     <h1 class="h3 mb-4 text-gray-800">Issue NOC</h1>
 }
 else
 {
-    <h1 class="h3 mb-4 text-gray-800">Issue NOC</h1>
+    <h1 class="h3 mb-4 text-gray-800">Upload Exemption Letter</h1>
 }
 
 <div class="row">
@@ -18,13 +18,13 @@ else
         <!-- Circle Buttons -->
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                @if (Model.IsUnderMasterPlan)
+                @if (Model.IsSiteWithin150m)
                 {
                     <h6 class="m-0 font-weight-bold text-primary">Issue NOC</h6>
                 }
                 else
                 {
-                    <h6 class="m-0 font-weight-bold text-primary">Issue NOC</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Upload Exemption Letter</h6>
                 }
             </div>
             <div class="card-body">
@@ -68,11 +68,11 @@ else
                         }
                         <div class="col-lg-4">
                             <div class="form-group">
-                                @if (Model.IsUnderMasterPlan)
+                                @if (Model.IsSiteWithin150m)
                                 {
                                     <label asp-for="CertificateFile" class="control-label">Upload NOC</label>
                                 }else{
-                                <label asp-for="CertificateFile" class="control-label">Upload Certificate</label>
+                                    <label asp-for="CertificateFile" class="control-label">Upload Exemption Letter</label>
                                 }
                                 <span style="color:red"> (Max File (pdf) Size 4MB)</span>
                                 <div class="custom-file1">
@@ -86,9 +86,14 @@ else
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="row">
                         <div class="col-lg-6">
-
-                            <button type="submit" class="btn btn-primary btn-user btn-block">Issue</button>
-                        </div>
+                            @if (Model.IsSiteWithin150m)
+                            {
+                                <button type="submit" class="btn btn-primary btn-user btn-block">Issue</button>
+                            }
+                            else{
+                                <button type="submit" class="btn btn-primary btn-user btn-block">Upload</button>
+                            }
+                            </div>
                         <div class="col-lg-6">
                             <a class="btn btn-secondary btn-user btn-block" asp-controller="ApprovalProcess" asp-action="Index">Back To List</a>
                         </div>

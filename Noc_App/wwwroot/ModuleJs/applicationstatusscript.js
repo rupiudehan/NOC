@@ -46,7 +46,12 @@ function LoadReport(divisionId) {
                 // table.DataTable().clear().draw();
                 // table.DataTable().destroy();
                 // BindTable();
-            }
+            } else {
+                if ($.fn.DataTable.isDataTable('#dataTable')) {
+                    table.DataTable().destroy();
+                    body.empty();
+                }
+                BindTable(); }
 
         },
         failure: function (f) {

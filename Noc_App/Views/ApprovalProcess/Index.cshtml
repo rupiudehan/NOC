@@ -1,6 +1,6 @@
-﻿@model IEnumerable<List<GrantUnprocessedAppDetails>>;
+﻿@model IEnumerable<List<GrantPendingApplicationDetails>>;
 @{
-    List<GrantUnprocessedAppDetails>[] arry = new List<GrantUnprocessedAppDetails>[3];
+    List<GrantPendingApplicationDetails>[] arry = new List<GrantPendingApplicationDetails>[3];
     string str = "Manage Unprocessed/Forwarded Applications", str2 = "List Of Unprocessed/Forwarded Applications";
     if (Model != null && Model.Count() > 0)
     {
@@ -170,7 +170,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (GrantUnprocessedAppDetails data in arry[0])
+                                            @foreach (GrantPendingApplicationDetails data in arry[0])
                                             {
                                                 <tr>
                                                     <td>@count</td>
@@ -281,6 +281,11 @@
                                                                                     }
                                                                                     else
                                                                                     {
+                                                                                        @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.IsSiteWithin150m == false))
+                                                                                        {
+                                                                                            <td></td>
+                                                                                        }
+                                                                                        else{
                                                                                         if (data.IsUnderMasterPlan != true)
                                                                                         {
                                                                                             <td>
@@ -292,6 +297,7 @@
                                                                                         else
                                                                                         {
                                                                                             <td></td>
+                                                                                        }
                                                                                         }
                                                                                     }
                                                                                 }
@@ -430,49 +436,57 @@
                                                                         }
                                                                         else
                                                                         {
-                                                                            if (data.IsUnderMasterPlan)
+                                                                            @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.IsSiteWithin150m == false))
                                                                             {
-                                                                                if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.TotalArea <= 2 && (data.LastForwardedByRole == "" || data.LastForwardedByRole == null || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
-                                                                                @* if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "")) || (data.LoggedInRole == "JUNIOR ENGINEER") || (data.LoggedInRole == "SUB DIVISIONAL OFFICER"))) *@
-                                                                                {
-                                                                                    <td>
-                                                                                        <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
-                                                                                    </td>
-                                                                                }
-                                                                                else
-                                                                                @* if (((data.LastForwardedByRole != "SUB DIVISIONAL OFFICER"))) *@
-                                                                                {
-                                                                                    <th></th>
-                                                                                    <th></th>
-                                                                                }
+                                                                                <td></td>
+                                                                                <td></td>
                                                                             }
                                                                             else
                                                                             {
-                                                                                @if (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea > 25)
+                                                                                if (data.IsUnderMasterPlan)
                                                                                 {
-                                                                                    <td>
-                                                                                        <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
-                                                                                    </td>
-                                                                                }
-                                                                                else if (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE")
-                                                                                {
-                                                                                    <td>
-                                                                                        <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
-                                                                                    </td>
+                                                                                    if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.TotalArea <= 2 && (data.LastForwardedByRole == "" || data.LastForwardedByRole == null || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
+                                                                                    @* if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "")) || (data.LoggedInRole == "JUNIOR ENGINEER") || (data.LoggedInRole == "SUB DIVISIONAL OFFICER"))) *@
+                                                                                    {
+                                                                                        <td>
+                                                                                            <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
+                                                                                        </td>
+                                                                                    }
+                                                                                    else
+                                                                                    @* if (((data.LastForwardedByRole != "SUB DIVISIONAL OFFICER"))) *@
+                                                                                    {
+                                                                                        <td></td>
+                                                                                        <td></td>
+                                                                                    }
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    <td>
-                                                                                        <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
-                                                                                    </td>
-                                                                                }
+                                                                                    @if (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea > 25)
+                                                                                    {
+                                                                                        <td>
+                                                                                            <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                                                                        </td>
+                                                                                    }
+                                                                                    else if (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE")
+                                                                                    {
+                                                                                        <td>
+                                                                                            <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
+                                                                                        </td>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <td>
+                                                                                            <a asp-action="Forward" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning">Forward</a>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <a asp-action="ShortFall" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-warning" style="background-color:#ea9797;color:black;">Shortfall</a>
+                                                                                        </td>
+                                                                                    }
 
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -535,6 +549,12 @@
                                                             {
                                                                 if (arry[0].Any(x => x.IsPartiallyApproved == false))
                                                                 {
+                                                                    @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.IsSiteWithin150m == false))
+                                                                    {
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                    }
+                                                                    else { 
                                                                     if (arry[0].Any(x => (x.LoggedInRole == "EXECUTIVE ENGINEER" && (x.LastForwardedByRole == "" || x.LastForwardedByRole == null || x.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (x.LoggedInRole == "JUNIOR ENGINEER" && x.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((x.LoggedInRole == x.LastForwardedByRole) && (x.LoggedInRole == "JUNIOR ENGINEER" || x.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (x.LoggedInRole == "SUB DIVISIONAL OFFICER" && x.LastForwardedByRole == "JUNIOR ENGINEER")))
                                                                     {
                                                                         if (((data.LoggedInRole == "EXECUTIVE ENGINEER" && (data.LastForwardedByRole == "" || data.LastForwardedByRole == null || data.LastForwardedByRole == "EXECUTIVE ENGINEER")) || (data.LoggedInRole == "JUNIOR ENGINEER" && data.LastForwardedByRole == "EXECUTIVE ENGINEER") || ((data.LoggedInRole == data.LastForwardedByRole) && (data.LoggedInRole == "JUNIOR ENGINEER" || data.LoggedInRole == "SUB DIVISIONAL OFFICER")) || (data.LoggedInRole == "SUB DIVISIONAL OFFICER" && data.LastForwardedByRole == "JUNIOR ENGINEER")))
@@ -574,6 +594,7 @@
                                                                     }
                                                                 }
                                                             }
+                                                            }
                                                         }
                                                         @* else
                                             {
@@ -581,7 +602,7 @@
                                             } *@
                                                         @if (arry[0].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER") || x.LoggedInRole == "CHIEF ENGINEER DRAINAGE") && x.rejectionmust != 1))
                                                         {
-                                                            @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <=2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25))
+                                                            @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.IsSiteWithin150m == false))
                                                             {
                                                                 @if (data.rejectionmust != 1)
                                                                 {
@@ -589,84 +610,43 @@
                                                                     if (data.IsShortFall)
                                                                     {
                                                                         <td>Reverted Due to Discrepancy</td>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        if (data.IsUnderMasterPlan)
-                                                                        {
-                                                                            <td>
-                                                                                <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue NOC</a>
-
-                                                                            </td>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <td>
-                                                                                <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue NOC</a>
-
-                                                                            </td>
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-                                                                    <td></td>
-                                                                }
-                                                                if (data.rejectionmust != 1)
-                                                                {
-                                                                    if (data.IsShortFall)
-                                                                    {
                                                                         <td>Reverted Due to Discrepancy</td>
                                                                     }
                                                                     else
                                                                     {
                                                                         <td>
-                                                                            <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
-                                                                            @* <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a> *@
+                                                                            <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Upload Exemption Letter</a>
+
                                                                         </td>
+                                                                        <td></td>
                                                                     }
                                                                 }
                                                                 else
                                                                 {
+                                                                    <td></td>
                                                                     <td>
                                                                         <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
 
                                                                     </td>
                                                                 }
-
-
                                                             }
-                                                            else if ((data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25) || (data.LoggedInRole != "JUNIOR ENGINEER" && data.LoggedInRole != "SUB DIVISIONAL OFFICER" && !(data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2)))
+                                                            else
                                                             {
-                                                                if (data.rejectionmust != 1)
+                                                                @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25))
                                                                 {
-                                                                    if (data.IsShortFall)
+                                                                    @if (data.rejectionmust != 1)
                                                                     {
-                                                                        @* @if (arry[0].Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && x.TotalArea<=2) || data.LoggedInRole == "CHIEF ENGINEER DRAINAGE") *@
-                                                                        @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25))
+
+                                                                        if (data.IsShortFall)
                                                                         {
-                                                                            <td>Reverted Due to Discrepancy</td>
                                                                             <td>Reverted Due to Discrepancy</td>
                                                                         }
                                                                         else
-                                                                        {
-                                                                            <td></td>
-                                                                            <td></td>
-                                                                        }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        @* @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25)) *@
-                                                                        @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25))
                                                                         {
                                                                             if (data.IsUnderMasterPlan)
                                                                             {
                                                                                 <td>
                                                                                     <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue NOC</a>
-
-                                                                                </td>
-                                                                                <td>
-                                                                                    <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
 
                                                                                 </td>
                                                                             }
@@ -676,39 +656,111 @@
                                                                                     <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue NOC</a>
 
                                                                                 </td>
-                                                                                <td>
-                                                                                    <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
-
-                                                                                </td>
-                                                                            }
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            @if (arry[0].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && x.TotalArea<=2) || (x.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && x.TotalArea<25)) && x.rejectionmust != 1))
-                                                                            {
-                                                                                <td></td>
-                                                                                <td></td>
                                                                             }
                                                                         }
                                                                     }
-                                                                }
-                                                                else
-                                                                {
-                                                                    @* @if (arry[0].Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <=2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25)) *@
-                                                                    @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25))
+                                                                    else
                                                                     {
                                                                         <td></td>
+                                                                    }
+                                                                    if (data.rejectionmust != 1)
+                                                                    {
+                                                                        if (data.IsShortFall)
+                                                                        {
+                                                                            <td>Reverted Due to Discrepancy</td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td>
+                                                                                <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+                                                                                @* <a href="#" data-toggle="modal" data-target="#rejectModal" onclick="SetValue('@data.ApplicationID')" class="btn btn-danger">Reject</a> *@
+                                                                            </td>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
                                                                         <td>
                                                                             <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
 
                                                                         </td>
                                                                     }
+
+
+                                                                }
+                                                                else if ((data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25) || (data.LoggedInRole != "JUNIOR ENGINEER" && data.LoggedInRole != "SUB DIVISIONAL OFFICER" && !(data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2)))
+                                                                {
+                                                                    if (data.rejectionmust != 1)
+                                                                    {
+                                                                        if (data.IsShortFall)
+                                                                        {
+                                                                            @* @if (arry[0].Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && x.TotalArea<=2) || data.LoggedInRole == "CHIEF ENGINEER DRAINAGE") *@
+                                                                            @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25))
+                                                                            {
+                                                                                <td>Reverted Due to Discrepancy</td>
+                                                                                <td>Reverted Due to Discrepancy</td>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @* @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25)) *@
+                                                                            @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25))
+                                                                            {
+                                                                                if (data.IsUnderMasterPlan)
+                                                                                {
+                                                                                    <td>
+                                                                                        <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue NOC</a>
+
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+
+                                                                                    </td>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <td>
+                                                                                        <a asp-action="IssueNOC" asp-controller="ApprovalProcess" asp-route-id="@data.ApplicationID" class="btn btn-success">Issue NOC</a>
+
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+
+                                                                                    </td>
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                @if (arry[0].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && x.TotalArea <= 2) || (x.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && x.TotalArea < 25)) && x.rejectionmust != 1))
+                                                                                {
+                                                                                    <td></td>
+                                                                                    <td></td>
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
                                                                     else
                                                                     {
-                                                                        @if (arry[0].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && x.TotalArea <= 2) || (x.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && x.TotalArea < 25)) && x.rejectionmust != 1))
+                                                                        @* @if (arry[0].Any(x => x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <=2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25)) *@
+                                                                        @if ((data.LoggedInRole == "EXECUTIVE ENGINEER" && data.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && data.TotalArea <= 2) || (data.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && data.TotalArea < 25))
                                                                         {
                                                                             <td></td>
-                                                                            <td></td>
+                                                                            <td>
+                                                                                <a asp-action="Reject" asp-controller="ApprovalProcess" asp-route-Id="@data.ApplicationID" class="btn btn-danger">Reject</a>
+
+                                                                            </td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @if (arry[0].Any(x => ((x.LoggedInRole == "EXECUTIVE ENGINEER" && x.LastForwardedByRole == "SUB DIVISIONAL OFFICER" && x.TotalArea <= 2) || (x.LoggedInRole == "CHIEF ENGINEER DRAINAGE" && x.TotalArea < 25)) && x.rejectionmust != 1))
+                                                                            {
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -853,7 +905,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach (GrantUnprocessedAppDetails data in arry[1])
+                                                @foreach (GrantPendingApplicationDetails data in arry[1])
                                                 {
                                                     <tr>
                                                         <td>@count</td>
@@ -965,7 +1017,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach (GrantUnprocessedAppDetails data in arry[2])
+                                                @foreach (GrantPendingApplicationDetails data in arry[2])
                                                     {
                                                         <tr>
                                                             <td>@count</td>
@@ -1048,7 +1100,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach (GrantUnprocessedAppDetails data in arry[3])
+                                                @foreach (GrantPendingApplicationDetails data in arry[3])
                                                     {
                                                         <tr>
                                                             <td>@count</td>

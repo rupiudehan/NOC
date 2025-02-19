@@ -61,6 +61,7 @@ namespace Noc_App.Controllers
         private readonly IRepository<ProcessedApplicationsViewModel> _processedAppDetailsRepo;
         private readonly IRepository<TransferedApplicationsViewModel> _transferedAppDetailsRepo;
         private readonly IConfiguration _configuration;
+        private readonly IRepository<GrantPendingApplicationDetails> _grantPendingApplicationDetailsRepo;
 
 
         public ApprovalProcessController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
@@ -69,7 +70,7 @@ namespace Noc_App.Controllers
             IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IWebHostEnvironment hostingEnvironment, IEmailService emailService
             , IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,IRepository<GrantUnprocessedAppDetails> grantUnprocessedAppDetailsRepo
-            , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation
+            , ICalculations calculations, IRepository<SiteUnitMaster> repoSiteUnitMaster, IRepository<RecommendationDetail> repoRecommendation, IRepository<GrantPendingApplicationDetails> grantPendingApplicationDetailsRepo
             , IRepository<UserRoleDetails> userRolesRepository, IRepository<GrantSectionsDetails> grantsectionRepository, IRepository<DrainWidthTypeDetails> drainwidthRepository
             , IRepository<GrantRejectionShortfallSection> grantrejectionRepository, IRepository<PlanSanctionAuthorityMaster> repoPlanSanctionAuthtoryMaster
             , IRepository<GrantFileTransferDetails> grantFileTransferRepository, IRepository<CircleDivisionMapping> circleDivRepository, IRepository<TransferedApplicationsViewModel> transferedAppDetailsRepo
@@ -110,6 +111,7 @@ namespace Noc_App.Controllers
             _processedAppDetailsRepo = processedAppDetailsRepo;
             _transferedAppDetailsRepo = transferedAppDetailsRepo;
             _configuration = configuration;
+            _grantPendingApplicationDetailsRepo = grantPendingApplicationDetailsRepo;
         }
 
         [Authorize(Roles = "PRINCIPAL SECRETARY,MINISTER,EXECUTIVE ENGINEER,CIRCLE OFFICER,CHIEF ENGINEER DRAINAGE,DWS,EXECUTIVE ENGINEER DRAINAGE,JUNIOR ENGINEER,SUB DIVISIONAL OFFICER,ADE,DIRECTOR DRAINAGE")]
@@ -126,14 +128,14 @@ namespace Noc_App.Controllers
                 var roleName = LoggedInRoleName();
                 string role = roleName;
                 role = (await GetAppRoleName(role)).AppRoleName;
-                List<List<GrantUnprocessedAppDetails>> modelView = new List<List<GrantUnprocessedAppDetails>>();
-                List<GrantUnprocessedAppDetails> model = new List<GrantUnprocessedAppDetails>();
+                List<List<GrantPendingApplicationDetails>> modelView = new List<List<GrantPendingApplicationDetails>>();
+                List<GrantPendingApplicationDetails> model = new List<GrantPendingApplicationDetails>();
                 if (role == "PRINCIPAL SECRETARY" || role == "MINISTER" || role == "CHIEF ENGINEER DRAINAGE" || role== "EXECUTIVE ENGINEER DRAINAGE" || role== "DIRECTOR DRAINAGE" || role== "DWS" || role== "ADE")
                     divisionId = "0";
-                model =await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationstoforward", "0", "0", "0", "0", divisionId, "'" +role+"'", "'" + userId + "'");
-                var modelForwarded = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsforwarded", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
-                var modelRejected = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsrejected", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
-                var modelIssued = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsissued", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
+                model =await _grantPendingApplicationDetailsRepo.ExecuteStoredProcedureAsync<GrantPendingApplicationDetails>("getapplicationstoforward", "0", "0", "0", "0", divisionId, "'" +role+"'", "'" + userId + "'");
+                var modelForwarded = await _grantPendingApplicationDetailsRepo.ExecuteStoredProcedureAsync<GrantPendingApplicationDetails>("getapplicationsforwarded", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
+                var modelRejected = await _grantPendingApplicationDetailsRepo.ExecuteStoredProcedureAsync<GrantPendingApplicationDetails>("getapplicationsrejected", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
+                var modelIssued = await _grantPendingApplicationDetailsRepo.ExecuteStoredProcedureAsync<GrantPendingApplicationDetails>("getapplicationsissued", "0", "0", "0", "0", divisionId, "'" + role + "'", "'" + userId + "'");
                 //var modelShortfall = await _grantUnprocessedAppDetailsRepo.ExecuteStoredProcedureAsync<GrantUnprocessedAppDetails>("getapplicationsexpiredshortfall", "0", "0", "0", "0", "0", "'" + role + "'", "'" + userId + "'");
 
                 modelView.Add(model);
@@ -870,6 +872,7 @@ namespace Noc_App.Controllers
                                                           LoggedInRole = roleName,
                                                           Remarks="",
                                                           IsDrainNotified=false,
+                                                          IsSiteWithin150m=false,
                                                           TypeOfWidth= typeofwidth.Id,
                                                           IsUnderMasterPlan=g.IsUnderMasterPlan,
                                                           Recommendations = recommendations!=null && recommendations.Count()>0? new SelectList(recommendations, "Id", "Name"):null,
@@ -1349,7 +1352,8 @@ namespace Noc_App.Controllers
                                 IsDrainNotified = Convert.ToInt16(model.IsDrainNotified),
                                 TypeOfWidth = typeofwidth.Id,
                                 DrainWidth = model.DrainWidth,
-                                ProcessedByName = LoggedInUserName() + "(" + LoggedInDesignationName() + ")"
+                                ProcessedByName = LoggedInUserName() + "(" + LoggedInDesignationName() + ")",
+                                IsSiteWithin150m= model.IsSiteWithin150m
                             };
                             List<GrantApprovalProcessDocumentsDetails> approvalDocList = new List<GrantApprovalProcessDocumentsDetails>();
                             approvalDocList.Add(approvalObj);
@@ -1443,7 +1447,8 @@ namespace Noc_App.Controllers
                                   GrantApprovalId= app,
                                   IsDrainNotified = Convert.ToBoolean(doc.IsDrainNotified),
                                   TypeOfWidth = doc.TypeOfWidth??0,
-                                  DrainWidth = doc.DrainWidth
+                                  DrainWidth = doc.DrainWidth,
+                                  IsSiteWithin150m=doc.IsSiteWithin150m
                               }
                               ).FirstOrDefault();
                 if (model == null)
@@ -1466,7 +1471,8 @@ namespace Noc_App.Controllers
                                  GrantApprovalId = app,
                                  IsDrainNotified=false,
                                  TypeOfWidth=doc.TypeOfWidth??0,
-                                 DrainWidth=0
+                                 DrainWidth=0,
+                                 IsSiteWithin150m=false
                              }
                                       );
                     model = d.FirstOrDefault();
@@ -1698,6 +1704,7 @@ namespace Noc_App.Controllers
                     obj.GrantApprovalID = model.GrantApprovalId;
                     obj.IsDrainNotified = Convert.ToInt16(model.IsDrainNotified);
                     obj.TypeOfWidth= typeofwidth.Id;
+                    obj.IsSiteWithin150m = model.IsSiteWithin150m;
                     if(model.DrainWidth>0)
                     obj.DrainWidth = model.DrainWidth;
                         
@@ -2031,6 +2038,34 @@ Divisions = new SelectList(divs, "Id", "Name"),
                 return View("NotFound");
             }
             var approval = (await _repoApprovalDetail.FindAsync(x => x.GrantID == grant.Id)).OrderBy(x => x.Id).LastOrDefault();
+            GrantApprovalProcessDocumentsDetails approvalDocs = (from d in _repoApprovalDocument.GetAll()
+                                join a in _repoApprovalDetail.GetAll() on d.GrantApprovalID equals a.Id
+                                where a.ProcessLevel==2 && a.GrantID==grant.Id
+                                select new GrantApprovalProcessDocumentsDetails { Id=d.Id,
+                                    CatchmentAreaAndFlowPath=d.CatchmentAreaAndFlowPath,
+                                    CrossSectionOrCalculationSheetReportPath=d.CrossSectionOrCalculationSheetReportPath,
+                                    DistanceFromCreekPath=d.DistanceFromCreekPath,
+                                    DrainLSectionPath=d.DrainLSectionPath,
+                                    DrainWidth=d.DrainWidth,
+                                    DrainWidthType=d.DrainWidthType,
+                                    GISOrDWSReportPath=d.GISOrDWSReportPath,
+                                    GrantApprovalID=d.GrantApprovalID,
+                                    IsDrainNotified=d.IsDrainNotified,
+                                    IsKMLByApplicantValid=d.IsKMLByApplicantValid,
+                                    IsSiteWithin150m=d.IsSiteWithin150m,
+                                    IsUnderMasterPlan=d.IsUnderMasterPlan,
+                                    SiteConditionReportPath=d.SiteConditionReportPath,
+                                    TypeOfWidth=d.TypeOfWidth,
+                                    ProcessedBy=d.ProcessedBy,
+                                    ProcessedByName=d.ProcessedByName,
+                                    ProcessedByRole=d.ProcessedByRole,
+                                    ProcessedOn=d.ProcessedOn,
+                                    UpdatedBy=d.UpdatedBy,
+                                    UpdatedByName=d.UpdatedByName,
+                                    UpdatedByRole=d.UpdatedByRole,
+                                    UpdatedOn=d.UpdatedOn
+                                }
+                                ).FirstOrDefault();
             IssueNocViewModelCreate model = new IssueNocViewModelCreate();
             if (grant.IsUnderMasterPlan)
             {
@@ -2050,6 +2085,7 @@ Divisions = new SelectList(divs, "Id", "Name"),
                              IsPartiallyApproved=grant.IsPartiallyApproved,
                              PreviousRemarks= grant.IsPartiallyApproved?approval.Remarks:"",
                              PreviosAuthorityRole = grant.IsPartiallyApproved ? approval.ProcessedByRole : "",
+                             IsSiteWithin150m=approvalDocs.IsSiteWithin150m,
                              LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                          }).FirstOrDefault();
             }
@@ -2071,6 +2107,7 @@ Divisions = new SelectList(divs, "Id", "Name"),
                              IsPartiallyApproved = grant.IsPartiallyApproved,
                              PreviousRemarks = grant.IsPartiallyApproved ? approval.Remarks : "",
                              PreviosAuthorityRole= grant.IsPartiallyApproved ?approval.ProcessedByRole :"",
+                             IsSiteWithin150m = approvalDocs.IsSiteWithin150m,
                              LocationDetails = "Division: " + div.Name + ", Sub-Division: " + sub.Name + ", Tehsil/Block: " + t.Name + ", Village: " + g.VillageName + ", Pincode: " + g.PinCode,
                          }).FirstOrDefault();
             }

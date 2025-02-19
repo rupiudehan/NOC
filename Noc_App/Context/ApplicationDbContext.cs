@@ -52,6 +52,7 @@ namespace Noc_App.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<GrantPendingApplicationDetails>().HasNoKey();
             modelBuilder.Entity<GrantUnprocessedAppDetails>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyAll>().HasNoKey();
             modelBuilder.Entity<DashboardPendencyViewModel>().HasNoKey();

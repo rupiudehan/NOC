@@ -64,5 +64,7 @@ namespace Noc_App.Models.ViewModel
         public double DrainWidth { get; set; }
         public int FromLocationId { get; set; }
         public int ToLocationId { get; set; }
+        [Display(Name = "Is Site Within 150 meters?")]
+        public bool IsSiteWithin150m { get; set; }
     }
 }

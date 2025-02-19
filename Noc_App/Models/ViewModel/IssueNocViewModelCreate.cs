@@ -17,5 +17,6 @@ namespace Noc_App.Models.ViewModel
         public bool IsPartiallyApproved { get; set; }
         public string PreviousRemarks { get; set; }
         public string PreviosAuthorityRole { get; set; }
+        public bool IsSiteWithin150m { get; set; }
     }
 }

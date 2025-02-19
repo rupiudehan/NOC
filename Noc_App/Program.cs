@@ -118,6 +118,7 @@ builder.Services.AddScoped<IRepository<ProcessedApplicationsViewModel>, Reposito
 builder.Services.AddScoped<IRepository<ReportApplicationsViewModel>, Repository<ReportApplicationsViewModel>>();
 builder.Services.AddScoped<IRepository<TransferedApplicationsViewModel>, Repository<TransferedApplicationsViewModel>>();
 builder.Services.AddScoped<IRepository<UserSessionDetails>, Repository<UserSessionDetails>>();
+builder.Services.AddScoped<IRepository<GrantPendingApplicationDetails>, Repository<GrantPendingApplicationDetails>>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

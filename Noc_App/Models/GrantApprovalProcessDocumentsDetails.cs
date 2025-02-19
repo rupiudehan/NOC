@@ -30,5 +30,6 @@ namespace Noc_App.Models
         public string UpdatedByRole { get; set; }
         public string UpdatedByName { get; set; }
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
+        public bool IsSiteWithin150m { get; set; }
     }
 }

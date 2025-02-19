@@ -44,5 +44,7 @@ namespace Noc_App.Models.ViewModel
         public int TypeOfWidth { get; set; }
         [Display(Name = "Width")]
         public double DrainWidth { get; set; }
+        [Display(Name = "Is Site Within 150 meters?")]
+        public bool IsSiteWithin150m { get; set; }
     }
 }

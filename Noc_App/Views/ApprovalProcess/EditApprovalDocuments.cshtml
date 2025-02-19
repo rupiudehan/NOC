@@ -123,6 +123,12 @@
                                 <span asp-validation-for="DrainWidth" class="text-danger"></span>
                             </div>
                         </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <b><label asp-for="IsSiteWithin150m" class="control-label"></label></b>
+                                <input type="checkbox" id="IsSiteWithin150m" asp-for="IsSiteWithin150m" checked />
+                            </div>
+                        </div>
                     </div>
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="row">

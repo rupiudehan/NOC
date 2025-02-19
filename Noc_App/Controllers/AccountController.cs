@@ -294,8 +294,8 @@ namespace Noc_App.Controllers
                 if (model.Email!=null && model.Token != null && model.Password != null){
                     if (model.Email.Trim() != "" && model.Token.Trim() != "" && model.Password.Trim() != "")
                     {
-                        //if ((model.Email == "admin"))
-                        if ((model.Email == "xen" || model.Email == "je" || model.Email == "sdo" || model.Email == "se" || model.Email == "dws" || model.Email == "xenho" || model.Email == "ce" || model.Email == "ade" || model.Email == "dd" || model.Email == "ps" || model.Email == "minister" || model.Email == "admin"))
+                        if ((model.Email == "admin"))
+                        //if ((model.Email == "xen" || model.Email == "je" || model.Email == "sdo" || model.Email == "se" || model.Email == "dws" || model.Email == "xenho" || model.Email == "ce" || model.Email == "ade" || model.Email == "dd" || model.Email == "ps" || model.Email == "minister" || model.Email == "admin"))
                         {
                             LoginResponseViewModel root = FetchUser().Find(x => x.user_info.EmailId == model.Email && password == "123");
                             if (root != null)
@@ -428,7 +428,7 @@ namespace Noc_App.Controllers
 
                                             }
                                         }
-                                        else if (role == "60" || role == "67" || role == "7")
+                                        else if (role == "60" || role == "67" || role == "7" || role == "1")
                                         {
 
                                             RoleDetail = (from r in _divisionRepository.GetAll().AsEnumerable()

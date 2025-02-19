@@ -56,13 +56,14 @@ namespace Noc_App.Controllers
         private readonly IRepository<ChallanDetails> _repoChallanDetails;
         private readonly IConfiguration _configuration;
         private readonly IRepository<GrantPaymentDetails> _repoPayment;
+        private readonly IRepository<GrantApprovalProcessDocumentsDetails> _repoApprovalDocument;
 
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         [Obsolete]
         public GrantController(IRepository<GrantDetails> repo, /*IRepository<VillageDetails> villageRepo,*/ IRepository<TehsilBlockDetails> tehsilBlockRepo, IRepository<SubDivisionDetails> subDivisionRepo,
             IRepository<DivisionDetails> divisionRepo, IRepository<ProjectTypeDetails> projectTypeRepo, IRepository<NocPermissionTypeDetails> nocPermissionTypeRepo,
-            IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment,
+            IRepository<NocTypeDetails> nocTypeRepo, IRepository<OwnerTypeDetails> ownerTypeRepo, IHostingEnvironment hostingEnvironment, IRepository<GrantApprovalProcessDocumentsDetails> repoApprovalDocument,
             IRepository<GrantKhasraDetails> khasraRepo, IRepository<SiteAreaUnitDetails> siteUnitsRepo, IEmailService emailService, IConfiguration configuration,
             IRepository<GrantPaymentDetails> grantPaymentRepo, IRepository<OwnerDetails> grantOwnersRepo, IRepository<DistrictDetails> districtRepo,
             IRepository<GrantApprovalDetail> repoApprovalDetail, IWebHostEnvironment hostEnvironment, IRepository<SiteUnitMaster> repoSiteUnitMaster
@@ -99,6 +100,7 @@ namespace Noc_App.Controllers
             _repoChallanDetails = repoChallanDetails;
             _configuration = configuration;
             _repoPayment = repoPayment;
+            _repoApprovalDocument = repoApprovalDocument;
         }
 
         [AllowAnonymous]
@@ -293,6 +295,40 @@ namespace Noc_App.Controllers
         {
             if (searchString != null && searchString.Trim() != "")
             {
+                var docus = (from g in _repo.GetAll()
+                             join app in _repoApprovalDetail.GetAll() on g.Id equals app.GrantID
+                             join d in _repoApprovalDocument.GetAll() on app.Id equals d.GrantApprovalID
+                             where app.ProcessLevel == 2 && g.ApplicationID.ToLower() == searchString.Trim().ToLower()
+                                 select new GrantApprovalProcessDocumentsDetails
+                                 {
+                                     Id = d.Id,
+                                     CatchmentAreaAndFlowPath = d.CatchmentAreaAndFlowPath,
+                                     CrossSectionOrCalculationSheetReportPath = d.CrossSectionOrCalculationSheetReportPath,
+                                     DistanceFromCreekPath = d.DistanceFromCreekPath,
+                                     DrainLSectionPath = d.DrainLSectionPath,
+                                     DrainWidth = d.DrainWidth,
+                                     DrainWidthType = d.DrainWidthType,
+                                     GISOrDWSReportPath = d.GISOrDWSReportPath,
+                                     GrantApprovalID = d.GrantApprovalID,
+                                     IsDrainNotified = d.IsDrainNotified,
+                                     IsKMLByApplicantValid = d.IsKMLByApplicantValid,
+                                     IsSiteWithin150m = d.IsSiteWithin150m,
+                                     IsUnderMasterPlan = d.IsUnderMasterPlan,
+                                     SiteConditionReportPath = d.SiteConditionReportPath,
+                                     TypeOfWidth = d.TypeOfWidth,
+                                     ProcessedBy = d.ProcessedBy,
+                                     ProcessedByName = d.ProcessedByName,
+                                     ProcessedByRole = d.ProcessedByRole,
+                                     ProcessedOn = d.ProcessedOn,
+                                     UpdatedBy = d.UpdatedBy,
+                                     UpdatedByName = d.UpdatedByName,
+                                     UpdatedByRole = d.UpdatedByRole,
+                                     UpdatedOn = d.UpdatedOn
+                                 }
+                                ).ToList();
+                GrantApprovalProcessDocumentsDetails documents = new GrantApprovalProcessDocumentsDetails();
+                if(docus.Count()>0)
+                    documents = docus.FirstOrDefault();
                 var model = (from g in _repo.GetAll()
                              join p in _grantPaymentRepo.GetAll() on g.Id equals p.GrantID into grantPayment
                              from payment in grantPayment.DefaultIfEmpty()
@@ -336,11 +372,20 @@ namespace Noc_App.Controllers
                                                         : 
                                                             "UnProcessed" 
                                             : 
-                                                g.IsApproved ? 
-                                                    g.IsUnderMasterPlan ? 
-                                                        "NOC Issued" 
-                                                    : 
-                                                        "NOC Issued" 
+                                                g.IsApproved ?
+                                                    documents!=null?
+                                                        documents.IsSiteWithin150m==false ?
+                                                            "Exemption Letter Issued"
+                                                        :
+                                                            g.IsUnderMasterPlan ? 
+                                                                "NOC Issued" 
+                                                            : 
+                                                                "NOC Issued"
+                                                    :
+                                                        g.IsUnderMasterPlan ?
+                                                            "NOC Issued"
+                                                        :
+                                                            "NOC Issued"
                                                 : 
                                                     g.IsPartiallyApproved?
                                                         "Approved, but pending with " + approval.ProcessedToRole+" to upload NOC"
