@@ -42,9 +42,16 @@
                                 }
                                 @if (arry[3] != null && arry[3].Any())
                                 {
-                                    <a class="nav-item nav-link" id="nav-shortfall-tab" data-toggle="tab" href="#nav-shortfall" role="tab" aria-controls="nav-shortfall" aria-selected="false">Issued NOC</a>
+                                    @if (arry[3] != null && arry[3].Any() && arry[3].Any(x => x.LoggedInRole == "MINISTER" || x.LoggedInRole == "PRINCIPAL SECRETARY"))
+                                    {
+                                        <a class="nav-item nav-link" id="nav-shortfall-tab" data-toggle="tab" href="#nav-shortfall" role="tab" aria-controls="nav-shortfall" aria-selected="false">Approved</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="nav-item nav-link" id="nav-shortfall-tab" data-toggle="tab" href="#nav-shortfall" role="tab" aria-controls="nav-shortfall" aria-selected="false">Issued NOC</a>
+                                    }
                                 }
-                                @*  @if (arry[3] != null && arry[3].Any())
+                            @*  @if (arry[3] != null && arry[3].Any())
                             {
                             <a class="nav-item nav-link" id="nav-shortfall-tab" data-toggle="tab" href="#nav-shortfall" role="tab" aria-controls="nav-shortfall" aria-selected="false">Expired Shortfalls</a>
                             } *@
@@ -1095,7 +1102,9 @@
                                                         {
                                                             <th>Recommendations</th>
                                                         }
-                                                        <th>NOC Certificate</th>
+                                                       
+                                                            <th>NOC Certificate</th>
+                                                        
 
                                                     </tr>
                                                 </thead>
@@ -1121,9 +1130,17 @@
                                                                     </td>
                                                                 }
                                                             }
+
                                                             <td>
+                                                            @if (data.CertificateFilePath != null && data.CertificateFilePath != "")
+                                                            {
                                                                 <a href="@Url.Action("Download", "ApprovalProcess", new { fileName = data.CertificateFilePath })">Download</a>
-                                                            </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                @:NOC not issued yet
+                                                            }
+                                                        </td>
                                                         </tr>
                                                         count = count + 1;
                                                     }

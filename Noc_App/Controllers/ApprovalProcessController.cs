@@ -120,7 +120,7 @@ namespace Noc_App.Controllers
             try
             {
 
-                string userId=LoggedInUserID();
+                string userId = "0";// LoggedInUserID();
 
                     string divisionId = LoggedInDivisionID();
                 
@@ -163,6 +163,7 @@ namespace Noc_App.Controllers
                 var roleName = LoggedInRoleName();
                 string role = roleName;
                 role = (await GetAppRoleName(role)).AppRoleName;
+                userId = role;
                 if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER DRAINAGE" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "DIRECTOR DRAINAGE" || role == "DWS" || role == "ADE")
                     divisionId = "0";
                 List<TransferedApplicationsViewModel> model = new List<TransferedApplicationsViewModel>();
@@ -189,6 +190,7 @@ namespace Noc_App.Controllers
                 var roleName = LoggedInRoleName();
                 string role = roleName;
                 role = (await GetAppRoleName(role)).AppRoleName;
+                userId = role;
                 if (role == "PRINCIPAL SECRETARY" || role == "CHIEF ENGINEER DRAINAGE" || role == "EXECUTIVE ENGINEER DRAINAGE" || role == "DIRECTOR DRAINAGE" || role == "DWS" || role == "ADE")
                     divisionId = "0";
                 List<ProcessedApplicationsViewModel> model = new List<ProcessedApplicationsViewModel>();
